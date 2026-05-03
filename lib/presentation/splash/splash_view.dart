@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// Écran 01 — Splash Screen.
 ///
@@ -22,6 +26,7 @@ class _SplashViewState extends State<SplashView>
     with TickerProviderStateMixin {
   late final AnimationController _ringsCtrl;
   late final AnimationController _pulseCtrl;
+  Timer? _navTimer;
 
   @override
   void initState() {
@@ -35,12 +40,15 @@ class _SplashViewState extends State<SplashView>
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
 
-    // TODO(phase-0): naviguer vers /hub après 2.5s + reprise localStorage.
-    // Pour l'instant on reste sur le splash le temps de valider le rendu.
+    // Auto-transition vers Hub après 2.5s (cf. maquette p.3 Interactions).
+    _navTimer = Timer(const Duration(milliseconds: 2500), () {
+      if (mounted) context.go(AppRoutes.hub);
+    });
   }
 
   @override
   void dispose() {
+    _navTimer?.cancel();
     _ringsCtrl.dispose();
     _pulseCtrl.dispose();
     super.dispose();

@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/presentation/hub/hub_view.dart';
 import 'package:defi_kilimandjaro/presentation/splash/splash_view.dart';
 import 'package:go_router/go_router.dart';
 
@@ -24,7 +25,12 @@ final GoRouter appRouter = GoRouter(
       name: 'splash',
       builder: (_, __) => const SplashView(),
     ),
-    // TODO(phase-1): hub, game, result
+    GoRoute(
+      path: AppRoutes.hub,
+      name: 'hub',
+      builder: (_, __) => const HubView(),
+    ),
+    // TODO(phase-1.2): game, result
     // TODO(phase-2): map, mountain
     // TODO(phase-3): profile
     // TODO(phase-6): duel
