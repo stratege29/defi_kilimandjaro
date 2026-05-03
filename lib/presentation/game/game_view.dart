@@ -5,6 +5,8 @@ import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/answer_cells.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/circular_grid.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/timer_bar.dart';
+import 'package:defi_kilimandjaro/presentation/result/failure_view.dart';
+import 'package:defi_kilimandjaro/presentation/result/victory_view.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,19 +25,33 @@ class GameView extends ConsumerStatefulWidget {
 }
 
 class _GameViewState extends ConsumerState<GameView> {
+  bool _overlayShown = false;
+
   @override
   Widget build(BuildContext context) {
     final provider = gameControllerProvider(widget.devinette);
     final gameState = ref.watch(provider);
     final controller = ref.read(provider.notifier);
 
-    // Handle end states.
-    if (gameState.phase == GamePhase.won || gameState.phase == GamePhase.lost) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        _showEndOverlay(context, gameState.phase == GamePhase.won);
-      });
-    }
+    // Listen for phase transitions and show overlay exactly once per end state.
+    ref.listen<GameState>(provider, (previous, next) {
+      if (_overlayShown) return;
+      if (next.phase == GamePhase.won &&
+          (previous == null || previous.phase != GamePhase.won)) {
+        _overlayShown = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _showVictoryOverlay(context, next.timeLeft);
+        });
+      } else if (next.phase == GamePhase.lost &&
+          (previous == null || previous.phase != GamePhase.lost)) {
+        _overlayShown = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _showFailureOverlay(context, controller);
+        });
+      }
+    });
 
     return Scaffold(
       backgroundColor: AppColors.vertForet,
@@ -104,14 +120,36 @@ class _GameViewState extends ConsumerState<GameView> {
     );
   }
 
-  void _showEndOverlay(BuildContext ctx, bool won) {
+  void _showVictoryOverlay(BuildContext ctx, int timeLeft) {
     showDialog<void>(
       context: ctx,
       barrierDismissible: false,
-      builder: (_) => _EndOverlay(
-        won: won,
+      barrierColor: Colors.black.withValues(alpha: 0.92),
+      builder: (_) => VictoryView(
         devinette: widget.devinette,
-        onClose: () => ctx.pop(),
+        timeLeft: timeLeft,
+        onNext: () {
+          // Close overlay then return to hub.
+          ctx
+            ..pop() // closes dialog
+            ..pop(); // back to hub
+        },
+      ),
+    );
+  }
+
+  void _showFailureOverlay(BuildContext ctx, GameController controller) {
+    showDialog<void>(
+      context: ctx,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withValues(alpha: 0.92),
+      builder: (_) => FailureView(
+        devinette: widget.devinette,
+        onRetry: () {
+          ctx.pop(); // closes dialog
+          _overlayShown = false;
+          controller.restart();
+        },
       ),
     );
   }
@@ -388,88 +426,6 @@ class _GameButton extends StatelessWidget {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Overlay de fin de partie (victoire ou défaite) — stub Phase 1.3.
-class _EndOverlay extends StatelessWidget {
-  const _EndOverlay({
-    required this.won,
-    required this.devinette,
-    required this.onClose,
-  });
-
-  final bool won;
-  final Devinette devinette;
-  final VoidCallback onClose;
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: AppColors.vertForet,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: won ? AppColors.orSoleil : AppColors.rouge,
-            width: 2,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text(
-              won ? '🎉' : '⌛',
-              style: const TextStyle(fontSize: 48),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              won
-                  ? 'game.won'.tr()
-                  : 'game.lost'.tr(),
-              style: AppTypography.playfair(
-                size: 24,
-                color: won ? AppColors.orSoleil : AppColors.rouge,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              devinette.answer,
-              style: AppTypography.bebas(
-                size: 32,
-                color: won ? AppColors.orSoleil : AppColors.rouge,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              devinette.explanation,
-              textAlign: TextAlign.center,
-              style: AppTypography.crimson(
-                size: 14,
-                color: AppColors.ivoire.withValues(alpha: 0.85),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              '"${devinette.proverb}"',
-              textAlign: TextAlign.center,
-              style: AppTypography.crimson(
-                size: 13,
-                color: AppColors.tagline,
-                style: FontStyle.italic,
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: onClose,
-              child: Text('common.back'.tr()),
-            ),
-          ],
         ),
       ),
     );

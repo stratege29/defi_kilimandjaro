@@ -29,5 +29,16 @@
     "lost": "Time's up",
     "hint_cost": "-20 coins",
     "level": "Level"
+  },
+  "result": {
+    "victory": {
+      "coins_earned": "+{coins} 🪙 Wisdom Coins",
+      "next": "NEXT →"
+    },
+    "failure": {
+      "answer_was": "The answer was {answer}",
+      "retry": "TRY AGAIN 🔁",
+      "consolation": "Give it another shot! 🎯"
+    }
   }
 }

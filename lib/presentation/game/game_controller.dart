@@ -190,6 +190,20 @@ class GameController extends StateNotifier<GameState> {
     }
   }
 
+  /// Re-démarre la même devinette : re-shuffle, timer 30 s, sélection vide.
+  void restart() {
+    _timer?.cancel();
+    state = GameState(
+      devinette: state.devinette,
+      selectedIndices: const <int>[],
+      timeLeft: _gameDuration,
+      phase: GamePhase.playing,
+      coins: state.coins,
+      shuffledIndices: _shuffleIndices(state.devinette.lettersPool.length),
+    );
+    _startTimer();
+  }
+
   @override
   void dispose() {
     _timer?.cancel();

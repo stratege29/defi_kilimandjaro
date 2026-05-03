@@ -29,5 +29,16 @@
     "lost": "Temps écoulé",
     "hint_cost": "-20 pièces",
     "level": "Niveau"
+  },
+  "result": {
+    "victory": {
+      "coins_earned": "+{coins} 🪙 Coins de Sagesse",
+      "next": "SUIVANT →"
+    },
+    "failure": {
+      "answer_was": "La réponse était {answer}",
+      "retry": "RÉESSAYER 🔁",
+      "consolation": "Retente ta chance ! 🎯"
+    }
   }
 }

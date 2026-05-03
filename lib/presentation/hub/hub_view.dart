@@ -1,12 +1,13 @@
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
-import 'package:defi_kilimandjaro/data/datasources/mock_devinettes.dart';
 import 'package:defi_kilimandjaro/data/datasources/mock_worlds.dart';
+import 'package:defi_kilimandjaro/data/repositories/devinette_repository_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/world.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/world_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Écran 02 — Hub des Mondes (cf. maquette p.4).
@@ -15,17 +16,17 @@ import 'package:go_router/go_router.dart';
 /// - Header : Logo + coins + niveau joueur
 /// - 4 cartes mondes verticales (défilable)
 /// - Bottom nav : Jouer / Afrique / Profil
-class HubView extends StatefulWidget {
+class HubView extends ConsumerStatefulWidget {
   const HubView({super.key});
 
   @override
-  State<HubView> createState() => _HubViewState();
+  ConsumerState<HubView> createState() => _HubViewState();
 }
 
-class _HubViewState extends State<HubView> {
+class _HubViewState extends ConsumerState<HubView> {
   NavTab _currentTab = NavTab.jouer;
 
-  void _onWorldTap(BuildContext context, World world) {
+  Future<void> _onWorldTap(BuildContext context, World world) async {
     if (!world.unlocked) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -38,8 +39,24 @@ class _HubViewState extends State<HubView> {
       );
       return;
     }
-    // Phase 1.2: navigate to game screen with mock devinette for visual validation.
-    context.push(AppRoutes.game, extra: foutouDevinette);
+
+    try {
+      final repo = ref.read(devinetteRepositoryProvider);
+      final devinette = await repo.randomFromWorld(world.id);
+      if (!context.mounted) return;
+      await context.push<void>(AppRoutes.game, extra: devinette);
+    } on Exception catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Aucune devinette disponible pour ${world.name}',
+            style: AppTypography.bebas(),
+          ),
+          backgroundColor: AppColors.rouge,
+        ),
+      );
+    }
   }
 
   @override
