@@ -53,17 +53,21 @@ class _SplashViewState extends State<SplashView>
       body: SafeArea(
         child: Stack(
           alignment: Alignment.center,
+          fit: StackFit.expand,
           children: [
-            // Cercles concentriques animés
-            AnimatedBuilder(
-              animation: _ringsCtrl,
-              builder: (_, __) => CustomPaint(
-                size: const Size.square(320),
-                painter: _ConcentricRingsPainter(progress: _ringsCtrl.value),
+            // Cercles concentriques animés (taille fixe centrée)
+            Center(
+              child: AnimatedBuilder(
+                animation: _ringsCtrl,
+                builder: (_, __) => CustomPaint(
+                  size: const Size.square(320),
+                  painter: _ConcentricRingsPainter(progress: _ringsCtrl.value),
+                ),
               ),
             ),
             // Logo central
             Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text('K', style: AppTypography.logoK),
