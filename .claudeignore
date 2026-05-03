@@ -1,0 +1,60 @@
+# Build artifacts
+build/
+.dart_tool/
+**/build/
+**/.dart_tool/
+
+# Generated code
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+*.config.dart
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework/
+ios/Flutter/App.framework/
+ios/Flutter/ephemeral/
+
+# Android
+android/.gradle/
+android/app/.cxx/
+
+# Cloud Functions deps
+functions/node_modules/
+functions/lib/
+
+# Test artifacts
+coverage/
+
+# Lock files (keep summary, not internals)
+*.lock.json
+package-lock.json
+
+# Binary assets — only summarize don't read
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.webp
+**/*.mp3
+**/*.wav
+**/*.ogg
+**/*.mp4
+**/*.mov
+
+# Release artifacts
+artifacts/
+*.ipa
+*.aab
+*.apk
+
+# OS / IDE noise
+.DS_Store
+.idea/
+.vscode/
+
+# Logs
+*.log
+firebase-debug.log
+firestore-debug.log

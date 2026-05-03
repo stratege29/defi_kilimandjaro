@@ -1,0 +1,22 @@
+{
+  "app": {
+    "name": "Kilimandjaro",
+    "tagline": "Sagesse Ivoirienne"
+  },
+  "splash": {
+    "loading": "Chargement..."
+  },
+  "common": {
+    "next": "Suivant",
+    "retry": "Réessayer",
+    "validate": "Valider",
+    "hint": "Indice",
+    "clear": "Effacer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer"
+  },
+  "error": {
+    "generic": "Une erreur est survenue",
+    "network": "Pas de connexion Internet"
+  }
+}

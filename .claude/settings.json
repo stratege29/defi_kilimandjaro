@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "MAX_THINKING_TOKENS": "10000",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "haiku",
+    "FLUTTER_SUPPRESS_ANALYTICS": "true"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(flutter:*)",
+      "Bash(dart:*)",
+      "Bash(fvm:*)",
+      "Bash(pod:*)",
+      "Bash(gem:*)",
+      "Bash(bundle:*)",
+      "Bash(firebase:*)",
+      "Bash(flutterfire:*)",
+      "Bash(gh:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git branch:*)",
+      "Bash(git switch:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(yarn:*)",
+      "Bash(pnpm:*)",
+      "Bash(node:*)",
+      "Bash(tsc:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(open:*)",
+      "Read(./**)",
+      "Edit(./**)",
+      "Write(./**)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/google-services.json)",
+      "Read(**/GoogleService-Info.plist)",
+      "Read(**/serviceAccountKey.json)",
+      "Read(**/*-firebase-adminsdk-*.json)",
+      "Read(**/keystore.jks)",
+      "Read(**/upload-keystore.jks)",
+      "Read(**/key.properties)",
+      "Read(**/Pods/**)",
+      "Read(**/build/**)",
+      "Read(**/.dart_tool/**)",
+      "Bash(rm -rf:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_TOOL_FILE_PATH\" == *.dart ]]; then dart format \"$CLAUDE_TOOL_FILE_PATH\" 2>/dev/null || true; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_TOOL_FILE_PATH\" == */lib/*.dart ]]; then cd \"$(dirname \"$CLAUDE_TOOL_FILE_PATH\" | sed 's|/lib/.*||')\" && flutter analyze --no-pub 2>&1 | head -20 || true; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [[ \"$CLAUDE_TOOL_FILE_PATH\" == *.ts ]] && [[ \"$CLAUDE_TOOL_FILE_PATH\" == */functions/* ]]; then cd \"$(echo $CLAUDE_TOOL_FILE_PATH | sed 's|/functions/.*|/functions|')\" && npx tsc --noEmit 2>&1 | head -10 || true; fi"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE '(rm -rf|--force|--no-verify)'; then echo 'BLOCKED: dangerous command detected'; exit 2; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE '(AIza[0-9A-Za-z_-]{35}|sk-[a-zA-Z0-9]{32,}|firebase-adminsdk)'; then echo 'BLOCKED: potential secret detected in content'; exit 2; fi"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_USER_PROMPT\" | grep -qiE '(palette|design|couleur|theme|maquette)'; then echo 'CONTEXT: palette officielle Kilimandjaro — Vert forêt #1a3a20 (fond), Vert clair #4a9e58 (succès/CTA), Or soleil #f0c040 (titres/coins), Or chaud #e8a020, Bois #c8843a (tuiles), Bois foncé #7c4e1e, Ivoire #f5ead0 (texte), Rouge #c0392b (erreur). Typos: Bebas Neue (titres), Playfair Display (mots), Crimson Pro (texte). Voir docs/maquette.pdf p.2.'; fi"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "echo \"🏔️  Kilimandjaro · $(git branch --show-current 2>/dev/null || echo 'no-git') · $(date +%H:%M)\""
+  }
+}

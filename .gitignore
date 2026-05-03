@@ -1,0 +1,109 @@
+# ====== Flutter / Dart ======
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+**/build/
+**/.dart_tool/
+*.lock
+!pubspec.lock
+!package-lock.json
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.gr.dart
+*.config.dart
+**/*.mocks.dart
+
+# IDE
+.idea/
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+*.iml
+*.ipr
+*.iws
+
+# ====== iOS ======
+**/ios/Flutter/.last_build_id
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Pods/
+ios/.symlinks/
+ios/Runner.xcworkspace/xcuserdata/
+ios/Runner.xcodeproj/xcuserdata/
+ios/Runner.xcodeproj/project.xcworkspace/xcuserdata/
+ios/Flutter/App.framework/
+ios/Flutter/Flutter.framework/
+ios/Flutter/Flutter.podspec
+ios/Flutter/ephemeral/
+
+# ====== Android ======
+android/.gradle/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/app/.cxx/
+android/app/release/
+android/app/debug/
+
+# ====== Secrets / Firebase ======
+**/google-services.json
+**/GoogleService-Info.plist
+**/firebase_options.dart
+.firebase/
+.firebaserc
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+**/*-firebase-adminsdk-*.json
+serviceAccountKey.json
+
+# Signing
+**/key.properties
+**/upload-keystore.jks
+**/keystore.jks
+*.p8
+*.p12
+*.mobileprovision
+*.cer
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# ====== Cloud Functions ======
+functions/node_modules/
+functions/lib/
+functions/.runtimeconfig.json
+functions/coverage/
+functions/.eslintcache
+functions/npm-debug.log
+
+# ====== Tests ======
+coverage/
+test/.test_coverage.dart
+
+# ====== OS ======
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ====== Build artifacts ======
+artifacts/
+*.ipa
+*.aab
+*.apk
+*.app
+
+# ====== Claude Code (local overrides) ======
+.claude/settings.local.json
+CLAUDE.local.md
+.claude/cache/

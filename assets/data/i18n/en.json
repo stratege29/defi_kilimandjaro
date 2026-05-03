@@ -1,0 +1,22 @@
+{
+  "app": {
+    "name": "Kilimandjaro",
+    "tagline": "Ivorian Wisdom"
+  },
+  "splash": {
+    "loading": "Loading..."
+  },
+  "common": {
+    "next": "Next",
+    "retry": "Try again",
+    "validate": "Validate",
+    "hint": "Hint",
+    "clear": "Clear",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "error": {
+    "generic": "An error occurred",
+    "network": "No internet connection"
+  }
+}
