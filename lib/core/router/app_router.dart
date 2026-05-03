@@ -1,14 +1,14 @@
+import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:defi_kilimandjaro/presentation/game/game_view.dart';
 import 'package:defi_kilimandjaro/presentation/hub/hub_view.dart';
 import 'package:defi_kilimandjaro/presentation/splash/splash_view.dart';
 import 'package:go_router/go_router.dart';
 
 /// Routes nommées de l'application.
-///
-/// Les écrans 02-08 seront branchés au fil des phases (cf. plan.md §2).
 abstract final class AppRoutes {
   static const splash = '/';
   static const hub = '/hub';
-  static const game = '/game/:levelId';
+  static const game = '/game';
   static const result = '/result';
   static const map = '/map';
   static const mountain = '/mountain/:countryCode';
@@ -19,7 +19,7 @@ abstract final class AppRoutes {
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.splash,
   debugLogDiagnostics: true,
-  routes: [
+  routes: <RouteBase>[
     GoRoute(
       path: AppRoutes.splash,
       name: 'splash',
@@ -30,7 +30,15 @@ final GoRouter appRouter = GoRouter(
       name: 'hub',
       builder: (_, __) => const HubView(),
     ),
-    // TODO(phase-1.2): game, result
+    GoRoute(
+      path: AppRoutes.game,
+      name: 'game',
+      builder: (_, state) {
+        final devinette = state.extra! as Devinette;
+        return GameView(devinette: devinette);
+      },
+    ),
+    // TODO(phase-1.3): result (victory / failure screens)
     // TODO(phase-2): map, mountain
     // TODO(phase-3): profile
     // TODO(phase-6): duel

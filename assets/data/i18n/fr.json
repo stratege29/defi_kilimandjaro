@@ -13,10 +13,21 @@
     "hint": "Indice",
     "clear": "Effacer",
     "cancel": "Annuler",
-    "confirm": "Confirmer"
+    "confirm": "Confirmer",
+    "back": "Retour"
   },
   "error": {
     "generic": "Une erreur est survenue",
     "network": "Pas de connexion Internet"
+  },
+  "game": {
+    "back": "Retour",
+    "hint": "Indice",
+    "clear": "Effacer",
+    "validate": "Valider",
+    "won": "Bravo !",
+    "lost": "Temps écoulé",
+    "hint_cost": "-20 pièces",
+    "level": "Niveau"
   }
 }

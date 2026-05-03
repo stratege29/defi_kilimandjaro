@@ -1,10 +1,13 @@
+import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/data/datasources/mock_devinettes.dart';
 import 'package:defi_kilimandjaro/data/datasources/mock_worlds.dart';
 import 'package:defi_kilimandjaro/domain/entities/world.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/world_card.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// Écran 02 — Hub des Mondes (cf. maquette p.4).
 ///
@@ -35,17 +38,8 @@ class _HubViewState extends State<HubView> {
       );
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Niveau ${world.completedLevels + 1} de ${world.name}',
-          style: AppTypography.bebas(),
-        ),
-        backgroundColor: AppColors.vertClair,
-        duration: const Duration(seconds: 1),
-      ),
-    );
-    // TODO(phase-1.2): context.push('/game/${world.id}/${world.completedLevels + 1}');
+    // Phase 1.2: navigate to game screen with mock devinette for visual validation.
+    context.push(AppRoutes.game, extra: foutouDevinette);
   }
 
   @override

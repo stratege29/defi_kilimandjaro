@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/audio/audio_engine.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_theme.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  await AudioEngine.instance.init();
 
   SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlay);
   await SystemChrome.setPreferredOrientations([

@@ -13,10 +13,21 @@
     "hint": "Hint",
     "clear": "Clear",
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "back": "Back"
   },
   "error": {
     "generic": "An error occurred",
     "network": "No internet connection"
+  },
+  "game": {
+    "back": "Back",
+    "hint": "Hint",
+    "clear": "Clear",
+    "validate": "Validate",
+    "won": "Well done!",
+    "lost": "Time's up",
+    "hint_cost": "-20 coins",
+    "level": "Level"
   }
 }
