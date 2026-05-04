@@ -97,7 +97,17 @@ class _HubViewState extends ConsumerState<HubView> {
       ),
       bottomNavigationBar: AppBottomNavBar(
         current: _currentTab,
-        onTabSelected: (t) => setState(() => _currentTab = t),
+        onTabSelected: (t) {
+          switch (t) {
+            case NavTab.jouer:
+              setState(() => _currentTab = t);
+            case NavTab.afrique:
+              context.go(AppRoutes.mountains);
+            case NavTab.profil:
+              setState(() => _currentTab = t);
+              // TODO(phase-3): context.go('/profile');
+          }
+        },
       ),
     );
   }

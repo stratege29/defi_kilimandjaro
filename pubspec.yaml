@@ -47,6 +47,7 @@ flutter:
   generate: true
 
   assets:
+    - assets/data/
     - assets/data/devinettes/
     - assets/data/i18n/
     - assets/svg/
