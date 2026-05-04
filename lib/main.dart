@@ -4,7 +4,10 @@ import 'package:defi_kilimandjaro/core/theme/app_theme.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/firebase_options.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +17,20 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await AudioEngine.instance.init();
+
+  // Firebase: initialize then ensure an anonymous session exists so
+  // every player has a UID for duels even before signing in with
+  // Google/Apple (Phase 6.1+).
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    if (FirebaseAuth.instance.currentUser == null) {
+      await FirebaseAuth.instance.signInAnonymously();
+    }
+  } on Exception catch (_) {
+    // Fail-soft: solo gameplay continues without backend if Firebase fails.
+  }
 
   final prefs = await SharedPreferences.getInstance();
 

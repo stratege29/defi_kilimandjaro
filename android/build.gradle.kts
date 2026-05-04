@@ -5,6 +5,13 @@ allprojects {
     }
 }
 
+buildscript {
+    dependencies {
+        // Firebase: google-services Gradle plugin (consumed by app/build.gradle.kts).
+        classpath("com.google.gms:google-services:4.4.2")
+    }
+}
+
 val newBuildDir: Directory =
     rootProject.layout.buildDirectory
         .dir("../../build")
