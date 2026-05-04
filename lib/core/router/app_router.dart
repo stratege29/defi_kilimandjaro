@@ -5,6 +5,7 @@ import 'package:defi_kilimandjaro/presentation/game/game_view.dart';
 import 'package:defi_kilimandjaro/presentation/hub/hub_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_detail_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_list_view.dart';
+import 'package:defi_kilimandjaro/presentation/profile/profile_view.dart';
 import 'package:defi_kilimandjaro/presentation/splash/splash_view.dart';
 import 'package:go_router/go_router.dart';
 
@@ -59,7 +60,11 @@ final GoRouter appRouter = GoRouter(
         mountain: state.extra! as Mountain,
       ),
     ),
-    // TODO(phase-3): profile
+    GoRoute(
+      path: AppRoutes.profile,
+      name: 'profile',
+      builder: (_, __) => const ProfileView(),
+    ),
     // TODO(phase-6): duel
   ],
 );

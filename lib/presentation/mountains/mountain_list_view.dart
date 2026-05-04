@@ -89,8 +89,7 @@ class _MountainListViewState extends ConsumerState<MountainListView> {
             case NavTab.afrique:
               break;
             case NavTab.profil:
-              // TODO(phase-3): /profile
-              break;
+              context.go(AppRoutes.profile);
           }
         },
       ),

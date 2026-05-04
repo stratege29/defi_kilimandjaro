@@ -110,8 +110,7 @@ class _HubViewState extends ConsumerState<HubView> {
             case NavTab.afrique:
               context.go(AppRoutes.mountains);
             case NavTab.profil:
-              setState(() => _currentTab = t);
-              // TODO(phase-3): context.go('/profile');
+              context.go(AppRoutes.profile);
           }
         },
       ),
