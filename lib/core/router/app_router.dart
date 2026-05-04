@@ -1,7 +1,9 @@
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_view.dart';
 import 'package:defi_kilimandjaro/presentation/hub/hub_view.dart';
+import 'package:defi_kilimandjaro/presentation/mountains/mountain_detail_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_list_view.dart';
 import 'package:defi_kilimandjaro/presentation/splash/splash_view.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +15,7 @@ abstract final class AppRoutes {
   static const game = '/game';
   static const result = '/result';
   static const mountains = '/mountains';
+  static const mountain = '/mountain';
   static const profile = '/profile';
   static const duel = '/duel/:matchId';
 }
@@ -48,6 +51,13 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.mountains,
       name: 'mountains',
       builder: (_, __) => const MountainListView(),
+    ),
+    GoRoute(
+      path: AppRoutes.mountain,
+      name: 'mountain',
+      builder: (_, state) => MountainDetailView(
+        mountain: state.extra! as Mountain,
+      ),
     ),
     // TODO(phase-3): profile
     // TODO(phase-6): duel

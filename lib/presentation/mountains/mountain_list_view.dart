@@ -1,10 +1,8 @@
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
-import 'package:defi_kilimandjaro/data/repositories/devinette_repository_impl.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
-import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_card.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +27,7 @@ class _MountainListViewState extends ConsumerState<MountainListView> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Bientôt disponible — termine ${m.altitude}m',
+            'Bientôt disponible — termine la précédente',
             style: AppTypography.bebas(),
           ),
           backgroundColor: AppColors.boisFonce,
@@ -38,30 +36,8 @@ class _MountainListViewState extends ConsumerState<MountainListView> {
       );
       return;
     }
-
-    try {
-      // Phase 2.2 stub : pour l'instant on lance une devinette aléatoire
-      // du monde "Village des Or" (le seul peuplé avec 30 entrées).
-      // En Phase 2.3 on liera devinettes par tags pays / culture régionale.
-      final repo = ref.read(devinetteRepositoryProvider);
-      final devinette = await repo.randomFromWorld('village_des_or');
-      if (!context.mounted) return;
-      await context.push<void>(
-        AppRoutes.game,
-        extra: GameArgs(devinette: devinette, mountainId: m.id),
-      );
-    } on Exception catch (_) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Erreur de chargement',
-            style: AppTypography.bebas(),
-          ),
-          backgroundColor: AppColors.rouge,
-        ),
-      );
-    }
+    // Phase 2.2 : navigation vers l'écran d'ascension de la montagne.
+    await context.push<void>(AppRoutes.mountain, extra: m);
   }
 
   @override
