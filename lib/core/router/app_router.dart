@@ -6,6 +6,7 @@ import 'package:defi_kilimandjaro/presentation/hub/hub_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_detail_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_list_view.dart';
 import 'package:defi_kilimandjaro/presentation/profile/profile_view.dart';
+import 'package:defi_kilimandjaro/presentation/shop/shop_view.dart';
 import 'package:defi_kilimandjaro/presentation/splash/splash_view.dart';
 import 'package:go_router/go_router.dart';
 
@@ -18,6 +19,7 @@ abstract final class AppRoutes {
   static const mountains = '/mountains';
   static const mountain = '/mountain';
   static const profile = '/profile';
+  static const shop = '/shop';
   static const duel = '/duel/:matchId';
 }
 
@@ -64,6 +66,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.profile,
       name: 'profile',
       builder: (_, __) => const ProfileView(),
+    ),
+    GoRoute(
+      path: AppRoutes.shop,
+      name: 'shop',
+      builder: (_, __) => const ShopView(),
     ),
     // TODO(phase-6): duel
   ],

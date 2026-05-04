@@ -1,6 +1,7 @@
 import 'package:defi_kilimandjaro/audio/audio_engine.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_theme.dart';
+import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -29,10 +30,34 @@ Future<void> main() async {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
         ],
-        child: const KilimandjaroApp(),
+        child: const _BootGate(child: KilimandjaroApp()),
       ),
     ),
   );
+}
+
+/// Initialise les services lourds (IAP) après que ProviderScope soit
+/// disponible, sans bloquer le splash visuel.
+class _BootGate extends ConsumerStatefulWidget {
+  const _BootGate({required this.child});
+  final Widget child;
+
+  @override
+  ConsumerState<_BootGate> createState() => _BootGateState();
+}
+
+class _BootGateState extends ConsumerState<_BootGate> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // IAP init is fire-and-forget; failure goes silent (sandbox absent etc.)
+      ref.read(iapServiceProvider).init();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 class KilimandjaroApp extends StatelessWidget {

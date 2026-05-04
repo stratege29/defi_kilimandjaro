@@ -139,7 +139,12 @@ class _Header extends ConsumerWidget {
         children: [
           Text('KILIMANDJARO', style: AppTypography.bebas(size: 18)),
           const Spacer(),
-          _Chip(icon: '🪙', value: '${progress.coins}'),
+          _Chip(
+            icon: '🪙',
+            value: '${progress.coins}',
+            trailingPlus: true,
+            onTap: () => context.push(AppRoutes.shop),
+          ),
           const SizedBox(width: 8),
           _Chip(icon: '⭐', value: 'N$levelTier'),
         ],
@@ -149,13 +154,20 @@ class _Header extends ConsumerWidget {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip({required this.icon, required this.value});
+  const _Chip({
+    required this.icon,
+    required this.value,
+    this.trailingPlus = false,
+    this.onTap,
+  });
   final String icon;
   final String value;
+  final bool trailingPlus;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final body = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: AppColors.bois.withValues(alpha: 0.28),
@@ -176,7 +188,24 @@ class _Chip extends StatelessWidget {
               color: AppColors.orSoleil,
             ),
           ),
+          if (trailingPlus) ...[
+            const SizedBox(width: 4),
+            Icon(
+              Icons.add_circle,
+              size: 16,
+              color: AppColors.orSoleil.withValues(alpha: 0.85),
+            ),
+          ],
         ],
+      ),
+    );
+    if (onTap == null) return body;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: body,
       ),
     );
   }

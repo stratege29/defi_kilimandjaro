@@ -89,6 +89,15 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     return true;
   }
 
+  /// Ajoute des coins au solde (utilisé par les achats IAP et les pubs
+  /// rewarded vidéo en Phase 4.2).
+  Future<void> addCoins(int amount) async {
+    if (amount <= 0) return;
+    final newState = state.copyWith(coins: state.coins + amount);
+    state = newState;
+    await _repo.save(newState);
+  }
+
   /// Réinitialisation depuis l'écran Profil.
   Future<void> reset() async {
     await _repo.reset();
