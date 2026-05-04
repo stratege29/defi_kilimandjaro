@@ -87,13 +87,15 @@
 - [ ] Tests widget grille + drag detection
 - [ ] **100 devinettes initiales** monde "Village des Or"
 
-### Phase 2 — Progression & Contenu (S5-S6)
-- [ ] **Écran 06 Carte d'Afrique** — Canvas 2D, 54 points-pays, halo or pays disponibles, drapeaux emoji, légende
-- [ ] **Écran 07 Montagne** — fond peint (ciel étoilé + neige), niveaux zigzag, 6 zones nommées (Base → Sommet mythique), nuages pulsants niveaux cachés
-- [ ] Génération procédurale niveaux infinis par pays
-- [ ] Économie Coins de Sagesse — gain victoire + bonus vitesse + coût indice
-- [ ] **Contenu : 200 devinettes** réparties sur 4 mondes + monde "Côte d'Ivoire" (Mont Nimba etc.)
-- [ ] Cache local devinettes (`isar`) + override Remote Config
+### Phase 2 — Progression géographique (S5-S6) — **PIVOT 2026-05-03**
+- [x] **Écran 06 Liste des Montagnes** (remplace Carte d'Afrique 54 pays) — 51 sommets ordonnés par altitude croissante, du Red Rocks Gambie (53 m) au Kilimandjaro Tanzanie (5 895 m, boss final). Une montagne = le point culminant d'un pays.
+- [ ] **Écran 07 Montagne détail** — vue d'ascension par montagne avec N niveaux (4-8 selon altitude/importance), fond peint ciel étoilé + neige
+- [ ] Génération procédurale niveaux par montagne (devinettes mappées par tags région)
+- [ ] Économie Coins de Sagesse persistante (`shared_preferences` v1, Firestore v2) — gain victoire + bonus vitesse + coût indice + déverrouillage montagnes
+- [ ] **Contenu : 200 devinettes** réparties sur 4 mondes + tags pays
+- [ ] Cache local devinettes + override Remote Config
+
+**Pourquoi le pivot** : la liste verticale ordonnée par altitude offre une métaphore d'ascension plus forte que la carte interactive (mobile-friendly, pas de pinch-zoom, progression visuelle linéaire), et colle parfaitement au branding "Kilimandjaro" — le Kilimandjaro devient le boss final naturel du jeu.
 
 ### Phase 3 — Profil & Rétention (S7)
 - [ ] **Écran 08 Profil** — avatar bois+or, 4 stats (Niveaux/Coins/Pays/Streak), pays explorés (chips drapeaux), titres honorifiques 4 paliers
