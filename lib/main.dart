@@ -1,6 +1,7 @@
 import 'package:defi_kilimandjaro/audio/audio_engine.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_theme.dart';
+import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -51,8 +52,9 @@ class _BootGateState extends ConsumerState<_BootGate> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // IAP init is fire-and-forget; failure goes silent (sandbox absent etc.)
+      // IAP and Ads init are fire-and-forget; failures go silent.
       ref.read(iapServiceProvider).init();
+      ref.read(adsServiceProvider).init();
     });
   }
 

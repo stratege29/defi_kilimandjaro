@@ -61,6 +61,7 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
   /// Récompense après une victoire sur une montagne donnée.
   ///
   /// `coinsAwarded` = base 30 + bonus vitesse (timeLeft × 2).
+  /// Reset le compteur d'échecs consécutifs.
   Future<void> recordWin({
     required String? mountainId,
     required int coinsAwarded,
@@ -75,7 +76,26 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
       completedLevelsByMountain: levels,
       totalLevelsCompleted: state.totalLevelsCompleted + 1,
       lastPlayDate: DateTime.now(),
+      consecutiveFailures: 0,
     );
+    state = newState;
+    await _repo.save(newState);
+  }
+
+  /// Incrémente le compteur d'échecs consécutifs (utilisé pour
+  /// déclencher l'interstitielle toutes les 3 défaites).
+  Future<int> recordFailure() async {
+    final newCount = state.consecutiveFailures + 1;
+    final newState = state.copyWith(consecutiveFailures: newCount);
+    state = newState;
+    await _repo.save(newState);
+    return newCount;
+  }
+
+  /// Marque l'achat "No-Ads" comme accordé. Idempotent.
+  Future<void> grantNoAds() async {
+    if (state.noAdsPurchased) return;
+    final newState = state.copyWith(noAdsPurchased: true);
     state = newState;
     await _repo.save(newState);
   }

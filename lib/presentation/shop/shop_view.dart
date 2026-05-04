@@ -44,15 +44,20 @@ class ShopView extends ConsumerWidget {
           children: [
             const _PromoBanner(),
             Expanded(
-              child: ListView.builder(
+              child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                itemCount: offers.length,
-                itemBuilder: (_, i) {
-                  return _PackCard(
-                    offer: offers[i],
-                    onBuy: () => _handleBuy(context, ref, offers[i]),
-                  );
-                },
+                children: [
+                  for (final o in offers)
+                    _PackCard(
+                      offer: o,
+                      onBuy: () => _handleBuy(context, ref, o),
+                    ),
+                  const SizedBox(height: 14),
+                  _NoAdsCard(
+                    purchased: progress.noAdsPurchased,
+                    onBuy: () => _handleBuyNoAds(context, ref),
+                  ),
+                ],
               ),
             ),
             _RestoreButton(onTap: () async {
@@ -72,6 +77,35 @@ class ShopView extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _handleBuyNoAds(BuildContext context, WidgetRef ref) async {
+    final notifier = ref.read(coinOffersProvider.notifier);
+    if (!notifier.noAdsAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Bientôt disponible',
+            style: AppTypography.bebas(),
+          ),
+          backgroundColor: AppColors.boisFonce,
+        ),
+      );
+      return;
+    }
+    final ok = await notifier.buyNoAds();
+    if (!context.mounted) return;
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Achat non lancé',
+            style: AppTypography.bebas(),
+          ),
+          backgroundColor: AppColors.rouge,
+        ),
+      );
+    }
   }
 
   Future<void> _handleBuy(
@@ -332,6 +366,107 @@ class _IconBadge extends StatelessWidget {
           ),
           const Text('🪙', style: TextStyle(fontSize: 28)),
         ],
+      ),
+    );
+  }
+}
+
+class _NoAdsCard extends ConsumerWidget {
+  const _NoAdsCard({required this.purchased, required this.onBuy});
+  final bool purchased;
+  final VoidCallback onBuy;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.watch(coinOffersProvider.notifier);
+    final price = notifier.noAdsPriceLabel;
+    final available = notifier.noAdsAvailable;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: purchased
+            ? AppColors.vertClair.withValues(alpha: 0.18)
+            : AppColors.bois.withValues(alpha: 0.28),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: purchased
+              ? AppColors.vertClair.withValues(alpha: 0.7)
+              : AppColors.orSoleil.withValues(alpha: 0.4),
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: purchased ? null : onBuy,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.orSoleil.withValues(alpha: 0.25),
+                    border: Border.all(
+                      color: AppColors.orSoleil.withValues(alpha: 0.7),
+                      width: 2,
+                    ),
+                  ),
+                  child: const Center(
+                    child: Text('🚫', style: TextStyle(fontSize: 26)),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Supprimer les pubs',
+                        style: AppTypography.bebas(size: 17),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        purchased
+                            ? '✓ Déjà acheté — merci !'
+                            : "Plus jamais d'interstitielles. Achat unique.",
+                        style: AppTypography.crimson(
+                          size: 12,
+                          color: AppColors.ivoire.withValues(alpha: 0.7),
+                          style: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (!purchased)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: available
+                          ? AppColors.orSoleil
+                          : AppColors.bois.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      price,
+                      style: AppTypography.bebas(
+                        color: available
+                            ? AppColors.vertForet
+                            : AppColors.ivoire.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

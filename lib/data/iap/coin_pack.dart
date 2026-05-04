@@ -45,6 +45,10 @@ enum CoinPack {
       CoinPack.values.map((e) => e.productId).toList();
 }
 
+/// Product ID du non-consumable "Supprimer les pubs" (4,99 €).
+const String noAdsProductId = 'no_ads_remove';
+const String noAdsFallbackPrice = '4,99 €';
+
 /// Snapshot d'un pack avec son prix résolu depuis le store.
 class CoinPackOffer extends Equatable {
   const CoinPackOffer({

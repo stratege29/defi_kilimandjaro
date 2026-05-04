@@ -11,6 +11,8 @@ class PlayerProgress extends Equatable {
     required this.totalLevelsCompleted,
     required this.dailyStreak,
     this.lastPlayDate,
+    this.consecutiveFailures = 0,
+    this.noAdsPurchased = false,
   });
 
   /// État initial pour un nouveau joueur.
@@ -32,6 +34,8 @@ class PlayerProgress extends Equatable {
       lastPlayDate: json['last_play'] == null
           ? null
           : DateTime.tryParse(json['last_play'] as String),
+      consecutiveFailures: (json['consecutive_failures'] as int?) ?? 0,
+      noAdsPurchased: (json['no_ads'] as bool?) ?? false,
     );
   }
 
@@ -50,12 +54,21 @@ class PlayerProgress extends Equatable {
   /// Dernière date de jeu (jour calendaire, sans heure).
   final DateTime? lastPlayDate;
 
+  /// Compteur d'échecs consécutifs (reset à chaque victoire).
+  /// Sert de trigger pour l'interstitielle (cf. plan.md §4 — 1 sur 3 échecs).
+  final int consecutiveFailures;
+
+  /// Achat non-consumable "Supprimer les pubs" (4,99 €).
+  final bool noAdsPurchased;
+
   Map<String, dynamic> toJson() => <String, dynamic>{
         'coins': coins,
         'levels': completedLevelsByMountain,
         'total': totalLevelsCompleted,
         'streak': dailyStreak,
         'last_play': lastPlayDate?.toIso8601String(),
+        'consecutive_failures': consecutiveFailures,
+        'no_ads': noAdsPurchased,
       };
 
   /// Combien de niveaux complétés sur cette montagne.
@@ -68,6 +81,8 @@ class PlayerProgress extends Equatable {
     int? totalLevelsCompleted,
     int? dailyStreak,
     DateTime? lastPlayDate,
+    int? consecutiveFailures,
+    bool? noAdsPurchased,
   }) {
     return PlayerProgress(
       coins: coins ?? this.coins,
@@ -76,6 +91,8 @@ class PlayerProgress extends Equatable {
       totalLevelsCompleted: totalLevelsCompleted ?? this.totalLevelsCompleted,
       dailyStreak: dailyStreak ?? this.dailyStreak,
       lastPlayDate: lastPlayDate ?? this.lastPlayDate,
+      consecutiveFailures: consecutiveFailures ?? this.consecutiveFailures,
+      noAdsPurchased: noAdsPurchased ?? this.noAdsPurchased,
     );
   }
 
@@ -86,5 +103,7 @@ class PlayerProgress extends Equatable {
         totalLevelsCompleted,
         dailyStreak,
         lastPlayDate,
+        consecutiveFailures,
+        noAdsPurchased,
       ];
 }

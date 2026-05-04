@@ -37,9 +37,11 @@ class IAPService {
       onError: (Object e) => _log.e('IAP stream error', error: e),
     );
 
-    final response = await _iap.queryProductDetails(
-      CoinPack.allProductIds().toSet(),
-    );
+    final allIds = <String>{
+      ...CoinPack.allProductIds(),
+      noAdsProductId,
+    };
+    final response = await _iap.queryProductDetails(allIds);
     if (response.error != null) {
       _log.w('IAP query error: ${response.error}');
     }
@@ -51,6 +53,17 @@ class IAPService {
     };
     _log.i('IAP init done — ${_details.length} products available');
   }
+
+  /// Lance l'achat du non-consumable "Supprimer les pubs".
+  Future<bool> buyNoAds() async {
+    final details = _details[noAdsProductId];
+    if (details == null) return false;
+    final purchaseParam = PurchaseParam(productDetails: details);
+    return _iap.buyNonConsumable(purchaseParam: purchaseParam);
+  }
+
+  /// Détails du No-Ads (null si pas dans le catalogue).
+  ProductDetails? get noAdsDetails => _details[noAdsProductId];
 
   /// Liste des offres à afficher dans la boutique.
   ///
@@ -103,9 +116,14 @@ class IAPService {
   }
 
   Future<void> _grant(PurchaseDetails purchase) async {
+    if (purchase.productID == noAdsProductId) {
+      await _progress.grantNoAds();
+      _log.i('No-Ads accordé via IAP');
+      return;
+    }
     final pack = CoinPack.fromProductId(purchase.productID);
     if (pack == null) {
-      _log.w('Achat reconnu mais pack inconnu: ${purchase.productID}');
+      _log.w('Achat reconnu mais produit inconnu: ${purchase.productID}');
       return;
     }
     await _progress.addCoins(pack.coins);
@@ -141,6 +159,13 @@ class CoinOffersNotifier extends StateNotifier<List<CoinPackOffer>> {
   }
 
   Future<bool> buy(CoinPack pack) => _service.buy(pack);
+
+  Future<bool> buyNoAds() => _service.buyNoAds();
+
+  String get noAdsPriceLabel =>
+      _service.noAdsDetails?.price ?? noAdsFallbackPrice;
+
+  bool get noAdsAvailable => _service.noAdsDetails != null;
 
   Future<void> restore() => _service.restore();
 }

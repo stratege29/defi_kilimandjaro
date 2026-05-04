@@ -1,5 +1,7 @@
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
+import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/answer_cells.dart';
@@ -100,7 +102,31 @@ class _GameViewState extends ConsumerState<GameView> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
+            // Rewarded video chip ("+50 🪙 regarder une pub").
+            if (!ref.watch(playerProgressProvider).noAdsPurchased)
+              _RewardedAdChip(
+                enabled: gameState.phase == GamePhase.playing,
+                onWatch: () async {
+                  final got = await ref
+                      .read(adsServiceProvider)
+                      .showRewardedForCoins();
+                  if (!context.mounted) return;
+                  if (got) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '+50 Coins de Sagesse',
+                          style: AppTypography.bebas(),
+                        ),
+                        backgroundColor: AppColors.vertClair,
+                        duration: const Duration(milliseconds: 1200),
+                      ),
+                    );
+                  }
+                },
+              ),
+            const SizedBox(height: 8),
             // Bottom action buttons.
             _ActionButtons(
               onHint: controller.useHint,
@@ -138,8 +164,23 @@ class _GameViewState extends ConsumerState<GameView> {
     );
   }
 
-  void _showFailureOverlay(BuildContext ctx, GameController controller) {
-    showDialog<void>(
+  Future<void> _showFailureOverlay(
+    BuildContext ctx,
+    GameController controller,
+  ) async {
+    // Records the failure and triggers an interstitial every 3 in a row,
+    // unless the player has bought "No-Ads".
+    final progress = ref.read(playerProgressProvider);
+    if (!progress.noAdsPurchased) {
+      final newCount = await ref
+          .read(playerProgressProvider.notifier)
+          .recordFailure();
+      if (newCount % 3 == 0) {
+        await ref.read(adsServiceProvider).maybeShowInterstitial();
+      }
+    }
+    if (!ctx.mounted) return;
+    await showDialog<void>(
       context: ctx,
       barrierDismissible: false,
       barrierColor: Colors.black.withValues(alpha: 0.92),
@@ -150,6 +191,55 @@ class _GameViewState extends ConsumerState<GameView> {
           _overlayShown = false;
           controller.restart();
         },
+      ),
+    );
+  }
+}
+
+class _RewardedAdChip extends StatelessWidget {
+  const _RewardedAdChip({required this.enabled, required this.onWatch});
+  final bool enabled;
+  final VoidCallback onWatch;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: enabled ? onWatch : null,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.bois.withValues(alpha: 0.35),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: AppColors.orSoleil.withValues(alpha: enabled ? 0.6 : 0.2),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.play_circle_outline,
+                  size: 16,
+                  color: AppColors.orSoleil
+                      .withValues(alpha: enabled ? 0.95 : 0.4),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '+50 🪙 regarder une pub',
+                  style: AppTypography.bebas(
+                    size: 13,
+                    color: AppColors.orSoleil
+                        .withValues(alpha: enabled ? 0.95 : 0.4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
