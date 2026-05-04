@@ -4,6 +4,7 @@ import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/devinette_repository_impl.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
+import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_card.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +46,10 @@ class _MountainListViewState extends ConsumerState<MountainListView> {
       final repo = ref.read(devinetteRepositoryProvider);
       final devinette = await repo.randomFromWorld('village_des_or');
       if (!context.mounted) return;
-      await context.push<void>(AppRoutes.game, extra: devinette);
+      await context.push<void>(
+        AppRoutes.game,
+        extra: GameArgs(devinette: devinette, mountainId: m.id),
+      );
     } on Exception catch (_) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

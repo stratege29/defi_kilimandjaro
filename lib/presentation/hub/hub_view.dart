@@ -3,7 +3,9 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/datasources/mock_worlds.dart';
 import 'package:defi_kilimandjaro/data/repositories/devinette_repository_impl.dart';
+import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/world.dart';
+import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/world_card.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +46,11 @@ class _HubViewState extends ConsumerState<HubView> {
       final repo = ref.read(devinetteRepositoryProvider);
       final devinette = await repo.randomFromWorld(world.id);
       if (!context.mounted) return;
-      await context.push<void>(AppRoutes.game, extra: devinette);
+      // Mode "monde thématique" : pas de mountainId associé.
+      await context.push<void>(
+        AppRoutes.game,
+        extra: GameArgs(devinette: devinette),
+      );
     } on Exception catch (_) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -113,11 +119,14 @@ class _HubViewState extends ConsumerState<HubView> {
   }
 }
 
-class _Header extends StatelessWidget {
+class _Header extends ConsumerWidget {
   const _Header();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final progress = ref.watch(playerProgressProvider);
+    final levelTier = 1 + (progress.totalLevelsCompleted ~/ 10);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       decoration: BoxDecoration(
@@ -129,14 +138,11 @@ class _Header extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Logo + nom
           Text('KILIMANDJARO', style: AppTypography.bebas(size: 18)),
           const Spacer(),
-          // Coins
-          const _Chip(icon: '🪙', value: '120'),
+          _Chip(icon: '🪙', value: '${progress.coins}'),
           const SizedBox(width: 8),
-          // Niveau joueur
-          const _Chip(icon: '⭐', value: 'N1'),
+          _Chip(icon: '⭐', value: 'N$levelTier'),
         ],
       ),
     );

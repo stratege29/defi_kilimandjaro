@@ -1,6 +1,6 @@
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
-import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/answer_cells.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/circular_grid.dart';
@@ -14,11 +14,11 @@ import 'package:go_router/go_router.dart';
 
 /// Écran 03 — Écran de Jeu (cf. plan.md §2 Phase 1.2 et maquette p.5).
 ///
-/// Reçoit la [Devinette] via [GoRouterState.extra].
+/// Reçoit les [GameArgs] via [GoRouterState.extra].
 class GameView extends ConsumerStatefulWidget {
-  const GameView({required this.devinette, super.key});
+  const GameView({required this.args, super.key});
 
-  final Devinette devinette;
+  final GameArgs args;
 
   @override
   ConsumerState<GameView> createState() => _GameViewState();
@@ -29,7 +29,7 @@ class _GameViewState extends ConsumerState<GameView> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = gameControllerProvider(widget.devinette);
+    final provider = gameControllerProvider(widget.args);
     final gameState = ref.watch(provider);
     final controller = ref.read(provider.notifier);
 
@@ -65,10 +65,10 @@ class _GameViewState extends ConsumerState<GameView> {
             ),
             const SizedBox(height: 8),
             // World banner.
-            _WorldBanner(world: widget.devinette.world),
+            _WorldBanner(world: widget.args.devinette.world),
             const SizedBox(height: 12),
             // Riddle card.
-            _RiddleCard(riddle: widget.devinette.riddle),
+            _RiddleCard(riddle: widget.args.devinette.riddle),
             const SizedBox(height: 12),
             // Timer bar.
             TimerBar(
@@ -78,7 +78,7 @@ class _GameViewState extends ConsumerState<GameView> {
             const SizedBox(height: 16),
             // Answer cells.
             AnswerCells(
-              answer: widget.devinette.answer,
+              answer: widget.args.devinette.answer,
               formedLetters: gameState.formedWord,
               isValidated: gameState.validationCorrect,
             ),
@@ -90,7 +90,7 @@ class _GameViewState extends ConsumerState<GameView> {
                   letters: gameState.displayLetters,
                   selectedIndices: gameState.selectedIndices,
                   hintRevealedCount: gameState.hintRevealedCount,
-                  answer: widget.devinette.answer,
+                  answer: widget.args.devinette.answer,
                   phase: gameState.phase,
                   onTileEntered: controller.selectTile,
                   onDragEnd: () {
@@ -108,7 +108,7 @@ class _GameViewState extends ConsumerState<GameView> {
               onValidate: controller.validate,
               canHint: gameState.coins >= 20 &&
                   gameState.hintRevealedCount <
-                      widget.devinette.answer.length &&
+                      widget.args.devinette.answer.length &&
                   gameState.phase == GamePhase.playing,
               canValidate: gameState.selectedIndices.isNotEmpty &&
                   gameState.phase == GamePhase.playing,
@@ -126,7 +126,7 @@ class _GameViewState extends ConsumerState<GameView> {
       barrierDismissible: false,
       barrierColor: Colors.black.withValues(alpha: 0.92),
       builder: (_) => VictoryView(
-        devinette: widget.devinette,
+        devinette: widget.args.devinette,
         timeLeft: timeLeft,
         onNext: () {
           // Close overlay then return to hub.
@@ -144,7 +144,7 @@ class _GameViewState extends ConsumerState<GameView> {
       barrierDismissible: false,
       barrierColor: Colors.black.withValues(alpha: 0.92),
       builder: (_) => FailureView(
-        devinette: widget.devinette,
+        devinette: widget.args.devinette,
         onRetry: () {
           ctx.pop(); // closes dialog
           _overlayShown = false;

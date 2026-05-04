@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
+import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Phase du cycle de vie d'une partie.
@@ -80,15 +82,16 @@ class GameState {
 /// - Sélection par index (pas par lettre) pour gérer les doublons.
 /// - Auto-validation quand [selectedIndices.length == answer.length].
 class GameController extends StateNotifier<GameState> {
-  GameController(Devinette devinette, this._audio)
+  GameController(this._args, this._audio, this._progress)
       : super(
           GameState(
-            devinette: devinette,
+            devinette: _args.devinette,
             selectedIndices: const <int>[],
             timeLeft: _gameDuration,
             phase: GamePhase.playing,
-            coins: 120,
-            shuffledIndices: _shuffleIndices(devinette.lettersPool.length),
+            coins: _progress.state.coins,
+            shuffledIndices:
+                _shuffleIndices(_args.devinette.lettersPool.length),
           ),
         ) {
     _startTimer();
@@ -96,8 +99,11 @@ class GameController extends StateNotifier<GameState> {
 
   static const int _hintCost = 20;
   static const int _gameDuration = 30;
+  static const int _coinsBase = 30;
 
+  final GameArgs _args;
   final AudioController _audio;
+  final PlayerProgressNotifier _progress;
   Timer? _timer;
 
   // ---------------------------------------------------------------------------
@@ -159,6 +165,8 @@ class GameController extends StateNotifier<GameState> {
       hintRevealedCount: state.hintRevealedCount + 1,
     );
 
+    // Persist deduction.
+    unawaited(_progress.spendOnHint(_hintCost));
     // Audio: kora 2 notes douces descendantes.
     unawaited(_audio.playHintUsed());
   }
@@ -171,9 +179,19 @@ class GameController extends StateNotifier<GameState> {
     final formed = state.formedWord;
     if (formed == state.devinette.answer) {
       _timer?.cancel();
+      // Récompense : base 30 + bonus vitesse (timeLeft × 2).
+      final coinsAwarded = _coinsBase + state.timeLeft * 2;
       state = state.copyWith(
         phase: GamePhase.won,
         validationCorrect: true,
+        coins: state.coins + coinsAwarded,
+      );
+      // Persiste la victoire (coins + level mountain + total + lastPlay).
+      unawaited(
+        _progress.recordWin(
+          mountainId: _args.mountainId,
+          coinsAwarded: coinsAwarded,
+        ),
       );
       // Audio: balafon accord 5 notes puis fanfare griot.
       unawaited(_audio.playWordComplete());
@@ -198,7 +216,7 @@ class GameController extends StateNotifier<GameState> {
       selectedIndices: const <int>[],
       timeLeft: _gameDuration,
       phase: GamePhase.playing,
-      coins: state.coins,
+      coins: _progress.state.coins,
       shuffledIndices: _shuffleIndices(state.devinette.lettersPool.length),
     );
     _startTimer();
@@ -245,9 +263,12 @@ class GameController extends StateNotifier<GameState> {
   }
 }
 
-/// Provider family permettant de créer un [GameController] par [Devinette].
+/// Provider family : un [GameController] par [GameArgs].
 final gameControllerProvider = StateNotifierProvider.autoDispose
-    .family<GameController, GameState, Devinette>(
-  (ref, devinette) =>
-      GameController(devinette, ref.read(audioControllerProvider.notifier)),
+    .family<GameController, GameState, GameArgs>(
+  (ref, args) => GameController(
+    args,
+    ref.read(audioControllerProvider.notifier),
+    ref.read(playerProgressProvider.notifier),
+  ),
 );

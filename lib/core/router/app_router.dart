@@ -1,4 +1,5 @@
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_view.dart';
 import 'package:defi_kilimandjaro/presentation/hub/hub_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_list_view.dart';
@@ -34,8 +35,13 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.game,
       name: 'game',
       builder: (_, state) {
-        final devinette = state.extra! as Devinette;
-        return GameView(devinette: devinette);
+        // Accepts either GameArgs (Phase 2.3+) or a bare Devinette (legacy
+        // Hub call from Phase 1).
+        final extra = state.extra;
+        final args = extra is GameArgs
+            ? extra
+            : GameArgs(devinette: extra! as Devinette);
+        return GameView(args: args);
       },
     ),
     GoRoute(
