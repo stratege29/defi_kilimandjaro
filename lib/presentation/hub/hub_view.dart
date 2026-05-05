@@ -73,6 +73,7 @@ class _HubViewState extends ConsumerState<HubView> {
         child: Column(
           children: [
             const _Header(),
+            const _DuelBanner(),
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.only(top: 8, bottom: 16),
@@ -113,6 +114,78 @@ class _HubViewState extends ConsumerState<HubView> {
               context.go(AppRoutes.profile);
           }
         },
+      ),
+    );
+  }
+}
+
+class _DuelBanner extends StatelessWidget {
+  const _DuelBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push(AppRoutes.duel),
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.rouge.withValues(alpha: 0.25),
+                  AppColors.orChaud.withValues(alpha: 0.18),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.orSoleil.withValues(alpha: 0.6),
+                width: 2,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.vertForet.withValues(alpha: 0.5),
+                    border: Border.all(color: AppColors.orSoleil),
+                  ),
+                  child: const Text('⚔️', style: TextStyle(fontSize: 22)),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'DÉFIER UN AMI',
+                        style: AppTypography.bebas(),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Duel temps réel via QR code',
+                        style: AppTypography.crimson(
+                          size: 12,
+                          color: AppColors.ivoire.withValues(alpha: 0.75),
+                          style: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: AppColors.orSoleil),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

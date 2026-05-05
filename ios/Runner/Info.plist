@@ -45,6 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Camera: required by mobile_scanner to scan duel QR codes. -->
+	<key>NSCameraUsageDescription</key>
+	<string>Pour scanner le QR code de ton ami et lancer un duel temps réel.</string>
 	<!-- AdMob: TEST identifier — replace with real ID once an AdMob app is created. -->
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-3940256099942544~1458002511</string>
