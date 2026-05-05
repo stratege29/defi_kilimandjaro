@@ -31,8 +31,12 @@ class DuelPlayView extends ConsumerWidget {
         .value ??
         initialSession;
 
-    final localState = ref.watch(duelControllerProvider(liveSession));
-    final controller = ref.read(duelControllerProvider(liveSession).notifier);
+    // IMPORTANT: keyed on initialSession (stable widget field) — using the
+    // live session as key would recreate the controller on every RTDB
+    // update and wipe the local selection.
+    final localState = ref.watch(duelControllerProvider(initialSession));
+    final controller =
+        ref.read(duelControllerProvider(initialSession).notifier);
 
     // Naviguer vers le résultat dès que la phase est finished.
     ref.listen<AsyncValue<DuelSession?>>(
