@@ -165,7 +165,9 @@ class _WaitingBody extends ConsumerWidget {
             'Code : $matchId',
             style: AppTypography.bebas(size: 22, color: AppColors.orSoleil),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 6),
+          _ManualEntryBlock(matchId: matchId, secret: secret),
+          const SizedBox(height: 16),
           asyncSession.when(
             loading: () => _statusBox('Connexion...'),
             error: (_, __) => _statusBox('Erreur de connexion'),
@@ -183,29 +185,120 @@ class _WaitingBody extends ConsumerWidget {
     );
   }
 
-  Widget _statusBox(String label) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: AppColors.bois.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: AppColors.orSoleil.withValues(alpha: 0.4),
+  Widget _statusBox(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.bois.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: AppColors.orSoleil.withValues(alpha: 0.4),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(
+            width: 14,
+            height: 14,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.orSoleil,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(label, style: AppTypography.bebas(size: 13)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Bloc dépliable affichant le secret pour la saisie manuelle (utile
+/// pour tests sur simulateur sans caméra).
+class _ManualEntryBlock extends StatefulWidget {
+  const _ManualEntryBlock({required this.matchId, required this.secret});
+  final String matchId;
+  final String secret;
+
+  @override
+  State<_ManualEntryBlock> createState() => _ManualEntryBlockState();
+}
+
+class _ManualEntryBlockState extends State<_ManualEntryBlock> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextButton(
+          onPressed: () => setState(() => _expanded = !_expanded),
+          child: Text(
+            _expanded
+                ? 'Masquer la saisie manuelle'
+                : 'Saisie manuelle (sans QR)',
+            style: AppTypography.crimson(
+              size: 12,
+              color: AppColors.ivoire.withValues(alpha: 0.7),
+              style: FontStyle.italic,
+            ),
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(
-              width: 14,
-              height: 14,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: AppColors.orSoleil,
+        if (_expanded)
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: AppColors.orSoleil.withValues(alpha: 0.3),
               ),
             ),
-            const SizedBox(width: 10),
-            Text(label, style: AppTypography.bebas(size: 13)),
-          ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _LabelValue(label: 'Match ID', value: widget.matchId),
+                const SizedBox(height: 6),
+                _LabelValue(label: 'Secret', value: widget.secret),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _LabelValue extends StatelessWidget {
+  const _LabelValue({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 70,
+          child: Text(
+            '$label :',
+            style: AppTypography.crimson(
+              size: 12,
+              color: AppColors.ivoire.withValues(alpha: 0.6),
+            ),
+          ),
         ),
-      );
+        Expanded(
+          child: SelectableText(
+            value,
+            style: AppTypography.bebas(
+              size: 13,
+              color: AppColors.orSoleil,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
