@@ -14,11 +14,15 @@
     "clear": "Effacer",
     "cancel": "Annuler",
     "confirm": "Confirmer",
-    "back": "Retour"
+    "back": "Retour",
+    "skip": "Passer",
+    "continue": "Continuer",
+    "close": "Fermer"
   },
   "error": {
     "generic": "Une erreur est survenue",
-    "network": "Pas de connexion Internet"
+    "network": "Pas de connexion Internet",
+    "load_failed": "Erreur de chargement"
   },
   "game": {
     "back": "Retour",
@@ -28,7 +32,8 @@
     "won": "Bravo !",
     "lost": "Temps écoulé",
     "hint_cost": "-20 pièces",
-    "level": "Niveau"
+    "level": "Niveau",
+    "watch_ad_reward": "+50 🪙 regarder une pub"
   },
   "result": {
     "victory": {
@@ -40,5 +45,119 @@
       "retry": "RÉESSAYER 🔁",
       "consolation": "Retente ta chance ! 🎯"
     }
+  },
+  "hub": {
+    "duel_banner": {
+      "title": "DÉFIER UN AMI",
+      "subtitle": "Duel temps réel via QR code"
+    },
+    "world_locked": "Coins requis : {cost}"
+  },
+  "mountains": {
+    "title": "MONTAGNES D'AFRIQUE",
+    "subtitle": "Du plus modeste sommet au toit du continent",
+    "locked": "Bientôt disponible — termine la précédente",
+    "level_locked": "Termine le niveau {previous} pour débloquer"
+  },
+  "profile": {
+    "default_name": "Joueur",
+    "no_title_yet": "Encore aucun titre — joue 5 niveaux",
+    "stats": {
+      "levels": "Niveaux",
+      "coins": "Coins",
+      "countries": "Pays",
+      "streak": "Streak"
+    },
+    "sections": {
+      "countries": "PAYS EXPLORÉS",
+      "titles": "TITRES HONORIFIQUES",
+      "settings": "PARAMÈTRES"
+    },
+    "no_countries": "Explore la carte d'Afrique pour commencer ton voyage",
+    "settings": {
+      "sound": "Son",
+      "sound_on": "Activé",
+      "sound_off": "Muet",
+      "reset": "Réinitialiser la progression"
+    },
+    "reset_dialog": {
+      "title": "Réinitialiser ?",
+      "message": "Tous les coins, niveaux et titres seront perdus. Action irréversible.",
+      "confirm": "Réinitialiser"
+    },
+    "title_progress": "Termine {threshold} niveaux pour débloquer ({current}/{threshold})"
+  },
+  "shop": {
+    "title": "BOUTIQUE",
+    "promo": {
+      "title": "COINS DE SAGESSE",
+      "subtitle": "Achète des coins pour révéler des indices et progresser plus vite vers le sommet du Kilimandjaro."
+    },
+    "popular": "POPULAIRE",
+    "available": "Achat unique en jeu",
+    "soon": "Bientôt disponible",
+    "no_ads": {
+      "title": "Supprimer les pubs",
+      "purchased": "✓ Déjà acheté — merci !",
+      "description": "Plus jamais d'interstitielles. Achat unique."
+    },
+    "restore": "Restaurer mes achats",
+    "restored": "Achats restaurés"
+  },
+  "duel": {
+    "title_entry": "DÉFI ENTRE AMIS",
+    "headline": "Affronte un ami en temps réel",
+    "subhead": "Le plus rapide à former le mot remporte la sagesse.",
+    "create": "CRÉER UN DÉFI",
+    "create_desc": "Génère un QR code à montrer à ton ami",
+    "join": "REJOINDRE VIA QR",
+    "join_desc": "Scanne le QR d'un ami pour rejoindre sa partie",
+    "internet_hint": "🌍 Internet requis pour la synchronisation temps réel.",
+    "create_title": "EN ATTENTE D'UN AMI",
+    "show_qr": "Montre ce QR à ton ami",
+    "show_qr_sub": "Il scanne avec « Rejoindre via QR ».",
+    "code": "Code : {id}",
+    "manual_show": "Saisie manuelle (sans QR)",
+    "manual_hide": "Masquer la saisie manuelle",
+    "match_id_label": "Match ID",
+    "secret_label": "Secret",
+    "waiting": "En attente d'un adversaire...",
+    "connecting": "Connexion...",
+    "opponent_joined": "Adversaire connecté ! Démarrage...",
+    "scan_title": "SCANNER LE QR",
+    "scan_hint": "Pointe ton appareil sur le QR de ton ami",
+    "scan_manual": "SAISIR LE CODE À LA MAIN",
+    "join_button": "REJOINDRE",
+    "manual_caption": "Demande à ton ami son code (6 caractères) et son secret (visible dans son URL de QR).",
+    "join_failed": "Connexion impossible",
+    "camera_unavailable": "Caméra indisponible",
+    "camera_simulator_hint": "Sur simulateur iOS la caméra ne fonctionne pas. Utilise « SAISIR LE CODE À LA MAIN » ci-dessous.",
+    "camera_permission_hint": "Vérifie que la permission caméra est accordée dans les paramètres système.",
+    "in_progress": "DUEL EN COURS",
+    "self": "Moi",
+    "opponent": "Adversaire",
+    "opponent_waiting": "En attente...",
+    "forfeit": "Abandonner",
+    "victory": "VICTOIRE",
+    "defeat": "DÉFAITE",
+    "victory_caption": "Tu as été le plus rapide !",
+    "defeat_caption": "Ton adversaire a été plus rapide.",
+    "back_hub": "RETOUR AU HUB",
+    "answer_label": "Mot : {word}"
+  },
+  "onboarding": {
+    "step1": {
+      "title": "Bienvenue, voyageur",
+      "body": "Glisse ton doigt sur les lettres pour former le mot caché par le griot."
+    },
+    "step2": {
+      "title": "Gravis l'Afrique",
+      "body": "51 sommets t'attendent, du Red Rocks de Gambie au toit du Kilimandjaro."
+    },
+    "step3": {
+      "title": "Défie un ami",
+      "body": "QR code en main, lance un duel temps réel. Le plus rapide remporte la sagesse."
+    },
+    "start": "C'EST PARTI"
   }
 }

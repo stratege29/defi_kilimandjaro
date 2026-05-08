@@ -15,6 +15,7 @@ dependencies:
   equatable: ^2.0.7
   firebase_auth: ^6.4.0
   firebase_core: ^4.7.0
+  firebase_crashlytics: ^5.2.0
   firebase_database: ^12.3.0
   flutter:
     sdk: flutter
@@ -39,6 +40,8 @@ dependencies:
 dev_dependencies:
   build_runner: ^2.4.13
   custom_lint: ^0.7.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
   flutter_test:
     sdk: flutter
   freezed: ^2.5.7
@@ -72,3 +75,27 @@ flutter:
     - assets/images/badges/
     - assets/images/shop/
     - assets/images/duel/
+
+# ----------------------------------------------------------------------------
+# App icon (run: dart run flutter_launcher_icons)
+# ----------------------------------------------------------------------------
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/images/brand/app_icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#1A3A20"
+  adaptive_icon_foreground: "assets/images/brand/app_icon.png"
+
+# ----------------------------------------------------------------------------
+# Native splash (run: dart run flutter_native_splash:create)
+# ----------------------------------------------------------------------------
+flutter_native_splash:
+  color: "#1A3A20"
+  image: assets/images/brand/logo_k.png
+  android_12:
+    color: "#1A3A20"
+    image: assets/images/brand/logo_k.png
+  ios_content_mode: center
+  fullscreen: true

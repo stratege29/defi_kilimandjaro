@@ -14,11 +14,15 @@
     "clear": "Clear",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "back": "Back"
+    "back": "Back",
+    "skip": "Skip",
+    "continue": "Continue",
+    "close": "Close"
   },
   "error": {
     "generic": "An error occurred",
-    "network": "No internet connection"
+    "network": "No internet connection",
+    "load_failed": "Failed to load"
   },
   "game": {
     "back": "Back",
@@ -28,7 +32,8 @@
     "won": "Well done!",
     "lost": "Time's up",
     "hint_cost": "-20 coins",
-    "level": "Level"
+    "level": "Level",
+    "watch_ad_reward": "+50 🪙 watch an ad"
   },
   "result": {
     "victory": {
@@ -40,5 +45,119 @@
       "retry": "TRY AGAIN 🔁",
       "consolation": "Give it another shot! 🎯"
     }
+  },
+  "hub": {
+    "duel_banner": {
+      "title": "CHALLENGE A FRIEND",
+      "subtitle": "Real-time duel via QR code"
+    },
+    "world_locked": "Coins required: {cost}"
+  },
+  "mountains": {
+    "title": "AFRICAN MOUNTAINS",
+    "subtitle": "From humble peaks to the roof of the continent",
+    "locked": "Coming soon — finish the previous one",
+    "level_locked": "Finish level {previous} to unlock"
+  },
+  "profile": {
+    "default_name": "Player",
+    "no_title_yet": "No title yet — play 5 levels",
+    "stats": {
+      "levels": "Levels",
+      "coins": "Coins",
+      "countries": "Countries",
+      "streak": "Streak"
+    },
+    "sections": {
+      "countries": "EXPLORED COUNTRIES",
+      "titles": "HONORIFIC TITLES",
+      "settings": "SETTINGS"
+    },
+    "no_countries": "Explore the map of Africa to begin your journey",
+    "settings": {
+      "sound": "Sound",
+      "sound_on": "On",
+      "sound_off": "Muted",
+      "reset": "Reset progression"
+    },
+    "reset_dialog": {
+      "title": "Reset?",
+      "message": "All coins, levels and titles will be lost. This cannot be undone.",
+      "confirm": "Reset"
+    },
+    "title_progress": "Finish {threshold} levels to unlock ({current}/{threshold})"
+  },
+  "shop": {
+    "title": "SHOP",
+    "promo": {
+      "title": "WISDOM COINS",
+      "subtitle": "Buy coins to reveal hints and climb faster toward the summit of Kilimandjaro."
+    },
+    "popular": "POPULAR",
+    "available": "One-time in-game purchase",
+    "soon": "Coming soon",
+    "no_ads": {
+      "title": "Remove ads",
+      "purchased": "✓ Already purchased — thank you!",
+      "description": "No more interstitials. One-time purchase."
+    },
+    "restore": "Restore my purchases",
+    "restored": "Purchases restored"
+  },
+  "duel": {
+    "title_entry": "FRIEND DUEL",
+    "headline": "Challenge a friend in real time",
+    "subhead": "First to form the word claims the wisdom.",
+    "create": "CREATE A DUEL",
+    "create_desc": "Generate a QR code to show your friend",
+    "join": "JOIN VIA QR",
+    "join_desc": "Scan a friend's QR to join their game",
+    "internet_hint": "🌍 Internet required for real-time synchronization.",
+    "create_title": "WAITING FOR A FRIEND",
+    "show_qr": "Show this QR to your friend",
+    "show_qr_sub": "They scan with \"Join via QR\".",
+    "code": "Code: {id}",
+    "manual_show": "Manual entry (no QR)",
+    "manual_hide": "Hide manual entry",
+    "match_id_label": "Match ID",
+    "secret_label": "Secret",
+    "waiting": "Waiting for an opponent...",
+    "connecting": "Connecting...",
+    "opponent_joined": "Opponent connected! Starting...",
+    "scan_title": "SCAN THE QR",
+    "scan_hint": "Point your device at your friend's QR",
+    "scan_manual": "ENTER CODE MANUALLY",
+    "join_button": "JOIN",
+    "manual_caption": "Ask your friend for their 6-char code and secret (visible in their QR URL).",
+    "join_failed": "Connection failed",
+    "camera_unavailable": "Camera unavailable",
+    "camera_simulator_hint": "The iOS simulator has no camera. Use \"ENTER CODE MANUALLY\" below.",
+    "camera_permission_hint": "Make sure camera permission is granted in system settings.",
+    "in_progress": "DUEL IN PROGRESS",
+    "self": "Me",
+    "opponent": "Opponent",
+    "opponent_waiting": "Waiting...",
+    "forfeit": "Forfeit",
+    "victory": "VICTORY",
+    "defeat": "DEFEAT",
+    "victory_caption": "You were the fastest!",
+    "defeat_caption": "Your opponent was faster.",
+    "back_hub": "BACK TO HUB",
+    "answer_label": "Word: {word}"
+  },
+  "onboarding": {
+    "step1": {
+      "title": "Welcome, traveler",
+      "body": "Slide your finger across the letters to form the word the griot is hiding."
+    },
+    "step2": {
+      "title": "Climb Africa",
+      "body": "51 peaks await you, from Gambia's Red Rocks to the roof of Kilimanjaro."
+    },
+    "step3": {
+      "title": "Challenge a friend",
+      "body": "QR code in hand, launch a real-time duel. Fastest player wins the wisdom."
+    },
+    "start": "LET'S GO"
   }
 }

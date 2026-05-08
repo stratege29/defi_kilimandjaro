@@ -11,6 +11,7 @@ import 'package:defi_kilimandjaro/presentation/game/game_view.dart';
 import 'package:defi_kilimandjaro/presentation/hub/hub_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_detail_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_list_view.dart';
+import 'package:defi_kilimandjaro/presentation/onboarding/onboarding_view.dart';
 import 'package:defi_kilimandjaro/presentation/profile/profile_view.dart';
 import 'package:defi_kilimandjaro/presentation/shop/shop_view.dart';
 import 'package:defi_kilimandjaro/presentation/splash/splash_view.dart';
@@ -19,6 +20,7 @@ import 'package:go_router/go_router.dart';
 /// Routes nommées de l'application.
 abstract final class AppRoutes {
   static const splash = '/';
+  static const onboarding = '/onboarding';
   static const hub = '/hub';
   static const game = '/game';
   static const result = '/result';
@@ -41,6 +43,11 @@ final GoRouter appRouter = GoRouter(
       path: AppRoutes.splash,
       name: 'splash',
       builder: (_, __) => const SplashView(),
+    ),
+    GoRoute(
+      path: AppRoutes.onboarding,
+      name: 'onboarding',
+      builder: (_, __) => const OnboardingView(),
     ),
     GoRoute(
       path: AppRoutes.hub,

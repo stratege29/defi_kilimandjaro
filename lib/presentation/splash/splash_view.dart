@@ -3,7 +3,10 @@ import 'dart:async';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/presentation/onboarding/onboarding_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Écran 01 — Splash Screen.
@@ -15,14 +18,14 @@ import 'package:go_router/go_router.dart';
 /// - Cercles concentriques animés (motifs Adinkra)
 /// - Indicateur de chargement pulsant (vert clair)
 /// - Auto-transition vers /hub après 2.5s
-class SplashView extends StatefulWidget {
+class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
 
   @override
-  State<SplashView> createState() => _SplashViewState();
+  ConsumerState<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends State<SplashView>
+class _SplashViewState extends ConsumerState<SplashView>
     with TickerProviderStateMixin {
   late final AnimationController _ringsCtrl;
   late final AnimationController _pulseCtrl;
@@ -40,9 +43,14 @@ class _SplashViewState extends State<SplashView>
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
 
-    // Auto-transition vers Hub après 2.5s (cf. maquette p.3 Interactions).
+    // Auto-transition après 2.5s vers Onboarding (1er lancement) ou Hub.
     _navTimer = Timer(const Duration(milliseconds: 2500), () {
-      if (mounted) context.go(AppRoutes.hub);
+      if (!mounted) return;
+      final prefs = ref.read(sharedPreferencesProvider);
+      final destination = isOnboardingSeen(prefs)
+          ? AppRoutes.hub
+          : AppRoutes.onboarding;
+      context.go(destination);
     });
   }
 
