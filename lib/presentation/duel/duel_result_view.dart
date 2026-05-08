@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
@@ -27,10 +28,10 @@ class DuelResultView extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-              Text(
-                won ? '🏆' : '💪',
-                style: const TextStyle(fontSize: 80),
-              ),
+              if (won)
+                Image.asset(AppAssets.duelTrophy, width: 120, height: 120)
+              else
+                Image.asset(AppAssets.iconStreak, width: 120, height: 120),
               const SizedBox(height: 16),
               Text(
                 won ? 'VICTOIRE' : 'DÉFAITE',

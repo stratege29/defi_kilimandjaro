@@ -59,3 +59,16 @@ flutter:
     - assets/data/devinettes/
     - assets/data/i18n/
     - assets/svg/
+    - assets/images/brand/
+    - assets/images/mascot/
+    - assets/images/tiles/
+    - assets/images/buttons/
+    - assets/images/icons/
+    - assets/images/backgrounds/
+    - assets/images/mountains/
+    - assets/images/devinettes/
+    - assets/images/ornaments/
+    - assets/images/fx/
+    - assets/images/badges/
+    - assets/images/shop/
+    - assets/images/duel/

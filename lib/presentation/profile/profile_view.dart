@@ -1,4 +1,5 @@
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
@@ -8,6 +9,7 @@ import 'package:defi_kilimandjaro/domain/entities/honorific_title.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/coin_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -172,23 +174,20 @@ class _AvatarHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
+        SizedBox(
           width: 76,
           height: 76,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.bois.withValues(alpha: 0.5),
-            border: Border.all(color: AppColors.orSoleil, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.4),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Image.asset(AppAssets.avatarFrame),
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: ClipOval(
+                  child: Image.asset(AppAssets.griotIdle, fit: BoxFit.cover),
+                ),
               ),
             ],
-          ),
-          child: const Center(
-            child: Icon(Icons.person, color: AppColors.ivoire, size: 40),
           ),
         ),
         const SizedBox(width: 14),
@@ -260,7 +259,7 @@ class _StatsRow extends StatelessWidget {
       children: [
         Expanded(
           child: _StatBox(
-            icon: '🏆',
+            iconLabel: '🏆',
             label: 'Niveaux',
             value: '${progress.totalLevelsCompleted}',
           ),
@@ -268,7 +267,7 @@ class _StatsRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _StatBox(
-            icon: '🪙',
+            iconWidget: const CoinIcon(size: 22),
             label: 'Coins',
             value: '${progress.coins}',
           ),
@@ -276,7 +275,7 @@ class _StatsRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _StatBox(
-            icon: '🏔️',
+            iconWidget: Image.asset(AppAssets.iconNavMap, width: 22, height: 22),
             label: 'Pays',
             value: '$countriesExplored',
           ),
@@ -284,7 +283,8 @@ class _StatsRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _StatBox(
-            icon: '🔥',
+            iconWidget:
+                Image.asset(AppAssets.iconStreak, width: 22, height: 22),
             label: 'Streak',
             value: '${progress.dailyStreak}',
           ),
@@ -296,12 +296,17 @@ class _StatsRow extends StatelessWidget {
 
 class _StatBox extends StatelessWidget {
   const _StatBox({
-    required this.icon,
     required this.label,
     required this.value,
-  });
+    this.iconLabel,
+    this.iconWidget,
+  }) : assert(
+          iconLabel != null || iconWidget != null,
+          'Provide either iconLabel (emoji) or iconWidget',
+        );
 
-  final String icon;
+  final String? iconLabel;
+  final Widget? iconWidget;
   final String label;
   final String value;
 
@@ -318,7 +323,11 @@ class _StatBox extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(icon, style: const TextStyle(fontSize: 20)),
+          SizedBox(
+            height: 22,
+            child: iconWidget ??
+                Text(iconLabel!, style: const TextStyle(fontSize: 20)),
+          ),
           const SizedBox(height: 2),
           Text(value, style: AppTypography.bebas(size: 20)),
           Text(
@@ -470,7 +479,7 @@ class _TitleRow extends StatelessWidget {
         children: [
           Opacity(
             opacity: unlocked ? 1 : 0.35,
-            child: Text(title.icon, style: const TextStyle(fontSize: 24)),
+            child: Image.asset(title.badgeAsset, width: 44, height: 44),
           ),
           const SizedBox(width: 12),
           Expanded(

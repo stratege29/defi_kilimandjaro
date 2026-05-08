@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
@@ -169,10 +170,14 @@ class _VictoryCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            // Celebration emoji — bouncing.
+            // Griot mascot — bouncing victory pose.
             ScaleTransition(
               scale: celebScale,
-              child: const Text('✨', style: TextStyle(fontSize: 48)),
+              child: Image.asset(
+                AppAssets.griotVictory,
+                width: 140,
+                height: 140,
+              ),
             ),
             const SizedBox(height: 12),
             // Subject illustration circle.

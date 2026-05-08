@@ -8,6 +8,7 @@ import 'package:defi_kilimandjaro/domain/entities/world.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/world_card.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/coin_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -213,7 +214,7 @@ class _Header extends ConsumerWidget {
           Text('KILIMANDJARO', style: AppTypography.bebas(size: 18)),
           const Spacer(),
           _Chip(
-            icon: '🪙',
+            iconWidget: const CoinIcon(size: 16),
             value: '${progress.coins}',
             trailingPlus: true,
             onTap: () => context.push(AppRoutes.shop),
@@ -228,12 +229,17 @@ class _Header extends ConsumerWidget {
 
 class _Chip extends StatelessWidget {
   const _Chip({
-    required this.icon,
     required this.value,
+    this.icon,
+    this.iconWidget,
     this.trailingPlus = false,
     this.onTap,
-  });
-  final String icon;
+  }) : assert(
+          icon != null || iconWidget != null,
+          'Provide either icon (emoji) or iconWidget',
+        );
+  final String? icon;
+  final Widget? iconWidget;
   final String value;
   final bool trailingPlus;
   final VoidCallback? onTap;
@@ -252,7 +258,7 @@ class _Chip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(icon, style: const TextStyle(fontSize: 14)),
+          iconWidget ?? Text(icon!, style: const TextStyle(fontSize: 14)),
           const SizedBox(width: 4),
           Text(
             value,

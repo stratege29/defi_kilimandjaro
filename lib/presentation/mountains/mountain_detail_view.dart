@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
@@ -8,6 +9,7 @@ import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/coin_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -211,7 +213,7 @@ class _Header extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('🪙', style: TextStyle(fontSize: 13)),
+                const CoinIcon(size: 16),
                 const SizedBox(width: 4),
                 Text(
                   '$coins',
@@ -408,7 +410,7 @@ class _LevelBullet extends StatelessWidget {
                 ),
               ),
             _BulletStatus.locked =>
-              const Icon(Icons.lock, color: Colors.white54, size: 22),
+              Image.asset(AppAssets.iconLock, width: 26, height: 26),
           },
         ),
       ),

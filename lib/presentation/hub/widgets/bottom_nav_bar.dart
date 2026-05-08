@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -33,19 +34,19 @@ class AppBottomNavBar extends StatelessWidget {
         child: Row(
           children: [
             _NavItem(
-              icon: Icons.play_arrow,
+              assetPath: AppAssets.iconNavPlay,
               label: 'Jouer',
               active: current == NavTab.jouer,
               onTap: () => onTabSelected(NavTab.jouer),
             ),
             _NavItem(
-              icon: Icons.public,
+              assetPath: AppAssets.iconNavMap,
               label: 'Afrique',
               active: current == NavTab.afrique,
               onTap: () => onTabSelected(NavTab.afrique),
             ),
             _NavItem(
-              icon: Icons.person,
+              assetPath: AppAssets.iconNavProfile,
               label: 'Profil',
               active: current == NavTab.profil,
               onTap: () => onTabSelected(NavTab.profil),
@@ -59,13 +60,18 @@ class AppBottomNavBar extends StatelessWidget {
 
 class _NavItem extends StatelessWidget {
   const _NavItem({
-    required this.icon,
     required this.label,
     required this.active,
     required this.onTap,
-  });
+    this.icon,
+    this.assetPath,
+  }) : assert(
+          icon != null || assetPath != null,
+          'Provide either Material icon or PNG asset path',
+        );
 
-  final IconData icon;
+  final IconData? icon;
+  final String? assetPath;
   final String label;
   final bool active;
   final VoidCallback onTap;
@@ -75,6 +81,13 @@ class _NavItem extends StatelessWidget {
     final color = active
         ? AppColors.orSoleil
         : AppColors.ivoire.withValues(alpha: 0.5);
+
+    final iconWidget = assetPath != null
+        ? Opacity(
+            opacity: active ? 1 : 0.55,
+            child: Image.asset(assetPath!, width: 28, height: 28),
+          )
+        : Icon(icon, color: color, size: 24);
 
     return Expanded(
       child: Material(
@@ -86,7 +99,7 @@ class _NavItem extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, color: color, size: 24),
+                iconWidget,
                 const SizedBox(height: 2),
                 Text(
                   label,

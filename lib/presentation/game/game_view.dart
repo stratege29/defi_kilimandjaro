@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
@@ -9,6 +10,7 @@ import 'package:defi_kilimandjaro/presentation/game/widgets/circular_grid.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/timer_bar.dart';
 import 'package:defi_kilimandjaro/presentation/result/failure_view.dart';
 import 'package:defi_kilimandjaro/presentation/result/victory_view.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/coin_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -229,7 +231,21 @@ class _RewardedAdChip extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '+50 🪙 regarder une pub',
+                  '+50',
+                  style: AppTypography.bebas(
+                    size: 13,
+                    color: AppColors.orSoleil
+                        .withValues(alpha: enabled ? 0.95 : 0.4),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Opacity(
+                  opacity: enabled ? 1 : 0.4,
+                  child: const CoinIcon(size: 14),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'regarder une pub',
                   style: AppTypography.bebas(
                     size: 13,
                     color: AppColors.orSoleil
@@ -272,11 +288,10 @@ class _GameHeader extends StatelessWidget {
           ),
           Text('KILIMANDJARO', style: AppTypography.bebas()),
           const Spacer(),
-          // Mute button (stub — audio agent scope).
-          Icon(
-            Icons.volume_up,
-            color: AppColors.orSoleil.withValues(alpha: 0.7),
-            size: 22,
+          // Audio indicator (static, toggle handled in profile).
+          Opacity(
+            opacity: 0.85,
+            child: Image.asset(AppAssets.iconAudioOn, width: 24, height: 24),
           ),
           const SizedBox(width: 12),
           // Coins chip.
@@ -306,7 +321,7 @@ class _CoinsChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const Text('🪙', style: TextStyle(fontSize: 14)),
+          const CoinIcon(size: 16),
           const SizedBox(width: 4),
           Text(
             '$coins',
@@ -383,9 +398,10 @@ class _RiddleCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           // Griot avatar.
-          const Text(
-            '🧙🏿',
-            style: TextStyle(fontSize: 28),
+          Image.asset(
+            AppAssets.griotIdle,
+            width: 64,
+            height: 64,
           ),
           const SizedBox(width: 10),
           // Riddle text.
@@ -429,7 +445,8 @@ class _ActionButtons extends StatelessWidget {
           Expanded(
             child: _GameButton(
               label: 'game.hint'.tr(),
-              subtitle: '-20 🪙',
+              subtitle: '-20',
+              iconAsset: AppAssets.iconHint,
               color: AppColors.bois,
               enabled: canHint,
               onTap: onHint,
@@ -440,6 +457,7 @@ class _ActionButtons extends StatelessWidget {
           Expanded(
             child: _GameButton(
               label: 'game.clear'.tr(),
+              iconAsset: AppAssets.iconErase,
               color: AppColors.boisFonce,
               onTap: onClear,
             ),
@@ -449,6 +467,7 @@ class _ActionButtons extends StatelessWidget {
           Expanded(
             child: _GameButton(
               label: 'game.validate'.tr(),
+              iconAsset: AppAssets.iconValidate,
               color: AppColors.vertClair,
               enabled: canValidate,
               onTap: onValidate,
@@ -466,11 +485,13 @@ class _GameButton extends StatelessWidget {
     required this.color,
     required this.onTap,
     this.subtitle,
+    this.iconAsset,
     this.enabled = true,
   });
 
   final String label;
   final String? subtitle;
+  final String? iconAsset;
   final Color color;
   final VoidCallback onTap;
   final bool enabled;
@@ -482,7 +503,7 @@ class _GameButton extends StatelessWidget {
       child: GestureDetector(
         onTap: enabled ? onTap : null,
         child: Container(
-          height: 48,
+          height: 56,
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(10),
@@ -495,24 +516,41 @@ class _GameButton extends StatelessWidget {
             ],
           ),
           child: Center(
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(
-                  label,
-                  style: AppTypography.bebas(
-                    size: 15,
-                    letterSpacing: 1,
-                  ),
-                ),
-                if (subtitle != null)
-                  Text(
-                    subtitle!,
-                    style: AppTypography.crimson(
-                      size: 11,
-                      color: AppColors.ivoire.withValues(alpha: 0.8),
+                if (iconAsset != null) ...[
+                  Image.asset(iconAsset!, width: 28, height: 28),
+                  const SizedBox(width: 6),
+                ],
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      label,
+                      style: AppTypography.bebas(
+                        size: 15,
+                        letterSpacing: 1,
+                      ),
                     ),
-                  ),
+                    if (subtitle != null)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            subtitle!,
+                            style: AppTypography.crimson(
+                              size: 11,
+                              color: AppColors.ivoire.withValues(alpha: 0.8),
+                            ),
+                          ),
+                          const SizedBox(width: 3),
+                          const CoinIcon(size: 11),
+                        ],
+                      ),
+                  ],
+                ),
               ],
             ),
           ),

@@ -1,8 +1,10 @@
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/iap/coin_pack.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/coin_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -161,7 +163,7 @@ class _CoinsHeaderChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('🪙', style: TextStyle(fontSize: 14)),
+          const CoinIcon(size: 16),
           const SizedBox(width: 4),
           Text(
             '$coins',
@@ -195,24 +197,34 @@ class _PromoBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.5)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(
-            'COINS DE SAGESSE',
-            style: AppTypography.bebas(
-              size: 18,
-              color: AppColors.orSoleil,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Achète des coins pour révéler des indices et progresser '
-            'plus vite vers le sommet du Kilimandjaro.',
-            style: AppTypography.crimson(
-              size: 13,
-              color: AppColors.ivoire.withValues(alpha: 0.85),
-              style: FontStyle.italic,
+          // Hero illustration : planche calebasses + coffres + trône.
+          Image.asset(AppAssets.shopPackSheet, width: 110, height: 110),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'COINS DE SAGESSE',
+                  style: AppTypography.bebas(
+                    size: 18,
+                    color: AppColors.orSoleil,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Achète des coins pour révéler des indices et progresser '
+                  'plus vite vers le sommet du Kilimandjaro.',
+                  style: AppTypography.crimson(
+                    size: 13,
+                    color: AppColors.ivoire.withValues(alpha: 0.85),
+                    style: FontStyle.italic,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -341,32 +353,27 @@ class _IconBadge extends StatelessWidget {
   const _IconBadge({required this.coins});
   final int coins;
 
+  /// Sélection du visuel selon la taille du pack — palette progressive
+  /// petite calebasse → grande calebasse → coffre → coffre cérémoniel → trône.
+  String _assetForCoins(int c) {
+    if (c >= 4000) return AppAssets.shopCoinsMega;
+    if (c >= 1000) return AppAssets.shopCoinsXL;
+    if (c >= 400) return AppAssets.shopCoinsL;
+    if (c >= 150) return AppAssets.shopCoinsM;
+    return AppAssets.shopCoinsS;
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = coins >= 1499
-        ? 64.0
+        ? 78.0
         : coins >= 499
-            ? 56.0
-            : 48.0;
+            ? 68.0
+            : 58.0;
     return SizedBox(
       width: size,
       height: size,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.orSoleil.withValues(alpha: 0.25),
-              border: Border.all(
-                color: AppColors.orSoleil.withValues(alpha: 0.7),
-                width: 2,
-              ),
-            ),
-          ),
-          const Text('🪙', style: TextStyle(fontSize: 28)),
-        ],
-      ),
+      child: Image.asset(_assetForCoins(coins), fit: BoxFit.contain),
     );
   }
 }
@@ -403,19 +410,12 @@ class _NoAdsCard extends ConsumerWidget {
             padding: const EdgeInsets.all(14),
             child: Row(
               children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.orSoleil.withValues(alpha: 0.25),
-                    border: Border.all(
-                      color: AppColors.orSoleil.withValues(alpha: 0.7),
-                      width: 2,
-                    ),
-                  ),
-                  child: const Center(
-                    child: Text('🚫', style: TextStyle(fontSize: 26)),
+                SizedBox(
+                  width: 64,
+                  height: 64,
+                  child: Image.asset(
+                    AppAssets.shopNoAds,
+                    fit: BoxFit.contain,
                   ),
                 ),
                 const SizedBox(width: 14),

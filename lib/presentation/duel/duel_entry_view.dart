@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
@@ -32,10 +33,12 @@ class DuelEntryView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 12),
-              const Text(
-                '⚔️',
-                style: TextStyle(fontSize: 64),
-                textAlign: TextAlign.center,
+              Center(
+                child: Image.asset(
+                  AppAssets.duelVsBanner,
+                  height: 96,
+                  fit: BoxFit.contain,
+                ),
               ),
               const SizedBox(height: 12),
               Text(

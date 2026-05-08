@@ -1,7 +1,33 @@
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:flutter/material.dart';
+
+/// IDs de montagnes pour lesquelles une illustration hero a été générée.
+const Set<String> _heroIds = {
+  'ci_nimba',
+  'cm_cameroon',
+  'ma_toubkal',
+  'et_ras_dashen',
+  'ke_mount_kenya',
+  'ug_stanley',
+  'tz_kilimanjaro',
+};
+
+/// Sélectionne le biome (1-4) depuis l'altitude.
+int _biomeTier(int altitudeM) {
+  if (altitudeM < 1000) return 1;
+  if (altitudeM < 2500) return 2;
+  if (altitudeM < 4000) return 3;
+  return 4;
+}
+
+/// Renvoie l'asset à afficher : hero si disponible, sinon biome par altitude.
+String _illustrationFor(Mountain m) {
+  if (_heroIds.contains(m.id)) return AppAssets.mountainHero(m.id);
+  return AppAssets.mountainBiome(_biomeTier(m.altitude));
+}
 
 /// Carte d'une montagne africaine dans la liste de progression.
 ///
@@ -55,7 +81,11 @@ class MountainCard extends StatelessWidget {
               children: [
                 _RankBadge(rank: rank, locked: !unlocked),
                 const SizedBox(width: 12),
-                _FlagAvatar(emoji: mountain.flagEmoji, locked: !unlocked),
+                _MountainAvatar(
+                  illustration: _illustrationFor(mountain),
+                  flagEmoji: mountain.flagEmoji,
+                  locked: !unlocked,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -124,28 +154,52 @@ class _RankBadge extends StatelessWidget {
   }
 }
 
-class _FlagAvatar extends StatelessWidget {
-  const _FlagAvatar({required this.emoji, required this.locked});
-  final String emoji;
+class _MountainAvatar extends StatelessWidget {
+  const _MountainAvatar({
+    required this.illustration,
+    required this.flagEmoji,
+    required this.locked,
+  });
+
+  final String illustration;
+  final String flagEmoji;
   final bool locked;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 48,
-      height: 48,
+      width: 56,
+      height: 56,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.bois.withValues(alpha: locked ? 0.15 : 0.4),
+        color: AppColors.bois.withValues(alpha: locked ? 0.15 : 0.35),
         border: Border.all(
           color: AppColors.orSoleil.withValues(alpha: locked ? 0.2 : 0.6),
           width: 1.4,
         ),
       ),
-      child: Center(
-        child: Opacity(
-          opacity: locked ? 0.4 : 1,
-          child: Text(emoji, style: const TextStyle(fontSize: 24)),
+      child: ClipOval(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Illustration (silhouette + couleurs).
+            Padding(
+              padding: const EdgeInsets.all(3),
+              child: Opacity(
+                opacity: locked ? 0.35 : 1,
+                child: Image.asset(illustration, fit: BoxFit.cover),
+              ),
+            ),
+            // Drapeau pays — petit overlay coin bas-droit.
+            Positioned(
+              right: 2,
+              bottom: 0,
+              child: Opacity(
+                opacity: locked ? 0.4 : 1,
+                child: Text(flagEmoji, style: const TextStyle(fontSize: 14)),
+              ),
+            ),
+          ],
         ),
       ),
     );

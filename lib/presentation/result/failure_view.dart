@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
@@ -127,8 +128,12 @@ class _FailureCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            // Hourglass — static.
-            const Text('⏳', style: TextStyle(fontSize: 48)),
+            // Griot mascot — empathetic consolation pose.
+            Image.asset(
+              AppAssets.griotSad,
+              width: 140,
+              height: 140,
+            ),
             const SizedBox(height: 12),
             // Subject circle — red border.
             _SubjectCircle(emoji: subjectEmoji, borderColor: AppColors.rouge),

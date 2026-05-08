@@ -61,6 +61,7 @@ android/app/debug/
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
+flutter_*.log
 **/*-firebase-adminsdk-*.json
 serviceAccountKey.json
 
