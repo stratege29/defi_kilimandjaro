@@ -1,15 +1,15 @@
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
-import 'package:defi_kilimandjaro/data/iap/coin_pack.dart';
+import 'package:defi_kilimandjaro/data/iap/cauris_pack.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
-import 'package:defi_kilimandjaro/presentation/widgets/coin_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Boutique de Coins de Sagesse — packs IAP.
+/// Boutique de Cauris de Sagesse — packs IAP.
 ///
 /// Cf. plan.md §1 et §4. Si le catalogue store est vide (produits pas
 /// encore créés en App Store Connect / Play Console), affiche les packs
@@ -19,7 +19,7 @@ class ShopView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final offers = ref.watch(coinOffersProvider);
+    final offers = ref.watch(caurisOffersProvider);
     final progress = ref.watch(playerProgressProvider);
 
     return Scaffold(
@@ -37,7 +37,7 @@ class ShopView extends ConsumerWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: _CoinsHeaderChip(coins: progress.coins),
+            child: _CaurisHeaderChip(cauris: progress.cauris),
           ),
         ],
       ),
@@ -63,7 +63,7 @@ class ShopView extends ConsumerWidget {
               ),
             ),
             _RestoreButton(onTap: () async {
-              await ref.read(coinOffersProvider.notifier).restore();
+              await ref.read(caurisOffersProvider.notifier).restore();
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -82,7 +82,7 @@ class ShopView extends ConsumerWidget {
   }
 
   Future<void> _handleBuyNoAds(BuildContext context, WidgetRef ref) async {
-    final notifier = ref.read(coinOffersProvider.notifier);
+    final notifier = ref.read(caurisOffersProvider.notifier);
     if (!notifier.noAdsAvailable) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -113,7 +113,7 @@ class ShopView extends ConsumerWidget {
   Future<void> _handleBuy(
     BuildContext context,
     WidgetRef ref,
-    CoinPackOffer offer,
+    CaurisPackOffer offer,
   ) async {
     if (!offer.available) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -127,7 +127,7 @@ class ShopView extends ConsumerWidget {
       );
       return;
     }
-    final ok = await ref.read(coinOffersProvider.notifier).buy(offer.pack);
+    final ok = await ref.read(caurisOffersProvider.notifier).buy(offer.pack);
     if (!context.mounted) return;
     if (!ok) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -144,12 +144,12 @@ class ShopView extends ConsumerWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Header chip (current coins)
+// Header chip (current cauris)
 // ---------------------------------------------------------------------------
 
-class _CoinsHeaderChip extends StatelessWidget {
-  const _CoinsHeaderChip({required this.coins});
-  final int coins;
+class _CaurisHeaderChip extends StatelessWidget {
+  const _CaurisHeaderChip({required this.cauris});
+  final int cauris;
 
   @override
   Widget build(BuildContext context) {
@@ -163,10 +163,10 @@ class _CoinsHeaderChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const CoinIcon(size: 16),
+          const CaurisIcon(size: 16),
           const SizedBox(width: 4),
           Text(
-            '$coins',
+            '$cauris',
             style: AppTypography.bebas(
               size: 14,
               color: AppColors.orSoleil,
@@ -208,7 +208,7 @@ class _PromoBanner extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'COINS DE SAGESSE',
+                  'CAURIS DE SAGESSE',
                   style: AppTypography.bebas(
                     size: 18,
                     color: AppColors.orSoleil,
@@ -216,7 +216,7 @@ class _PromoBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Achète des coins pour révéler des indices et progresser '
+                  'Achète des cauris pour révéler des indices et progresser '
                   'plus vite vers le sommet du Kilimandjaro.',
                   style: AppTypography.crimson(
                     size: 13,
@@ -240,7 +240,7 @@ class _PromoBanner extends StatelessWidget {
 class _PackCard extends StatelessWidget {
   const _PackCard({required this.offer, required this.onBuy});
 
-  final CoinPackOffer offer;
+  final CaurisPackOffer offer;
   final VoidCallback onBuy;
 
   @override
@@ -271,7 +271,7 @@ class _PackCard extends StatelessWidget {
             padding: const EdgeInsets.all(14),
             child: Row(
               children: [
-                _IconBadge(coins: pack.coins),
+                _IconBadge(cauris: pack.cauris),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
@@ -281,7 +281,7 @@ class _PackCard extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            '${pack.coins} Coins',
+                            '${pack.cauris} Cauris',
                             style: AppTypography.bebas(size: 18),
                           ),
                           if (highlight) ...[
@@ -350,30 +350,30 @@ class _PackCard extends StatelessWidget {
 }
 
 class _IconBadge extends StatelessWidget {
-  const _IconBadge({required this.coins});
-  final int coins;
+  const _IconBadge({required this.cauris});
+  final int cauris;
 
   /// Sélection du visuel selon la taille du pack — palette progressive
   /// petite calebasse → grande calebasse → coffre → coffre cérémoniel → trône.
-  String _assetForCoins(int c) {
-    if (c >= 4000) return AppAssets.shopCoinsMega;
-    if (c >= 1000) return AppAssets.shopCoinsXL;
-    if (c >= 400) return AppAssets.shopCoinsL;
-    if (c >= 150) return AppAssets.shopCoinsM;
-    return AppAssets.shopCoinsS;
+  String _assetForCauris(int c) {
+    if (c >= 4000) return AppAssets.shopCaurisMega;
+    if (c >= 1000) return AppAssets.shopCaurisXL;
+    if (c >= 400) return AppAssets.shopCaurisL;
+    if (c >= 150) return AppAssets.shopCaurisM;
+    return AppAssets.shopCaurisS;
   }
 
   @override
   Widget build(BuildContext context) {
-    final size = coins >= 1499
+    final size = cauris >= 1499
         ? 78.0
-        : coins >= 499
+        : cauris >= 499
             ? 68.0
             : 58.0;
     return SizedBox(
       width: size,
       height: size,
-      child: Image.asset(_assetForCoins(coins), fit: BoxFit.contain),
+      child: Image.asset(_assetForCauris(cauris), fit: BoxFit.contain),
     );
   }
 }
@@ -385,7 +385,7 @@ class _NoAdsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = ref.watch(coinOffersProvider.notifier);
+    final notifier = ref.watch(caurisOffersProvider.notifier);
     final price = notifier.noAdsPriceLabel;
     final available = notifier.noAdsAvailable;
 

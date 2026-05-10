@@ -8,28 +8,28 @@ class GameSession extends Equatable {
     required this.devinette,
     required this.startedAt,
     this.hintsUsed = 0,
-    this.coinsSpent = 0,
+    this.caurisSpent = 0,
   });
 
   final Devinette devinette;
   final DateTime startedAt;
   final int hintsUsed;
-  final int coinsSpent;
+  final int caurisSpent;
 
   GameSession copyWith({
     Devinette? devinette,
     DateTime? startedAt,
     int? hintsUsed,
-    int? coinsSpent,
+    int? caurisSpent,
   }) {
     return GameSession(
       devinette: devinette ?? this.devinette,
       startedAt: startedAt ?? this.startedAt,
       hintsUsed: hintsUsed ?? this.hintsUsed,
-      coinsSpent: coinsSpent ?? this.coinsSpent,
+      caurisSpent: caurisSpent ?? this.caurisSpent,
     );
   }
 
   @override
-  List<Object?> get props => [devinette, startedAt, hintsUsed, coinsSpent];
+  List<Object?> get props => [devinette, startedAt, hintsUsed, caurisSpent];
 }

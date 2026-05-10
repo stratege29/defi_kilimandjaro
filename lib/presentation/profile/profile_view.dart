@@ -5,11 +5,13 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/honorific_title.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
+import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
-import 'package:defi_kilimandjaro/presentation/widgets/coin_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +28,7 @@ class ProfileView extends ConsumerWidget {
     final progress = ref.watch(playerProgressProvider);
     final asyncMountains = ref.watch(mountainsProvider);
     final audioState = ref.watch(audioControllerProvider);
+    final profileAsync = ref.watch(playerProfileStreamProvider);
 
     final title = HonorificTitle.currentFor(progress.totalLevelsCompleted);
 
@@ -44,6 +47,11 @@ class ProfileView extends ConsumerWidget {
                     list.where((m) => progress.levelsOn(m.id) > 0).length,
                 orElse: () => 0,
               ),
+            ),
+            const SizedBox(height: 16),
+            // Altitude ELO — section Phase 6.
+            _AltitudeSection(
+              profile: profileAsync.value,
             ),
             const SizedBox(height: 28),
             _Section(
@@ -112,9 +120,9 @@ class ProfileView extends ConsumerWidget {
         current: NavTab.profil,
         onTabSelected: (t) {
           switch (t) {
-            case NavTab.jouer:
+            case NavTab.defi:
               context.go(AppRoutes.hub);
-            case NavTab.afrique:
+            case NavTab.sommets:
               context.go(AppRoutes.mountains);
             case NavTab.profil:
               break;
@@ -134,7 +142,7 @@ class ProfileView extends ConsumerWidget {
           style: AppTypography.bebas(size: 18),
         ),
         content: Text(
-          'Tous les coins, niveaux et titres seront perdus. Action '
+          'Tous les cauris, niveaux et titres seront perdus. Action '
           'irréversible.',
           style: AppTypography.crimson(size: 14),
         ),
@@ -244,7 +252,7 @@ class _AvatarHeader extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Stats row : Niveaux · Coins · Pays · Streak
+// Stats row : Niveaux · Cauris · Pays · Streak
 // ---------------------------------------------------------------------------
 
 class _StatsRow extends StatelessWidget {
@@ -267,9 +275,9 @@ class _StatsRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _StatBox(
-            iconWidget: const CoinIcon(size: 22),
-            label: 'Coins',
-            value: '${progress.coins}',
+            iconWidget: const CaurisIcon(size: 22),
+            label: 'Cauris',
+            value: '${progress.cauris}',
           ),
         ),
         const SizedBox(width: 8),
@@ -524,6 +532,137 @@ class _TitleRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Altitude ELO section (Phase 6)
+// ---------------------------------------------------------------------------
+
+class _AltitudeSection extends StatelessWidget {
+  const _AltitudeSection({required this.profile});
+  final PlayerProfile? profile;
+
+  @override
+  Widget build(BuildContext context) {
+    final elo = profile?.elo ?? PlayerProfile.eloInitial;
+    final peak = profile?.peakElo ?? PlayerProfile.eloInitial;
+    final totalDuels = profile?.totalDuels ?? 0;
+    final wins = profile?.wins ?? 0;
+    final losses = profile?.losses ?? 0;
+    final isMaster = elo >= PlayerProfile.eloMaster;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.bois.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.terrain, color: AppColors.orSoleil, size: 18),
+              const SizedBox(width: 6),
+              Text(
+                'DÉFI EN LIGNE',
+                style: AppTypography.bebas(
+                  size: 13,
+                  color: AppColors.orSoleil,
+                ),
+              ),
+              if (isMaster) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.orSoleil.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'MAITRE DU KILIMANDJARO',
+                    style: AppTypography.bebas(
+                      size: 10,
+                      color: AppColors.orSoleil,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _AltitudeStat(
+                  label: 'Altitude',
+                  value: '$elo m',
+                  color: AppColors.orSoleil,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _AltitudeStat(
+                  label: 'Record',
+                  value: '$peak m',
+                  color: AppColors.vertClair,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _AltitudeStat(
+                  label: 'Duels',
+                  value: '$totalDuels',
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _AltitudeStat(
+                  label: 'V/D',
+                  value: '$wins/$losses',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AltitudeStat extends StatelessWidget {
+  const _AltitudeStat({
+    required this.label,
+    required this.value,
+    this.color = AppColors.ivoire,
+  });
+
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: AppTypography.bebas(size: 18, color: color),
+        ),
+        Text(
+          label,
+          style: AppTypography.crimson(
+            size: 11,
+            color: AppColors.ivoire.withValues(alpha: 0.7),
+          ),
+        ),
+      ],
     );
   }
 }

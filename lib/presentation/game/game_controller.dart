@@ -17,7 +17,7 @@ class GameState {
     required this.selectedIndices,
     required this.timeLeft,
     required this.phase,
-    required this.coins,
+    required this.cauris,
     required this.shuffledIndices,
     this.hintRevealedCount = 0,
     this.validationCorrect = false,
@@ -30,7 +30,7 @@ class GameState {
 
   final int timeLeft;
   final GamePhase phase;
-  final int coins;
+  final int cauris;
 
   /// Permutation des indices de lettersPool (Fisher-Yates au départ).
   final List<int> shuffledIndices;
@@ -58,7 +58,7 @@ class GameState {
     List<int>? selectedIndices,
     int? timeLeft,
     GamePhase? phase,
-    int? coins,
+    int? cauris,
     List<int>? shuffledIndices,
     int? hintRevealedCount,
     bool? validationCorrect,
@@ -68,7 +68,7 @@ class GameState {
       selectedIndices: selectedIndices ?? this.selectedIndices,
       timeLeft: timeLeft ?? this.timeLeft,
       phase: phase ?? this.phase,
-      coins: coins ?? this.coins,
+      cauris: cauris ?? this.cauris,
       shuffledIndices: shuffledIndices ?? this.shuffledIndices,
       hintRevealedCount: hintRevealedCount ?? this.hintRevealedCount,
       validationCorrect: validationCorrect ?? this.validationCorrect,
@@ -89,7 +89,7 @@ class GameController extends StateNotifier<GameState> {
             selectedIndices: const <int>[],
             timeLeft: _gameDuration,
             phase: GamePhase.playing,
-            coins: _progress.state.coins,
+            cauris: _progress.state.cauris,
             shuffledIndices:
                 _shuffleIndices(_args.devinette.lettersPool.length),
           ),
@@ -99,7 +99,7 @@ class GameController extends StateNotifier<GameState> {
 
   static const int _hintCost = 20;
   static const int _gameDuration = 30;
-  static const int _coinsBase = 30;
+  static const int _caurisBase = 30;
 
   final GameArgs _args;
   final AudioController _audio;
@@ -154,14 +154,14 @@ class GameController extends StateNotifier<GameState> {
     );
   }
 
-  /// Révèle la prochaine lettre (coûte [_hintCost] coins).
+  /// Révèle la prochaine lettre (coûte [_hintCost] cauris).
   void useHint() {
     if (state.phase != GamePhase.playing) return;
-    if (state.coins < _hintCost) return;
+    if (state.cauris < _hintCost) return;
     if (state.hintRevealedCount >= state.devinette.answer.length) return;
 
     state = state.copyWith(
-      coins: state.coins - _hintCost,
+      cauris: state.cauris - _hintCost,
       hintRevealedCount: state.hintRevealedCount + 1,
     );
 
@@ -180,17 +180,17 @@ class GameController extends StateNotifier<GameState> {
     if (formed == state.devinette.answer) {
       _timer?.cancel();
       // Récompense : base 30 + bonus vitesse (timeLeft × 2).
-      final coinsAwarded = _coinsBase + state.timeLeft * 2;
+      final caurisAwarded = _caurisBase + state.timeLeft * 2;
       state = state.copyWith(
         phase: GamePhase.won,
         validationCorrect: true,
-        coins: state.coins + coinsAwarded,
+        cauris: state.cauris + caurisAwarded,
       );
-      // Persiste la victoire (coins + level mountain + total + lastPlay).
+      // Persiste la victoire (cauris + level mountain + total + lastPlay).
       unawaited(
         _progress.recordWin(
           mountainId: _args.mountainId,
-          coinsAwarded: coinsAwarded,
+          caurisAwarded: caurisAwarded,
         ),
       );
       // Audio: balafon accord 5 notes puis fanfare griot.
@@ -216,7 +216,7 @@ class GameController extends StateNotifier<GameState> {
       selectedIndices: const <int>[],
       timeLeft: _gameDuration,
       phase: GamePhase.playing,
-      coins: _progress.state.coins,
+      cauris: _progress.state.cauris,
       shuffledIndices: _shuffleIndices(state.devinette.lettersPool.length),
     );
     _startTimer();

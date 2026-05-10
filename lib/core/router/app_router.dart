@@ -6,6 +6,7 @@ import 'package:defi_kilimandjaro/presentation/duel/duel_entry_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_play_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_result_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_scan_view.dart';
+import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_view.dart';
 import 'package:defi_kilimandjaro/presentation/hub/hub_view.dart';
@@ -33,6 +34,9 @@ abstract final class AppRoutes {
   static const duelScan = '/duel/scan';
   static const duelPlay = '/duel/play';
   static const duelResult = '/duel/result';
+
+  /// Lobby matchmaking ELO (Phase 6).
+  static const duelLobby = '/duel/lobby';
 }
 
 final GoRouter appRouter = GoRouter(
@@ -118,6 +122,11 @@ final GoRouter appRouter = GoRouter(
         session: state.extra! as DuelSession,
       ),
     ),
-    // TODO(phase-6): duel
+    // Phase 6 — matchmaking ELO lobby.
+    GoRoute(
+      path: AppRoutes.duelLobby,
+      name: 'duel-lobby',
+      builder: (_, __) => const LobbyView(),
+    ),
   ],
 );

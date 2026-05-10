@@ -31,13 +31,13 @@
     "validate": "Valider",
     "won": "Bravo !",
     "lost": "Temps écoulé",
-    "hint_cost": "-20 pièces",
+    "hint_cost": "-20 cauris",
     "level": "Niveau",
-    "watch_ad_reward": "+50 🪙 regarder une pub"
+    "watch_ad_reward": "+50 🐚 regarder une pub"
   },
   "result": {
     "victory": {
-      "coins_earned": "+{coins} 🪙 Coins de Sagesse",
+      "cauris_earned": "+{cauris} 🐚 Cauris de Sagesse",
       "next": "SUIVANT →"
     },
     "failure": {
@@ -47,14 +47,19 @@
     }
   },
   "hub": {
-    "duel_banner": {
+    "title": "DÉFI",
+    "subtitle": "Affronte la communauté",
+    "friend_button": {
       "title": "DÉFIER UN AMI",
       "subtitle": "Duel temps réel via QR code"
     },
-    "world_locked": "Coins requis : {cost}"
+    "online_button": {
+      "title": "DÉFI EN LIGNE",
+      "subtitle": "Matchmaking ELO — trouve ton rival"
+    }
   },
   "mountains": {
-    "title": "MONTAGNES D'AFRIQUE",
+    "title": "SOMMETS D'AFRIQUE",
     "subtitle": "Du plus modeste sommet au toit du continent",
     "locked": "Bientôt disponible — termine la précédente",
     "level_locked": "Termine le niveau {previous} pour débloquer"
@@ -64,7 +69,7 @@
     "no_title_yet": "Encore aucun titre — joue 5 niveaux",
     "stats": {
       "levels": "Niveaux",
-      "coins": "Coins",
+      "cauris": "Cauris",
       "countries": "Pays",
       "streak": "Streak"
     },
@@ -82,7 +87,7 @@
     },
     "reset_dialog": {
       "title": "Réinitialiser ?",
-      "message": "Tous les coins, niveaux et titres seront perdus. Action irréversible.",
+      "message": "Tous les cauris, niveaux et titres seront perdus. Action irréversible.",
       "confirm": "Réinitialiser"
     },
     "title_progress": "Termine {threshold} niveaux pour débloquer ({current}/{threshold})"
@@ -90,8 +95,8 @@
   "shop": {
     "title": "BOUTIQUE",
     "promo": {
-      "title": "COINS DE SAGESSE",
-      "subtitle": "Achète des coins pour révéler des indices et progresser plus vite vers le sommet du Kilimandjaro."
+      "title": "CAURIS DE SAGESSE",
+      "subtitle": "Achète des cauris pour révéler des indices et progresser plus vite vers le sommet du Kilimandjaro."
     },
     "popular": "POPULAIRE",
     "available": "Achat unique en jeu",
@@ -143,7 +148,32 @@
     "victory_caption": "Tu as été le plus rapide !",
     "defeat_caption": "Ton adversaire a été plus rapide.",
     "back_hub": "RETOUR AU HUB",
-    "answer_label": "Mot : {word}"
+    "answer_label": "Mot : {word}",
+    "lobby": {
+      "title": "DÉFI EN LIGNE",
+      "altitude_current": "Altitude actuelle : {elo} m",
+      "searching": "Recherche d'un grimpeur de niveau similaire…",
+      "band": "Bande de recherche : ±{radius} m",
+      "time_left": "Temps restant : {s}s",
+      "cancel": "ANNULER",
+      "no_opponent_title": "PERSONNE DISPONIBLE",
+      "no_opponent_body": "Personne dans ton altitude pour le moment.\nReviens dans quelques instants !",
+      "retry": "RÉESSAYER",
+      "go_summit": "GRAVIR UN SOMMET"
+    },
+    "result_ranked": {
+      "altitude_gained": "+{delta} m d'altitude conquis",
+      "altitude_lost": "{delta} m d'altitude",
+      "new_altitude": "Nouvelle altitude : {elo} m"
+    },
+    "profile_altitude": {
+      "section": "DÉFI EN LIGNE",
+      "altitude": "Altitude",
+      "record": "Record",
+      "duels": "Duels",
+      "wl": "V/D",
+      "master": "MAITRE DU KILIMANDJARO"
+    }
   },
   "onboarding": {
     "step1": {

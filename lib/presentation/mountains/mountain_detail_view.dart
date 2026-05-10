@@ -9,7 +9,7 @@ import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
-import 'package:defi_kilimandjaro/presentation/widgets/coin_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -128,7 +128,7 @@ class _MountainDetailViewState extends ConsumerState<MountainDetailView>
           SafeArea(
             child: Column(
               children: [
-                _Header(mountain: mountain, coins: progress.coins),
+                _Header(mountain: mountain, cauris: progress.cauris),
                 Expanded(
                   child: LayoutBuilder(
                     builder: (_, constraints) {
@@ -152,13 +152,13 @@ class _MountainDetailViewState extends ConsumerState<MountainDetailView>
 }
 
 // ---------------------------------------------------------------------------
-// Header — back arrow + flag + name + altitude + coins
+// Header — back arrow + flag + name + altitude + cauris
 // ---------------------------------------------------------------------------
 
 class _Header extends StatelessWidget {
-  const _Header({required this.mountain, required this.coins});
+  const _Header({required this.mountain, required this.cauris});
   final Mountain mountain;
-  final int coins;
+  final int cauris;
 
   @override
   Widget build(BuildContext context) {
@@ -213,10 +213,10 @@ class _Header extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const CoinIcon(size: 16),
+                const CaurisIcon(size: 16),
                 const SizedBox(width: 4),
                 Text(
-                  '$coins',
+                  '$cauris',
                   style: AppTypography.bebas(
                     size: 14,
                     color: AppColors.orSoleil,

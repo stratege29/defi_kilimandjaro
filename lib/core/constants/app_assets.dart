@@ -65,8 +65,11 @@ abstract final class AppAssets {
   static const String avatarFrame = '$_buttons/avatar_frame.png';
 
   // --- Icônes UI ---
-  static const String iconCoin = '$_icons/coin.png';
-  static const String iconCoinStack = '$_icons/coin_stack.png';
+  // NB : les fichiers PNG conservent leur nom `coin*.png` côté assets/
+  // pour ne pas dupliquer la planche illustrative — seuls les identifiants
+  // Dart suivent le rebranding Cauris.
+  static const String iconCauris = '$_icons/coin.png';
+  static const String iconCaurisStack = '$_icons/coin_stack.png';
   static const String iconHint = '$_icons/hint_kola.png';
   static const String iconErase = '$_icons/erase_broom.png';
   static const String iconValidate = '$_icons/validate_check.png';
@@ -117,11 +120,11 @@ abstract final class AppAssets {
   /// comme illustration hero du Shop tant que les visuels individuels
   /// L1-L6 ne sont pas générés.
   static const String shopPackSheet = '$_shop/shop_pack_sheet.png';
-  static const String shopCoinsS = '$_shop/coins_s.png';
-  static const String shopCoinsM = '$_shop/coins_m.png';
-  static const String shopCoinsL = '$_shop/coins_l.png';
-  static const String shopCoinsXL = '$_shop/coins_xl.png';
-  static const String shopCoinsMega = '$_shop/coins_mega.png';
+  static const String shopCaurisS = '$_shop/coins_s.png';
+  static const String shopCaurisM = '$_shop/coins_m.png';
+  static const String shopCaurisL = '$_shop/coins_l.png';
+  static const String shopCaurisXL = '$_shop/coins_xl.png';
+  static const String shopCaurisMega = '$_shop/coins_mega.png';
   static const String shopNoAds = '$_shop/no_ads.png';
 
   // --- Duel ---

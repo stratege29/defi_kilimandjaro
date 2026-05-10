@@ -9,9 +9,12 @@ import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/firebase_options.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -48,6 +51,48 @@ Future<void> _bootstrap() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
+    // Local emulator wiring — opt-in via --dart-define USE_FIREBASE_EMULATOR=true
+    // (cf. README emulator section). Doit être appelé AVANT toute requête
+    // Firestore/RTDB/Functions et AVANT signInAnonymously.
+    // Chaque appel est isolé pour ne pas tuer le boot si l'emulator est
+    // injoignable.
+    const useEmulator = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
+    if (useEmulator) {
+      const emulatorHost = String.fromEnvironment(
+        'EMULATOR_HOST',
+        defaultValue: 'localhost',
+      );
+      // ignore: avoid_print
+      print('🔧 Wiring Firebase emulators to $emulatorHost');
+      try {
+        FirebaseFirestore.instance.useFirestoreEmulator(emulatorHost, 8080);
+      } catch (e) {
+        // ignore: avoid_print
+        print('🔧 Firestore emulator wire failed: $e');
+      }
+      try {
+        FirebaseDatabase.instance.useDatabaseEmulator(emulatorHost, 9000);
+      } catch (e) {
+        // ignore: avoid_print
+        print('🔧 Database emulator wire failed: $e');
+      }
+      try {
+        FirebaseFunctions.instanceFor(region: 'europe-west1')
+            .useFunctionsEmulator(emulatorHost, 5001);
+      } catch (e) {
+        // ignore: avoid_print
+        print('🔧 Functions emulator wire failed: $e');
+      }
+      try {
+        await FirebaseAuth.instance
+            .useAuthEmulator(emulatorHost, 9099)
+            .timeout(const Duration(seconds: 5));
+      } catch (e) {
+        // ignore: avoid_print
+        print('🔧 Auth emulator wire failed/timeout: $e');
+      }
+    }
+
     // Crashlytics: route Flutter framework errors to Firebase in release.
     FlutterError.onError = (errorDetails) {
       FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
@@ -59,11 +104,36 @@ Future<void> _bootstrap() async {
     await FirebaseCrashlytics.instance
         .setCrashlyticsCollectionEnabled(!kDebugMode);
 
-    if (FirebaseAuth.instance.currentUser == null) {
-      await FirebaseAuth.instance.signInAnonymously();
+    // En mode emulator, on force un fresh sign-in pour invalider tout
+    // token cached d'une session prod précédente (qui ferait rejeter les
+    // requêtes Firestore avec permission-denied).
+    if (useEmulator && FirebaseAuth.instance.currentUser != null) {
+      try {
+        await FirebaseAuth.instance.signOut();
+        // ignore: avoid_print
+        print('🔧 Emulator mode: signed out previous user (likely prod token)');
+      } catch (e) {
+        // ignore: avoid_print
+        print('🔧 signOut failed: $e');
+      }
     }
-  } on Exception catch (_) {
+
+    if (FirebaseAuth.instance.currentUser == null) {
+      try {
+        final cred = await FirebaseAuth.instance
+            .signInAnonymously()
+            .timeout(const Duration(seconds: 8));
+        // ignore: avoid_print
+        print('🔧 signInAnonymously OK uid=${cred.user?.uid}');
+      } catch (e) {
+        // ignore: avoid_print
+        print('🔧 signInAnonymously failed/timeout: $e');
+      }
+    }
+  } catch (e) {
     // Fail-soft: solo gameplay continues without backend if Firebase fails.
+    // ignore: avoid_print
+    print('🔧 Firebase bootstrap failed: $e');
   }
 
   final prefs = await SharedPreferences.getInstance();

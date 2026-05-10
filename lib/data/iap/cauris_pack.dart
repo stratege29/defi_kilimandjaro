@@ -1,30 +1,43 @@
 import 'package:equatable/equatable.dart';
 
-/// Catalogue des packs de Coins de Sagesse vendus en IAP.
+/// Catalogue des packs de Cauris de Sagesse vendus en IAP.
 ///
-/// Les `productId` doivent être identiques entre App Store Connect et
-/// Play Console. Convention `coins_pack_<amount>`.
-enum CoinPack {
-  small(productId: 'coins_pack_49', coins: 49, fallbackPriceLabel: '0,99 €'),
-  medium(productId: 'coins_pack_199', coins: 199, fallbackPriceLabel: '2,99 €'),
+/// Les `productId` sont conservés en `coins_pack_*` car ils correspondent
+/// aux SKUs déjà déclarés (ou à déclarer) sur App Store Connect / Play
+/// Console — un rename casserait les achats existants.
+enum CaurisPack {
+  small(productId: 'coins_pack_49', cauris: 49, fallbackPriceLabel: '0,99 €'),
+  medium(
+    productId: 'coins_pack_199',
+    cauris: 199,
+    fallbackPriceLabel: '2,99 €',
+  ),
   large(
     productId: 'coins_pack_499',
-    coins: 499,
+    cauris: 499,
     fallbackPriceLabel: '4,99 €',
     isBestValue: true,
   ),
-  huge(productId: 'coins_pack_1499', coins: 1499, fallbackPriceLabel: '9,99 €'),
-  mega(productId: 'coins_pack_4999', coins: 4999, fallbackPriceLabel: '24,99 €');
+  huge(
+    productId: 'coins_pack_1499',
+    cauris: 1499,
+    fallbackPriceLabel: '9,99 €',
+  ),
+  mega(
+    productId: 'coins_pack_4999',
+    cauris: 4999,
+    fallbackPriceLabel: '24,99 €',
+  );
 
-  const CoinPack({
+  const CaurisPack({
     required this.productId,
-    required this.coins,
+    required this.cauris,
     required this.fallbackPriceLabel,
     this.isBestValue = false,
   });
 
   final String productId;
-  final int coins;
+  final int cauris;
 
   /// Prix affiché si on n'a pas pu charger le catalogue store
   /// (ex: products pas encore créés en App Store Connect).
@@ -33,8 +46,8 @@ enum CoinPack {
   /// Mis en avant comme meilleur rapport qualité/prix.
   final bool isBestValue;
 
-  static CoinPack? fromProductId(String id) {
-    for (final p in CoinPack.values) {
+  static CaurisPack? fromProductId(String id) {
+    for (final p in CaurisPack.values) {
       if (p.productId == id) return p;
     }
     return null;
@@ -42,7 +55,7 @@ enum CoinPack {
 
   /// Tous les product IDs (à enregistrer dans le store).
   static List<String> allProductIds() =>
-      CoinPack.values.map((e) => e.productId).toList();
+      CaurisPack.values.map((e) => e.productId).toList();
 }
 
 /// Product ID du non-consumable "Supprimer les pubs" (4,99 €).
@@ -50,21 +63,21 @@ const String noAdsProductId = 'no_ads_remove';
 const String noAdsFallbackPrice = '4,99 €';
 
 /// Snapshot d'un pack avec son prix résolu depuis le store.
-class CoinPackOffer extends Equatable {
-  const CoinPackOffer({
+class CaurisPackOffer extends Equatable {
+  const CaurisPackOffer({
     required this.pack,
     required this.priceLabel,
     this.available = true,
   });
 
   /// Construction avec prix fallback (utilisé en mode dev sans store).
-  factory CoinPackOffer.fallback(CoinPack pack) => CoinPackOffer(
+  factory CaurisPackOffer.fallback(CaurisPack pack) => CaurisPackOffer(
         pack: pack,
         priceLabel: pack.fallbackPriceLabel,
         available: false,
       );
 
-  final CoinPack pack;
+  final CaurisPack pack;
   final String priceLabel;
   final bool available;
 

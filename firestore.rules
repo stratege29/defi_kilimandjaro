@@ -1,0 +1,33 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Profils joueurs ---
+    // Lecture publique pour afficher l'ELO dans le lobby.
+    // Écriture UNIQUEMENT via Admin SDK (Cloud Functions endMatch / requestMatch).
+    match /profiles/{uid} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // --- Historique des matchs ---
+    // Lecture autorisée aux participants du match uniquement.
+    // Écriture UNIQUEMENT via Admin SDK (Cloud Function endMatch).
+    match /matches_history/{matchId} {
+      allow read: if request.auth != null
+        && request.auth.uid in resource.data.players;
+      allow write: if false;
+    }
+
+    // --- Quotas rate-limiter (usage interne Functions) ---
+    match /users_quota/{uid} {
+      allow read, write: if false;
+    }
+
+    // --- Tout le reste est refusé par défaut ---
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

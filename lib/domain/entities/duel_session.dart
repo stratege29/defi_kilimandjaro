@@ -53,6 +53,7 @@ class DuelPlayer extends Equatable {
 /// - `riddle` / `explanation` / `proverb` : contenu de la devinette
 /// - `players/{uid}` : DuelPlayer state
 /// - `winner` : UID du gagnant (set quand phase = finished)
+/// - `is_ranked` : true pour matchmaking ELO, false pour duel ami QR (Phase 6)
 class DuelSession extends Equatable {
   const DuelSession({
     required this.matchId,
@@ -67,6 +68,7 @@ class DuelSession extends Equatable {
     required this.proverb,
     required this.players,
     this.winner,
+    this.isRanked = false,
   });
 
   factory DuelSession.fromJson(String matchId, Map<String, dynamic> json) {
@@ -97,6 +99,7 @@ class DuelSession extends Equatable {
       proverb: json['proverb'] as String? ?? '',
       players: players,
       winner: json['winner'] as String?,
+      isRanked: (json['is_ranked'] as bool?) ?? false,
     );
   }
 
@@ -112,6 +115,10 @@ class DuelSession extends Equatable {
   final String proverb;
   final Map<String, DuelPlayer> players;
   final String? winner;
+
+  /// True si le match a été créé par le matchmaking ELO (Phase 6).
+  /// False pour les duels ami via QR code.
+  final bool isRanked;
 
   /// Représentation compressée pour QR : `kilimandjaro://join?m=<id>&s=<secret>`.
   String toQrPayload() => 'kilimandjaro://join?m=$matchId&s=$secret';
@@ -149,5 +156,6 @@ class DuelSession extends Equatable {
         proverb,
         players,
         winner,
+        isRanked,
       ];
 }

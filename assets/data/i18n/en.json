@@ -31,13 +31,13 @@
     "validate": "Validate",
     "won": "Well done!",
     "lost": "Time's up",
-    "hint_cost": "-20 coins",
+    "hint_cost": "-20 cauris",
     "level": "Level",
-    "watch_ad_reward": "+50 🪙 watch an ad"
+    "watch_ad_reward": "+50 🐚 watch an ad"
   },
   "result": {
     "victory": {
-      "coins_earned": "+{coins} 🪙 Wisdom Coins",
+      "cauris_earned": "+{cauris} 🐚 Wisdom Cauris",
       "next": "NEXT →"
     },
     "failure": {
@@ -47,14 +47,19 @@
     }
   },
   "hub": {
-    "duel_banner": {
+    "title": "CHALLENGE",
+    "subtitle": "Take on the community",
+    "friend_button": {
       "title": "CHALLENGE A FRIEND",
       "subtitle": "Real-time duel via QR code"
     },
-    "world_locked": "Coins required: {cost}"
+    "online_button": {
+      "title": "ONLINE CHALLENGE",
+      "subtitle": "ELO matchmaking — find your rival"
+    }
   },
   "mountains": {
-    "title": "AFRICAN MOUNTAINS",
+    "title": "AFRICAN PEAKS",
     "subtitle": "From humble peaks to the roof of the continent",
     "locked": "Coming soon — finish the previous one",
     "level_locked": "Finish level {previous} to unlock"
@@ -64,7 +69,7 @@
     "no_title_yet": "No title yet — play 5 levels",
     "stats": {
       "levels": "Levels",
-      "coins": "Coins",
+      "cauris": "Cauris",
       "countries": "Countries",
       "streak": "Streak"
     },
@@ -82,7 +87,7 @@
     },
     "reset_dialog": {
       "title": "Reset?",
-      "message": "All coins, levels and titles will be lost. This cannot be undone.",
+      "message": "All cauris, levels and titles will be lost. This cannot be undone.",
       "confirm": "Reset"
     },
     "title_progress": "Finish {threshold} levels to unlock ({current}/{threshold})"
@@ -90,8 +95,8 @@
   "shop": {
     "title": "SHOP",
     "promo": {
-      "title": "WISDOM COINS",
-      "subtitle": "Buy coins to reveal hints and climb faster toward the summit of Kilimandjaro."
+      "title": "WISDOM CAURIS",
+      "subtitle": "Buy cauris to reveal hints and climb faster toward the summit of Kilimandjaro."
     },
     "popular": "POPULAR",
     "available": "One-time in-game purchase",
@@ -143,7 +148,32 @@
     "victory_caption": "You were the fastest!",
     "defeat_caption": "Your opponent was faster.",
     "back_hub": "BACK TO HUB",
-    "answer_label": "Word: {word}"
+    "answer_label": "Word: {word}",
+    "lobby": {
+      "title": "ONLINE CHALLENGE",
+      "altitude_current": "Current altitude: {elo} m",
+      "searching": "Searching for a climber at a similar level…",
+      "band": "Search band: ±{radius} m",
+      "time_left": "Time left: {s}s",
+      "cancel": "CANCEL",
+      "no_opponent_title": "NOBODY AVAILABLE",
+      "no_opponent_body": "No one at your altitude right now.\nCome back in a few moments!",
+      "retry": "TRY AGAIN",
+      "go_summit": "CLIMB A SUMMIT"
+    },
+    "result_ranked": {
+      "altitude_gained": "+{delta} m altitude gained",
+      "altitude_lost": "{delta} m altitude",
+      "new_altitude": "New altitude: {elo} m"
+    },
+    "profile_altitude": {
+      "section": "ONLINE CHALLENGE",
+      "altitude": "Altitude",
+      "record": "Record",
+      "duels": "Duels",
+      "wl": "W/L",
+      "master": "MASTER OF KILIMANJARO"
+    }
   },
   "onboarding": {
     "step1": {

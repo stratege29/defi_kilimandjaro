@@ -1,24 +1,21 @@
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
-import 'package:defi_kilimandjaro/data/datasources/mock_worlds.dart';
-import 'package:defi_kilimandjaro/data/repositories/devinette_repository_impl.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
-import 'package:defi_kilimandjaro/domain/entities/world.dart';
-import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
-import 'package:defi_kilimandjaro/presentation/hub/widgets/world_card.dart';
-import 'package:defi_kilimandjaro/presentation/widgets/coin_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Écran 02 — Hub des Mondes (cf. maquette p.4).
+/// Écran 02 — Hub Défi.
 ///
-/// Sélection du monde thématique. Vue d'ensemble de la progression par monde.
-/// - Header : Logo + coins + niveau joueur
-/// - 4 cartes mondes verticales (défilable)
-/// - Bottom nav : Jouer / Afrique / Profil
+/// Point d'entrée des modes compétitifs :
+/// - Défier un ami (QR code, temps réel) — actif.
+/// - Défi en ligne ELO (matchmaking aléatoire) — bientôt.
+///
+/// La progression solo est désormais regroupée dans l'onglet « Sommets »
+/// (cf. `mountain_list_view.dart`).
 class HubView extends ConsumerStatefulWidget {
   const HubView({super.key});
 
@@ -27,45 +24,6 @@ class HubView extends ConsumerStatefulWidget {
 }
 
 class _HubViewState extends ConsumerState<HubView> {
-  NavTab _currentTab = NavTab.jouer;
-
-  Future<void> _onWorldTap(BuildContext context, World world) async {
-    if (!world.unlocked) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Coins requis : ${world.unlockCost}',
-            style: AppTypography.bebas(),
-          ),
-          backgroundColor: AppColors.boisFonce,
-        ),
-      );
-      return;
-    }
-
-    try {
-      final repo = ref.read(devinetteRepositoryProvider);
-      final devinette = await repo.randomFromWorld(world.id);
-      if (!context.mounted) return;
-      // Mode "monde thématique" : pas de mountainId associé.
-      await context.push<void>(
-        AppRoutes.game,
-        extra: GameArgs(devinette: devinette),
-      );
-    } on Exception catch (_) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Aucune devinette disponible pour ${world.name}',
-            style: AppTypography.bebas(),
-          ),
-          backgroundColor: AppColors.rouge,
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,42 +32,39 @@ class _HubViewState extends ConsumerState<HubView> {
         child: Column(
           children: [
             const _Header(),
-            const _DuelBanner(),
+            const _IntroBlock(),
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.only(top: 8, bottom: 16),
-                itemCount: mockWorlds.length,
-                itemBuilder: (_, i) {
-                  final world = mockWorlds[i];
-                  return WorldCard(
-                    world: world,
-                    onTap: () => _onWorldTap(context, world),
-                    onLongPress: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Aperçu ${world.name} (TODO)',
-                            style: AppTypography.bebas(),
-                          ),
-                          backgroundColor: AppColors.boisFonce,
-                          duration: const Duration(milliseconds: 800),
-                        ),
-                      );
-                    },
-                  );
-                },
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                children: [
+                  _DuelButton(
+                    icon: Icons.qr_code_2,
+                    label: 'DÉFIER UN AMI',
+                    description: 'Duel temps réel via QR code',
+                    accent: AppColors.vertClair,
+                    onTap: () => context.push(AppRoutes.duel),
+                  ),
+                  const SizedBox(height: 14),
+                  _DuelButton(
+                    icon: Icons.public,
+                    label: 'DÉFI EN LIGNE',
+                    description: 'Matchmaking ELO — trouve ton rival',
+                    accent: AppColors.orSoleil,
+                    onTap: () => context.push(AppRoutes.duelLobby),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
       bottomNavigationBar: AppBottomNavBar(
-        current: _currentTab,
+        current: NavTab.defi,
         onTabSelected: (t) {
           switch (t) {
-            case NavTab.jouer:
-              setState(() => _currentTab = t);
-            case NavTab.afrique:
+            case NavTab.defi:
+              break;
+            case NavTab.sommets:
               context.go(AppRoutes.mountains);
             case NavTab.profil:
               context.go(AppRoutes.profile);
@@ -118,73 +73,99 @@ class _HubViewState extends ConsumerState<HubView> {
       ),
     );
   }
+
+  // _showSoonSnack supprimé — le bouton DÉFI EN LIGNE est désormais actif
+  // et navigue vers AppRoutes.duelLobby (Phase 6).
 }
 
-class _DuelBanner extends StatelessWidget {
-  const _DuelBanner();
+class _IntroBlock extends StatelessWidget {
+  const _IntroBlock();
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => context.push(AppRoutes.duel),
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.rouge.withValues(alpha: 0.25),
-                  AppColors.orChaud.withValues(alpha: 0.18),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: AppColors.orSoleil.withValues(alpha: 0.6),
-                width: 2,
-              ),
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'DÉFI 1V1',
+            style: AppTypography.bebas(size: 26, color: AppColors.orSoleil),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Mesure-toi à un ami ou à la communauté.',
+            style: AppTypography.crimson(
+              size: 13,
+              color: AppColors.ivoire.withValues(alpha: 0.75),
+              style: FontStyle.italic,
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.vertForet.withValues(alpha: 0.5),
-                    border: Border.all(color: AppColors.orSoleil),
-                  ),
-                  child: const Text('⚔️', style: TextStyle(fontSize: 22)),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'DÉFIER UN AMI',
-                        style: AppTypography.bebas(),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Duel temps réel via QR code',
-                        style: AppTypography.crimson(
-                          size: 12,
-                          color: AppColors.ivoire.withValues(alpha: 0.75),
-                          style: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right, color: AppColors.orSoleil),
-              ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DuelButton extends StatelessWidget {
+  const _DuelButton({
+    required this.icon,
+    required this.label,
+    required this.description,
+    required this.accent,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final String description;
+  final Color accent;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: accent.withValues(alpha: 0.18),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: accent.withValues(alpha: 0.7),
+              width: 2,
             ),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: accent, size: 36),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      label,
+                      style: AppTypography.bebas(size: 18),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      description,
+                      style: AppTypography.crimson(
+                        size: 12,
+                        color: AppColors.ivoire.withValues(alpha: 0.7),
+                        style: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: accent),
+            ],
           ),
         ),
       ),
@@ -214,8 +195,8 @@ class _Header extends ConsumerWidget {
           Text('KILIMANDJARO', style: AppTypography.bebas(size: 18)),
           const Spacer(),
           _Chip(
-            iconWidget: const CoinIcon(size: 16),
-            value: '${progress.coins}',
+            iconWidget: const CaurisIcon(size: 16),
+            value: '${progress.cauris}',
             trailingPlus: true,
             onTap: () => context.push(AppRoutes.shop),
           ),

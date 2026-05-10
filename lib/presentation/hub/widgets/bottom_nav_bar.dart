@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 /// Navigation bottom (cf. maquette §Composants p.2 et p.4).
 ///
 /// 3 onglets sticky en bas · fond noir 60% · onglet actif en or.
-enum NavTab { jouer, afrique, profil }
+enum NavTab { defi, sommets, profil }
 
 class AppBottomNavBar extends StatelessWidget {
   const AppBottomNavBar({
@@ -35,15 +35,15 @@ class AppBottomNavBar extends StatelessWidget {
           children: [
             _NavItem(
               assetPath: AppAssets.iconNavPlay,
-              label: 'Jouer',
-              active: current == NavTab.jouer,
-              onTap: () => onTabSelected(NavTab.jouer),
+              label: 'Défi',
+              active: current == NavTab.defi,
+              onTap: () => onTabSelected(NavTab.defi),
             ),
             _NavItem(
               assetPath: AppAssets.iconNavMap,
-              label: 'Afrique',
-              active: current == NavTab.afrique,
-              onTap: () => onTabSelected(NavTab.afrique),
+              label: 'Sommets',
+              active: current == NavTab.sommets,
+              onTap: () => onTabSelected(NavTab.sommets),
             ),
             _NavItem(
               assetPath: AppAssets.iconNavProfile,

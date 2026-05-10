@@ -10,7 +10,7 @@ import 'package:defi_kilimandjaro/presentation/game/widgets/circular_grid.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/timer_bar.dart';
 import 'package:defi_kilimandjaro/presentation/result/failure_view.dart';
 import 'package:defi_kilimandjaro/presentation/result/victory_view.dart';
-import 'package:defi_kilimandjaro/presentation/widgets/coin_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -64,7 +64,7 @@ class _GameViewState extends ConsumerState<GameView> {
           children: <Widget>[
             // Header.
             _GameHeader(
-              coins: gameState.coins,
+              cauris: gameState.cauris,
               onBack: () => context.pop(),
             ),
             const SizedBox(height: 8),
@@ -112,13 +112,13 @@ class _GameViewState extends ConsumerState<GameView> {
                 onWatch: () async {
                   final got = await ref
                       .read(adsServiceProvider)
-                      .showRewardedForCoins();
+                      .showRewardedForCauris();
                   if (!context.mounted) return;
                   if (got) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          '+50 Coins de Sagesse',
+                          '+50 Cauris de Sagesse',
                           style: AppTypography.bebas(),
                         ),
                         backgroundColor: AppColors.vertClair,
@@ -134,7 +134,7 @@ class _GameViewState extends ConsumerState<GameView> {
               onHint: controller.useHint,
               onClear: controller.clearSelection,
               onValidate: controller.validate,
-              canHint: gameState.coins >= 20 &&
+              canHint: gameState.cauris >= 20 &&
                   gameState.hintRevealedCount <
                       widget.args.devinette.answer.length &&
                   gameState.phase == GamePhase.playing,
@@ -241,7 +241,7 @@ class _RewardedAdChip extends StatelessWidget {
                 const SizedBox(width: 4),
                 Opacity(
                   opacity: enabled ? 1 : 0.4,
-                  child: const CoinIcon(size: 14),
+                  child: const CaurisIcon(size: 14),
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -267,11 +267,11 @@ class _RewardedAdChip extends StatelessWidget {
 
 class _GameHeader extends StatelessWidget {
   const _GameHeader({
-    required this.coins,
+    required this.cauris,
     required this.onBack,
   });
 
-  final int coins;
+  final int cauris;
   final VoidCallback onBack;
 
   @override
@@ -294,18 +294,18 @@ class _GameHeader extends StatelessWidget {
             child: Image.asset(AppAssets.iconAudioOn, width: 24, height: 24),
           ),
           const SizedBox(width: 12),
-          // Coins chip.
-          _CoinsChip(coins: coins),
+          // Cauris chip.
+          _CaurisChip(cauris: cauris),
         ],
       ),
     );
   }
 }
 
-class _CoinsChip extends StatelessWidget {
-  const _CoinsChip({required this.coins});
+class _CaurisChip extends StatelessWidget {
+  const _CaurisChip({required this.cauris});
 
-  final int coins;
+  final int cauris;
 
   @override
   Widget build(BuildContext context) {
@@ -321,10 +321,10 @@ class _CoinsChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          const CoinIcon(size: 16),
+          const CaurisIcon(size: 16),
           const SizedBox(width: 4),
           Text(
-            '$coins',
+            '$cauris',
             style: AppTypography.bebas(size: 14, color: AppColors.orSoleil),
           ),
         ],
@@ -546,7 +546,7 @@ class _GameButton extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 3),
-                          const CoinIcon(size: 11),
+                          const CaurisIcon(size: 11),
                         ],
                       ),
                   ],

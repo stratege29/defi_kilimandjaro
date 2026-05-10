@@ -60,11 +60,11 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
 
   /// Récompense après une victoire sur une montagne donnée.
   ///
-  /// `coinsAwarded` = base 30 + bonus vitesse (timeLeft × 2).
+  /// `caurisAwarded` = base 30 + bonus vitesse (timeLeft × 2).
   /// Reset le compteur d'échecs consécutifs.
   Future<void> recordWin({
     required String? mountainId,
-    required int coinsAwarded,
+    required int caurisAwarded,
   }) async {
     final levels = Map<String, int>.from(state.completedLevelsByMountain);
     if (mountainId != null) {
@@ -72,7 +72,7 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     }
 
     final newState = state.copyWith(
-      coins: state.coins + coinsAwarded,
+      cauris: state.cauris + caurisAwarded,
       completedLevelsByMountain: levels,
       totalLevelsCompleted: state.totalLevelsCompleted + 1,
       lastPlayDate: DateTime.now(),
@@ -102,18 +102,18 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
 
   /// Déduit le coût d'un indice. Retourne `false` si solde insuffisant.
   Future<bool> spendOnHint(int cost) async {
-    if (state.coins < cost) return false;
-    final newState = state.copyWith(coins: state.coins - cost);
+    if (state.cauris < cost) return false;
+    final newState = state.copyWith(cauris: state.cauris - cost);
     state = newState;
     await _repo.save(newState);
     return true;
   }
 
-  /// Ajoute des coins au solde (utilisé par les achats IAP et les pubs
+  /// Ajoute des cauris au solde (utilisé par les achats IAP et les pubs
   /// rewarded vidéo en Phase 4.2).
-  Future<void> addCoins(int amount) async {
+  Future<void> addCauris(int amount) async {
     if (amount <= 0) return;
-    final newState = state.copyWith(coins: state.coins + amount);
+    final newState = state.copyWith(cauris: state.cauris + amount);
     state = newState;
     await _repo.save(newState);
   }

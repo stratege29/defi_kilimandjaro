@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/domain/entities/mountain_shape.dart';
 import 'package:equatable/equatable.dart';
 
 /// Une montagne africaine — point culminant d'un pays.
@@ -13,6 +14,7 @@ class Mountain extends Equatable {
     required this.flagEmoji,
     required this.altitude,
     required this.totalLevels,
+    this.shape = MountainShape.cone,
     this.completedLevels = 0,
     this.unlocked = false,
   });
@@ -26,8 +28,16 @@ class Mountain extends Equatable {
       flagEmoji: json['flag_emoji'] as String,
       altitude: json['altitude_m'] as int,
       totalLevels: (json['total_levels'] as int?) ?? 6,
+      shape: _parseShape((json['shape'] as String?) ?? ''),
       completedLevels: (json['completed_levels'] as int?) ?? 0,
       unlocked: (json['unlocked'] as bool?) ?? false,
+    );
+  }
+
+  static MountainShape _parseShape(String raw) {
+    return MountainShape.values.firstWhere(
+      (s) => s.name == raw,
+      orElse: () => MountainShape.cone,
     );
   }
 
@@ -41,6 +51,10 @@ class Mountain extends Equatable {
   final int altitude;
 
   final int totalLevels;
+
+  /// Archétype géomorphologique du sommet — détermine la silhouette dessinée.
+  final MountainShape shape;
+
   final int completedLevels;
   final bool unlocked;
 
@@ -50,6 +64,7 @@ class Mountain extends Equatable {
   Mountain copyWith({
     int? completedLevels,
     bool? unlocked,
+    MountainShape? shape,
   }) {
     return Mountain(
       id: id,
@@ -59,6 +74,7 @@ class Mountain extends Equatable {
       flagEmoji: flagEmoji,
       altitude: altitude,
       totalLevels: totalLevels,
+      shape: shape ?? this.shape,
       completedLevels: completedLevels ?? this.completedLevels,
       unlocked: unlocked ?? this.unlocked,
     );
@@ -73,6 +89,7 @@ class Mountain extends Equatable {
         flagEmoji,
         altitude,
         totalLevels,
+        shape,
         completedLevels,
         unlocked,
       ];

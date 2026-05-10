@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:defi_kilimandjaro/data/iap/coin_pack.dart';
+import 'package:defi_kilimandjaro/data/iap/cauris_pack.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -38,7 +38,7 @@ class IAPService {
     );
 
     final allIds = <String>{
-      ...CoinPack.allProductIds(),
+      ...CaurisPack.allProductIds(),
       noAdsProductId,
     };
     final response = await _iap.queryProductDetails(allIds);
@@ -69,22 +69,22 @@ class IAPService {
   ///
   /// Si le catalogue store est vide (dev / produits pas encore créés),
   /// on renvoie tous les packs avec leurs prix fallback et `available=false`.
-  List<CoinPackOffer> offers() {
+  List<CaurisPackOffer> offers() {
     if (_details.isEmpty) {
-      return CoinPack.values.map(CoinPackOffer.fallback).toList();
+      return CaurisPack.values.map(CaurisPackOffer.fallback).toList();
     }
     return [
-      for (final p in CoinPack.values)
+      for (final p in CaurisPack.values)
         if (_details[p.productId] case final d?)
-          CoinPackOffer(pack: p, priceLabel: d.price)
+          CaurisPackOffer(pack: p, priceLabel: d.price)
         else
-          CoinPackOffer.fallback(p),
+          CaurisPackOffer.fallback(p),
     ];
   }
 
   /// Lance l'achat. Retourne `false` si le pack n'est pas dans le catalogue
   /// store (impossible d'acheter en l'état).
-  Future<bool> buy(CoinPack pack) async {
+  Future<bool> buy(CaurisPack pack) async {
     final details = _details[pack.productId];
     if (details == null) {
       _log.w("Tentative achat d'un pack non dispo: ${pack.productId}");
@@ -121,13 +121,13 @@ class IAPService {
       _log.i('No-Ads accordé via IAP');
       return;
     }
-    final pack = CoinPack.fromProductId(purchase.productID);
+    final pack = CaurisPack.fromProductId(purchase.productID);
     if (pack == null) {
       _log.w('Achat reconnu mais produit inconnu: ${purchase.productID}');
       return;
     }
-    await _progress.addCoins(pack.coins);
-    _log.i('+${pack.coins} coins crédités via IAP ${pack.productId}');
+    await _progress.addCauris(pack.cauris);
+    _log.i('+${pack.cauris} cauris crédités via IAP ${pack.productId}');
   }
 
   Future<void> dispose() async {
@@ -149,8 +149,8 @@ final iapServiceProvider = Provider<IAPService>((ref) {
 });
 
 /// Liste d'offres réactive — re-fetch quand on appelle `refresh()`.
-class CoinOffersNotifier extends StateNotifier<List<CoinPackOffer>> {
-  CoinOffersNotifier(this._service) : super(_service.offers());
+class CaurisOffersNotifier extends StateNotifier<List<CaurisPackOffer>> {
+  CaurisOffersNotifier(this._service) : super(_service.offers());
 
   final IAPService _service;
 
@@ -158,7 +158,7 @@ class CoinOffersNotifier extends StateNotifier<List<CoinPackOffer>> {
     state = _service.offers();
   }
 
-  Future<bool> buy(CoinPack pack) => _service.buy(pack);
+  Future<bool> buy(CaurisPack pack) => _service.buy(pack);
 
   Future<bool> buyNoAds() => _service.buyNoAds();
 
@@ -170,7 +170,7 @@ class CoinOffersNotifier extends StateNotifier<List<CoinPackOffer>> {
   Future<void> restore() => _service.restore();
 }
 
-final coinOffersProvider =
-    StateNotifierProvider<CoinOffersNotifier, List<CoinPackOffer>>((ref) {
-  return CoinOffersNotifier(ref.watch(iapServiceProvider));
+final caurisOffersProvider =
+    StateNotifierProvider<CaurisOffersNotifier, List<CaurisPackOffer>>((ref) {
+  return CaurisOffersNotifier(ref.watch(iapServiceProvider));
 });

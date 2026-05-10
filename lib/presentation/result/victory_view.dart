@@ -22,7 +22,7 @@ class VictoryView extends StatefulWidget {
 
   final Devinette devinette;
 
-  /// Secondes restantes au moment de la victoire (pour bonus coins).
+  /// Secondes restantes au moment de la victoire (pour bonus cauris).
   final int timeLeft;
 
   /// Callback appelé quand l'utilisateur tape SUIVANT.
@@ -41,7 +41,7 @@ class _VictoryViewState extends State<VictoryView>
   late final Animation<double> _celebScale;
   late final Animation<double> _cardScale;
 
-  int get _coinsEarned => 30 + widget.timeLeft;
+  int get _caurisEarned => 30 + widget.timeLeft;
 
   @override
   void initState() {
@@ -116,7 +116,7 @@ class _VictoryViewState extends State<VictoryView>
             scale: _cardScale,
             child: _VictoryCard(
               devinette: widget.devinette,
-              coinsEarned: _coinsEarned,
+              caurisEarned: _caurisEarned,
               celebScale: _celebScale,
               subjectEmoji: _subjectEmoji(),
               onNext: widget.onNext,
@@ -135,14 +135,14 @@ class _VictoryViewState extends State<VictoryView>
 class _VictoryCard extends StatelessWidget {
   const _VictoryCard({
     required this.devinette,
-    required this.coinsEarned,
+    required this.caurisEarned,
     required this.celebScale,
     required this.subjectEmoji,
     required this.onNext,
   });
 
   final Devinette devinette;
-  final int coinsEarned;
+  final int caurisEarned;
   final Animation<double> celebScale;
   final String subjectEmoji;
   final VoidCallback onNext;
@@ -202,10 +202,10 @@ class _VictoryCard extends StatelessWidget {
             // Proverb box.
             _ProverbBox(proverb: devinette.proverb),
             const SizedBox(height: 14),
-            // Coins earned.
+            // Cauris earned.
             Text(
-              'result.victory.coins_earned'
-                  .tr(namedArgs: <String, String>{'coins': '$coinsEarned'}),
+              'result.victory.cauris_earned'
+                  .tr(namedArgs: <String, String>{'cauris': '$caurisEarned'}),
               style: AppTypography.bebas(size: 18, color: AppColors.orSoleil),
             ),
             const SizedBox(height: 20),

@@ -6,7 +6,7 @@ import 'package:equatable/equatable.dart';
 /// Évolution v2 : sync Firestore quand authentifié (Phase 4 + multijoueur).
 class PlayerProgress extends Equatable {
   const PlayerProgress({
-    required this.coins,
+    required this.cauris,
     required this.completedLevelsByMountain,
     required this.totalLevelsCompleted,
     required this.dailyStreak,
@@ -17,15 +17,17 @@ class PlayerProgress extends Equatable {
 
   /// État initial pour un nouveau joueur.
   factory PlayerProgress.initial() => const PlayerProgress(
-        coins: 120,
+        cauris: 120,
         completedLevelsByMountain: <String, int>{},
         totalLevelsCompleted: 0,
         dailyStreak: 0,
       );
 
   factory PlayerProgress.fromJson(Map<String, dynamic> json) {
+    // Tolère l'ancienne clé `coins` pour ne pas perdre le solde des
+    // joueurs existants après le rebranding Cauris.
     return PlayerProgress(
-      coins: (json['coins'] as int?) ?? 120,
+      cauris: (json['cauris'] as int?) ?? (json['coins'] as int?) ?? 120,
       completedLevelsByMountain:
           ((json['levels'] as Map<String, dynamic>?) ?? <String, dynamic>{})
               .map((k, v) => MapEntry(k, v as int)),
@@ -39,8 +41,8 @@ class PlayerProgress extends Equatable {
     );
   }
 
-  /// Solde de Coins de Sagesse.
-  final int coins;
+  /// Solde de Cauris de Sagesse (cauris = monnaie shell d'Afrique de l'Ouest).
+  final int cauris;
 
   /// Niveaux complétés par montagne (mountainId → count).
   final Map<String, int> completedLevelsByMountain;
@@ -62,7 +64,7 @@ class PlayerProgress extends Equatable {
   final bool noAdsPurchased;
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'coins': coins,
+        'cauris': cauris,
         'levels': completedLevelsByMountain,
         'total': totalLevelsCompleted,
         'streak': dailyStreak,
@@ -76,7 +78,7 @@ class PlayerProgress extends Equatable {
       completedLevelsByMountain[mountainId] ?? 0;
 
   PlayerProgress copyWith({
-    int? coins,
+    int? cauris,
     Map<String, int>? completedLevelsByMountain,
     int? totalLevelsCompleted,
     int? dailyStreak,
@@ -85,7 +87,7 @@ class PlayerProgress extends Equatable {
     bool? noAdsPurchased,
   }) {
     return PlayerProgress(
-      coins: coins ?? this.coins,
+      cauris: cauris ?? this.cauris,
       completedLevelsByMountain:
           completedLevelsByMountain ?? this.completedLevelsByMountain,
       totalLevelsCompleted: totalLevelsCompleted ?? this.totalLevelsCompleted,
@@ -98,7 +100,7 @@ class PlayerProgress extends Equatable {
 
   @override
   List<Object?> get props => [
-        coins,
+        cauris,
         completedLevelsByMountain,
         totalLevelsCompleted,
         dailyStreak,

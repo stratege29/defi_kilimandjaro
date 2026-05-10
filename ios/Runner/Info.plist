@@ -48,6 +48,26 @@
 		<!-- Camera: required by mobile_scanner to scan duel QR codes. -->
 		<key>NSCameraUsageDescription</key>
 		<string>Pour scanner le QR code de ton ami et lancer un duel temps réel.</string>
+		<!-- Local network access: required pour Firebase emulator en dev (LAN IP). -->
+		<key>NSLocalNetworkUsageDescription</key>
+		<string>Connexion aux services Firebase locaux (mode développement uniquement).</string>
+		<!-- Force iOS à déclencher le dialog "Réseau local" au boot. Sans ça,
+		     iOS ne demande jamais la permission et bloque silencieusement les
+		     connexions vers les IPs LAN. -->
+		<key>NSBonjourServices</key>
+		<array>
+			<string>_http._tcp</string>
+			<string>_dartobservatory._tcp</string>
+		</array>
+		<!-- ATS exception: autorise HTTP cleartext vers le réseau local pour
+		     les Firebase emulators en dev. NE PAS expédier en production. -->
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsLocalNetworking</key>
+			<true/>
+			<key>NSAllowsArbitraryLoads</key>
+			<true/>
+		</dict>
 		<!-- AdMob: TEST identifier — replace with real ID once an AdMob app is created. -->
 		<key>GADApplicationIdentifier</key>
 		<string>ca-app-pub-3940256099942544~1458002511</string>

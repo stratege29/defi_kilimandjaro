@@ -62,9 +62,9 @@ class AdsService {
     );
   }
 
-  /// Montre une rewarded video. Crédite [coinsReward] sur succès.
+  /// Montre une rewarded video. Crédite [caurisReward] sur succès.
   /// Retourne `true` si l'utilisateur a regardé jusqu'au bout.
-  Future<bool> showRewardedForCoins({int coinsReward = 50}) async {
+  Future<bool> showRewardedForCauris({int caurisReward = 50}) async {
     if (!_initialized) return false;
     final ad = _rewarded;
     if (ad == null) {
@@ -92,7 +92,7 @@ class AdsService {
 
     await ad.show(
       onUserEarnedReward: (_, __) async {
-        await _progress.addCoins(coinsReward);
+        await _progress.addCauris(caurisReward);
         if (!completer.isCompleted) completer.complete(true);
       },
     );
