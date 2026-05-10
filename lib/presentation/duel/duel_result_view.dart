@@ -5,6 +5,8 @@ import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/matchmaking_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
+import 'package:defi_kilimandjaro/presentation/duel/lobby_controller.dart'
+    show lobbyRematchUidProvider;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -61,6 +63,27 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
         setState(() => _eloLoading = false);
       }
     }
+  }
+
+  /// Détermine l'UID de l'adversaire (pour le bouton REMATCH).
+  String? _opponentUid() {
+    final myUid = ref.read(firebaseAuthProvider).currentUser?.uid ?? '';
+    for (final uid in widget.session.players.keys) {
+      if (uid != myUid) return uid;
+    }
+    return null;
+  }
+
+  void _onRematch() {
+    final opponentUid = _opponentUid();
+    // Pré-positionne le provider rematch avant de naviguer.
+    if (opponentUid != null) {
+      ref.read(lobbyRematchUidProvider.notifier).state = opponentUid;
+    }
+    // Navigation vers le lobby avec message rematch.
+    // TODO(PR-3 social): remplacer par une CF "rematch ciblé" qui force le
+    // match avec l'adversaire exact via target_opponent: opponentUid.
+    context.go(AppRoutes.duelLobby);
   }
 
   @override
@@ -152,6 +175,7 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                 ),
               ),
               const Spacer(),
+              // --- CTA principal : RETOUR AU HUB ---
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -169,6 +193,32 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                   ),
                 ),
               ),
+              // --- CTA secondaire : REMATCH (uniquement pour les duels ranked) ---
+              if (widget.session.isRanked) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _onRematch,
+                    icon: const Icon(
+                      Icons.replay,
+                      color: AppColors.vertClair,
+                      size: 20,
+                    ),
+                    label: Text(
+                      'REMATCH',
+                      style: AppTypography.bebas(
+                        size: 18,
+                        color: AppColors.vertClair,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.vertClair),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 8),
             ],
           ),

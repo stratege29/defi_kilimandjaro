@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
@@ -16,31 +17,53 @@ import 'package:go_router/go_router.dart';
 ///
 /// Reçoit la [DuelSession] initiale via `state.extra`, puis suit les
 /// updates via `duelSessionStreamProvider`.
-class DuelPlayView extends ConsumerWidget {
+///
+/// Si la session est ranked, joue le son de démarrage de duel une seule
+/// fois au montage (cf. spec PR #2 § Audio wiring).
+class DuelPlayView extends ConsumerStatefulWidget {
   const DuelPlayView({required this.initialSession, super.key});
 
   final DuelSession initialSession;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DuelPlayView> createState() => _DuelPlayViewState();
+}
+
+class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
+  @override
+  void initState() {
+    super.initState();
+    // Wire audio : gong de démarrage uniquement pour les duels ranked.
+    if (widget.initialSession.isRanked) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref
+            .read(audioControllerProvider.notifier)
+            .playDuelStart()
+            .ignore();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final auth = ref.watch(firebaseAuthProvider);
     final selfUid = auth.currentUser?.uid ?? '';
 
     final liveSession = ref
-        .watch(duelSessionStreamProvider(initialSession.matchId))
+        .watch(duelSessionStreamProvider(widget.initialSession.matchId))
         .value ??
-        initialSession;
+        widget.initialSession;
 
     // IMPORTANT: keyed on initialSession (stable widget field) — using the
     // live session as key would recreate the controller on every RTDB
     // update and wipe the local selection.
-    final localState = ref.watch(duelControllerProvider(initialSession));
+    final localState = ref.watch(duelControllerProvider(widget.initialSession));
     final controller =
-        ref.read(duelControllerProvider(initialSession).notifier);
+        ref.read(duelControllerProvider(widget.initialSession).notifier);
 
     // Naviguer vers le résultat dès que la phase est finished.
     ref.listen<AsyncValue<DuelSession?>>(
-      duelSessionStreamProvider(initialSession.matchId),
+      duelSessionStreamProvider(widget.initialSession.matchId),
       (prev, next) {
         final s = next.value;
         if (s == null) return;
@@ -119,7 +142,7 @@ class DuelPlayView extends ConsumerWidget {
       ),
     );
   }
-}
+} // _DuelPlayViewState
 
 class _DuelHeader extends StatelessWidget {
   const _DuelHeader({

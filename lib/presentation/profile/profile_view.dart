@@ -10,6 +10,8 @@ import 'package:defi_kilimandjaro/domain/entities/honorific_title.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
+import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart'
+    show kAltitudeHeroTag;
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:flutter/material.dart';
@@ -599,11 +601,15 @@ class _AltitudeSection extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
+              // Hero partagé avec HubView et LobbyView.
               Expanded(
-                child: _AltitudeStat(
-                  label: 'Altitude',
-                  value: '$elo m',
-                  color: AppColors.orSoleil,
+                child: Hero(
+                  tag: kAltitudeHeroTag,
+                  child: _AltitudeStat(
+                    label: 'Altitude',
+                    value: '$elo m',
+                    color: AppColors.orSoleil,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),

@@ -16,6 +16,7 @@ import 'package:defi_kilimandjaro/presentation/onboarding/onboarding_view.dart';
 import 'package:defi_kilimandjaro/presentation/profile/profile_view.dart';
 import 'package:defi_kilimandjaro/presentation/shop/shop_view.dart';
 import 'package:defi_kilimandjaro/presentation/splash/splash_view.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 /// Routes nommées de l'application.
@@ -108,11 +109,23 @@ final GoRouter appRouter = GoRouter(
       name: 'duel-scan',
       builder: (_, __) => const DuelScanView(),
     ),
+    // duelPlay : transition crossfade 400ms depuis le lobby.
     GoRoute(
       path: AppRoutes.duelPlay,
       name: 'duel-play',
-      builder: (_, state) => DuelPlayView(
-        initialSession: state.extra! as DuelSession,
+      pageBuilder: (_, state) => CustomTransitionPage<void>(
+        key: state.pageKey,
+        child: DuelPlayView(
+          initialSession: state.extra! as DuelSession,
+        ),
+        transitionDuration: const Duration(milliseconds: 400),
+        // reverseTransitionDuration defaults to transitionDuration (400ms) —
+        // explicitly set a shorter one for the back gesture.
+        reverseTransitionDuration: const Duration(milliseconds: 280),
+        transitionsBuilder: (_, animation, __, child) => FadeTransition(
+          opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+          child: child,
+        ),
       ),
     ),
     GoRoute(
@@ -123,10 +136,16 @@ final GoRouter appRouter = GoRouter(
       ),
     ),
     // Phase 6 — matchmaking ELO lobby.
+    // Accepte un [LobbyArgs] optionnel en extra pour le mode rematch.
     GoRoute(
       path: AppRoutes.duelLobby,
       name: 'duel-lobby',
-      builder: (_, __) => const LobbyView(),
+      builder: (_, state) {
+        // Réinitialise l'UID rematch quand on arrive via navigation directe
+        // (sans LobbyArgs). Le provider est mis à jour avant la navigation
+        // dans DuelResultView._onRematch via lobbyRematchUidProvider.
+        return const LobbyView();
+      },
     ),
   ],
 );

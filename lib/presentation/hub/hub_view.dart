@@ -2,6 +2,8 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
+import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:flutter/material.dart';
@@ -45,12 +47,17 @@ class _HubViewState extends ConsumerState<HubView> {
                     onTap: () => context.push(AppRoutes.duel),
                   ),
                   const SizedBox(height: 14),
-                  _DuelButton(
-                    icon: Icons.public,
-                    label: 'DÉFI EN LIGNE',
-                    description: 'Matchmaking ELO — trouve ton rival',
-                    accent: AppColors.orSoleil,
-                    onTap: () => context.push(AppRoutes.duelLobby),
+                  // Hero tag sur ce bouton : la couleur orSoleil reste
+                  // visuellement continue pendant la navigation vers le lobby.
+                  Hero(
+                    tag: 'hub-duel-en-ligne',
+                    child: _DuelButton(
+                      icon: Icons.public,
+                      label: 'DÉFI EN LIGNE',
+                      description: 'Matchmaking ELO — trouve ton rival',
+                      accent: AppColors.orSoleil,
+                      onTap: () => context.push(AppRoutes.duelLobby),
+                    ),
                   ),
                 ],
               ),
@@ -180,6 +187,8 @@ class _Header extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final progress = ref.watch(playerProgressProvider);
     final levelTier = 1 + (progress.totalLevelsCompleted ~/ 10);
+    final profileAsync = ref.watch(playerProfileStreamProvider);
+    final myElo = profileAsync.value?.elo ?? 1000;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
@@ -202,6 +211,41 @@ class _Header extends ConsumerWidget {
           ),
           const SizedBox(width: 8),
           _Chip(icon: '⭐', value: 'N$levelTier'),
+          const SizedBox(width: 8),
+          // Hero partagé avec LobbyView et ProfileView.
+          Hero(
+            tag: kAltitudeHeroTag,
+            child: _AltitudeHeroChip(elo: myElo),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Chip altitude partagée via Hero entre Hub, Lobby et Profile.
+class _AltitudeHeroChip extends StatelessWidget {
+  const _AltitudeHeroChip({required this.elo});
+  final int elo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.bois.withValues(alpha: 0.28),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.terrain, size: 14, color: AppColors.orSoleil),
+          const SizedBox(width: 4),
+          Text(
+            '$elo m',
+            style: AppTypography.bebas(size: 14, color: AppColors.orSoleil),
+          ),
         ],
       ),
     );

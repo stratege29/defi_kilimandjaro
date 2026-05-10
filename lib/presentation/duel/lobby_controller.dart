@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/data/repositories/matchmaking_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
@@ -28,12 +29,14 @@ class LobbyState {
     required this.secondsElapsed,
     this.matchedSession,
     this.errorMessage,
+    this.rematchOpponentUid,
   });
 
-  factory LobbyState.initial() => const LobbyState(
+  factory LobbyState.initial({String? rematchOpponentUid}) => LobbyState(
         phase: LobbyPhase.searching,
         expansionStep: 0,
         secondsElapsed: 0,
+        rematchOpponentUid: rematchOpponentUid,
       );
 
   final LobbyPhase phase;
@@ -52,12 +55,23 @@ class LobbyState {
 
   final String? errorMessage;
 
+  /// UID de l'adversaire ciblé pour un rematch (null = matchmaking standard).
+  ///
+  /// TODO(PR-3 social): quand un vrai CF "rematch ciblé synchrone" sera ajouté,
+  /// passer ce uid à la Cloud Function pour forcer le match avec cet adversaire.
+  /// Pour l'instant le matchmaking standard s'applique et le champ sert
+  /// uniquement à afficher un message informatif dans l'UI.
+  final String? rematchOpponentUid;
+
+  bool get isRematch => rematchOpponentUid != null;
+
   LobbyState copyWith({
     LobbyPhase? phase,
     int? expansionStep,
     int? secondsElapsed,
     DuelSession? matchedSession,
     String? errorMessage,
+    String? rematchOpponentUid,
   }) {
     return LobbyState(
       phase: phase ?? this.phase,
@@ -65,8 +79,18 @@ class LobbyState {
       secondsElapsed: secondsElapsed ?? this.secondsElapsed,
       matchedSession: matchedSession ?? this.matchedSession,
       errorMessage: errorMessage ?? this.errorMessage,
+      rematchOpponentUid: rematchOpponentUid ?? this.rematchOpponentUid,
     );
   }
+}
+
+/// Paramètres du lobby passés via `state.extra` dans go_router.
+///
+/// [rematchOpponentUid] : UID de l'adversaire du dernier duel. Si fourni,
+/// le lobby affiche un message "rematch" mais utilise le matchmaking standard.
+class LobbyArgs {
+  const LobbyArgs({this.rematchOpponentUid});
+  final String? rematchOpponentUid;
 }
 
 /// Contrôleur du lobby matchmaking.
@@ -74,16 +98,22 @@ class LobbyState {
 /// - Appelle `requestMatch` toutes les 5 s avec expansion progressive.
 /// - Timeout à 30 s → état noOpponent.
 /// - Annule proprement via [cancelSearch].
+/// - Wire audio : loop tam-tam au démarrage, stop + ding au match.
 class LobbyController extends StateNotifier<LobbyState> {
   LobbyController({
     required this.matchmakingRepo,
+    required this.audioController,
     required this.profile,
-  }) : super(LobbyState.initial()) {
+    String? rematchOpponentUid,
+  }) : super(LobbyState.initial(rematchOpponentUid: rematchOpponentUid)) {
     _requestId = const Uuid().v4();
     _startSearch();
+    // Audio — démarre la loop tam-tam 108 BPM dès l'entrée en recherche.
+    unawaited(audioController.playLobbySearchLoop());
   }
 
   final MatchmakingRepository matchmakingRepo;
+  final AudioController audioController;
   final PlayerProfile profile;
   final Logger _log = Logger();
 
@@ -118,7 +148,8 @@ class LobbyController extends StateNotifier<LobbyState> {
 
     final expansionStep = state.secondsElapsed ~/ _pollIntervalSeconds;
     _log.d('Polling matchmaking — step $expansionStep, '
-        'band ±${150 + expansionStep * 75} m');
+        'band ±${150 + expansionStep * 75} m'
+        '${state.isRematch ? " [rematch]" : ""}');
 
     state = state.copyWith(expansionStep: expansionStep);
 
@@ -133,6 +164,9 @@ class LobbyController extends StateNotifier<LobbyState> {
       if (result is MatchmakingMatched) {
         _pollTimer?.cancel();
         _tickTimer?.cancel();
+        // Audio — stop loop + ding match trouvé.
+        unawaited(audioController.stopLobbySearchLoop());
+        unawaited(audioController.playLobbyMatchFound());
         state = state.copyWith(
           phase: LobbyPhase.matched,
           matchedSession: result.session,
@@ -150,6 +184,7 @@ class LobbyController extends StateNotifier<LobbyState> {
     _pollTimer?.cancel();
     _tickTimer?.cancel();
     if (!_cancelled && state.phase == LobbyPhase.searching) {
+      unawaited(audioController.stopLobbySearchLoop());
       state = state.copyWith(phase: LobbyPhase.noOpponent);
       // Annuler l'entrée lobby côté serveur (fire-and-forget).
       matchmakingRepo.cancelMatch().ignore();
@@ -162,6 +197,7 @@ class LobbyController extends StateNotifier<LobbyState> {
     _cancelled = true;
     _pollTimer?.cancel();
     _tickTimer?.cancel();
+    unawaited(audioController.stopLobbySearchLoop());
     await matchmakingRepo.cancelMatch();
   }
 
@@ -171,8 +207,10 @@ class LobbyController extends StateNotifier<LobbyState> {
     _tickTimer?.cancel();
     _cancelled = false;
     _requestId = const Uuid().v4();
-    state = LobbyState.initial();
+    state = LobbyState.initial(rematchOpponentUid: state.rematchOpponentUid);
     _startSearch();
+    // Relance la loop audio.
+    unawaited(audioController.playLobbySearchLoop());
   }
 
   @override
@@ -180,6 +218,8 @@ class LobbyController extends StateNotifier<LobbyState> {
     _cancelled = true;
     _pollTimer?.cancel();
     _tickTimer?.cancel();
+    // Arrêt sécurisé de la loop au cas où le widget est détruit en mid-search.
+    unawaited(audioController.stopLobbySearchLoop());
     super.dispose();
   }
 }
@@ -190,9 +230,23 @@ final lobbyControllerProvider =
     final profile = ref.watch(
       playerProfileStreamProvider.select((v) => v.value),
     );
+    // L'UID du rematch est passé via les args de la route (voir app_router.dart).
+    final rematchUid = ref.watch(_lobbyRematchUidProvider);
     return LobbyController(
       matchmakingRepo: ref.watch(matchmakingRepositoryProvider),
+      audioController: ref.read(audioControllerProvider.notifier),
       profile: profile ?? PlayerProfile.initial('anonymous'),
+      rematchOpponentUid: rematchUid,
     );
   },
 );
+
+/// Provider intermédiaire permettant de passer l'UID de rematch sans
+/// modifier la signature du provider principal (évite le family).
+///
+/// Surcharger ce provider depuis la vue avant d'accéder à lobbyControllerProvider.
+final _lobbyRematchUidProvider = StateProvider<String?>((ref) => null);
+
+/// Provider public permettant à la vue lobby et au router de setter
+/// l'UID de rematch avant la navigation.
+final lobbyRematchUidProvider = _lobbyRematchUidProvider;

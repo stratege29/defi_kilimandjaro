@@ -4,10 +4,12 @@ import 'package:defi_kilimandjaro/audio/instruments/balafon.dart';
 import 'package:defi_kilimandjaro/audio/instruments/djembe.dart';
 import 'package:defi_kilimandjaro/audio/instruments/griot_fanfare.dart';
 import 'package:defi_kilimandjaro/audio/instruments/kora.dart';
+import 'package:defi_kilimandjaro/audio/instruments/lobby_duel.dart';
 import 'package:defi_kilimandjaro/audio/instruments/tam_tam.dart';
 import 'package:defi_kilimandjaro/audio/tempo_scheduler.dart';
 import 'package:defi_kilimandjaro/audio/wav_buffer.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -57,6 +59,46 @@ void main() {
       }
     });
 
+    test('LobbyDuel samples produce valid WAV byte buffers', () {
+      final wavs = <(String, List<int>)>[
+        ('lobbyLoopDoum', LobbyDuel.renderLoopDoum()),
+        ('lobbyLoopTac', LobbyDuel.renderLoopTac()),
+        ('lobbyMatchFound', LobbyDuel.renderMatchFound()),
+        ('duelStart', LobbyDuel.renderDuelStart()),
+      ];
+      for (final (name, w) in wavs) {
+        expect(
+          w.length,
+          greaterThan(44),
+          reason: '$name WAV should have header',
+        );
+        expect(
+          String.fromCharCodes(w.sublist(0, 4)),
+          'RIFF',
+          reason: '$name should start with RIFF',
+        );
+        expect(
+          String.fromCharCodes(w.sublist(8, 12)),
+          'WAVE',
+          reason: '$name should be WAVE format',
+        );
+      }
+    });
+
+    test('LobbyDuel.renderLoopDoum is shorter than renderMatchFound', () {
+      // doum is a short single-hit sample (~280 ms); matchFound is ~620 ms.
+      final doum = LobbyDuel.renderLoopDoum();
+      final matchFound = LobbyDuel.renderMatchFound();
+      expect(doum.length, lessThan(matchFound.length));
+    });
+
+    test('LobbyDuel.renderDuelStart is longer than renderLoopTac', () {
+      // duelStart is ~820 ms; tac is a short hit ~180 ms.
+      final tac = LobbyDuel.renderLoopTac();
+      final duelStart = LobbyDuel.renderDuelStart();
+      expect(tac.length, lessThan(duelStart.length));
+    });
+
     test('WavBuffer.normalize peaks at target', () {
       final buf = WavBuffer.silence(0.01)
         ..[0] = 0.2
@@ -77,6 +119,75 @@ void main() {
       final s = AudioState.defaults().copyWith(muted: true);
       expect(s.muted, isTrue);
       expect(s.volume, 0.8);
+    });
+  });
+
+  group('AudioController lobby loop', () {
+    late AudioController controller;
+
+    setUp(() {
+      // Provide a mock SharedPreferences store so setMuted/setVolume don't
+      // throw MissingPluginException in the unit-test runner.
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      // AudioEngine is in silent mode (SoLoud unavailable) — play() is no-op.
+      controller = AudioController(AudioEngine.instance);
+    });
+
+    tearDown(() {
+      controller.dispose();
+    });
+
+    test('playLobbySearchLoop is idempotent — multiple calls start one loop',
+        () async {
+      await controller.playLobbySearchLoop();
+      await controller.playLobbySearchLoop(); // second call must be no-op
+      // Verify no exception is thrown and controller is still usable.
+      expect(controller.state.muted, isFalse);
+    });
+
+    test('stopLobbySearchLoop is safe when no loop is active', () async {
+      // Must not throw even if called before playLobbySearchLoop.
+      await expectLater(controller.stopLobbySearchLoop(), completes);
+    });
+
+    test('stopLobbySearchLoop stops the loop', () async {
+      await controller.playLobbySearchLoop();
+      await controller.stopLobbySearchLoop();
+      // Starting again after stop must succeed (loop re-entrant).
+      await expectLater(controller.playLobbySearchLoop(), completes);
+    });
+
+    test('playLobbySearchLoop is no-op when muted', () async {
+      await controller.setMuted(muted: true);
+      await controller.playLobbySearchLoop();
+      // No timer started — stopLobbySearchLoop should be a no-op.
+      await expectLater(controller.stopLobbySearchLoop(), completes);
+    });
+
+    test('playLobbyMatchFound stops loop then plays cue — no throw', () async {
+      await controller.playLobbySearchLoop();
+      await expectLater(controller.playLobbyMatchFound(), completes);
+    });
+
+    test('playLobbyMatchFound is no-op when muted', () async {
+      await controller.setMuted(muted: true);
+      await expectLater(controller.playLobbyMatchFound(), completes);
+    });
+
+    test('playDuelStart does not throw', () async {
+      await expectLater(controller.playDuelStart(), completes);
+    });
+
+    test('playDuelStart is no-op when muted', () async {
+      await controller.setMuted(muted: true);
+      await expectLater(controller.playDuelStart(), completes);
+    });
+
+    test('suspend() cancels the loop', () async {
+      await controller.playLobbySearchLoop();
+      controller.suspend();
+      // After suspend, stopping again should be safe.
+      await expectLater(controller.stopLobbySearchLoop(), completes);
     });
   });
 

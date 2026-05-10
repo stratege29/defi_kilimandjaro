@@ -1,10 +1,10 @@
-import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:defi_kilimandjaro/audio/instruments/balafon.dart';
 import 'package:defi_kilimandjaro/audio/instruments/djembe.dart';
 import 'package:defi_kilimandjaro/audio/instruments/griot_fanfare.dart';
 import 'package:defi_kilimandjaro/audio/instruments/kora.dart';
+import 'package:defi_kilimandjaro/audio/instruments/lobby_duel.dart';
 import 'package:defi_kilimandjaro/audio/instruments/tam_tam.dart';
 import 'package:defi_kilimandjaro/audio/wav_buffer.dart';
 import 'package:flutter/widgets.dart';
@@ -39,6 +39,20 @@ enum AudioCue {
 
   /// Tick timer — sweep tam-tam.
   timerTick,
+
+  // ─── Lobby matchmaking (Phase 6 — PR #2) ────────────────────────────────
+
+  /// Frappe grave "DOUM" 108 BPM — sample unitaire utilisé par le loop lobby.
+  lobbyLoopDoum,
+
+  /// Frappe sèche "tac" — sample unitaire utilisé par le loop lobby.
+  lobbyLoopTac,
+
+  /// Ding! balafon G5→C6 + roulement djembé — adversaire trouvé (~620 ms).
+  lobbyMatchFound,
+
+  /// Gong kora C3 + frappe tam-tam très grave — démarrage du duel ranked (~820 ms).
+  duelStart,
 }
 
 /// Singleton du moteur audio. Gère :
@@ -172,6 +186,11 @@ class AudioEngine with WidgetsBindingObserver {
       AudioCue.failure: _renderFailure(),
       AudioCue.wrongAnswer: Djembe.renderWrongDouble(),
       AudioCue.timerTick: TamTam.renderTick(),
+      // Lobby / duel cues (PR #2)
+      AudioCue.lobbyLoopDoum: LobbyDuel.renderLoopDoum(),
+      AudioCue.lobbyLoopTac: LobbyDuel.renderLoopTac(),
+      AudioCue.lobbyMatchFound: LobbyDuel.renderMatchFound(),
+      AudioCue.duelStart: LobbyDuel.renderDuelStart(),
     };
     for (final entry in cues.entries) {
       try {
