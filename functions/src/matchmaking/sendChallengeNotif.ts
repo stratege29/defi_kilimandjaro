@@ -27,8 +27,12 @@ interface MatchData {
 export const sendChallengeNotif = onValueCreated(
   {
     ref: "/matches/{matchId}",
-    region: "europe-west1",
-    // Instance de base de données (projet kilimandjaro-dev).
+    // La RTDB de ce projet est en us-central1 (URL legacy firebaseio.com),
+    // pas europe-west1 — la fonction doit donc tourner dans la même région
+    // que la DB pour que le trigger soit valide. Les callables (requestMatch,
+    // endMatch, cancelMatch, requestRematch) restent en europe-west1 pour
+    // la latence Côte d'Ivoire (les callables ne sont pas région-bound DB).
+    region: "us-central1",
     instance: process.env["RTDB_INSTANCE"] ?? undefined,
   },
   async (event) => {
