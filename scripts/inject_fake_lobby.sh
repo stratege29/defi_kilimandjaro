@@ -23,6 +23,7 @@ printf '%s' "$JSON" > "$TMPFILE"
 
 firebase database:set "/lobby/${UID_FAKE}" "$TMPFILE" \
   --project kilimandjaro-dev \
+  --instance kilimandjaro-dev-default-rtdb \
   --force
 
 echo "✔ Fake lobby entry posted. Wait <5s for your iPhone client to match."
