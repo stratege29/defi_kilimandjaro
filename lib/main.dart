@@ -1,25 +1,56 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:defi_kilimandjaro/audio/audio_engine.dart';
+import 'package:defi_kilimandjaro/core/deep_links.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_theme.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/ads/consent_service.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
+import 'package:defi_kilimandjaro/data/repositories/fcm_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/firebase_options.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+// ---------------------------------------------------------------------------
+// FCM background message handler — doit etre une fonction top-level.
+// Appelee par le plugin quand l'app est terminee ou en arriere-plan.
+// Ne doit pas appeler de code Flutter UI.
+// ---------------------------------------------------------------------------
+@pragma('vm:entry-point')
+Future<void> _fcmBackgroundHandler(RemoteMessage message) async {
+  // Firebase doit etre initialise dans l'isolat background.
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Pas d'action UI ici — la navigation se fait dans onMessageOpenedApp.
+}
+
+/// Navigue vers la route duel deep-link a partir du payload FCM.
+///
+/// Utilise [appRouterNavigatorKey] pour acceder au Navigator sans BuildContext.
+void _navigateToMatchFromFcm(RemoteMessage message) {
+  final matchId = message.data['matchId'] as String?;
+  final type = message.data['type'] as String?;
+  if (matchId == null || matchId.isEmpty) return;
+  if (type != 'duel_challenge') return;
+
+  // Utilise la route deep-link existante /duel/join/:matchId.
+  final context = appRouterNavigatorKey.currentContext;
+  if (context == null) return;
+  GoRouter.of(context).go(AppRoutes.duelJoinPath(matchId));
+}
 
 Future<void> main() async {
   // All boot work runs in a guarded zone so any uncaught async error
@@ -130,6 +161,26 @@ Future<void> _bootstrap() async {
         print('🔧 signInAnonymously failed/timeout: $e');
       }
     }
+
+    // FCM : enregistrer le handler background AVANT toute autre init FCM.
+    // Doit etre appele ici (avant runApp) pour que le plugin le connaisse
+    // au demarrage de l'isolat background.
+    FirebaseMessaging.onBackgroundMessage(_fcmBackgroundHandler);
+
+    // FCM : handler quand l'utilisateur tape sur une notif depuis background.
+    FirebaseMessaging.onMessageOpenedApp.listen(_navigateToMatchFromFcm);
+
+    // FCM : verifier si l'app a ete ouverte depuis une notif (app terminee).
+    final initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      // Delay pour laisser le router s'initialiser.
+      unawaited(
+        Future<void>.delayed(const Duration(milliseconds: 500), () {
+          _navigateToMatchFromFcm(initialMessage);
+        }),
+      );
+    }
   } catch (e) {
     // Fail-soft: solo gameplay continues without backend if Firebase fails.
     // ignore: avoid_print
@@ -158,8 +209,8 @@ Future<void> _bootstrap() async {
   );
 }
 
-/// Initialise les services lourds (IAP) après que ProviderScope soit
-/// disponible, sans bloquer le splash visuel.
+/// Initialise les services lourds (IAP, FCM, deep links) apres que
+/// ProviderScope soit disponible, sans bloquer le splash visuel.
 class _BootGate extends ConsumerStatefulWidget {
   const _BootGate({required this.child});
   final Widget child;
@@ -169,6 +220,8 @@ class _BootGate extends ConsumerStatefulWidget {
 }
 
 class _BootGateState extends ConsumerState<_BootGate> {
+  StreamSubscription<RemoteMessage>? _fcmForegroundSub;
+
   @override
   void initState() {
     super.initState();
@@ -176,11 +229,51 @@ class _BootGateState extends ConsumerState<_BootGate> {
       // IAP init is fire-and-forget.
       unawaited(ref.read(iapServiceProvider).init());
 
+      // FCM token storage (permission + persistance Firestore).
+      // Fire-and-forget : ne doit pas bloquer le boot.
+      unawaited(ref.read(fcmRepositoryProvider).init());
+
+      // FCM foreground : notif in-app quand un duel challenge arrive.
+      _fcmForegroundSub = FirebaseMessaging.onMessage.listen(
+        _onForegroundMessage,
+      );
+
       // UMP consent before AdMob (RGPD UE compliance).
       await ref.read(consentServiceProvider).requestConsent();
       if (!mounted) return;
       unawaited(ref.read(adsServiceProvider).init());
+
+      // Deep links : ecoute les URL scheme kilimandjaro://duel/*
+      unawaited(ref.read(deepLinkServiceProvider).init());
     });
+  }
+
+  /// Affiche une snackbar discrete quand un defi arrive en premier plan.
+  void _onForegroundMessage(RemoteMessage message) {
+    if (!mounted) return;
+    final matchId = message.data['matchId'] as String?;
+    final type = message.data['type'] as String?;
+    if (matchId == null || type != 'duel_challenge') return;
+
+    final title = message.notification?.title ?? 'Tu as un defi !';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(title),
+        duration: const Duration(seconds: 6),
+        action: SnackBarAction(
+          label: 'Rejoindre',
+          onPressed: () {
+            GoRouter.of(context).go(AppRoutes.duelJoinPath(matchId));
+          },
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _fcmForegroundSub?.cancel();
+    super.dispose();
   }
 
   @override

@@ -183,6 +183,53 @@ class DuelRepository {
     });
   }
 
+  /// Rejoint un match ouvert (deep link / share) sans vérification de secret.
+  ///
+  /// Vérifie que le match :
+  /// - existe
+  /// - est en phase [DuelPhase.waiting]
+  /// - n'a qu'un seul joueur (le créateur), ou que l'uid courant est déjà
+  ///   dedans (retour tolérant).
+  ///
+  /// Lance un [StateError] en cas d'erreur (match introuvable, plein,
+  /// ou déjà terminé).
+  Future<DuelSession> joinOpen(String matchId) async {
+    final uid = currentUid;
+    final ref = _matchRef(matchId);
+    final snapshot = await ref.get();
+    if (!snapshot.exists) {
+      throw Exception('duel_not_found');
+    }
+    final data = (snapshot.value! as Map).cast<String, dynamic>();
+    final phase = data['phase'] as String? ?? 'waiting';
+    if (phase == DuelPhase.finished.name) {
+      throw Exception('duel_expired');
+    }
+    final players =
+        (data['players'] as Map?)?.cast<String, dynamic>() ??
+            <String, dynamic>{};
+    if (players.length >= 2 && !players.containsKey(uid)) {
+      throw Exception('duel_full');
+    }
+
+    if (!players.containsKey(uid)) {
+      await ref.update(<String, Object?>{
+        'players/$uid':
+            const DuelPlayer(uid: 'self', progress: 0).toJson()
+              ..remove('finished_at'),
+        'phase': DuelPhase.active.name,
+      });
+    }
+    _log.i('joinOpen: $matchId par $uid');
+
+    // Relis la session mise à jour.
+    final updated = await ref.get();
+    return DuelSession.fromJson(
+      matchId,
+      (updated.value! as Map).cast<String, dynamic>(),
+    );
+  }
+
   /// Supprime la session (créateur seulement).
   Future<void> deleteIfOwner(String matchId) async {
     final uid = currentUid;

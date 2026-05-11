@@ -2,6 +2,7 @@ import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_create_view.dart';
+import 'package:defi_kilimandjaro/presentation/duel/duel_deep_link_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_entry_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_play_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_result_view.dart';
@@ -38,9 +39,26 @@ abstract final class AppRoutes {
 
   /// Lobby matchmaking ELO (Phase 6).
   static const duelLobby = '/duel/lobby';
+
+  /// Deep link entrant : `kilimandjaro://duel/<matchId>` → `/duel/join/:matchId`.
+  ///
+  /// Utilisé par DeepLinkService et par le handler FCM de l'agent backend.
+  /// Le paramètre path est `:matchId`.
+  static const duelJoin = '/duel/join/:matchId';
+
+  /// Construit le path de navigation vers un match via deep link.
+  static String duelJoinPath(String matchId) => '/duel/join/$matchId';
 }
 
+/// Clé de navigation globale exposée pour DeepLinkService et le handler FCM.
+///
+/// L'agent backend (FCM) peut récupérer cette clé depuis `app_router.dart`
+/// pour accéder au contexte de navigation sans dépendre de BuildContext.
+final GlobalKey<NavigatorState> appRouterNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'appRouter');
+
 final GoRouter appRouter = GoRouter(
+  navigatorKey: appRouterNavigatorKey,
   initialLocation: AppRoutes.splash,
   debugLogDiagnostics: true,
   routes: <RouteBase>[
@@ -146,6 +164,16 @@ final GoRouter appRouter = GoRouter(
         // dans DuelResultView._onRematch via lobbyRematchUidProvider.
         return const LobbyView();
       },
+    ),
+    // PR #3 — Deep link : `kilimandjaro://duel/<matchId>`.
+    // [DuelDeepLinkView] gère le join asynchrone puis redirige vers
+    // [DuelPlayView] ou affiche un message d'erreur.
+    GoRoute(
+      path: '/duel/join/:matchId',
+      name: 'duel-join',
+      builder: (_, state) => DuelDeepLinkView(
+        matchId: state.pathParameters['matchId']!,
+      ),
     ),
   ],
 );

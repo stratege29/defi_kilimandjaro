@@ -1,6 +1,8 @@
 import Flutter
 import UIKit
 import FirebaseCore
+import FirebaseMessaging
+import UserNotifications
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -15,15 +17,65 @@ import FirebaseCore
     // Firebase init AVANT GeneratedPluginRegistrant (sinon cloud_functions crash).
     FirebaseApp.configure()
 
+    // UNUserNotificationCenter — requis pour recevoir les notifications en
+    // foreground (onMessage côté Flutter) et pour afficher les alertes.
+    UNUserNotificationCenter.current().delegate = self
+
+    // Messaging delegate — relaie le token APNs vers FCM via didReceiveRegistrationToken.
+    Messaging.messaging().delegate = self
+
     // Force iOS à demander la permission "Réseau local" en lançant un browse
-    // Bonjour. Une simple requête HTTP vers une IP privée ne suffit pas à
-    // déclencher le dialog. Indispensable pour atteindre Firebase emulator
-    // sur le LAN en mode dev.
+    // Bonjour. Indispensable pour atteindre Firebase emulator sur le LAN.
     triggerLocalNetworkPermission()
 
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
+
+  // MARK: — APNs device token → FCM
+
+  /// iOS appelle cette méthode quand l'app reçoit son token APNs.
+  /// On le passe immédiatement à FCM pour qu'il génère un FCM token.
+  override func application(
+    _ application: UIApplication,
+    didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+  ) {
+    Messaging.messaging().apnsToken = deviceToken
+    super.application(
+      application,
+      didRegisterForRemoteNotificationsWithDeviceToken: deviceToken
+    )
+  }
+
+  // MARK: — UNUserNotificationCenterDelegate
+
+  /// Appelée quand une notification arrive en foreground.
+  /// Retourne .banner + .sound pour que la notif soit visible même app ouverte.
+  override func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    willPresent notification: UNNotification,
+    withCompletionHandler completionHandler:
+      @escaping (UNNotificationPresentationOptions) -> Void
+  ) {
+    completionHandler([.banner, .sound, .badge])
+  }
+
+  /// Appelée quand l'utilisateur tape sur une notification.
+  /// Le plugin firebase_messaging intercepte cet event — ne pas l'overrider
+  /// sans appeler super car cela briserait onMessageOpenedApp côté Dart.
+  override func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse,
+    withCompletionHandler completionHandler: @escaping () -> Void
+  ) {
+    super.userNotificationCenter(
+      center,
+      didReceive: response,
+      withCompletionHandler: completionHandler
+    )
+  }
+
+  // MARK: — Local network permission (dev emulator)
 
   private func triggerLocalNetworkPermission() {
     let browser = NetServiceBrowser()
@@ -35,5 +87,30 @@ import FirebaseCore
       self?.localNetworkBrowser?.stop()
       self?.localNetworkBrowser = nil
     }
+  }
+}
+
+// MARK: — MessagingDelegate
+
+/// Extension MessagingDelegate séparée pour la clarté.
+/// didReceiveRegistrationToken est appelée :
+/// - Au démarrage (token initial).
+/// - Quand FCM rafraîchit le token (rotation automatique).
+///
+/// Le plugin firebase_messaging intercepte déjà cet event côté Dart via
+/// onTokenRefresh — cette extension est une sécurité supplémentaire pour
+/// les cas où le plugin Dart n'est pas encore prêt.
+extension AppDelegate: MessagingDelegate {
+  func messaging(
+    _ messaging: Messaging,
+    didReceiveRegistrationToken fcmToken: String?
+  ) {
+    guard let fcmToken else { return }
+    // Log uniquement en debug pour ne pas exposer le token dans les logs prod.
+    #if DEBUG
+    print("[FCM] Token reçu: \(fcmToken)")
+    #endif
+    // Le plugin firebase_messaging Flutter intercepte ce token via son propre
+    // MessagingDelegate interne. Pas besoin de le transmettre manuellement.
   }
 }

@@ -82,5 +82,17 @@
 		<true/>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
+		<!-- Deep links: custom URL scheme kilimandjaro://duel/<matchId> -->
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>kilimandjaro</string>
+				</array>
+				<key>CFBundleURLName</key>
+				<string>com.ultimesgriots.kilimandjaro</string>
+			</dict>
+		</array>
 	</dict>
 </plist>

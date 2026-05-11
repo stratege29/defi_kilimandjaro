@@ -165,6 +165,20 @@
       "go_summit": "CLIMB A SUMMIT"
     },
     "rematch": "REMATCH",
+    "share": "SHARE THE CHALLENGE",
+    "deep_link": {
+      "connecting": "Connecting to duel...",
+      "unavailable": "Challenge unavailable",
+      "not_found": "This challenge doesn't exist.",
+      "expired": "This challenge is already over.",
+      "full": "This challenge is full (2/2 players).",
+      "auth_timeout": "Connection too slow. Try again.",
+      "generic_error": "Unable to join the challenge.",
+      "back_hub": "BACK TO HUB"
+    },
+    "share_text": "I just climbed {delta}m on Kilimandjaro Ivorian Wisdom!\nChallenge me: {link}",
+    "share_text_no_delta": "Challenge me on Kilimandjaro Ivorian Wisdom!\nDuel: {link}",
+    "share_error": "Unable to share the challenge.",
     "result_ranked": {
       "altitude_gained": "+{delta} m altitude gained",
       "altitude_lost": "{delta} m altitude",

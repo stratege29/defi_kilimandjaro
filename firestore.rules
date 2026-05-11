@@ -5,10 +5,28 @@ service cloud.firestore {
 
     // --- Profils joueurs ---
     // Lecture publique pour afficher l'ELO dans le lobby.
-    // Écriture UNIQUEMENT via Admin SDK (Cloud Functions endMatch / requestMatch).
+    // Écriture ELO/stats UNIQUEMENT via Admin SDK (Cloud Functions endMatch / requestMatch).
+    // Exception : le client peut écrire uniquement fcm_token et fcm_updated_at
+    // (nécessaire pour l'enregistrement FCM côté app, sans passer par une CF).
     match /profiles/{uid} {
       allow read: if request.auth != null;
+
+      // Écriture générale bloquée (Admin SDK seulement).
       allow write: if false;
+
+      // Le joueur peut mettre à jour uniquement ses champs FCM sur son propre profil.
+      // update : le document existe déjà (créé par Admin SDK via requestMatch).
+      //   diff().affectedKeys() garantit qu'aucun autre champ n'est touché.
+      // create : cas edge où le profil n'existe pas encore (premier boot avant requestMatch).
+      //   On n'autorise que fcm_token + fcm_updated_at dans le nouveau document.
+      allow update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['fcm_token', 'fcm_updated_at']);
+
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['fcm_token', 'fcm_updated_at']);
     }
 
     // --- Historique des matchs ---

@@ -18,6 +18,7 @@ dependencies:
   firebase_core: ^4.7.0
   firebase_crashlytics: ^5.2.0
   firebase_database: ^12.3.0
+  firebase_messaging: ^16.2.0
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -37,6 +38,9 @@ dependencies:
   qr_flutter: ^4.1.0
   riverpod_annotation: ^2.6.1
   shared_preferences: ^2.3.3
+  app_links: ^6.3.0
+  path_provider: ^2.1.5
+  share_plus: ^11.1.0
   uuid: ^4.5.1
 
 dev_dependencies:

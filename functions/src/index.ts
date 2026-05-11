@@ -6,6 +6,7 @@
  *
  * Domaines :
  * - matchmaking/  : requestMatch, cancelMatch, endMatch (Phase 6)
+ * - matchmaking/  : sendChallengeNotif, requestRematch (Phase 7 — social)
  */
 import { initializeApp } from "firebase-admin/app";
 
@@ -15,3 +16,7 @@ initializeApp();
 export { requestMatch } from "./matchmaking/requestMatch";
 export { cancelMatch } from "./matchmaking/cancelMatch";
 export { endMatch } from "./matchmaking/endMatch";
+
+// --- Social & Viral (Phase 7) ---
+export { sendChallengeNotif } from "./matchmaking/sendChallengeNotif";
+export { requestRematch } from "./matchmaking/requestRematch";

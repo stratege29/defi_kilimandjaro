@@ -165,6 +165,20 @@
       "go_summit": "GRAVIR UN SOMMET"
     },
     "rematch": "REMATCH",
+    "share": "PARTAGER LE DÉFI",
+    "deep_link": {
+      "connecting": "Connexion au défi...",
+      "unavailable": "Défi indisponible",
+      "not_found": "Ce défi est introuvable.",
+      "expired": "Ce défi est déjà terminé.",
+      "full": "Ce défi est complet (2/2 joueurs).",
+      "auth_timeout": "Connexion trop lente. Réessaie.",
+      "generic_error": "Impossible de rejoindre le défi.",
+      "back_hub": "RETOUR AU HUB"
+    },
+    "share_text": "J'ai gravi {delta}m d'altitude sur Kilimandjaro Sagesse Ivoirienne !\nDéfie-moi : {link}",
+    "share_text_no_delta": "Affronte-moi sur Kilimandjaro Sagesse Ivoirienne !\nDéfi : {link}",
+    "share_error": "Impossible de partager le défi.",
     "result_ranked": {
       "altitude_gained": "+{delta} m d'altitude conquis",
       "altitude_lost": "{delta} m d'altitude",

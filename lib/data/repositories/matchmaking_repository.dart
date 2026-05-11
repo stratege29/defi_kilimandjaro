@@ -99,6 +99,39 @@ class MatchmakingRepository {
     }
   }
 
+  /// Demande un rematch cible contre un adversaire identifie.
+  ///
+  /// Le serveur verifie que le caller et l'adversaire etaient bien dans
+  /// le match [previousMatchId], puis cree un nouveau match avec
+  /// l'adversaire [opponentUid] comme cible (champ target_uid RTDB).
+  /// La CF sendChallengeNotif envoie automatiquement une notif FCM.
+  ///
+  /// Retourne le matchId du nouveau match et le secret pour rejoindre.
+  /// Le caller doit observer /matches/{matchId} via RTDB stream.
+  Future<({String matchId, String secret})> requestRematch({
+    required String previousMatchId,
+    required String opponentUid,
+  }) async {
+    try {
+      final result = await _fn('requestRematch').call<dynamic>(<String, dynamic>{
+        'previousMatchId': previousMatchId,
+        'opponentUid': opponentUid,
+      });
+
+      final data = (result.data as Map).cast<String, dynamic>();
+      final matchId = data['matchId'] as String;
+      final secret = data['secret'] as String;
+      _log.i('Rematch créé: $matchId contre $opponentUid');
+      return (matchId: matchId, secret: secret);
+    } on FirebaseFunctionsException catch (e) {
+      _log.e('requestRematch error: ${e.code} ${e.message}');
+      rethrow;
+    } on Exception catch (e) {
+      _log.e('requestRematch unexpected error', error: e);
+      rethrow;
+    }
+  }
+
   /// Clôture un match ranked et déclenche le calcul ELO côté serveur.
   ///
   /// [matchId] : identifiant du match terminé.

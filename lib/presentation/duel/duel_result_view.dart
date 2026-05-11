@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:ui' as ui;
+
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
@@ -6,11 +9,14 @@ import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/matchmaking_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_controller.dart'
-    show lobbyRematchUidProvider;
+    show lobbyPreviousMatchIdProvider, lobbyRematchUidProvider;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 /// Résultat d'un duel — gagnant / perdant + résumé.
 ///
@@ -29,6 +35,10 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
   final Logger _log = Logger();
   EloDelta? _eloDelta;
   bool _eloLoading = true;
+  bool _shareLoading = false;
+
+  /// Clé utilisée pour capturer le widget résultat en PNG via [RepaintBoundary].
+  final GlobalKey _repaintKey = GlobalKey();
 
   @override
   void initState() {
@@ -76,14 +86,71 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
 
   void _onRematch() {
     final opponentUid = _opponentUid();
-    // Pré-positionne le provider rematch avant de naviguer.
+    // Pre-positionne les providers rematch avant de naviguer.
+    // Le LobbyController detectera isRematch == true et appellera
+    // requestRematch CF au lieu du matchmaking ELO standard.
     if (opponentUid != null) {
       ref.read(lobbyRematchUidProvider.notifier).state = opponentUid;
     }
-    // Navigation vers le lobby avec message rematch.
-    // TODO(PR-3 social): remplacer par une CF "rematch ciblé" qui force le
-    // match avec l'adversaire exact via target_opponent: opponentUid.
+    ref.read(lobbyPreviousMatchIdProvider.notifier).state =
+        widget.session.matchId;
     context.go(AppRoutes.duelLobby);
+  }
+
+  /// Crée un nouveau match ouvert, capture le widget résultat en PNG,
+  /// puis déclenche le share sheet natif avec texte + image.
+  Future<void> _onShare() async {
+    if (_shareLoading) return;
+    setState(() => _shareLoading = true);
+
+    try {
+      // 1. Crée un nouveau match ouvert (le match courant est finished).
+      final repo = ref.read(duelRepositoryProvider);
+      final (:matchId, secret: _) = await repo.createDuel();
+      final deepLink = 'kilimandjaro://duel/$matchId';
+
+      // 2. Capture le widget résultat en PNG.
+      final boundary = _repaintKey.currentContext?.findRenderObject()
+          as RenderRepaintBoundary?;
+
+      XFile? imageFile;
+      if (boundary != null) {
+        final image = await boundary.toImage(pixelRatio: 2);
+        final byteData =
+            await image.toByteData(format: ui.ImageByteFormat.png);
+        if (byteData != null) {
+          final tmpDir = await getTemporaryDirectory();
+          final file = File('${tmpDir.path}/kilimandjaro_result.png');
+          await file.writeAsBytes(byteData.buffer.asUint8List());
+          imageFile = XFile(file.path, mimeType: 'image/png');
+        }
+      }
+
+      // 3. Construit le texte de partage.
+      final delta = _eloDelta?.delta;
+      final altitudeText =
+          delta != null ? '${delta >= 0 ? '+' : ''}${delta}m' : '';
+      final shareText = altitudeText.isNotEmpty
+          ? "J'ai gravi $altitudeText d'altitude sur Kilimandjaro Sagesse Ivoirienne !\nDéfie-moi : $deepLink"
+          : 'Affronte-moi sur Kilimandjaro Sagesse Ivoirienne !\nDéfi : $deepLink';
+
+      // 4. Déclenche le share sheet natif (API share_plus v11+).
+      if (imageFile != null) {
+        await SharePlus.instance.share(
+          ShareParams(files: [imageFile], text: shareText),
+        );
+      } else {
+        await SharePlus.instance.share(ShareParams(text: shareText));
+      }
+    } on Exception catch (e) {
+      _log.e('Share failed', error: e);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Impossible de partager le défi.')),
+      );
+    } finally {
+      if (mounted) setState(() => _shareLoading = false);
+    }
   }
 
   @override
@@ -99,83 +166,107 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
-              if (won)
-                Image.asset(AppAssets.duelTrophy, width: 120, height: 120)
-              else
-                Image.asset(AppAssets.iconStreak, width: 120, height: 120),
-              const SizedBox(height: 16),
-              Text(
-                won ? 'VICTOIRE' : 'DÉFAITE',
-                style: AppTypography.bebas(
-                  size: 36,
-                  color: won ? AppColors.vertClair : AppColors.rouge,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                won
-                    ? 'Tu as été le plus rapide !'
-                    : 'Ton adversaire a été plus rapide.',
-                textAlign: TextAlign.center,
-                style: AppTypography.crimson(
-                  size: 14,
-                  color: AppColors.ivoire.withValues(alpha: 0.85),
-                  style: FontStyle.italic,
-                ),
-              ),
-              // --- Section ELO (uniquement si ranked) ---
-              if (widget.session.isRanked) ...[
-                const SizedBox(height: 20),
-                _EloSection(
-                  loading: _eloLoading,
-                  delta: _eloDelta,
-                  won: won,
-                ),
-              ],
-              const SizedBox(height: 24),
-              // --- Résumé du mot ---
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: AppColors.boisFonce.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: AppColors.orSoleil.withValues(alpha: 0.5),
+              // RepaintBoundary : tout le contenu résultat capturé pour le share.
+              Expanded(
+                child: RepaintBoundary(
+                  key: _repaintKey,
+                  child: ColoredBox(
+                    color: AppColors.vertForet,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 20),
+                        if (won)
+                          Image.asset(
+                            AppAssets.duelTrophy,
+                            width: 120,
+                            height: 120,
+                          )
+                        else
+                          Image.asset(
+                            AppAssets.iconStreak,
+                            width: 120,
+                            height: 120,
+                          ),
+                        const SizedBox(height: 16),
+                        Text(
+                          won ? 'VICTOIRE' : 'DÉFAITE',
+                          style: AppTypography.bebas(
+                            size: 36,
+                            color: won ? AppColors.vertClair : AppColors.rouge,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          won
+                              ? 'Tu as été le plus rapide !'
+                              : 'Ton adversaire a été plus rapide.',
+                          textAlign: TextAlign.center,
+                          style: AppTypography.crimson(
+                            size: 14,
+                            color: AppColors.ivoire.withValues(alpha: 0.85),
+                            style: FontStyle.italic,
+                          ),
+                        ),
+                        // --- Section ELO (uniquement si ranked) ---
+                        if (widget.session.isRanked) ...[
+                          const SizedBox(height: 20),
+                          _EloSection(
+                            loading: _eloLoading,
+                            delta: _eloDelta,
+                            won: won,
+                          ),
+                        ],
+                        const SizedBox(height: 24),
+                        // --- Résumé du mot ---
+                        Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: AppColors.boisFonce.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: AppColors.orSoleil.withValues(alpha: 0.5),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                'Mot : ${widget.session.answer}',
+                                style: AppTypography.bebas(
+                                  size: 24,
+                                  color: AppColors.orSoleil,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                widget.session.explanation,
+                                textAlign: TextAlign.center,
+                                style: AppTypography.crimson(size: 13),
+                              ),
+                              if (widget.session.proverb.isNotEmpty) ...[
+                                const SizedBox(height: 10),
+                                Text(
+                                  '« ${widget.session.proverb} »',
+                                  textAlign: TextAlign.center,
+                                  style: AppTypography.crimson(
+                                    size: 14,
+                                    color: AppColors.orSoleil,
+                                    style: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
                   ),
                 ),
-                child: Column(
-                  children: [
-                    Text(
-                      'Mot : ${widget.session.answer}',
-                      style: AppTypography.bebas(
-                        size: 24,
-                        color: AppColors.orSoleil,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      widget.session.explanation,
-                      textAlign: TextAlign.center,
-                      style: AppTypography.crimson(size: 13),
-                    ),
-                    if (widget.session.proverb.isNotEmpty) ...[
-                      const SizedBox(height: 10),
-                      Text(
-                        '« ${widget.session.proverb} »',
-                        textAlign: TextAlign.center,
-                        style: AppTypography.crimson(
-                          size: 14,
-                          color: AppColors.orSoleil,
-                          style: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
               ),
-              const Spacer(),
-              // --- CTA principal : RETOUR AU HUB ---
+              // --- CTAs ---
+              const SizedBox(height: 12),
+              // CTA principal : RETOUR AU HUB
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -193,7 +284,7 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                   ),
                 ),
               ),
-              // --- CTA secondaire : REMATCH (uniquement pour les duels ranked) ---
+              // CTA secondaire : REMATCH (uniquement pour les duels ranked)
               if (widget.session.isRanked) ...[
                 const SizedBox(height: 10),
                 SizedBox(
@@ -214,6 +305,41 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                     ),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.vertClair),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+              ],
+              // CTA tertiaire : PARTAGER LE DÉFI (ranked uniquement)
+              if (widget.session.isRanked) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _shareLoading ? null : _onShare,
+                    icon: _shareLoading
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              color: AppColors.orChaud,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Icon(
+                            Icons.share,
+                            color: AppColors.orChaud,
+                            size: 20,
+                          ),
+                    label: Text(
+                      'PARTAGER LE DÉFI',
+                      style: AppTypography.bebas(
+                        size: 18,
+                        color: AppColors.orChaud,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.orChaud),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
