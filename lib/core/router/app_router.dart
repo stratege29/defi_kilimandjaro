@@ -61,6 +61,19 @@ final GoRouter appRouter = GoRouter(
   navigatorKey: appRouterNavigatorKey,
   initialLocation: AppRoutes.splash,
   debugLogDiagnostics: true,
+  // Quand iOS/Android forwarde un URI custom-scheme (kilimandjaro://duel/X),
+  // go_router le reçoit comme location avant que DeepLinkService ne puisse
+  // intervenir. On le réécrit ici en path interne /duel/join/X.
+  redirect: (context, state) {
+    final uri = state.uri;
+    if (uri.scheme == 'kilimandjaro' && uri.host == 'duel') {
+      final segments = uri.pathSegments;
+      if (segments.isNotEmpty && segments.first.isNotEmpty) {
+        return AppRoutes.duelJoinPath(segments.first);
+      }
+    }
+    return null;
+  },
   routes: <RouteBase>[
     GoRoute(
       path: AppRoutes.splash,
