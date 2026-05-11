@@ -11,6 +11,10 @@ import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_view.dart';
 import 'package:defi_kilimandjaro/presentation/hub/hub_view.dart';
+import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_confirm_view.dart';
+import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_scan_view.dart';
+import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_view.dart';
+import 'package:defi_kilimandjaro/presentation/leaderboard/leaderboard_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_detail_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_list_view.dart';
 import 'package:defi_kilimandjaro/presentation/onboarding/onboarding_view.dart';
@@ -48,6 +52,17 @@ abstract final class AppRoutes {
 
   /// Construit le path de navigation vers un match via deep link.
   static String duelJoinPath(String matchId) => '/duel/join/$matchId';
+
+  // Leaderboard & amis (PR #4).
+  static const leaderboard = '/leaderboard';
+  static const addFriend = '/leaderboard/add-friend';
+  static const addFriendScan = '/leaderboard/add-friend/scan';
+
+  /// Route deep link `kilimandjaro://friend/<uid>` → `/friend/add/<uid>`.
+  static const friendAdd = '/friend/add';
+
+  /// Construit le path de navigation vers la confirmation d'ajout d'ami.
+  static String friendAddPath(String uid) => '/friend/add/$uid';
 }
 
 /// Clé de navigation globale exposée pour DeepLinkService et le handler FCM.
@@ -61,15 +76,24 @@ final GoRouter appRouter = GoRouter(
   navigatorKey: appRouterNavigatorKey,
   initialLocation: AppRoutes.splash,
   debugLogDiagnostics: true,
-  // Quand iOS/Android forwarde un URI custom-scheme (kilimandjaro://duel/X),
+  // Quand iOS/Android forwarde un URI custom-scheme (kilimandjaro://X/Y),
   // go_router le reçoit comme location avant que DeepLinkService ne puisse
-  // intervenir. On le réécrit ici en path interne /duel/join/X.
+  // intervenir. On réécrit :
+  // - kilimandjaro://duel/<matchId>   → /duel/join/<matchId>
+  // - kilimandjaro://friend/<uid>     → /friend/add/<uid>
   redirect: (context, state) {
     final uri = state.uri;
-    if (uri.scheme == 'kilimandjaro' && uri.host == 'duel') {
-      final segments = uri.pathSegments;
-      if (segments.isNotEmpty && segments.first.isNotEmpty) {
-        return AppRoutes.duelJoinPath(segments.first);
+    if (uri.scheme == 'kilimandjaro') {
+      if (uri.host == 'duel') {
+        final segments = uri.pathSegments;
+        if (segments.isNotEmpty && segments.first.isNotEmpty) {
+          return AppRoutes.duelJoinPath(segments.first);
+        }
+      } else if (uri.host == 'friend') {
+        final segments = uri.pathSegments;
+        if (segments.isNotEmpty && segments.first.isNotEmpty) {
+          return AppRoutes.friendAddPath(segments.first);
+        }
       }
     }
     return null;
@@ -186,6 +210,32 @@ final GoRouter appRouter = GoRouter(
       name: 'duel-join',
       builder: (_, state) => DuelDeepLinkView(
         matchId: state.pathParameters['matchId']!,
+      ),
+    ),
+    // -------------------------------------------------------------------------
+    // PR #4 — Leaderboard & amis
+    // -------------------------------------------------------------------------
+    GoRoute(
+      path: AppRoutes.leaderboard,
+      name: 'leaderboard',
+      builder: (_, __) => const LeaderboardView(),
+    ),
+    GoRoute(
+      path: AppRoutes.addFriend,
+      name: 'add-friend',
+      builder: (_, __) => const AddFriendView(),
+    ),
+    GoRoute(
+      path: AppRoutes.addFriendScan,
+      name: 'add-friend-scan',
+      builder: (_, __) => const AddFriendScanView(),
+    ),
+    // Route deep link `kilimandjaro://friend/{uid}` → `/friend/add/:uid`.
+    GoRoute(
+      path: '/friend/add/:uid',
+      name: 'friend-add-confirm',
+      builder: (_, state) => AddFriendConfirmView(
+        friendUid: state.pathParameters['uid'] ?? '',
       ),
     ),
   ],

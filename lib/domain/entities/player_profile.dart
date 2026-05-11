@@ -5,8 +5,10 @@ import 'package:equatable/equatable.dart';
 /// L'ELO est exprimé en **mètres d'altitude** pour coller à la métaphore
 /// Kilimandjaro. 1000 m = départ, 5895 m = "Maître du Kilimandjaro".
 ///
-/// Règle : ce modèle n'est JAMAIS écrit depuis le client.
-/// Seul le Cloud Function `endMatch` peut modifier `elo` via Admin SDK.
+/// Règle : `elo`, `peakElo`, `totalDuels`, `wins`, `losses` ne sont JAMAIS
+/// écrits depuis le client — uniquement via le Cloud Function `endMatch`.
+/// `display_name` est l'exception : écrit côté client (rules Firestore
+/// autorisent uniquement ce champ via `merge: true`).
 class PlayerProfile extends Equatable {
   const PlayerProfile({
     required this.uid,
@@ -15,6 +17,8 @@ class PlayerProfile extends Equatable {
     required this.totalDuels,
     required this.wins,
     required this.losses,
+    this.displayName,
+    this.displayNameUpdatedAt,
   });
 
   factory PlayerProfile.initial(String uid) => PlayerProfile(
@@ -34,6 +38,12 @@ class PlayerProfile extends Equatable {
         totalDuels: (json['totalDuels'] as num?)?.toInt() ?? 0,
         wins: (json['wins'] as num?)?.toInt() ?? 0,
         losses: (json['losses'] as num?)?.toInt() ?? 0,
+        displayName: json['display_name'] as String?,
+        displayNameUpdatedAt: json['display_name_updated_at'] == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(
+                (json['display_name_updated_at'] as num).toInt(),
+              ),
       );
 
   /// ELO initial : 1000 m (altitude de départ symbolique).
@@ -54,6 +64,12 @@ class PlayerProfile extends Equatable {
   final int wins;
   final int losses;
 
+  /// Nom de grimpeur choisi par le joueur (leaderboard). Null = non défini.
+  final String? displayName;
+
+  /// Date de la dernière modification du displayName (anti-spam).
+  final DateTime? displayNameUpdatedAt;
+
   /// Taux de victoire [0.0 – 1.0]. Null si pas de duel joué.
   double? get winRate => totalDuels == 0 ? null : wins / totalDuels;
 
@@ -63,12 +79,17 @@ class PlayerProfile extends Equatable {
   /// Titre altitude — label affiché dans l'UI.
   String get altitudeLabel => '$elo m';
 
+  /// Nom affiché dans le classement : displayName si défini, sinon anonyme.
+  String get displayLabel =>
+      (displayName?.isNotEmpty ?? false) ? displayName! : 'Grimpeur anonyme';
+
   Map<String, dynamic> toJson() => <String, dynamic>{
         'elo': elo,
         'peakElo': peakElo,
         'totalDuels': totalDuels,
         'wins': wins,
         'losses': losses,
+        if (displayName != null) 'display_name': displayName,
       };
 
   PlayerProfile copyWith({
@@ -78,6 +99,8 @@ class PlayerProfile extends Equatable {
     int? totalDuels,
     int? wins,
     int? losses,
+    String? displayName,
+    DateTime? displayNameUpdatedAt,
   }) {
     return PlayerProfile(
       uid: uid ?? this.uid,
@@ -86,9 +109,20 @@ class PlayerProfile extends Equatable {
       totalDuels: totalDuels ?? this.totalDuels,
       wins: wins ?? this.wins,
       losses: losses ?? this.losses,
+      displayName: displayName ?? this.displayName,
+      displayNameUpdatedAt: displayNameUpdatedAt ?? this.displayNameUpdatedAt,
     );
   }
 
   @override
-  List<Object?> get props => [uid, elo, peakElo, totalDuels, wins, losses];
+  List<Object?> get props => [
+        uid,
+        elo,
+        peakElo,
+        totalDuels,
+        wins,
+        losses,
+        displayName,
+        displayNameUpdatedAt,
+      ];
 }

@@ -76,6 +76,7 @@
     "sections": {
       "countries": "PAYS EXPLORÉS",
       "titles": "TITRES HONORIFIQUES",
+      "leaderboard": "CLASSEMENTS",
       "settings": "PARAMÈTRES"
     },
     "no_countries": "Explore la carte d'Afrique pour commencer ton voyage",
@@ -83,7 +84,8 @@
       "sound": "Son",
       "sound_on": "Activé",
       "sound_off": "Muet",
-      "reset": "Réinitialiser la progression"
+      "reset": "Réinitialiser la progression",
+      "leaderboard": "Voir les classements"
     },
     "reset_dialog": {
       "title": "Réinitialiser ?",
@@ -192,6 +194,46 @@
       "wl": "V/D",
       "master": "MAITRE DU KILIMANDJARO"
     }
+  },
+  "leaderboard": {
+    "title": "CLASSEMENTS",
+    "tab_global": "GLOBAL",
+    "tab_friends": "AMIS",
+    "badge_master": "MAITRE",
+    "my_rank_label": "Tu es {0} — {1}",
+    "prompt_title": "Choisis ton nom de grimpeur",
+    "prompt_body": "Ton nom apparaîtra dans les classements. Tu peux rester anonyme.",
+    "prompt_hint": "Ex: SagesseDuSud",
+    "prompt_error_min": "3 caractères minimum",
+    "prompt_validate": "VALIDER",
+    "prompt_anonymous": "RESTER ANONYME"
+  },
+  "friends": {
+    "add_title": "AJOUTER UN AMI",
+    "confirm_title": "AJOUTER UN AMI",
+    "my_qr_title": "TON QR CODE",
+    "my_qr_caption": "Montre ce QR à ton ami pour qu'il te suive.",
+    "scan_friend_title": "SCANNER UN QR",
+    "scan_friend_body": "Scanne le QR de ton ami pour le suivre dans les classements.",
+    "open_camera": "OUVRIR LA CAMÉRA",
+    "scan_title": "SCANNER LE QR DE TON AMI",
+    "scan_hint": "Pointe ton appareil sur le QR de ton ami",
+    "manual_entry_title": "SAISIE MANUELLE",
+    "manual_entry_body": "Saisis l'identifiant unique de ton ami (visible dans son profil).",
+    "manual_uid_hint": "Identifiant (28 caractères)",
+    "add_button": "AJOUTER",
+    "follow_button": "SUIVRE",
+    "confirm_follow_title": "Suivre ce grimpeur ?",
+    "confirm_follow_body": "Suivre {0} ({1}) dans les classements ?",
+    "add_success": "{0} ajouté à tes amis !",
+    "remove_title": "Retirer de la liste ?",
+    "remove_body": "Retirer {0} de tes amis ? Tu peux le ré-ajouter à tout moment.",
+    "remove_confirm": "RETIRER",
+    "empty": "Tu ne suis personne encore",
+    "empty_sub": "Ajoute des amis via QR pour te mesurer à eux.",
+    "add_via_qr": "AJOUTER VIA QR",
+    "error_self": "Tu ne peux pas te suivre toi-même.",
+    "error_not_found": "Grimpeur introuvable. Vérifie l'identifiant."
   },
   "onboarding": {
     "step1": {

@@ -67,6 +67,28 @@ class ProfileRepository {
       return null;
     }
   }
+
+  /// Met à jour le displayName du joueur courant.
+  ///
+  /// Autorisé par les règles Firestore (écriture de `display_name` uniquement).
+  /// Utilise `SetOptions(merge: true)` pour ne pas écraser les champs ELO.
+  Future<void> updateDisplayName(String uid, String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return;
+    try {
+      await _profiles.doc(uid).set(
+        <String, dynamic>{
+          'display_name': trimmed,
+          'display_name_updated_at': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+      _log.i('displayName updated for $uid → "$trimmed"');
+    } on Exception catch (e) {
+      _log.e('updateDisplayName error', error: e);
+      rethrow;
+    }
+  }
 }
 
 final firestoreProvider = Provider<FirebaseFirestore>((ref) {
@@ -85,3 +107,9 @@ final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
 final playerProfileStreamProvider = StreamProvider<PlayerProfile>((ref) {
   return ref.watch(profileRepositoryProvider).watchMyProfile();
 });
+
+/// Provider Firestore pour la couche leaderboard.
+/// Exposé ici pour éviter une dépendance circulaire avec leaderboard_repository.
+final firestoreForLeaderboardProvider = Provider<FirebaseFirestore>(
+  (ref) => ref.watch(firestoreProvider),
+);

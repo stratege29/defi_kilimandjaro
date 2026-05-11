@@ -29,6 +29,27 @@ String? parseDeepLinkMatchId(Uri uri) {
   return matchId;
 }
 
+/// Extrait l'uid depuis une URI deep link `kilimandjaro://friend/<uid>`.
+///
+/// Retourne null si l'URI ne correspond pas au schéma attendu.
+///
+/// Exemples valides :
+/// - `kilimandjaro://friend/abc123uid` → `'abc123uid'`
+///
+/// Exemples invalides (retournent null) :
+/// - `https://kilimandjaro.app/friend/uid`
+/// - `kilimandjaro://duel/ABC123`
+/// - `kilimandjaro://friend/` (uid vide)
+String? parseDeepLinkFriendUid(Uri uri) {
+  if (uri.scheme != 'kilimandjaro') return null;
+  if (uri.host != 'friend') return null;
+  final segments = uri.pathSegments;
+  if (segments.isEmpty) return null;
+  final uid = segments.first.trim();
+  if (uid.isEmpty) return null;
+  return uid;
+}
+
 /// Service singleton qui écoute les URL scheme `kilimandjaro://duel/<matchId>`
 /// et navigue vers `/duel/join/<matchId>`.
 ///
@@ -80,14 +101,24 @@ class DeepLinkService {
   }
 
   void _handle(Uri uri) {
-    final matchId = parseDeepLinkMatchId(uri);
-    if (matchId == null) return;
     final context = navigatorKey.currentContext;
     if (context == null) {
       _log.w('DeepLink: contexte navigator null pour $uri');
       return;
     }
-    GoRouter.of(context).go(AppRoutes.duelJoinPath(matchId));
+
+    // `kilimandjaro://duel/<matchId>` → join duel.
+    final matchId = parseDeepLinkMatchId(uri);
+    if (matchId != null) {
+      GoRouter.of(context).go(AppRoutes.duelJoinPath(matchId));
+      return;
+    }
+
+    // `kilimandjaro://friend/<uid>` → confirmation ajout ami.
+    final friendUid = parseDeepLinkFriendUid(uri);
+    if (friendUid != null) {
+      GoRouter.of(context).go(AppRoutes.friendAddPath(friendUid));
+    }
   }
 }
 

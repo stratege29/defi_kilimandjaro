@@ -14,6 +14,7 @@ import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart'
     show kAltitudeHeroTag;
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -90,6 +91,17 @@ class ProfileView extends ConsumerWidget {
                       progressTowards: progress.totalLevelsCompleted,
                     ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 28),
+            // Section CLASSEMENTS (PR #4).
+            _Section(
+              title: 'profile.sections.leaderboard'.tr(),
+              child: _SettingTile(
+                icon: Icons.emoji_events,
+                label: 'profile.settings.leaderboard'.tr(),
+                valueLabel: '',
+                onTap: () => context.push(AppRoutes.leaderboard),
               ),
             ),
             const SizedBox(height: 28),

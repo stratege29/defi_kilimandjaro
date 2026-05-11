@@ -76,6 +76,7 @@
     "sections": {
       "countries": "EXPLORED COUNTRIES",
       "titles": "HONORIFIC TITLES",
+      "leaderboard": "RANKINGS",
       "settings": "SETTINGS"
     },
     "no_countries": "Explore the map of Africa to begin your journey",
@@ -83,7 +84,8 @@
       "sound": "Sound",
       "sound_on": "On",
       "sound_off": "Muted",
-      "reset": "Reset progression"
+      "reset": "Reset progression",
+      "leaderboard": "View rankings"
     },
     "reset_dialog": {
       "title": "Reset?",
@@ -192,6 +194,46 @@
       "wl": "W/L",
       "master": "MASTER OF KILIMANJARO"
     }
+  },
+  "leaderboard": {
+    "title": "RANKINGS",
+    "tab_global": "GLOBAL",
+    "tab_friends": "FRIENDS",
+    "badge_master": "MASTER",
+    "my_rank_label": "You are {0} — {1}",
+    "prompt_title": "Choose your climber name",
+    "prompt_body": "Your name will appear in the rankings. You can stay anonymous.",
+    "prompt_hint": "e.g. WisdomSeeker",
+    "prompt_error_min": "3 characters minimum",
+    "prompt_validate": "VALIDATE",
+    "prompt_anonymous": "STAY ANONYMOUS"
+  },
+  "friends": {
+    "add_title": "ADD A FRIEND",
+    "confirm_title": "ADD A FRIEND",
+    "my_qr_title": "YOUR QR CODE",
+    "my_qr_caption": "Show this QR to your friend so they can follow you.",
+    "scan_friend_title": "SCAN A QR",
+    "scan_friend_body": "Scan your friend's QR to follow them in the rankings.",
+    "open_camera": "OPEN CAMERA",
+    "scan_title": "SCAN YOUR FRIEND'S QR",
+    "scan_hint": "Point your device at your friend's QR code",
+    "manual_entry_title": "MANUAL ENTRY",
+    "manual_entry_body": "Enter your friend's unique ID (visible in their profile).",
+    "manual_uid_hint": "ID (28 characters)",
+    "add_button": "ADD",
+    "follow_button": "FOLLOW",
+    "confirm_follow_title": "Follow this climber?",
+    "confirm_follow_body": "Follow {0} ({1}) in the rankings?",
+    "add_success": "{0} added to your friends!",
+    "remove_title": "Remove from list?",
+    "remove_body": "Remove {0} from your friends? You can add them again anytime.",
+    "remove_confirm": "REMOVE",
+    "empty": "You're not following anyone yet",
+    "empty_sub": "Add friends via QR to compete with them.",
+    "add_via_qr": "ADD VIA QR",
+    "error_self": "You cannot follow yourself.",
+    "error_not_found": "Climber not found. Check the ID."
   },
   "onboarding": {
     "step1": {
