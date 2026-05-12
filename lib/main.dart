@@ -8,6 +8,7 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_theme.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/ads/consent_service.dart';
+import 'package:defi_kilimandjaro/data/firebase/app_check_setup.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/fcm_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
@@ -81,6 +82,11 @@ Future<void> _bootstrap() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+
+    // App Check: must run right after Firebase.initializeApp and before any
+    // authenticated call (Auth, Firestore, RTDB, Cloud Functions). See
+    // lib/data/firebase/app_check_setup.dart for provider configuration.
+    await activateAppCheck();
 
     // Local emulator wiring — opt-in via --dart-define USE_FIREBASE_EMULATOR=true
     // (cf. README emulator section). Doit être appelé AVANT toute requête

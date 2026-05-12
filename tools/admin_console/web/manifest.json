@@ -1,0 +1,11 @@
+{
+  "name": "Kilimandjaro Admin",
+  "short_name": "KMJ Admin",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0F0E1B",
+  "theme_color": "#D2A24C",
+  "description": "Console de modération Kilimandjaro",
+  "orientation": "any",
+  "prefer_related_applications": false
+}

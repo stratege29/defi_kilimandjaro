@@ -23,7 +23,9 @@ android {
 
     defaultConfig {
         applicationId = "com.ultimesgriots.kilimandjaro"
-        minSdk = flutter.minSdkVersion
+        // App Check (Play Integrity) requires minSdk >= 19. We pin to 21 to
+        // stay aligned with Firebase 4.x baseline and fail fast on regressions.
+        minSdk = maxOf(flutter.minSdkVersion, 21)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
