@@ -25,7 +25,10 @@ const AUTO_FLAG_THRESHOLD = 3;
 export const reportDevinette = onCall(
   {
     region: "europe-west1",
-    enforceAppCheck: true,
+    // App Check enforcement deferred until feature/app-check is merged and
+    // App Check is configured in Firebase Console. Flip back to true once
+    // that's done.
+    enforceAppCheck: false,
     cors: true,
   },
   async (req) => {

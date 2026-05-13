@@ -31,7 +31,10 @@ const SubmissionInput = z.object({
 export const submitDevinette = onCall(
   {
     region: "europe-west1",
-    enforceAppCheck: true,
+    // App Check enforcement deferred until feature/app-check is merged and
+    // App Check is configured in Firebase Console (Play Integrity + App
+    // Attest + debug tokens). Flip back to true once that's done.
+    enforceAppCheck: false,
     cors: true,
   },
   async (req) => {
