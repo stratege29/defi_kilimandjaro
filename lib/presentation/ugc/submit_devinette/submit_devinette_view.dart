@@ -38,10 +38,18 @@ class _SubmitDevinetteViewState extends ConsumerState<SubmitDevinetteView> {
 
   static const _langOptions = <String>['fr', 'en'];
 
+  bool _langInitialized = false;
+
   @override
-  void initState() {
-    super.initState();
-    _lang = context.locale.languageCode;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // context.locale relies on the EasyLocalization InheritedWidget, which is
+    // only safe to read here or in build(). Seed _lang on first run so the
+    // dropdown defaults to the user's active locale.
+    if (!_langInitialized) {
+      _lang = context.locale.languageCode;
+      _langInitialized = true;
+    }
   }
 
   @override
