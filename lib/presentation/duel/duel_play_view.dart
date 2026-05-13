@@ -120,6 +120,7 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
                       : (localState.timeLeft == 0
                           ? GamePhase.lost
                           : GamePhase.playing),
+                  seed: liveSession.answer,
                   onTileEntered: controller.selectTile,
                   onDragEnd: () {},
                 ),

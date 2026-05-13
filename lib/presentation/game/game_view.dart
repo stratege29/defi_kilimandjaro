@@ -96,6 +96,7 @@ class _GameViewState extends ConsumerState<GameView> {
                   hintRevealedCount: gameState.hintRevealedCount,
                   answer: widget.args.devinette.answer,
                   phase: gameState.phase,
+                  seed: widget.args.devinette.id,
                   onTileEntered: controller.selectTile,
                   onDragEnd: () {
                     // validate() is called automatically on complete word;
