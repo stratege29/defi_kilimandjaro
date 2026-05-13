@@ -286,9 +286,16 @@ Devinette devinetteFromDuel(DuelSession session) {
     country: 'ci',
     answer: session.answer,
     lettersPool: session.lettersPool,
-    riddle: session.riddle,
-    explanation: session.explanation,
-    proverb: session.proverb,
+    // v2 schema: monolingual duel payload wrapped under active locale.
+    riddleByLang: <String, String>{
+      DevinetteLocale.activeLang: session.riddle,
+    },
+    explanationByLang: <String, String>{
+      DevinetteLocale.activeLang: session.explanation,
+    },
+    proverbByLang: <String, String>{
+      DevinetteLocale.activeLang: session.proverb,
+    },
     difficulty: 1,
     estimatedTimeS: 30,
     tags: const ['duel'],
