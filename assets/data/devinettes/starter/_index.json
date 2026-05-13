@@ -1,0 +1,22 @@
+{
+  "format_version": 2,
+  "worlds": {
+    "village_des_or": {
+      "count": 30,
+      "file": "village_des_or.json"
+    },
+    "foret_sacree": {
+      "count": 0,
+      "file": "foret_sacree.json"
+    },
+    "lagune_des_saveurs": {
+      "count": 0,
+      "file": "lagune_des_saveurs.json"
+    },
+    "monts_des_legendes": {
+      "count": 0,
+      "file": "monts_des_legendes.json"
+    }
+  },
+  "total": 30
+}

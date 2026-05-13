@@ -1,0 +1,929 @@
+[
+  {
+    "id": "village_or_001",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "FOUTOU",
+    "answer_normalized": "foutou",
+    "letters_pool": [
+      "F",
+      "O",
+      "U",
+      "T",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Dans le mortier on me pile longtemps. Igname ou banane, je deviens pâte tendre."
+    },
+    "explanation": {
+      "fr": "Le foutou est une pâte pilée emblématique ivoirienne, préparée à base d'igname, de banane plantain ou de manioc, servie avec une sauce."
+    },
+    "proverb": {
+      "fr": "Ensemble on pile mieux."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "cuisine",
+      "tradition",
+      "village"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_002",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "ATTIEKE",
+    "answer_normalized": "attieke",
+    "letters_pool": [
+      "A",
+      "T",
+      "T",
+      "I",
+      "E",
+      "K",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Semoule de manioc, je viens d'Abidjan. Avec poisson braisé, je fais le bonheur du midi."
+    },
+    "explanation": {
+      "fr": "L'attieke est une semoule de manioc fermenté, plat populaire d'origine ébrié, souvent accompagné de poisson, viande ou sauce claire."
+    },
+    "proverb": {
+      "fr": "Le bon repas se partage."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_003",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "MAIS",
+    "answer_normalized": "mais",
+    "letters_pool": [
+      "M",
+      "A",
+      "I",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Grain doré sur l'épi, on me grille au feu de bois pour le goûter."
+    },
+    "explanation": {
+      "fr": "Le maïs est une céréale très consommée en Côte d'Ivoire, grillée, bouillie ou transformée en farine pour diverses préparations."
+    },
+    "proverb": {
+      "fr": "Chaque grain compte."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "cuisine",
+      "cereale",
+      "village"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_004",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "GOMBO",
+    "answer_normalized": "gombo",
+    "letters_pool": [
+      "G",
+      "O",
+      "M",
+      "B",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Vert et long sur la branche, je rends la sauce onctueuse et glissante."
+    },
+    "explanation": {
+      "fr": "Le gombo est un legume tres utilise en cote d'ivoire pour sa texture filante, base de la fameuse sauce gombo accompagnant foutou ou riz."
+    },
+    "proverb": {
+      "fr": "Sauce gombo lie les convives."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "cuisine",
+      "legume"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_005",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "ALLOCO",
+    "answer_normalized": "alloco",
+    "letters_pool": [
+      "A",
+      "L",
+      "L",
+      "O",
+      "C",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Banane bien mûre coupée en rondelles, je grésille dans l'huile et je dore au soleil."
+    },
+    "explanation": {
+      "fr": "L'alloco désigne des bananes plantains mûres frites, servies en accompagnement ou en street food, parfois avec piment et oignons."
+    },
+    "proverb": {
+      "fr": "Ce qui est mûr se cuisine bien."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "cuisine",
+      "street-food"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_006",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "POULE",
+    "answer_normalized": "poule",
+    "letters_pool": [
+      "P",
+      "O",
+      "U",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Je gratte la cour du matin au soir. Mes œufs nourrissent toute la maison."
+    },
+    "explanation": {
+      "fr": "La poule est un animal domestique courant dans la cour des concessions villageoises, élevée pour ses œufs et sa viande."
+    },
+    "proverb": {
+      "fr": "La poule patiente trouve toujours son grain."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "animaux",
+      "village"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_007",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "NATTE",
+    "answer_normalized": "natte",
+    "letters_pool": [
+      "N",
+      "A",
+      "T",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Tressée en feuilles ou en raphia, je deviens lit ou tapis pour la sieste."
+    },
+    "explanation": {
+      "fr": "La natte est un objet domestique tressé, utilisée pour s'asseoir, dormir ou recevoir, présente dans toutes les cours villageoises."
+    },
+    "proverb": {
+      "fr": "Sur la natte, on se retrouve."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "objets",
+      "village"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_008",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "PAGNE",
+    "answer_normalized": "pagne",
+    "letters_pool": [
+      "P",
+      "A",
+      "G",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Tissu coloré qu'on noue à la taille, je m'orne de motifs et raconte une histoire."
+    },
+    "explanation": {
+      "fr": "Le pagne est un textile imprimé porté quotidiennement, élément central du vestiaire féminin ivoirien et symbole d'élégance."
+    },
+    "proverb": {
+      "fr": "Beau pagne, fière allure."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "objets",
+      "tradition"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_009",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "SEAU",
+    "answer_normalized": "seau",
+    "letters_pool": [
+      "S",
+      "E",
+      "A",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Du puits au foyer, je porte sur la tête l'eau du matin."
+    },
+    "explanation": {
+      "fr": "Le seau est un récipient utilisé pour puiser et transporter l'eau au village, souvent porté sur la tête."
+    },
+    "proverb": {
+      "fr": "Goutte à goutte, le seau se remplit."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "objets",
+      "village"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_010",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "FOYER",
+    "answer_normalized": "foyer",
+    "letters_pool": [
+      "F",
+      "O",
+      "Y",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Trois pierres rondes, une marmite dessus. C'est ici que la famille se réchauffe."
+    },
+    "explanation": {
+      "fr": "Le foyer traditionnel se compose souvent de trois pierres soutenant la marmite au-dessus du feu, lieu central de la cuisine villageoise."
+    },
+    "proverb": {
+      "fr": "Le foyer rassemble la famille."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "objets",
+      "village",
+      "cuisine"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_011",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "CASE",
+    "answer_normalized": "case",
+    "letters_pool": [
+      "C",
+      "A",
+      "S",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Murs de banco, toit de paille, je suis l'abri du soir."
+    },
+    "explanation": {
+      "fr": "La case désigne l'habitation traditionnelle villageoise, généralement construite en banco avec un toit végétal."
+    },
+    "proverb": {
+      "fr": "Chaque case a son histoire."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "habitat",
+      "village"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_012",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "BOEUF",
+    "answer_normalized": "boeuf",
+    "letters_pool": [
+      "B",
+      "O",
+      "E",
+      "U",
+      "F"
+    ],
+    "riddle": {
+      "fr": "Lourd et lent, mes cornes fendent l'air. Sans moi, peu de labours, peu de festins."
+    },
+    "explanation": {
+      "fr": "Le boeuf est un animal d'elevage important au village, utilise pour les travaux agricoles et la viande lors des grandes occasions."
+    },
+    "proverb": {
+      "fr": "Le boeuf avance d'un pas sur, le sillon le suit."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "animaux",
+      "village"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_013",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "IGNAME",
+    "answer_normalized": "igname",
+    "letters_pool": [
+      "I",
+      "G",
+      "N",
+      "A",
+      "M",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Tubercule qu'on déterre avec soin. Pilée, bouillie ou frite, je régale la table."
+    },
+    "explanation": {
+      "fr": "L'igname est un tubercule fondamental dans la cuisine ivoirienne, base du foutou et célébrée lors de fêtes des récoltes en pays Akan."
+    },
+    "proverb": {
+      "fr": "Bonne terre, belle igname."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": [
+      "cuisine",
+      "agriculture"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_014",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "MANIOC",
+    "answer_normalized": "manioc",
+    "letters_pool": [
+      "M",
+      "A",
+      "N",
+      "I",
+      "O",
+      "C"
+    ],
+    "riddle": {
+      "fr": "De ma racine on tire farine, attieke et placali. Sans moi, le marché perd ses couleurs."
+    },
+    "explanation": {
+      "fr": "Le manioc est une racine cultivée largement, transformée en attieke, placali ou farine, base alimentaire essentielle."
+    },
+    "proverb": {
+      "fr": "La racine nourrit le tronc."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": [
+      "cuisine",
+      "agriculture"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_015",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "PILON",
+    "answer_normalized": "pilon",
+    "letters_pool": [
+      "P",
+      "I",
+      "L",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Bras de bois lourd, je danse dans le mortier au rythme des mains."
+    },
+    "explanation": {
+      "fr": "Le pilon est un long bâton de bois utilisé pour piler igname, banane ou céréales dans le mortier."
+    },
+    "proverb": {
+      "fr": "Sans pilon, le mortier est vide."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "objets",
+      "cuisine"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_016",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "MARCHE",
+    "answer_normalized": "marche",
+    "letters_pool": [
+      "M",
+      "A",
+      "R",
+      "C",
+      "H",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Étals colorés, voix qui s'appellent, prix qu'on négocie, je suis le cœur du village."
+    },
+    "explanation": {
+      "fr": "Le marché est un lieu central de la vie communautaire, espace d'échanges commerciaux et sociaux."
+    },
+    "proverb": {
+      "fr": "Au marché, tout se rencontre."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lieux",
+      "village"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_017",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "PUITS",
+    "answer_normalized": "puits",
+    "letters_pool": [
+      "P",
+      "U",
+      "I",
+      "T",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Trou profond, eau fraîche au fond, on me visite chaque matin avec une corde."
+    },
+    "explanation": {
+      "fr": "Le puits est une source d'eau commune au village, indispensable pour les besoins quotidiens des familles."
+    },
+    "proverb": {
+      "fr": "Le puits ne refuse personne."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lieux",
+      "village"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_018",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "CHEVRE",
+    "answer_normalized": "chevre",
+    "letters_pool": [
+      "C",
+      "H",
+      "E",
+      "V",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cornes courtes, barbe au menton, je broute autour de la case et donne mon lait."
+    },
+    "explanation": {
+      "fr": "La chèvre est un animal domestique très répandu au village, élevé pour son lait, sa viande et son rôle dans les cérémonies."
+    },
+    "proverb": {
+      "fr": "Chèvre attachée broute selon sa corde."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "animaux",
+      "village"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_019",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "MOUTON",
+    "answer_normalized": "mouton",
+    "letters_pool": [
+      "M",
+      "O",
+      "U",
+      "T",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Toison épaisse, pas tranquille, je suis l'invité d'honneur des grandes fêtes."
+    },
+    "explanation": {
+      "fr": "Le mouton est un animal domestique courant, élevé pour la viande et présent lors de fêtes familiales et célébrations."
+    },
+    "proverb": {
+      "fr": "Mouton sage suit le troupeau."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "animaux",
+      "village"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_020",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "SAUCE",
+    "answer_normalized": "sauce",
+    "letters_pool": [
+      "S",
+      "A",
+      "U",
+      "C",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Graine, gombo ou arachide, je nappe le riz et fais danser les papilles."
+    },
+    "explanation": {
+      "fr": "La sauce accompagne riz, foutou ou attieke, déclinée en de nombreuses variantes : graine, gombo, arachide, claire."
+    },
+    "proverb": {
+      "fr": "La sauce fait le repas."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_021",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "MORTIER",
+    "answer_normalized": "mortier",
+    "letters_pool": [
+      "M",
+      "O",
+      "R",
+      "T",
+      "I",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Bois creusé en gros bol, j'attends le pilon pour faire chanter les ignames."
+    },
+    "explanation": {
+      "fr": "Le mortier est un récipient en bois sculpté servant à piler ignames, manioc ou condiments avec un pilon."
+    },
+    "proverb": {
+      "fr": "Le mortier se souvient de chaque coup."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "objets",
+      "cuisine"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_022",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "GARBA",
+    "answer_normalized": "garba",
+    "letters_pool": [
+      "G",
+      "A",
+      "R",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Attieke et thon frit, vendu au coin de la rue. Le ventre vide me trouve toujours."
+    },
+    "explanation": {
+      "fr": "Le garba est un plat populaire de street food associant attieke et thon frit, emblématique des villes ivoiriennes."
+    },
+    "proverb": {
+      "fr": "Le bon plat se partage debout."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": [
+      "cuisine",
+      "street-food"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_023",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "GRIOT",
+    "answer_normalized": "griot",
+    "letters_pool": [
+      "G",
+      "R",
+      "I",
+      "O",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Mémoire vivante, ma parole tisse l'histoire des familles aux soirs de pleine lune."
+    },
+    "explanation": {
+      "fr": "Le griot est un dépositaire de la tradition orale, conteur, généalogiste et musicien, gardien de la mémoire communautaire."
+    },
+    "proverb": {
+      "fr": "La parole est une semence."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "tradition",
+      "oralite"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_024",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "FAMILLE",
+    "answer_normalized": "famille",
+    "letters_pool": [
+      "F",
+      "A",
+      "M",
+      "I",
+      "L",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Plus large qu'un toit, plus solide qu'un mur, je relie les générations."
+    },
+    "explanation": {
+      "fr": "La famille étendue est au cœur de la société ivoirienne, regroupant plusieurs générations et liens élargis au-delà du foyer immédiat."
+    },
+    "proverb": {
+      "fr": "Une seule main n'attache pas un fagot."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 30,
+    "tags": [
+      "tradition",
+      "village"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_025",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "KEDJENOU",
+    "answer_normalized": "kedjenou",
+    "letters_pool": [
+      "K",
+      "E",
+      "D",
+      "J",
+      "E",
+      "N",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Marmite scellée, mijoté lent, poulet ou pintade, je garde tous mes parfums."
+    },
+    "explanation": {
+      "fr": "Le kedjenou est un mets baoulé mijoté en marmite fermée, à base de poulet ou de pintade et de légumes, cuisson lente sans eau ajoutée."
+    },
+    "proverb": {
+      "fr": "La patience parfume la marmite."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_026",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "GNAGNAN",
+    "answer_normalized": "gnagnan",
+    "letters_pool": [
+      "G",
+      "N",
+      "A",
+      "G",
+      "N",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Petite baie verte, parfois amère, je relève sauces et ragoûts au village."
+    },
+    "explanation": {
+      "fr": "Le gnagnan est une petite baie utilisée comme légume amer dans les sauces traditionnelles ivoiriennes, notamment chez les Akan."
+    },
+    "proverb": {
+      "fr": "L'amertume aujourd'hui, le goût demain."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_027",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "MARMITE",
+    "answer_normalized": "marmite",
+    "letters_pool": [
+      "M",
+      "A",
+      "R",
+      "M",
+      "I",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Ventre rond noirci de fumee, je mijote sur trois pierres et garde les saveurs."
+    },
+    "explanation": {
+      "fr": "La marmite est l'ustensile central du foyer villageois, posee sur les trois pierres du feu pour cuire sauces et ragouts."
+    },
+    "proverb": {
+      "fr": "Ce que la marmite cache, le couvercle le sait."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "objets",
+      "cuisine"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_028",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "PLACALI",
+    "answer_normalized": "placali",
+    "letters_pool": [
+      "P",
+      "L",
+      "A",
+      "C",
+      "A",
+      "L",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Pâte fermentée de manioc, douce et lisse, je glisse avec la sauce graine."
+    },
+    "explanation": {
+      "fr": "Le placali est une pâte préparée à base de manioc fermenté, accompagnée souvent de sauce graine, plat très apprécié en Côte d'Ivoire."
+    },
+    "proverb": {
+      "fr": "Le temps lisse la pâte."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_029",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "ARACHIDE",
+    "answer_normalized": "arachide",
+    "letters_pool": [
+      "A",
+      "R",
+      "A",
+      "C",
+      "H",
+      "I",
+      "D",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Sous la terre je pousse en gousses. Grillée ou en pâte, je parfume la sauce."
+    },
+    "explanation": {
+      "fr": "L'arachide est une légumineuse cultivée largement, consommée grillée ou transformée en pâte pour les sauces traditionnelles."
+    },
+    "proverb": {
+      "fr": "Ce qui est caché finit par mûrir."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": [
+      "cuisine",
+      "agriculture"
+    ],
+    "format_version": 2
+  },
+  {
+    "id": "village_or_030",
+    "world": "village_des_or",
+    "country": "ci",
+    "answer": "TAMTAM",
+    "answer_normalized": "tamtam",
+    "letters_pool": [
+      "T",
+      "A",
+      "M",
+      "T",
+      "A",
+      "M"
+    ],
+    "riddle": {
+      "fr": "Peau tendue sur le bois, mes battements appellent au rassemblement et à la danse."
+    },
+    "explanation": {
+      "fr": "Le tam-tam est un instrument à percussion traditionnel, utilisé pour la communication, les fêtes et les cérémonies villageoises."
+    },
+    "proverb": {
+      "fr": "Quand le tam-tam parle, le village écoute."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": [
+      "objets",
+      "tradition",
+      "musique"
+    ],
+    "format_version": 2
+  }
+]
