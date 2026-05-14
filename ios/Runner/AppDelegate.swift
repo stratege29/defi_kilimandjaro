@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import FirebaseAppCheck
 import FirebaseCore
 import FirebaseMessaging
 import UserNotifications
@@ -14,6 +15,18 @@ import UserNotifications
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    // App Check provider factory MUST be installed BEFORE FirebaseApp.configure()
+    // for Firebase to use it during internal init. In debug builds we wire the
+    // debug provider so the simulator (no DeviceCheck hardware) gets a token
+    // from the FIRAAppCheckDebugToken env var configured in Runner.xcscheme.
+    #if DEBUG
+    AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
+    #else
+    // Release: DeviceCheckProviderFactory handles App Attest on iOS 14+ and
+    // falls back to DeviceCheck on older devices.
+    AppCheck.setAppCheckProviderFactory(DeviceCheckProviderFactory())
+    #endif
+
     // Firebase init AVANT GeneratedPluginRegistrant (sinon cloud_functions crash).
     FirebaseApp.configure()
 
