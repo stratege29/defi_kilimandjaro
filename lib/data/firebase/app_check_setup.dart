@@ -29,7 +29,13 @@ Future<void> activateAppCheck() async {
         ? const AndroidDebugProvider()
         : const AndroidPlayIntegrityProvider(),
     providerApple: kDebugMode
-        ? const AppleDebugProvider()
+        ? const AppleDebugProvider(
+            // Hardcoded debug UUID — must be allow-listed in Firebase
+            // Console > App Check > Apps > iOS > ⋮ > Manage debug tokens.
+            // This avoids relying on FIRAAppCheckDebugToken Xcode scheme env
+            // vars which `flutter run` doesn't forward to the simulator.
+            debugToken: '8aeb4a3e-9c6f-47d1-993e-1cc9168104de',
+          )
         : const AppleDeviceCheckProvider(),
   );
   // Token auto-refresh: laisser activé en prod. Désactiver localement si tu
