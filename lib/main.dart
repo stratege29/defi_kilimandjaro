@@ -80,9 +80,15 @@ Future<void> _bootstrap() async {
   // every player has a UID for duels even before signing in with
   // Google/Apple (Phase 6.1+).
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    // Native plugins (e.g. firebase_messaging on iOS) may auto-initialize the
+    // default app from GoogleService-Info.plist before Dart gets here, which
+    // makes initializeApp() throw [core/duplicate-app]. Treat that as success
+    // so the rest of the bootstrap (App Check, emulators, auth) still runs.
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
 
     // App Check: must run right after Firebase.initializeApp and before any
     // authenticated call (Auth, Firestore, RTDB, Cloud Functions). See
