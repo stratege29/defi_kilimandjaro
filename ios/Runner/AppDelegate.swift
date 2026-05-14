@@ -15,11 +15,14 @@ import UserNotifications
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    // App Check provider factory MUST be installed BEFORE FirebaseApp.configure()
-    // for Firebase to use it during internal init. In debug builds we wire the
-    // debug provider so the simulator (no DeviceCheck hardware) gets a token
-    // from the FIRAAppCheckDebugToken env var configured in Runner.xcscheme.
     #if DEBUG
+    // FIRAAppCheckDebugToken doit être set AVANT FirebaseApp.configure().
+    // Le SDK le lit au launch, pas au runtime — c'est pourquoi le setenv
+    // que fait le plugin Dart au moment de activate() arrive trop tard et
+    // l'AppCheckDebugProvider tombe sur le fallback DeviceCheckProvider.
+    // UUID à allow-lister : Firebase Console > App Check > iOS > Manage
+    // debug tokens. Ne PAS commiter cette valeur en prod.
+    setenv("FIRAAppCheckDebugToken", "8aeb4a3e-9c6f-47d1-993e-1cc9168104de", 1)
     AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
     #else
     // Release: DeviceCheckProviderFactory handles App Attest on iOS 14+ and
