@@ -1,0 +1,27 @@
+name: kilimandjaro_admin
+description: "Console de modération humaine — Kilimandjaro Sagesse Ivoirienne"
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.10.1
+  flutter: '>=3.38.0'
+
+dependencies:
+  cloud_firestore: ^5.4.0
+  cloud_functions: ^6.2.0
+  firebase_auth: ^6.4.0
+  firebase_core: ^4.7.0
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  google_sign_in: ^6.2.2
+  intl: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^7.0.0
+
+flutter:
+  uses-material-design: true

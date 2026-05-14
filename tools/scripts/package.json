@@ -1,0 +1,10 @@
+{
+  "name": "kilimandjaro-tools",
+  "private": true,
+  "type": "module",
+  "description": "One-off scripts (seed Firestore, etc.). Not deployed.",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}
