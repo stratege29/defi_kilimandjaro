@@ -25,16 +25,14 @@ class AddFriendConfirmView extends ConsumerStatefulWidget {
       _AddFriendConfirmViewState();
 }
 
-class _AddFriendConfirmViewState
-    extends ConsumerState<AddFriendConfirmView> {
+class _AddFriendConfirmViewState extends ConsumerState<AddFriendConfirmView> {
   bool _submitting = false;
 
   String? get _myUid => FirebaseAuth.instance.currentUser?.uid;
 
   @override
   Widget build(BuildContext context) {
-    final profileAsync =
-        ref.watch(_profileProvider(widget.friendUid));
+    final profileAsync = ref.watch(_profileProvider(widget.friendUid));
     final myUid = _myUid;
 
     return Scaffold(
@@ -114,8 +112,10 @@ class _AddFriendConfirmViewState
 }
 
 /// FutureProvider.family pour le profil d'un ami (fetch ponctuel).
-final _profileProvider =
-    FutureProvider.family<PlayerProfile?, String>((ref, uid) {
+final _profileProvider = FutureProvider.family<PlayerProfile?, String>((
+  ref,
+  uid,
+) {
   return ref.watch(profileRepositoryProvider).fetchProfile(uid);
 });
 
@@ -168,18 +168,14 @@ class _ConfirmBody extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               '$elo m',
-              style: AppTypography.bebas(
-                size: 18,
-                color: AppColors.orSoleil,
-              ),
+              style: AppTypography.bebas(size: 18, color: AppColors.orSoleil),
             ),
             const SizedBox(height: 32),
             Text(
-              'friends.confirm_follow_body'
-                  .tr(args: [displayName, '$elo m']),
+              'friends.confirm_follow_body'.tr(args: [displayName, '$elo m']),
               style: AppTypography.crimson(
                 size: 14,
-                color: AppColors.ivoire.withValues(alpha: 0.8),
+                color: AppColors.textePrimaire,
                 style: FontStyle.italic,
               ),
               textAlign: TextAlign.center,
@@ -189,8 +185,7 @@ class _ConfirmBody extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed:
-                        submitting ? null : () => context.pop(),
+                    onPressed: submitting ? null : () => context.pop(),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.bois),
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -198,7 +193,7 @@ class _ConfirmBody extends StatelessWidget {
                     child: Text(
                       'common.cancel'.tr(),
                       style: AppTypography.bebas(
-                        color: AppColors.ivoire.withValues(alpha: 0.7),
+                        color: AppColors.texteSecondaire,
                       ),
                     ),
                   ),
@@ -247,11 +242,7 @@ class _ErrorBody extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.error_outline,
-              color: AppColors.rouge,
-              size: 48,
-            ),
+            const Icon(Icons.error_outline, color: AppColors.rouge, size: 48),
             const SizedBox(height: 16),
             Text(
               message,
@@ -261,13 +252,8 @@ class _ErrorBody extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => context.pop(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.bois,
-              ),
-              child: Text(
-                'common.back'.tr(),
-                style: AppTypography.bebas(),
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.bois),
+              child: Text('common.back'.tr(), style: AppTypography.bebas()),
             ),
           ],
         ),

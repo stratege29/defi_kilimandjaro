@@ -36,10 +36,7 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
     // Wire audio : gong de démarrage uniquement pour les duels ranked.
     if (widget.initialSession.isRanked) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref
-            .read(audioControllerProvider.notifier)
-            .playDuelStart()
-            .ignore();
+        ref.read(audioControllerProvider.notifier).playDuelStart().ignore();
       });
     }
   }
@@ -49,17 +46,19 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
     final auth = ref.watch(firebaseAuthProvider);
     final selfUid = auth.currentUser?.uid ?? '';
 
-    final liveSession = ref
-        .watch(duelSessionStreamProvider(widget.initialSession.matchId))
-        .value ??
+    final liveSession =
+        ref
+            .watch(duelSessionStreamProvider(widget.initialSession.matchId))
+            .value ??
         widget.initialSession;
 
     // IMPORTANT: keyed on initialSession (stable widget field) — using the
     // live session as key would recreate the controller on every RTDB
     // update and wipe the local selection.
     final localState = ref.watch(duelControllerProvider(widget.initialSession));
-    final controller =
-        ref.read(duelControllerProvider(widget.initialSession).notifier);
+    final controller = ref.read(
+      duelControllerProvider(widget.initialSession).notifier,
+    );
 
     // Naviguer vers le résultat dès que la phase est finished.
     ref.listen<AsyncValue<DuelSession?>>(
@@ -90,17 +89,12 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
             _DuelHeader(
               selfProgress: selfPlayer?.progress ?? 0,
               opponentProgress: opponent?.progress ?? 0,
-              opponentLabel: opponent != null
-                  ? 'Adversaire'
-                  : 'En attente...',
+              opponentLabel: opponent != null ? 'Adversaire' : 'En attente...',
             ),
             const SizedBox(height: 12),
             _RiddleCard(riddle: liveSession.riddle),
             const SizedBox(height: 10),
-            TimerBar(
-              timeLeft: localState.timeLeft,
-              totalTime: 30,
-            ),
+            TimerBar(timeLeft: localState.timeLeft, totalTime: 30),
             const SizedBox(height: 14),
             AnswerCells(
               answer: liveSession.answer,
@@ -118,8 +112,8 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
                   phase: localState.submitted
                       ? GamePhase.won
                       : (localState.timeLeft == 0
-                          ? GamePhase.lost
-                          : GamePhase.playing),
+                            ? GamePhase.lost
+                            : GamePhase.playing),
                   seed: liveSession.answer,
                   onTileEntered: controller.selectTile,
                   onDragEnd: () {},
@@ -163,9 +157,7 @@ class _DuelHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.35),
         border: Border(
-          bottom: BorderSide(
-            color: AppColors.orSoleil.withValues(alpha: 0.2),
-          ),
+          bottom: BorderSide(color: AppColors.orSoleil.withValues(alpha: 0.2)),
         ),
       ),
       child: Column(
@@ -174,16 +166,13 @@ class _DuelHeader extends StatelessWidget {
             children: [
               const Text('⚔️', style: TextStyle(fontSize: 18)),
               const SizedBox(width: 6),
-              Text(
-                'DUEL EN COURS',
-                style: AppTypography.bebas(size: 14),
-              ),
+              Text('DUEL EN COURS', style: AppTypography.bebas(size: 14)),
               const Spacer(),
               Text(
                 opponentLabel,
                 style: AppTypography.crimson(
                   size: 12,
-                  color: AppColors.ivoire.withValues(alpha: 0.7),
+                  color: AppColors.texteSecondaire,
                   style: FontStyle.italic,
                 ),
               ),
@@ -272,10 +261,7 @@ class _RiddleCard extends StatelessWidget {
           Expanded(
             child: Text(
               riddle,
-              style: AppTypography.crimson(
-                size: 14,
-                style: FontStyle.italic,
-              ),
+              style: AppTypography.crimson(size: 14, style: FontStyle.italic),
             ),
           ),
         ],

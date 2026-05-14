@@ -104,7 +104,7 @@ class _IntroBlock extends StatelessWidget {
             'Mesure-toi à un ami ou à la communauté.',
             style: AppTypography.crimson(
               size: 13,
-              color: AppColors.ivoire.withValues(alpha: 0.75),
+              color: AppColors.texteSecondaire,
               style: FontStyle.italic,
             ),
           ),
@@ -141,10 +141,7 @@ class _DuelButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: accent.withValues(alpha: 0.18),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: accent.withValues(alpha: 0.7),
-              width: 2,
-            ),
+            border: Border.all(color: accent.withValues(alpha: 0.7), width: 2),
           ),
           child: Row(
             children: [
@@ -155,16 +152,13 @@ class _DuelButton extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      label,
-                      style: AppTypography.bebas(size: 18),
-                    ),
+                    Text(label, style: AppTypography.bebas(size: 18)),
                     const SizedBox(height: 2),
                     Text(
                       description,
                       style: AppTypography.crimson(
                         size: 12,
-                        color: AppColors.ivoire.withValues(alpha: 0.7),
+                        color: AppColors.texteSecondaire,
                         style: FontStyle.italic,
                       ),
                     ),
@@ -194,9 +188,7 @@ class _Header extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-            color: AppColors.orSoleil.withValues(alpha: 0.2),
-          ),
+          bottom: BorderSide(color: AppColors.orSoleil.withValues(alpha: 0.2)),
         ),
       ),
       child: Row(
@@ -260,9 +252,9 @@ class _Chip extends StatelessWidget {
     this.trailingPlus = false,
     this.onTap,
   }) : assert(
-          icon != null || iconWidget != null,
-          'Provide either icon (emoji) or iconWidget',
-        );
+         icon != null || iconWidget != null,
+         'Provide either icon (emoji) or iconWidget',
+       );
   final String? icon;
   final Widget? iconWidget;
   final String value;
@@ -276,9 +268,7 @@ class _Chip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.bois.withValues(alpha: 0.28),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.orSoleil.withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -287,10 +277,7 @@ class _Chip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             value,
-            style: AppTypography.bebas(
-              size: 14,
-              color: AppColors.orSoleil,
-            ),
+            style: AppTypography.bebas(size: 14, color: AppColors.orSoleil),
           ),
           if (trailingPlus) ...[
             const SizedBox(width: 4),

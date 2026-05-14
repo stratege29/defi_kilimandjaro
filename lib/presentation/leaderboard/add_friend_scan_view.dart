@@ -72,8 +72,9 @@ class _AddFriendScanViewState extends ConsumerState<AddFriendScanView> {
 
     setState(() => _processing = true);
     try {
-      final profile =
-          await ref.read(profileRepositoryProvider).fetchProfile(friendUid);
+      final profile = await ref
+          .read(profileRepositoryProvider)
+          .fetchProfile(friendUid);
 
       if (!mounted) return;
       if (profile == null) {
@@ -89,9 +90,7 @@ class _AddFriendScanViewState extends ConsumerState<AddFriendScanView> {
       if (!mounted) return;
 
       if (confirmed) {
-        await ref
-            .read(friendsRepositoryProvider)
-            .addFriend(myUid, friendUid);
+        await ref.read(friendsRepositoryProvider).addFriend(myUid, friendUid);
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -262,7 +261,7 @@ class _CameraUnavailable extends StatelessWidget {
                   : 'duel.camera_permission_hint'.tr(),
               style: AppTypography.crimson(
                 size: 13,
-                color: AppColors.ivoire.withValues(alpha: 0.7),
+                color: AppColors.texteSecondaire,
                 style: FontStyle.italic,
               ),
               textAlign: TextAlign.center,

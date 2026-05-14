@@ -51,8 +51,9 @@ class _DuelDeepLinkViewState extends ConsumerState<DuelDeepLinkView> {
     if (!mounted) return;
 
     try {
-      final session =
-          await ref.read(duelRepositoryProvider).joinOpen(widget.matchId);
+      final session = await ref
+          .read(duelRepositoryProvider)
+          .joinOpen(widget.matchId);
       if (!mounted) return;
       context.go(AppRoutes.duelPlay, extra: session);
     } on Exception catch (e) {
@@ -63,10 +64,18 @@ class _DuelDeepLinkViewState extends ConsumerState<DuelDeepLinkView> {
   }
 
   String _errorLabel(String rawMessage) {
-    if (rawMessage.contains('duel_not_found')) return 'Ce défi est introuvable.';
-    if (rawMessage.contains('duel_expired')) return 'Ce défi est déjà terminé.';
-    if (rawMessage.contains('duel_full')) return 'Ce défi est complet (2/2 joueurs).';
-    if (rawMessage.contains('auth_timeout')) return 'Connexion trop lente. Réessaie.';
+    if (rawMessage.contains('duel_not_found')) {
+      return 'Ce défi est introuvable.';
+    }
+    if (rawMessage.contains('duel_expired')) {
+      return 'Ce défi est déjà terminé.';
+    }
+    if (rawMessage.contains('duel_full')) {
+      return 'Ce défi est complet (2/2 joueurs).';
+    }
+    if (rawMessage.contains('auth_timeout')) {
+      return 'Connexion trop lente. Réessaie.';
+    }
     return 'Impossible de rejoindre le défi.';
   }
 
@@ -111,7 +120,7 @@ class _DuelDeepLinkViewState extends ConsumerState<DuelDeepLinkView> {
           widget.matchId,
           style: AppTypography.crimson(
             size: 13,
-            color: AppColors.ivoire.withValues(alpha: 0.5),
+            color: AppColors.texteTertiaire,
           ),
         ),
       ],
@@ -134,7 +143,7 @@ class _DuelDeepLinkViewState extends ConsumerState<DuelDeepLinkView> {
           message,
           style: AppTypography.crimson(
             size: 14,
-            color: AppColors.ivoire.withValues(alpha: 0.8),
+            color: AppColors.textePrimaire,
           ),
           textAlign: TextAlign.center,
         ),
@@ -149,10 +158,7 @@ class _DuelDeepLinkViewState extends ConsumerState<DuelDeepLinkView> {
             ),
             child: Text(
               'RETOUR AU HUB',
-              style: AppTypography.bebas(
-                size: 18,
-                color: AppColors.vertForet,
-              ),
+              style: AppTypography.bebas(size: 18, color: AppColors.vertForet),
             ),
           ),
         ),

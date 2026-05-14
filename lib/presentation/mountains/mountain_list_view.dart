@@ -36,6 +36,12 @@ class _MountainListViewState extends ConsumerState<MountainListView>
   late final AnimationController _pulseController;
   late final Animation<double> _pulseAnim;
 
+  // Le jump initial vers la montagne en cours ne doit s'exécuter qu'une fois
+  // par instance — sinon il interromprait le scroll de l'utilisateur à chaque
+  // rebuild. Vérifier `_pageController.page == null` ne suffit pas : dès que
+  // le PageView attache le controller, `page` vaut 0.0, jamais null.
+  bool _initialJumpDone = false;
+
   @override
   void initState() {
     super.initState();
@@ -71,12 +77,14 @@ class _MountainListViewState extends ConsumerState<MountainListView>
   }
 
   /// Initialise le PageController sur le sommet courant (premier non-completed).
+  /// One-shot par instance via [_initialJumpDone].
   void _jumpToCurrentMountain(List<Mountain> mountains) {
+    if (_initialJumpDone) return;
     if (!_pageController.hasClients) return;
     final idx = _currentMountainIndex(mountains);
-    if (idx != null && _pageController.page == null) {
-      _pageController.jumpToPage(idx);
-    }
+    if (idx == null) return;
+    _pageController.jumpToPage(idx);
+    _initialJumpDone = true;
   }
 
   /// Index du sommet courant (premier non-completed, ou 0).
@@ -141,9 +149,9 @@ class _MountainListViewState extends ConsumerState<MountainListView>
           );
 
           final currentPage = _pagePosition.round().clamp(
-                0,
-                mountains.length - 1,
-              );
+            0,
+            mountains.length - 1,
+          );
           final currentMountain = mountains[currentPage];
           final biome = biomeForAltitude(currentMountain.altitude);
           final interpolatedAlt = _interpolatedAltitude(mountains);
@@ -159,7 +167,8 @@ class _MountainListViewState extends ConsumerState<MountainListView>
               // 2. Silhouettes BG parallax.
               Positioned.fill(
                 child: ParallaxBgLayer(
-                  scrollFraction: _pagePosition / math.max(mountains.length - 1, 1),
+                  scrollFraction:
+                      _pagePosition / math.max(mountains.length - 1, 1),
                   biome: biome,
                 ),
               ),
@@ -240,7 +249,8 @@ class _MountainPage extends StatelessWidget {
   final VoidCallback onTap;
 
   bool get _isCompleted =>
-      mountain.completedLevels >= mountain.totalLevels && mountain.totalLevels > 0;
+      mountain.completedLevels >= mountain.totalLevels &&
+      mountain.totalLevels > 0;
 
   Color _silhouetteColor() {
     final biome = biomeForAltitude(mountain.altitude);
@@ -321,18 +331,12 @@ class _NameHeader extends StatelessWidget {
       opacity: opacity,
       child: Row(
         children: [
-          Text(
-            mountain.flagEmoji,
-            style: const TextStyle(fontSize: 20),
-          ),
+          Text(mountain.flagEmoji, style: const TextStyle(fontSize: 20)),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               mountain.name.toUpperCase(),
-              style: AppTypography.bebas(
-                size: 18,
-                letterSpacing: 3,
-              ),
+              style: AppTypography.bebas(size: 18, letterSpacing: 3),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -340,7 +344,7 @@ class _NameHeader extends StatelessWidget {
             mountain.countryName,
             style: AppTypography.crimson(
               size: 12,
-              color: AppColors.ivoire.withValues(alpha: 0.65),
+              color: AppColors.texteSecondaire,
               style: FontStyle.italic,
             ),
           ),
@@ -362,11 +366,7 @@ class _AltitudeDisplay extends StatelessWidget {
         children: [
           TextSpan(
             text: formatted,
-            style: AppTypography.bebas(
-              size: 56,
-              color: AppColors.orSoleil,
-              letterSpacing: 1,
-            ),
+            style: AppTypography.bebas(size: 56, color: AppColors.orSoleil),
           ),
           TextSpan(
             text: ' m',
@@ -422,7 +422,7 @@ class _ProgressFooter extends StatelessWidget {
             '${mountain.completedLevels}/${mountain.totalLevels} niveaux conquis',
             style: AppTypography.crimson(
               size: 13,
-              color: AppColors.ivoire.withValues(alpha: 0.7),
+              color: AppColors.texteSecondaire,
             ),
           ),
           const SizedBox(height: 14),
@@ -454,9 +454,7 @@ class _StarRow extends StatelessWidget {
           child: Icon(
             filled ? Icons.star_rounded : Icons.star_outline_rounded,
             size: 18,
-            color: filled
-                ? AppColors.orSoleil
-                : AppColors.ivoire.withValues(alpha: 0.30),
+            color: filled ? AppColors.orSoleil : AppColors.texteDisabled,
           ),
         );
       }),
@@ -483,7 +481,7 @@ class _CtaButton extends StatelessWidget {
 
     if (!unlocked) {
       bgColor = AppColors.boisFonce.withValues(alpha: 0.6);
-      textColor = AppColors.ivoire.withValues(alpha: 0.5);
+      textColor = AppColors.texteTertiaire;
       label = 'TERMINE LE SOMMET PRÉCÉDENT';
     } else if (isCompleted) {
       bgColor = AppColors.vertClair.withValues(alpha: 0.25);

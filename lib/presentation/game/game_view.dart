@@ -1,14 +1,19 @@
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
+import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
+import 'package:defi_kilimandjaro/data/repositories/devinette_repository_impl.dart';
+import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/answer_cells.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/circular_grid.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/timer_bar.dart';
 import 'package:defi_kilimandjaro/presentation/result/failure_view.dart';
+import 'package:defi_kilimandjaro/presentation/result/mountain_conquest_view.dart';
 import 'package:defi_kilimandjaro/presentation/result/victory_view.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -28,8 +33,54 @@ class GameView extends ConsumerStatefulWidget {
   ConsumerState<GameView> createState() => _GameViewState();
 }
 
-class _GameViewState extends ConsumerState<GameView> {
+class _GameViewState extends ConsumerState<GameView>
+    with WidgetsBindingObserver {
   bool _overlayShown = false;
+
+  /// Vrai quand un dialog (back confirm, victory, failure, conquest) tient
+  /// le timer en pause via [_pauseForModal]. Évite un double-resume.
+  bool _modalPaused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Pause le décompte quand l'app passe en arrière-plan (appel téléphonique,
+    // notification plein écran, switch d'app). Reprend à la résumée.
+    final notifier = ref.read(gameControllerProvider(widget.args).notifier);
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+        notifier.pause();
+      case AppLifecycleState.resumed:
+        if (!_modalPaused) notifier.resume();
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
+
+  void _pauseForModal() {
+    if (_modalPaused) return;
+    _modalPaused = true;
+    ref.read(gameControllerProvider(widget.args).notifier).pause();
+  }
+
+  void _resumeFromModal() {
+    if (!_modalPaused) return;
+    _modalPaused = false;
+    ref.read(gameControllerProvider(widget.args).notifier).resume();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,96 +108,167 @@ class _GameViewState extends ConsumerState<GameView> {
       }
     });
 
-    return Scaffold(
-      backgroundColor: AppColors.vertForet,
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            // Header.
-            _GameHeader(
-              cauris: gameState.cauris,
-              onBack: () => context.pop(),
-            ),
-            const SizedBox(height: 8),
-            // World banner.
-            _WorldBanner(world: widget.args.devinette.world),
-            const SizedBox(height: 12),
-            // Riddle card.
-            _RiddleCard(riddle: widget.args.devinette.riddle),
-            const SizedBox(height: 12),
-            // Timer bar.
-            TimerBar(
-              timeLeft: gameState.timeLeft,
-              totalTime: 30,
-            ),
-            const SizedBox(height: 16),
-            // Answer cells.
-            AnswerCells(
-              answer: widget.args.devinette.answer,
-              formedLetters: gameState.formedWord,
-              isValidated: gameState.validationCorrect,
-            ),
-            const SizedBox(height: 20),
-            // Circular tile grid (expands to fill space).
-            Expanded(
-              child: Center(
-                child: CircularGrid(
-                  letters: gameState.displayLetters,
-                  selectedIndices: gameState.selectedIndices,
-                  hintRevealedCount: gameState.hintRevealedCount,
-                  answer: widget.args.devinette.answer,
-                  phase: gameState.phase,
-                  seed: widget.args.devinette.id,
-                  onTileEntered: controller.selectTile,
-                  onDragEnd: () {
-                    // validate() is called automatically on complete word;
-                    // on partial lift we just let selection persist.
-                  },
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        _confirmBack();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.vertForet,
+        body: SafeArea(
+          child: Column(
+            children: <Widget>[
+              // Header.
+              _GameHeader(cauris: gameState.cauris, onBack: _confirmBack),
+              const SizedBox(height: 8),
+              // World banner.
+              _WorldBanner(world: widget.args.devinette.world),
+              const SizedBox(height: 12),
+              // Riddle card.
+              _RiddleCard(riddle: widget.args.devinette.riddle),
+              const SizedBox(height: 12),
+              // Timer bar.
+              TimerBar(timeLeft: gameState.timeLeft, totalTime: 30),
+              const SizedBox(height: 16),
+              // Answer cells.
+              AnswerCells(
+                answer: widget.args.devinette.answer,
+                formedLetters: gameState.formedWord,
+                isValidated: gameState.validationCorrect,
+              ),
+              const SizedBox(height: 20),
+              // Circular tile grid (expands to fill space).
+              Expanded(
+                child: Center(
+                  child: CircularGrid(
+                    letters: gameState.displayLetters,
+                    selectedIndices: gameState.selectedIndices,
+                    hintRevealedCount: gameState.hintRevealedCount,
+                    answer: widget.args.devinette.answer,
+                    phase: gameState.phase,
+                    seed: widget.args.devinette.id,
+                    onTileEntered: controller.selectTile,
+                    onDragEnd: () {
+                      // validate() is called automatically on complete word;
+                      // on partial lift we just let selection persist.
+                    },
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            // Rewarded video chip ("+50 🪙 regarder une pub").
-            if (!ref.watch(playerProgressProvider).noAdsPurchased)
-              _RewardedAdChip(
-                enabled: gameState.phase == GamePhase.playing,
-                onWatch: () async {
-                  final got = await ref
-                      .read(adsServiceProvider)
-                      .showRewardedForCauris();
-                  if (!context.mounted) return;
-                  if (got) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          '+50 Cauris de Sagesse',
-                          style: AppTypography.bebas(),
+              const SizedBox(height: 8),
+              // Rewarded video chip ("+50 🪙 regarder une pub").
+              if (!ref.watch(playerProgressProvider).noAdsPurchased)
+                _RewardedAdChip(
+                  enabled: gameState.phase == GamePhase.playing,
+                  onWatch: () async {
+                    final got = await ref
+                        .read(adsServiceProvider)
+                        .showRewardedForCauris();
+                    if (!context.mounted) return;
+                    if (got) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            '+50 Cauris de Sagesse',
+                            style: AppTypography.bebas(),
+                          ),
+                          backgroundColor: AppColors.vertClair,
+                          duration: const Duration(milliseconds: 1200),
                         ),
-                        backgroundColor: AppColors.vertClair,
-                        duration: const Duration(milliseconds: 1200),
-                      ),
-                    );
-                  }
-                },
+                      );
+                    }
+                  },
+                ),
+              const SizedBox(height: 8),
+              // Bottom action buttons.
+              _ActionButtons(
+                onHint: controller.useHint,
+                onClear: controller.clearSelection,
+                onValidate: controller.validate,
+                canHint:
+                    gameState.cauris >= 20 &&
+                    gameState.hintRevealedCount <
+                        widget.args.devinette.answer.length &&
+                    gameState.phase == GamePhase.playing,
+                canValidate:
+                    gameState.selectedIndices.isNotEmpty &&
+                    gameState.phase == GamePhase.playing,
               ),
-            const SizedBox(height: 8),
-            // Bottom action buttons.
-            _ActionButtons(
-              onHint: controller.useHint,
-              onClear: controller.clearSelection,
-              onValidate: controller.validate,
-              canHint: gameState.cauris >= 20 &&
-                  gameState.hintRevealedCount <
-                      widget.args.devinette.answer.length &&
-                  gameState.phase == GamePhase.playing,
-              canValidate: gameState.selectedIndices.isNotEmpty &&
-                  gameState.phase == GamePhase.playing,
-            ),
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  /// Demande confirmation avant de quitter une partie en cours. Pas de modal
+  /// si la partie est déjà terminée (won/lost) — dans ce cas, pop direct.
+  Future<void> _confirmBack() async {
+    final gameState = ref.read(gameControllerProvider(widget.args));
+    if (gameState.phase != GamePhase.playing) {
+      if (mounted) context.pop();
+      return;
+    }
+
+    _pauseForModal();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: AppColors.boisFonce,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: AppColors.orSoleil.withValues(alpha: 0.5)),
+        ),
+        title: Text(
+          'Quitter la partie ?',
+          style: AppTypography.bebas(size: 20, color: AppColors.orSoleil),
+        ),
+        content: Text(
+          'Tu perdras ta progression sur cette devinette.',
+          style: AppTypography.crimson(
+            size: 15,
+            color: AppColors.textePrimaire,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(true),
+            child: Text(
+              'QUITTER',
+              style: AppTypography.bebas(
+                size: 14,
+                color: AppColors.texteSecondaire,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(false),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.vertClair,
+              foregroundColor: AppColors.ivoire,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'CONTINUER',
+              style: AppTypography.bebas(size: 14, letterSpacing: 1.5),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted) return;
+    if (confirmed ?? false) {
+      context.pop();
+    } else {
+      _resumeFromModal();
+    }
   }
 
   void _showVictoryOverlay(BuildContext ctx, int timeLeft) {
@@ -158,13 +280,116 @@ class _GameViewState extends ConsumerState<GameView> {
         devinette: widget.args.devinette,
         timeLeft: timeLeft,
         onNext: () {
-          // Close overlay then return to hub.
-          ctx
-            ..pop() // closes dialog
-            ..pop(); // back to hub
+          // Ferme l'overlay puis enchaîne automatiquement sur la prochaine
+          // étape : devinette suivante de la même montagne, ou montagne
+          // suivante si celle-ci vient d'être conquise.
+          ctx.pop();
+          _advanceAfterVictory();
         },
       ),
     );
+  }
+
+  /// Détermine et exécute la prochaine navigation après une victoire.
+  ///
+  /// - Mode Hub (sans `mountainId`) : retour au hub (legacy).
+  /// - Montagne en cours non terminée : charge une devinette random du même
+  ///   monde et remplace la route `/game` (re-démarre une partie fraîche).
+  /// - Montagne tout juste conquise : remplace `/mountain` par la prochaine
+  ///   montagne débloquée (la liste `mountainsProvider` reflète déjà la win,
+  ///   `recordWin` ayant muté `playerProgressProvider` de façon synchrone).
+  Future<void> _advanceAfterVictory() async {
+    final mountainId = widget.args.mountainId;
+    if (mountainId == null) {
+      if (mounted) context.pop();
+      return;
+    }
+
+    final List<Mountain> mountains;
+    try {
+      mountains = await ref.read(mountainsProvider.future);
+    } on Exception catch (_) {
+      if (mounted) context.pop();
+      return;
+    }
+    if (!mounted) return;
+
+    final currentIdx = mountains.indexWhere((m) => m.id == mountainId);
+    if (currentIdx < 0) {
+      context.pop();
+      return;
+    }
+
+    final current = mountains[currentIdx];
+    final mountainDone = current.completedLevels >= current.totalLevels;
+
+    if (!mountainDone) {
+      await _pushNextDevinette(mountainId);
+      return;
+    }
+
+    // Cherche la prochaine montagne débloquée.
+    Mountain? next;
+    for (var i = currentIdx + 1; i < mountains.length; i++) {
+      if (mountains[i].unlocked) {
+        next = mountains[i];
+        break;
+      }
+    }
+
+    if (next == null) {
+      // Plus de montagne accessible — retour au détail courant. On affiche
+      // tout de même l'overlay de conquête car c'est probablement le sommet
+      // final (Kilimandjaro).
+      await _showConquestOverlay(current);
+      if (!mounted) return;
+      context.pop();
+      return;
+    }
+
+    // Célèbre la conquête, puis bascule vers la montagne suivante.
+    await _showConquestOverlay(current);
+    if (!mounted) return;
+    context.pop(); // /game → /mountain(courant)
+    if (!mounted) return;
+    context.pushReplacement(AppRoutes.mountain, extra: next);
+  }
+
+  /// Affiche l'overlay « TU AS CONQUIS » et attend que l'utilisateur tape
+  /// « PROCHAINE MONTAGNE ».
+  Future<void> _showConquestOverlay(Mountain conquered) async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withValues(alpha: 0.94),
+      builder: (dialogCtx) => MountainConquestView(
+        mountain: conquered,
+        onContinue: () => Navigator.of(dialogCtx).pop(),
+      ),
+    );
+  }
+
+  Future<void> _pushNextDevinette(String mountainId) async {
+    try {
+      final repo = ref.read(devinetteRepositoryProvider);
+      // Phase 2.2 stub : devinette aléatoire de "village_des_or".
+      // Phase 4 : tag par pays / région (cohérent avec mountain_detail_view).
+      final next = await repo.randomFromWorld('village_des_or');
+      if (!mounted) return;
+      context.pushReplacement(
+        AppRoutes.game,
+        extra: GameArgs(devinette: next, mountainId: mountainId),
+      );
+    } on Exception catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur de chargement', style: AppTypography.bebas()),
+          backgroundColor: AppColors.rouge,
+        ),
+      );
+      context.pop();
+    }
   }
 
   Future<void> _showFailureOverlay(
@@ -218,7 +443,9 @@ class _RewardedAdChip extends StatelessWidget {
               color: AppColors.bois.withValues(alpha: 0.35),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: AppColors.orSoleil.withValues(alpha: enabled ? 0.6 : 0.2),
+                color: AppColors.orSoleil.withValues(
+                  alpha: enabled ? 0.6 : 0.2,
+                ),
               ),
             ),
             child: Row(
@@ -227,16 +454,18 @@ class _RewardedAdChip extends StatelessWidget {
                 Icon(
                   Icons.play_circle_outline,
                   size: 16,
-                  color: AppColors.orSoleil
-                      .withValues(alpha: enabled ? 0.95 : 0.4),
+                  color: AppColors.orSoleil.withValues(
+                    alpha: enabled ? 0.95 : 0.4,
+                  ),
                 ),
                 const SizedBox(width: 6),
                 Text(
                   '+50',
                   style: AppTypography.bebas(
                     size: 13,
-                    color: AppColors.orSoleil
-                        .withValues(alpha: enabled ? 0.95 : 0.4),
+                    color: AppColors.orSoleil.withValues(
+                      alpha: enabled ? 0.95 : 0.4,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 4),
@@ -249,8 +478,9 @@ class _RewardedAdChip extends StatelessWidget {
                   'regarder une pub',
                   style: AppTypography.bebas(
                     size: 13,
-                    color: AppColors.orSoleil
-                        .withValues(alpha: enabled ? 0.95 : 0.4),
+                    color: AppColors.orSoleil.withValues(
+                      alpha: enabled ? 0.95 : 0.4,
+                    ),
                   ),
                 ),
               ],
@@ -267,10 +497,7 @@ class _RewardedAdChip extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _GameHeader extends StatelessWidget {
-  const _GameHeader({
-    required this.cauris,
-    required this.onBack,
-  });
+  const _GameHeader({required this.cauris, required this.onBack});
 
   final int cauris;
   final VoidCallback onBack;
@@ -315,9 +542,7 @@ class _CaurisChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.bois.withValues(alpha: 0.28),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.orSoleil.withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -347,9 +572,7 @@ class _WorldBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.bois.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.orSoleil.withValues(alpha: 0.25),
-        ),
+        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.25)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -399,20 +622,13 @@ class _RiddleCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           // Griot avatar.
-          Image.asset(
-            AppAssets.griotIdle,
-            width: 64,
-            height: 64,
-          ),
+          Image.asset(AppAssets.griotIdle, width: 64, height: 64),
           const SizedBox(width: 10),
           // Riddle text.
           Expanded(
             child: Text(
               riddle,
-              style: AppTypography.crimson(
-                size: 15,
-                style: FontStyle.italic,
-              ),
+              style: AppTypography.crimson(size: 15, style: FontStyle.italic),
             ),
           ),
         ],
@@ -528,13 +744,7 @@ class _GameButton extends StatelessWidget {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
-                      label,
-                      style: AppTypography.bebas(
-                        size: 15,
-                        letterSpacing: 1,
-                      ),
-                    ),
+                    Text(label, style: AppTypography.bebas(size: 15)),
                     if (subtitle != null)
                       Row(
                         mainAxisSize: MainAxisSize.min,
@@ -543,7 +753,7 @@ class _GameButton extends StatelessWidget {
                             subtitle!,
                             style: AppTypography.crimson(
                               size: 11,
-                              color: AppColors.ivoire.withValues(alpha: 0.8),
+                              color: AppColors.textePrimaire,
                             ),
                           ),
                           const SizedBox(width: 3),

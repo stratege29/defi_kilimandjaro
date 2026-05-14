@@ -57,10 +57,9 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
       return;
     }
     try {
-      final delta = await ref.read(matchmakingRepositoryProvider).endMatch(
-            matchId: widget.session.matchId,
-            winnerUid: winnerUid,
-          );
+      final delta = await ref
+          .read(matchmakingRepositoryProvider)
+          .endMatch(matchId: widget.session.matchId, winnerUid: winnerUid);
       if (mounted) {
         setState(() {
           _eloDelta = delta;
@@ -110,14 +109,14 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
       final deepLink = 'kilimandjaro://duel/$matchId';
 
       // 2. Capture le widget résultat en PNG.
-      final boundary = _repaintKey.currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
+      final boundary =
+          _repaintKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
 
       XFile? imageFile;
       if (boundary != null) {
         final image = await boundary.toImage(pixelRatio: 2);
-        final byteData =
-            await image.toByteData(format: ui.ImageByteFormat.png);
+        final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
         if (byteData != null) {
           final tmpDir = await getTemporaryDirectory();
           final file = File('${tmpDir.path}/kilimandjaro_result.png');
@@ -128,8 +127,9 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
 
       // 3. Construit le texte de partage.
       final delta = _eloDelta?.delta;
-      final altitudeText =
-          delta != null ? '${delta >= 0 ? '+' : ''}${delta}m' : '';
+      final altitudeText = delta != null
+          ? '${delta >= 0 ? '+' : ''}${delta}m'
+          : '';
       final shareText = altitudeText.isNotEmpty
           ? "J'ai gravi $altitudeText d'altitude sur Kilimandjaro Sagesse Ivoirienne !\nDéfie-moi : $deepLink"
           : 'Affronte-moi sur Kilimandjaro Sagesse Ivoirienne !\nDéfi : $deepLink';
@@ -204,7 +204,7 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                           textAlign: TextAlign.center,
                           style: AppTypography.crimson(
                             size: 14,
-                            color: AppColors.ivoire.withValues(alpha: 0.85),
+                            color: AppColors.textePrimaire,
                             style: FontStyle.italic,
                           ),
                         ),
@@ -400,15 +400,12 @@ class _EloSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            label,
-            style: AppTypography.bebas(size: 22, color: color),
-          ),
+          Text(label, style: AppTypography.bebas(size: 22, color: color)),
           Text(
             'Nouvelle altitude : ${delta!.newElo} m',
             style: AppTypography.crimson(
               size: 13,
-              color: AppColors.ivoire.withValues(alpha: 0.7),
+              color: AppColors.texteSecondaire,
             ),
           ),
         ],

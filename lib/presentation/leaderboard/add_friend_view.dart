@@ -90,9 +90,7 @@ class _MyQrCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.bois.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.orSoleil.withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.4)),
       ),
       child: Column(
         children: [
@@ -127,7 +125,7 @@ class _MyQrCard extends StatelessWidget {
             'friends.my_qr_caption'.tr(),
             style: AppTypography.crimson(
               size: 12,
-              color: AppColors.ivoire.withValues(alpha: 0.7),
+              color: AppColors.texteSecondaire,
               style: FontStyle.italic,
             ),
             textAlign: TextAlign.center,
@@ -150,9 +148,7 @@ class _ScanFriendCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.bois.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.orSoleil.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,7 +157,7 @@ class _ScanFriendCard extends StatelessWidget {
             'friends.scan_friend_body'.tr(),
             style: AppTypography.crimson(
               size: 13,
-              color: AppColors.ivoire.withValues(alpha: 0.8),
+              color: AppColors.textePrimaire,
             ),
           ),
           const SizedBox(height: 12),
@@ -173,10 +169,7 @@ class _ScanFriendCard extends StatelessWidget {
                 backgroundColor: AppColors.vertClair,
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              icon: const Icon(
-                Icons.qr_code_scanner,
-                color: AppColors.ivoire,
-              ),
+              icon: const Icon(Icons.qr_code_scanner, color: AppColors.ivoire),
               label: Text(
                 'friends.open_camera'.tr(),
                 style: AppTypography.bebas(size: 15),
@@ -226,8 +219,9 @@ class _ManualUidEntryState extends ConsumerState<_ManualUidEntry> {
     });
 
     try {
-      final profile =
-          await ref.read(profileRepositoryProvider).fetchProfile(uid);
+      final profile = await ref
+          .read(profileRepositoryProvider)
+          .fetchProfile(uid);
       if (!mounted) return;
       if (profile == null) {
         setState(() => _error = 'friends.error_not_found'.tr());
@@ -241,9 +235,7 @@ class _ManualUidEntryState extends ConsumerState<_ManualUidEntry> {
       if (!mounted) return;
       if (!confirmed) return;
 
-      await ref
-          .read(friendsRepositoryProvider)
-          .addFriend(widget.myUid, uid);
+      await ref.read(friendsRepositoryProvider).addFriend(widget.myUid, uid);
       if (!mounted) return;
       _controller.clear();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -305,9 +297,7 @@ class _ManualUidEntryState extends ConsumerState<_ManualUidEntry> {
       decoration: BoxDecoration(
         color: AppColors.bois.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.orSoleil.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -316,7 +306,7 @@ class _ManualUidEntryState extends ConsumerState<_ManualUidEntry> {
             'friends.manual_entry_body'.tr(),
             style: AppTypography.crimson(
               size: 12,
-              color: AppColors.ivoire.withValues(alpha: 0.7),
+              color: AppColors.texteSecondaire,
               style: FontStyle.italic,
             ),
           ),
@@ -328,12 +318,12 @@ class _ManualUidEntryState extends ConsumerState<_ManualUidEntry> {
             decoration: InputDecoration(
               counterStyle: AppTypography.crimson(
                 size: 10,
-                color: AppColors.ivoire.withValues(alpha: 0.4),
+                color: AppColors.texteDisabled,
               ),
               hintText: 'friends.manual_uid_hint'.tr(),
               hintStyle: AppTypography.crimson(
                 size: 12,
-                color: AppColors.ivoire.withValues(alpha: 0.4),
+                color: AppColors.texteDisabled,
               ),
               errorText: _error,
               errorStyle: AppTypography.crimson(

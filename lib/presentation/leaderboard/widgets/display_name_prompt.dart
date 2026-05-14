@@ -49,15 +49,13 @@ class _DisplayNamePromptDialogState extends State<DisplayNamePromptDialog> {
 
   void _confirm() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    Navigator.of(context).pop(
-      (DisplayNamePromptResult.confirmed, _controller.text.trim()),
-    );
+    Navigator.of(
+      context,
+    ).pop((DisplayNamePromptResult.confirmed, _controller.text.trim()));
   }
 
   void _stayAnonymous() {
-    Navigator.of(context).pop(
-      (DisplayNamePromptResult.anonymous, null),
-    );
+    Navigator.of(context).pop((DisplayNamePromptResult.anonymous, null));
   }
 
   @override
@@ -78,7 +76,7 @@ class _DisplayNamePromptDialogState extends State<DisplayNamePromptDialog> {
               'leaderboard.prompt_body'.tr(),
               style: AppTypography.crimson(
                 size: 13,
-                color: AppColors.ivoire.withValues(alpha: 0.75),
+                color: AppColors.texteSecondaire,
                 style: FontStyle.italic,
               ),
             ),
@@ -92,12 +90,12 @@ class _DisplayNamePromptDialogState extends State<DisplayNamePromptDialog> {
               decoration: InputDecoration(
                 counterStyle: AppTypography.crimson(
                   size: 11,
-                  color: AppColors.ivoire.withValues(alpha: 0.5),
+                  color: AppColors.texteTertiaire,
                 ),
                 hintText: 'leaderboard.prompt_hint'.tr(),
                 hintStyle: AppTypography.crimson(
                   size: 14,
-                  color: AppColors.ivoire.withValues(alpha: 0.4),
+                  color: AppColors.texteDisabled,
                 ),
                 enabledBorder: const OutlineInputBorder(
                   borderSide: BorderSide(color: AppColors.bois),
@@ -135,7 +133,7 @@ class _DisplayNamePromptDialogState extends State<DisplayNamePromptDialog> {
             'leaderboard.prompt_anonymous'.tr(),
             style: AppTypography.crimson(
               size: 13,
-              color: AppColors.ivoire.withValues(alpha: 0.7),
+              color: AppColors.texteSecondaire,
             ),
           ),
         ),
@@ -143,8 +141,7 @@ class _DisplayNamePromptDialogState extends State<DisplayNamePromptDialog> {
           onPressed: _confirm,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.vertClair,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           ),
           child: Text(
             'leaderboard.prompt_validate'.tr(),

@@ -53,9 +53,7 @@ class ProfileView extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             // Altitude ELO — section Phase 6.
-            _AltitudeSection(
-              profile: profileAsync.value,
-            ),
+            _AltitudeSection(profile: profileAsync.value),
             const SizedBox(height: 28),
             _Section(
               title: 'PAYS EXPLORÉS',
@@ -63,19 +61,15 @@ class ProfileView extends ConsumerWidget {
                 loading: () => const SizedBox(
                   height: 60,
                   child: Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.orSoleil,
-                    ),
+                    child: CircularProgressIndicator(color: AppColors.orSoleil),
                   ),
                 ),
                 error: (_, __) => Text(
                   'Erreur de chargement',
                   style: AppTypography.crimson(),
                 ),
-                data: (list) => _ExploredCountriesGrid(
-                  mountains: list,
-                  progress: progress,
-                ),
+                data: (list) =>
+                    _ExploredCountriesGrid(mountains: list, progress: progress),
               ),
             ),
             const SizedBox(height: 28),
@@ -133,9 +127,8 @@ class ProfileView extends ConsumerWidget {
                     icon: audioState.muted ? Icons.volume_off : Icons.volume_up,
                     label: 'Son',
                     valueLabel: audioState.muted ? 'Muet' : 'Activé',
-                    onTap: () => ref
-                        .read(audioControllerProvider.notifier)
-                        .toggleMute(),
+                    onTap: () =>
+                        ref.read(audioControllerProvider.notifier).toggleMute(),
                   ),
                   _SettingTile(
                     icon: Icons.refresh,
@@ -171,10 +164,7 @@ class ProfileView extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.boisFonce,
-        title: Text(
-          'Réinitialiser ?',
-          style: AppTypography.bebas(size: 18),
-        ),
+        title: Text('Réinitialiser ?', style: AppTypography.bebas(size: 18)),
         content: Text(
           'Tous les cauris, niveaux et titres seront perdus. Action '
           'irréversible.',
@@ -183,10 +173,7 @@ class ProfileView extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(
-              'Annuler',
-              style: AppTypography.bebas(),
-            ),
+            child: Text('Annuler', style: AppTypography.bebas()),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -273,7 +260,7 @@ class _AvatarHeader extends StatelessWidget {
                   'Encore aucun titre — joue 5 niveaux',
                   style: AppTypography.crimson(
                     size: 13,
-                    color: AppColors.ivoire.withValues(alpha: 0.6),
+                    color: AppColors.texteSecondaire,
                     style: FontStyle.italic,
                   ),
                 ),
@@ -317,7 +304,11 @@ class _StatsRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _StatBox(
-            iconWidget: Image.asset(AppAssets.iconNavMap, width: 22, height: 22),
+            iconWidget: Image.asset(
+              AppAssets.iconNavMap,
+              width: 22,
+              height: 22,
+            ),
             label: 'Pays',
             value: '$countriesExplored',
           ),
@@ -325,8 +316,11 @@ class _StatsRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _StatBox(
-            iconWidget:
-                Image.asset(AppAssets.iconStreak, width: 22, height: 22),
+            iconWidget: Image.asset(
+              AppAssets.iconStreak,
+              width: 22,
+              height: 22,
+            ),
             label: 'Streak',
             value: '${progress.dailyStreak}',
           ),
@@ -343,9 +337,9 @@ class _StatBox extends StatelessWidget {
     this.iconLabel,
     this.iconWidget,
   }) : assert(
-          iconLabel != null || iconWidget != null,
-          'Provide either iconLabel (emoji) or iconWidget',
-        );
+         iconLabel != null || iconWidget != null,
+         'Provide either iconLabel (emoji) or iconWidget',
+       );
 
   final String? iconLabel;
   final Widget? iconWidget;
@@ -359,15 +353,14 @@ class _StatBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.bois.withValues(alpha: 0.28),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.orSoleil.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
           SizedBox(
             height: 22,
-            child: iconWidget ??
+            child:
+                iconWidget ??
                 Text(iconLabel!, style: const TextStyle(fontSize: 20)),
           ),
           const SizedBox(height: 2),
@@ -376,7 +369,7 @@ class _StatBox extends StatelessWidget {
             label,
             style: AppTypography.crimson(
               size: 11,
-              color: AppColors.ivoire.withValues(alpha: 0.7),
+              color: AppColors.texteSecondaire,
             ),
           ),
         ],
@@ -432,15 +425,13 @@ class _ExploredCountriesGrid extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.bois.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: AppColors.orSoleil.withValues(alpha: 0.2),
-          ),
+          border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.2)),
         ),
         child: Text(
           "Explore la carte d'Afrique pour commencer ton voyage",
           style: AppTypography.crimson(
             size: 13,
-            color: AppColors.ivoire.withValues(alpha: 0.6),
+            color: AppColors.texteSecondaire,
             style: FontStyle.italic,
           ),
         ),
@@ -466,10 +457,7 @@ class _ExploredCountriesGrid extends StatelessWidget {
               children: [
                 Text(m.flagEmoji, style: const TextStyle(fontSize: 14)),
                 const SizedBox(width: 6),
-                Text(
-                  m.countryName,
-                  style: AppTypography.bebas(size: 13),
-                ),
+                Text(m.countryName, style: AppTypography.bebas(size: 13)),
               ],
             ),
           ),
@@ -500,14 +488,14 @@ class _TitleRow extends StatelessWidget {
     final bg = isCurrent
         ? AppColors.vertClair.withValues(alpha: 0.18)
         : unlocked
-            ? AppColors.bois.withValues(alpha: 0.30)
-            : AppColors.bois.withValues(alpha: 0.12);
+        ? AppColors.bois.withValues(alpha: 0.30)
+        : AppColors.bois.withValues(alpha: 0.12);
 
     final border = isCurrent
         ? AppColors.vertClair.withValues(alpha: 0.7)
         : unlocked
-            ? AppColors.orSoleil.withValues(alpha: 0.4)
-            : AppColors.orSoleil.withValues(alpha: 0.15);
+        ? AppColors.orSoleil.withValues(alpha: 0.4)
+        : AppColors.orSoleil.withValues(alpha: 0.15);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -536,7 +524,7 @@ class _TitleRow extends StatelessWidget {
                       style: AppTypography.bebas(
                         color: unlocked
                             ? AppColors.ivoire
-                            : AppColors.ivoire.withValues(alpha: 0.5),
+                            : AppColors.texteTertiaire,
                       ),
                     ),
                     if (isCurrent) ...[
@@ -554,10 +542,10 @@ class _TitleRow extends StatelessWidget {
                   unlocked
                       ? title.description
                       : 'Termine ${title.threshold} niveaux pour débloquer '
-                          '($progressTowards/${title.threshold})',
+                            '($progressTowards/${title.threshold})',
                   style: AppTypography.crimson(
                     size: 12,
-                    color: AppColors.ivoire.withValues(alpha: 0.7),
+                    color: AppColors.texteSecondaire,
                     style: FontStyle.italic,
                   ),
                 ),
@@ -603,10 +591,7 @@ class _AltitudeSection extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 'DÉFI EN LIGNE',
-                style: AppTypography.bebas(
-                  size: 13,
-                  color: AppColors.orSoleil,
-                ),
+                style: AppTypography.bebas(size: 13, color: AppColors.orSoleil),
               ),
               if (isMaster) ...[
                 const SizedBox(width: 8),
@@ -654,17 +639,11 @@ class _AltitudeSection extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: _AltitudeStat(
-                  label: 'Duels',
-                  value: '$totalDuels',
-                ),
+                child: _AltitudeStat(label: 'Duels', value: '$totalDuels'),
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: _AltitudeStat(
-                  label: 'V/D',
-                  value: '$wins/$losses',
-                ),
+                child: _AltitudeStat(label: 'V/D', value: '$wins/$losses'),
               ),
             ],
           ),
@@ -689,15 +668,12 @@ class _AltitudeStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          value,
-          style: AppTypography.bebas(size: 18, color: color),
-        ),
+        Text(value, style: AppTypography.bebas(size: 18, color: color)),
         Text(
           label,
           style: AppTypography.crimson(
             size: 11,
-            color: AppColors.ivoire.withValues(alpha: 0.7),
+            color: AppColors.texteSecondaire,
           ),
         ),
       ],

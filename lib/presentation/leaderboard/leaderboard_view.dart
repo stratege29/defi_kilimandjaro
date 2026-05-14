@@ -50,8 +50,9 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView>
     super.didChangeDependencies();
     if (!_promptChecked) {
       _promptChecked = true;
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => _checkDisplayNamePrompt());
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _checkDisplayNamePrompt(),
+      );
     }
   }
 
@@ -60,8 +61,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView>
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    final profile =
-        await ref.read(profileRepositoryProvider).fetchProfile(uid);
+    final profile = await ref.read(profileRepositoryProvider).fetchProfile(uid);
     if (profile?.displayName?.isNotEmpty ?? false) return;
 
     final prefs = ref.read(sharedPreferencesProvider);
@@ -74,9 +74,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView>
     final (result, name) = await DisplayNamePromptDialog.show(context);
 
     if (result == DisplayNamePromptResult.confirmed && name != null) {
-      await ref
-          .read(profileRepositoryProvider)
-          .updateDisplayName(uid, name);
+      await ref.read(profileRepositoryProvider).updateDisplayName(uid, name);
     }
   }
 
@@ -114,7 +112,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView>
             controller: _tabController,
             indicatorColor: AppColors.orSoleil,
             labelStyle: AppTypography.bebas(size: 14),
-            unselectedLabelColor: AppColors.ivoire.withValues(alpha: 0.5),
+            unselectedLabelColor: AppColors.texteTertiaire,
             tabs: [
               Tab(text: 'leaderboard.tab_global'.tr()),
               Tab(text: 'leaderboard.tab_friends'.tr()),
@@ -144,8 +142,9 @@ class _GlobalTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncEntries = ref.watch(globalLeaderboardProvider);
-    final myRankAsync =
-        myUid != null ? ref.watch(_myRankProvider(myUid!)) : null;
+    final myRankAsync = myUid != null
+        ? ref.watch(_myRankProvider(myUid!))
+        : null;
 
     return asyncEntries.when(
       loading: () => const Center(
@@ -165,24 +164,18 @@ class _GlobalTab extends ConsumerWidget {
               // Header sticky : mon rang si hors top-100 visible.
               if (!inList && myUid != null)
                 SliverToBoxAdapter(
-                  child: _MyRankHeader(
-                    myUid: myUid!,
-                    rankAsync: myRankAsync,
-                  ),
+                  child: _MyRankHeader(myUid: myUid!, rankAsync: myRankAsync),
                 ),
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (_, i) {
-                      final entry = entries[i];
-                      return LeaderboardTile(
-                        entry: entry,
-                        isMe: entry.uid == myUid,
-                      );
-                    },
-                    childCount: entries.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((_, i) {
+                    final entry = entries[i];
+                    return LeaderboardTile(
+                      entry: entry,
+                      isMe: entry.uid == myUid,
+                    );
+                  }, childCount: entries.length),
                 ),
               ),
             ],
@@ -193,8 +186,10 @@ class _GlobalTab extends ConsumerWidget {
   }
 }
 
-final _myRankProvider =
-    FutureProvider.family<LeaderboardEntry?, String>((ref, uid) {
+final _myRankProvider = FutureProvider.family<LeaderboardEntry?, String>((
+  ref,
+  uid,
+) {
   return ref.watch(leaderboardRepositoryProvider).fetchMyRank(uid);
 });
 
@@ -225,10 +220,7 @@ class _MyRankHeader extends ConsumerWidget {
               'leaderboard.my_rank_label'.tr(
                 args: ['#${entry.rank}', entry.altitudeLabel],
               ),
-              style: AppTypography.bebas(
-                size: 14,
-                color: AppColors.orSoleil,
-              ),
+              style: AppTypography.bebas(size: 14, color: AppColors.orSoleil),
             ),
           ),
         ],
@@ -301,9 +293,7 @@ class _FriendsTab extends ConsumerWidget {
     LeaderboardEntry entry,
   ) async {
     try {
-      await ref
-          .read(friendsRepositoryProvider)
-          .removeFriend(myUid, entry.uid);
+      await ref.read(friendsRepositoryProvider).removeFriend(myUid, entry.uid);
       ref.invalidate(friendsLeaderboardProvider(myUid));
     } on Exception catch (e) {
       if (!context.mounted) return;
@@ -346,7 +336,7 @@ class _FriendsEmptyState extends StatelessWidget {
               'friends.empty_sub'.tr(),
               style: AppTypography.crimson(
                 size: 13,
-                color: AppColors.ivoire.withValues(alpha: 0.7),
+                color: AppColors.texteSecondaire,
                 style: FontStyle.italic,
               ),
               textAlign: TextAlign.center,
@@ -402,7 +392,7 @@ class _ErrorState extends StatelessWidget {
               message,
               style: AppTypography.crimson(
                 size: 11,
-                color: AppColors.ivoire.withValues(alpha: 0.5),
+                color: AppColors.texteTertiaire,
               ),
               textAlign: TextAlign.center,
             ),

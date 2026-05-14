@@ -38,9 +38,10 @@ class _FailureViewState extends State<FailureView>
       duration: const Duration(milliseconds: 400),
     )..forward();
 
-    _cardScale = Tween<double>(begin: 0.7, end: 1).animate(
-      CurvedAnimation(parent: _cardCtrl, curve: Curves.easeOutBack),
-    );
+    _cardScale = Tween<double>(
+      begin: 0.7,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _cardCtrl, curve: Curves.easeOutBack));
   }
 
   @override
@@ -80,7 +81,9 @@ class _FailureViewState extends State<FailureView>
         child: _FailureCard(
           devinette: widget.devinette,
           subjectEmoji: _subjectEmoji(),
-          truncatedExplanation: _truncatedExplanation(widget.devinette.explanation),
+          truncatedExplanation: _truncatedExplanation(
+            widget.devinette.explanation,
+          ),
           onRetry: widget.onRetry,
         ),
       ),
@@ -129,11 +132,7 @@ class _FailureCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             // Griot mascot — empathetic consolation pose.
-            Image.asset(
-              AppAssets.griotSad,
-              width: 140,
-              height: 140,
-            ),
+            Image.asset(AppAssets.griotSad, width: 140, height: 140),
             const SizedBox(height: 12),
             // Subject circle — red border.
             _SubjectCircle(emoji: subjectEmoji, borderColor: AppColors.rouge),
@@ -147,11 +146,12 @@ class _FailureCard extends StatelessWidget {
             const SizedBox(height: 8),
             // "La réponse était {answer}"
             Text(
-              'result.failure.answer_was'
-                  .tr(namedArgs: <String, String>{'answer': devinette.answer}),
+              'result.failure.answer_was'.tr(
+                namedArgs: <String, String>{'answer': devinette.answer},
+              ),
               style: AppTypography.crimson(
                 size: 15,
-                color: AppColors.ivoire.withValues(alpha: 0.85),
+                color: AppColors.textePrimaire,
               ),
               textAlign: TextAlign.center,
             ),
@@ -162,7 +162,7 @@ class _FailureCard extends StatelessWidget {
               textAlign: TextAlign.center,
               style: AppTypography.crimson(
                 size: 15,
-                color: AppColors.ivoire.withValues(alpha: 0.80),
+                color: AppColors.textePrimaire,
                 style: FontStyle.italic,
               ),
             ),
@@ -173,9 +173,7 @@ class _FailureCard extends StatelessWidget {
             // Encouragement line.
             Text(
               'result.failure.consolation'.tr(),
-              style: AppTypography.crimson(
-                style: FontStyle.italic,
-              ),
+              style: AppTypography.crimson(style: FontStyle.italic),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -189,10 +187,7 @@ class _FailureCard extends StatelessWidget {
 }
 
 class _SubjectCircle extends StatelessWidget {
-  const _SubjectCircle({
-    required this.emoji,
-    required this.borderColor,
-  });
+  const _SubjectCircle({required this.emoji, required this.borderColor});
 
   final String emoji;
   final Color borderColor;

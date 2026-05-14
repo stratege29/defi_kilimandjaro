@@ -52,7 +52,7 @@ class DuelEntryView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: AppTypography.crimson(
                   size: 14,
-                  color: AppColors.ivoire.withValues(alpha: 0.75),
+                  color: AppColors.texteSecondaire,
                   style: FontStyle.italic,
                 ),
               ),
@@ -60,8 +60,7 @@ class DuelEntryView extends StatelessWidget {
               _BigButton(
                 icon: Icons.qr_code_2,
                 label: 'CRÉER UN DÉFI',
-                description:
-                    'Génère un QR code à montrer à ton ami',
+                description: 'Génère un QR code à montrer à ton ami',
                 color: AppColors.vertClair,
                 onTap: () => context.push(AppRoutes.duelCreate),
               ),
@@ -79,7 +78,7 @@ class DuelEntryView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: AppTypography.crimson(
                   size: 12,
-                  color: AppColors.ivoire.withValues(alpha: 0.55),
+                  color: AppColors.texteTertiaire,
                   style: FontStyle.italic,
                 ),
               ),
@@ -135,7 +134,7 @@ class _BigButton extends StatelessWidget {
                       description,
                       style: AppTypography.crimson(
                         size: 12,
-                        color: AppColors.ivoire.withValues(alpha: 0.7),
+                        color: AppColors.texteSecondaire,
                         style: FontStyle.italic,
                       ),
                     ),

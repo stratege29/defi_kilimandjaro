@@ -89,7 +89,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
                   'Passer',
                   style: AppTypography.crimson(
                     size: 14,
-                    color: AppColors.ivoire.withValues(alpha: 0.7),
+                    color: AppColors.texteSecondaire,
                     style: FontStyle.italic,
                   ),
                 ),
@@ -168,10 +168,7 @@ class _StepView extends StatelessWidget {
           Expanded(
             flex: 3,
             child: Center(
-              child: Image.asset(
-                step.mascotAsset,
-                fit: BoxFit.contain,
-              ),
+              child: Image.asset(step.mascotAsset, fit: BoxFit.contain),
             ),
           ),
           Expanded(
@@ -188,7 +185,7 @@ class _StepView extends StatelessWidget {
                   step.defaultBody,
                   textAlign: TextAlign.center,
                   style: AppTypography.crimson(
-                    color: AppColors.ivoire.withValues(alpha: 0.85),
+                    color: AppColors.textePrimaire,
                     style: FontStyle.italic,
                   ),
                 ),
@@ -220,7 +217,7 @@ class _DotsRow extends StatelessWidget {
             decoration: BoxDecoration(
               color: i == current
                   ? AppColors.orSoleil
-                  : AppColors.ivoire.withValues(alpha: 0.3),
+                  : AppColors.texteDisabled,
               borderRadius: BorderRadius.circular(4),
             ),
           ),

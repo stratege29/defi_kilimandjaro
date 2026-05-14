@@ -36,10 +36,9 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
 
     setState(() => _processing = true);
     try {
-      await ref.read(duelRepositoryProvider).joinDuel(
-            matchId: parsed.matchId,
-            secret: parsed.secret,
-          );
+      await ref
+          .read(duelRepositoryProvider)
+          .joinDuel(matchId: parsed.matchId, secret: parsed.secret);
       // Récupère la session live pour l'envoyer à la play view.
       final session = await ref
           .read(duelRepositoryProvider)
@@ -91,10 +90,7 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
               height: 260,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: AppColors.orSoleil,
-                  width: 3,
-                ),
+                border: Border.all(color: AppColors.orSoleil, width: 3),
               ),
             ),
           ),
@@ -166,17 +162,14 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Code du défi',
-              style: AppTypography.bebas(size: 18),
-            ),
+            Text('Code du défi', style: AppTypography.bebas(size: 18)),
             const SizedBox(height: 4),
             Text(
               'Demande à ton ami son code (6 caractères) et son secret '
               '(visible dans son URL de QR).',
               style: AppTypography.crimson(
                 size: 12,
-                color: AppColors.ivoire.withValues(alpha: 0.65),
+                color: AppColors.texteSecondaire,
                 style: FontStyle.italic,
               ),
             ),
@@ -193,7 +186,7 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
                 hintText: 'ABCD23',
                 hintStyle: AppTypography.crimson(
                   size: 13,
-                  color: AppColors.ivoire.withValues(alpha: 0.4),
+                  color: AppColors.texteDisabled,
                 ),
                 border: const OutlineInputBorder(),
               ),
@@ -239,10 +232,9 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
     if (_processing) return;
     setState(() => _processing = true);
     try {
-      await ref.read(duelRepositoryProvider).joinDuel(
-            matchId: matchId,
-            secret: secret,
-          );
+      await ref
+          .read(duelRepositoryProvider)
+          .joinDuel(matchId: matchId, secret: secret);
       final session = await ref
           .read(duelRepositoryProvider)
           .watch(matchId)
@@ -293,12 +285,12 @@ class _CameraUnavailable extends StatelessWidget {
             Text(
               platform == TargetPlatform.iOS
                   ? 'Sur simulateur iOS la caméra ne fonctionne pas. '
-                      'Utilise « SAISIR LE CODE À LA MAIN » ci-dessous.'
+                        'Utilise « SAISIR LE CODE À LA MAIN » ci-dessous.'
                   : 'Vérifie que la permission caméra est accordée dans '
-                      'les paramètres système.',
+                        'les paramètres système.',
               style: AppTypography.crimson(
                 size: 13,
-                color: AppColors.ivoire.withValues(alpha: 0.7),
+                color: AppColors.texteSecondaire,
                 style: FontStyle.italic,
               ),
               textAlign: TextAlign.center,

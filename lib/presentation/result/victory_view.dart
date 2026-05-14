@@ -5,8 +5,10 @@ import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 
 /// Écran 04 — Overlay Victoire (cf. maquette p.6).
 ///
@@ -37,9 +39,11 @@ class _VictoryViewState extends State<VictoryView>
   late final AnimationController _particleCtrl;
   late final AnimationController _celebCtrl;
   late final AnimationController _cardCtrl;
+  late final AnimationController _caurisCtrl;
 
   late final Animation<double> _celebScale;
   late final Animation<double> _cardScale;
+  late final Animation<int> _caurisAnim;
 
   int get _caurisEarned => 30 + widget.timeLeft;
 
@@ -57,18 +61,40 @@ class _VictoryViewState extends State<VictoryView>
       duration: const Duration(milliseconds: 800),
     )..repeat(reverse: true);
 
-    _cardCtrl = AnimationController(
+    // Spring damped : 1 overshoot puis stabilisation (Duolingo-style).
+    // upperBound:2 autorise le bond visuel sans clipping.
+    _cardCtrl = AnimationController(vsync: this, upperBound: 2)
+      ..animateWith(
+        SpringSimulation(
+          const SpringDescription(mass: 1, stiffness: 180, damping: 14),
+          0,
+          1,
+          0,
+        ),
+      );
+
+    _celebScale = Tween<double>(
+      begin: 0.85,
+      end: 1.2,
+    ).animate(CurvedAnimation(parent: _celebCtrl, curve: Curves.easeInOut));
+
+    // Tween piloté par le ressort : la valeur du controller oscille en
+    // amorti, le Tween la mappe sur l'échelle visuelle 0.7 → 1.0+.
+    _cardScale = Tween<double>(begin: 0.7, end: 1).animate(_cardCtrl);
+
+    // Compteur cauris : décale après le pop-in de la carte pour que le tween
+    // 0 → N soit perçu comme une récompense distincte.
+    _caurisCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 450),
-    )..forward();
-
-    _celebScale = Tween<double>(begin: 0.85, end: 1.2).animate(
-      CurvedAnimation(parent: _celebCtrl, curve: Curves.easeInOut),
+      duration: const Duration(milliseconds: 900),
     );
-
-    _cardScale = Tween<double>(begin: 0.7, end: 1).animate(
-      CurvedAnimation(parent: _cardCtrl, curve: Curves.easeOutBack),
-    );
+    _caurisAnim = IntTween(
+      begin: 0,
+      end: _caurisEarned,
+    ).animate(CurvedAnimation(parent: _caurisCtrl, curve: Curves.easeOutCubic));
+    Future<void>.delayed(const Duration(milliseconds: 450), () {
+      if (mounted) _caurisCtrl.forward();
+    });
   }
 
   @override
@@ -76,6 +102,7 @@ class _VictoryViewState extends State<VictoryView>
     _particleCtrl.dispose();
     _celebCtrl.dispose();
     _cardCtrl.dispose();
+    _caurisCtrl.dispose();
     super.dispose();
   }
 
@@ -116,7 +143,7 @@ class _VictoryViewState extends State<VictoryView>
             scale: _cardScale,
             child: _VictoryCard(
               devinette: widget.devinette,
-              caurisEarned: _caurisEarned,
+              caurisAnim: _caurisAnim,
               celebScale: _celebScale,
               subjectEmoji: _subjectEmoji(),
               onNext: widget.onNext,
@@ -135,14 +162,14 @@ class _VictoryViewState extends State<VictoryView>
 class _VictoryCard extends StatelessWidget {
   const _VictoryCard({
     required this.devinette,
-    required this.caurisEarned,
+    required this.caurisAnim,
     required this.celebScale,
     required this.subjectEmoji,
     required this.onNext,
   });
 
   final Devinette devinette;
-  final int caurisEarned;
+  final Animation<int> caurisAnim;
   final Animation<double> celebScale;
   final String subjectEmoji;
   final VoidCallback onNext;
@@ -181,7 +208,10 @@ class _VictoryCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             // Subject illustration circle.
-            _SubjectCircle(emoji: subjectEmoji, borderColor: AppColors.orSoleil),
+            _SubjectCircle(
+              emoji: subjectEmoji,
+              borderColor: AppColors.orSoleil,
+            ),
             const SizedBox(height: 16),
             // Answer word.
             Text(
@@ -194,23 +224,29 @@ class _VictoryCard extends StatelessWidget {
             Text(
               devinette.explanation,
               textAlign: TextAlign.center,
-              style: AppTypography.crimson(
-                style: FontStyle.italic,
-              ),
+              style: AppTypography.crimson(style: FontStyle.italic),
             ),
             const SizedBox(height: 16),
             // Proverb box.
             _ProverbBox(proverb: devinette.proverb),
             const SizedBox(height: 14),
-            // Cauris earned.
-            Text(
-              'result.victory.cauris_earned'
-                  .tr(namedArgs: <String, String>{'cauris': '$caurisEarned'}),
-              style: AppTypography.bebas(size: 18, color: AppColors.orSoleil),
+            // Cauris earned — compteur tween 0 → N (ka-ching).
+            AnimatedBuilder(
+              animation: caurisAnim,
+              builder: (_, __) => Text(
+                'result.victory.cauris_earned'.tr(
+                  namedArgs: <String, String>{'cauris': '${caurisAnim.value}'},
+                ),
+                style: AppTypography.bebas(size: 18, color: AppColors.orSoleil),
+              ),
             ),
             const SizedBox(height: 20),
-            // Next button.
-            _NextButton(onTap: onNext),
+            // Next button — design system 2026 (AppButton primary, scale-on-press).
+            AppButton(
+              label: 'result.victory.next'.tr(),
+              onPressed: onNext,
+              fullWidth: true,
+            ),
           ],
         ),
       ),
@@ -219,10 +255,7 @@ class _VictoryCard extends StatelessWidget {
 }
 
 class _SubjectCircle extends StatelessWidget {
-  const _SubjectCircle({
-    required this.emoji,
-    required this.borderColor,
-  });
+  const _SubjectCircle({required this.emoji, required this.borderColor});
 
   final String emoji;
   final Color borderColor;
@@ -264,36 +297,6 @@ class _ProverbBox extends StatelessWidget {
           size: 18,
           color: AppColors.orSoleil,
           style: FontStyle.italic,
-        ),
-      ),
-    );
-  }
-}
-
-class _NextButton extends StatelessWidget {
-  const _NextButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 52,
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.vertClair,
-          foregroundColor: AppColors.ivoire,
-          minimumSize: const Size(240, 52),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 4,
-        ),
-        child: Text(
-          'result.victory.next'.tr(),
-          style: AppTypography.bebas(size: 18),
         ),
       ),
     );

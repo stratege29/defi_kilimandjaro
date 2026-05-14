@@ -80,10 +80,7 @@ class _MountainDetailViewState extends ConsumerState<MountainDetailView>
       if (!mounted) return;
       await context.push<void>(
         AppRoutes.game,
-        extra: GameArgs(
-          devinette: devinette,
-          mountainId: widget.mountain.id,
-        ),
+        extra: GameArgs(devinette: devinette, mountainId: widget.mountain.id),
       );
     } on Exception catch (_) {
       if (!mounted) return;
@@ -194,7 +191,7 @@ class _Header extends StatelessWidget {
                   '${mountain.countryName} · ${mountain.altitude} m',
                   style: AppTypography.crimson(
                     size: 12,
-                    color: AppColors.ivoire.withValues(alpha: 0.7),
+                    color: AppColors.texteSecondaire,
                     style: FontStyle.italic,
                   ),
                 ),
@@ -287,8 +284,8 @@ class _LevelsLayer extends StatelessWidget {
               status: i + 1 <= completed
                   ? _BulletStatus.completed
                   : i + 1 == completed + 1 && mountain.unlocked
-                      ? _BulletStatus.current
-                      : _BulletStatus.locked,
+                  ? _BulletStatus.current
+                  : _BulletStatus.locked,
               pulse: pulse,
               onTap: () => onLevelTap(i + 1),
             ),
@@ -308,7 +305,7 @@ class _LevelsLayer extends StatelessWidget {
                 z.name,
                 style: AppTypography.crimson(
                   size: 11,
-                  color: AppColors.ivoire.withValues(alpha: 0.85),
+                  color: AppColors.textePrimaire,
                   style: FontStyle.italic,
                 ),
               ),
@@ -400,17 +397,20 @@ class _LevelBullet extends StatelessWidget {
         ),
         child: Center(
           child: switch (status) {
-            _BulletStatus.completed =>
-              const Icon(Icons.check, color: AppColors.vertForet, size: 26),
+            _BulletStatus.completed => const Icon(
+              Icons.check,
+              color: AppColors.vertForet,
+              size: 26,
+            ),
             _BulletStatus.current => Text(
-                '$levelNumber',
-                style: AppTypography.bebas(
-                  size: 22,
-                  color: AppColors.vertForet,
-                ),
-              ),
-            _BulletStatus.locked =>
-              Image.asset(AppAssets.iconLock, width: 26, height: 26),
+              '$levelNumber',
+              style: AppTypography.bebas(size: 22, color: AppColors.vertForet),
+            ),
+            _BulletStatus.locked => Image.asset(
+              AppAssets.iconLock,
+              width: 26,
+              height: 26,
+            ),
           },
         ),
       ),
@@ -433,8 +433,9 @@ class _LevelBullet extends StatelessWidget {
                 height: 80,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.orSoleil
-                      .withValues(alpha: 0.25 * (1 - pulse.value)),
+                  color: AppColors.orSoleil.withValues(
+                    alpha: 0.25 * (1 - pulse.value),
+                  ),
                 ),
               ),
             ),
@@ -497,7 +498,7 @@ class _Footer extends StatelessWidget {
             '${mountain.completedLevels} / ${mountain.totalLevels} niveaux',
             style: AppTypography.crimson(
               size: 12,
-              color: AppColors.ivoire.withValues(alpha: 0.7),
+              color: AppColors.texteSecondaire,
             ),
           ),
         ],
@@ -536,8 +537,7 @@ class _MountainBackgroundPainter extends CustomPainter {
     );
 
     // Stars (~30 small white dots, deterministic).
-    final starPaint = Paint()
-      ..color = AppColors.ivoire.withValues(alpha: 0.7);
+    final starPaint = Paint()..color = AppColors.texteSecondaire;
     for (var i = 0; i < 35; i++) {
       final x = rng.nextDouble() * size.width;
       final y = rng.nextDouble() * size.height * 0.55;
@@ -561,10 +561,7 @@ class _MountainBackgroundPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            AppColors.boisFonce,
-            Color(0xFF3B2A14),
-          ],
+          colors: [AppColors.boisFonce, Color(0xFF3B2A14)],
         ).createShader(mtnRect),
     );
 
@@ -579,7 +576,7 @@ class _MountainBackgroundPainter extends CustomPainter {
 
     // Soft snow stripes flowing down.
     final stripePaint = Paint()
-      ..color = AppColors.ivoire.withValues(alpha: 0.4)
+      ..color = AppColors.texteDisabled
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     for (var i = 0; i < 6; i++) {
@@ -604,8 +601,9 @@ class _MountainBackgroundPainter extends CustomPainter {
         Offset(centerX + dx, cloudY),
         radius,
         Paint()
-          ..color = AppColors.ivoire
-              .withValues(alpha: 0.10 + 0.06 * (1 - pulse)),
+          ..color = AppColors.ivoire.withValues(
+            alpha: 0.10 + 0.06 * (1 - pulse),
+          ),
       );
     }
   }

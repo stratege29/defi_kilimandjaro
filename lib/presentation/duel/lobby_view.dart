@@ -54,9 +54,10 @@ class _LobbyViewState extends ConsumerState<LobbyView>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    _flashOpacity = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _flashCtrl, curve: Curves.easeOut),
-    );
+    _flashOpacity = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _flashCtrl, curve: Curves.easeOut));
 
     _slideCtrl = AnimationController(
       vsync: this,
@@ -103,17 +104,16 @@ class _LobbyViewState extends ConsumerState<LobbyView>
                       switchOutCurve: Curves.easeIn,
                       child: switch (lobbyState.phase) {
                         LobbyPhase.searching ||
-                        LobbyPhase.matched =>
-                          _SearchingBody(
-                            key: const ValueKey('searching'),
-                            state: lobbyState,
-                            myElo: myElo,
-                          ),
+                        LobbyPhase.matched => _SearchingBody(
+                          key: const ValueKey('searching'),
+                          state: lobbyState,
+                          myElo: myElo,
+                        ),
                         LobbyPhase.noOpponent => _NoOpponentBody(
-                            key: const ValueKey('noOpponent'),
-                            slideCtrl: _slideCtrl,
-                            isRematch: lobbyState.isRematch,
-                          ),
+                          key: const ValueKey('noOpponent'),
+                          slideCtrl: _slideCtrl,
+                          isRematch: lobbyState.isRematch,
+                        ),
                       },
                     ),
                   ),
@@ -125,8 +125,9 @@ class _LobbyViewState extends ConsumerState<LobbyView>
               animation: _flashOpacity,
               builder: (_, __) => IgnorePointer(
                 child: Container(
-                  color: AppColors.orSoleil
-                      .withValues(alpha: _flashOpacity.value * 0.55),
+                  color: AppColors.orSoleil.withValues(
+                    alpha: _flashOpacity.value * 0.55,
+                  ),
                 ),
               ),
             ),
@@ -168,9 +169,7 @@ class _LobbyHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(8, 16, 16, 12),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-            color: AppColors.orSoleil.withValues(alpha: 0.2),
-          ),
+          bottom: BorderSide(color: AppColors.orSoleil.withValues(alpha: 0.2)),
         ),
       ),
       child: Row(
@@ -206,9 +205,7 @@ class _AltitudeChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.bois.withValues(alpha: 0.28),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.orSoleil.withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -228,19 +225,17 @@ class _AltitudeChip extends StatelessWidget {
 // ─── Searching body ───────────────────────────────────────────────────────────
 
 class _SearchingBody extends ConsumerWidget {
-  const _SearchingBody({
-    required this.state,
-    required this.myElo,
-    super.key,
-  });
+  const _SearchingBody({required this.state, required this.myElo, super.key});
 
   final LobbyState state;
   final int myElo;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final remaining =
-        (_kLobbyTimeoutSeconds - state.secondsElapsed).clamp(0, _kLobbyTimeoutSeconds);
+    final remaining = (_kLobbyTimeoutSeconds - state.secondsElapsed).clamp(
+      0,
+      _kLobbyTimeoutSeconds,
+    );
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -276,7 +271,7 @@ class _SearchingBody extends ConsumerWidget {
             textAlign: TextAlign.center,
             style: AppTypography.crimson(
               size: 15,
-              color: AppColors.ivoire.withValues(alpha: 0.85),
+              color: AppColors.textePrimaire,
               style: FontStyle.italic,
             ),
           ),
@@ -288,9 +283,7 @@ class _SearchingBody extends ConsumerWidget {
             width: double.infinity,
             child: OutlinedButton(
               onPressed: () async {
-                await ref
-                    .read(lobbyControllerProvider.notifier)
-                    .cancelSearch();
+                await ref.read(lobbyControllerProvider.notifier).cancelSearch();
                 if (!context.mounted) return;
                 context.pop();
               },
@@ -349,10 +342,7 @@ class _CountdownRing extends StatelessWidget {
             ),
           ),
           // Anneau de progression animé.
-          AnimatedCustomPaint(
-            progress: progress,
-            color: color,
-          ),
+          AnimatedCustomPaint(progress: progress, color: color),
           child,
         ],
       ),
@@ -382,16 +372,16 @@ class _AnimatedCustomPaintState
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
-    _progress = visitor(
-      _progress,
-      widget.progress,
-      (v) => Tween<double>(begin: v as double),
-    ) as Tween<double>?;
-    _color = visitor(
-      _color,
-      widget.color,
-      (v) => ColorTween(begin: v as Color),
-    ) as ColorTween?;
+    _progress =
+        visitor(
+              _progress,
+              widget.progress,
+              (v) => Tween<double>(begin: v as double),
+            )
+            as Tween<double>?;
+    _color =
+        visitor(_color, widget.color, (v) => ColorTween(begin: v as Color))
+            as ColorTween?;
   }
 
   @override
@@ -407,10 +397,7 @@ class _AnimatedCustomPaintState
 }
 
 class _RingPainter extends CustomPainter {
-  _RingPainter({
-    required this.progress,
-    required this.color,
-  });
+  _RingPainter({required this.progress, required this.color});
 
   final double progress;
   final Color color;
@@ -466,14 +453,16 @@ class _TamTamMascotState extends State<_TamTamMascot>
       duration: Duration(milliseconds: _kLobbyBeatMs.round()),
     )..repeat(reverse: true);
 
-    _bounce = Tween<double>(begin: 0, end: -10).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
-    );
+    _bounce = Tween<double>(
+      begin: 0,
+      end: -10,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
 
     // Rotation 5° gauche/droite synchronisée avec le bounce.
-    _rotation = Tween<double>(begin: -0.087, end: 0.087).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
-    );
+    _rotation = Tween<double>(
+      begin: -0.087,
+      end: 0.087,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
   }
 
   @override
@@ -489,10 +478,7 @@ class _TamTamMascotState extends State<_TamTamMascot>
       builder: (_, child) {
         return Transform.translate(
           offset: Offset(0, _bounce.value),
-          child: Transform.rotate(
-            angle: _rotation.value,
-            child: child,
-          ),
+          child: Transform.rotate(angle: _rotation.value, child: child),
         );
       },
       child: Container(
@@ -549,7 +535,7 @@ class _BandExpansionBar extends StatelessWidget {
               'Zone de recherche',
               style: AppTypography.crimson(
                 size: 12,
-                color: AppColors.ivoire.withValues(alpha: 0.7),
+                color: AppColors.texteSecondaire,
               ),
             ),
             Text(
@@ -636,7 +622,7 @@ class _NoOpponentBody extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: AppTypography.crimson(
                 size: 14,
-                color: AppColors.ivoire.withValues(alpha: 0.8),
+                color: AppColors.textePrimaire,
                 style: FontStyle.italic,
               ),
             ),
@@ -680,7 +666,10 @@ class _NoOpponentBody extends ConsumerWidget {
                 ),
                 child: Text(
                   'GRAVIR UN SOMMET',
-                  style: AppTypography.bebas(size: 18, color: AppColors.orSoleil),
+                  style: AppTypography.bebas(
+                    size: 18,
+                    color: AppColors.orSoleil,
+                  ),
                 ),
               ),
             ),
@@ -718,10 +707,7 @@ class _SlideUpButton extends StatelessWidget {
       animation: animation,
       builder: (_, child) => Transform.translate(
         offset: Offset(0, 30 * (1 - animation.value)),
-        child: Opacity(
-          opacity: animation.value,
-          child: child,
-        ),
+        child: Opacity(opacity: animation.value, child: child),
       ),
       child: child,
     );

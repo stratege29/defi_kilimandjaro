@@ -85,12 +85,7 @@ class _AltimeterPainter extends CustomPainter {
       final fillPaint = Paint()
         ..color = AppColors.orSoleil.withValues(alpha: 0.35)
         ..style = PaintingStyle.fill;
-      final fillRect = Rect.fromLTWH(
-        _railX,
-        h - fillH,
-        _railWidth,
-        fillH,
-      );
+      final fillRect = Rect.fromLTWH(_railX, h - fillH, _railWidth, fillH);
       canvas.drawRRect(
         RRect.fromRectAndRadius(fillRect, const Radius.circular(2)),
         fillPaint,
@@ -99,12 +94,12 @@ class _AltimeterPainter extends CustomPainter {
 
     // Graduations
     final tickPaint = Paint()
-      ..color = AppColors.ivoire.withValues(alpha: 0.40)
+      ..color = AppColors.texteDisabled
       ..strokeWidth = 1;
 
     final labelStyle = AppTypography.bebas(
       size: 8,
-      color: AppColors.ivoire.withValues(alpha: 0.55),
+      color: AppColors.texteTertiaire,
       letterSpacing: 0,
     );
 
@@ -158,11 +153,7 @@ class _AltimeterPainter extends CustomPainter {
       ..close();
     canvas
       ..drawPath(path, cursorPaint)
-      ..drawCircle(
-        Offset(_railX + _railWidth / 2, cursorY),
-        5,
-        cursorPaint,
-      );
+      ..drawCircle(Offset(_railX + _railWidth / 2, cursorY), 5, cursorPaint);
   }
 
   @override

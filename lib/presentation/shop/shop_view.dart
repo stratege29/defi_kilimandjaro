@@ -62,19 +62,21 @@ class ShopView extends ConsumerWidget {
                 ],
               ),
             ),
-            _RestoreButton(onTap: () async {
-              await ref.read(caurisOffersProvider.notifier).restore();
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Achats restaurés',
-                    style: AppTypography.bebas(),
+            _RestoreButton(
+              onTap: () async {
+                await ref.read(caurisOffersProvider.notifier).restore();
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Achats restaurés',
+                      style: AppTypography.bebas(),
+                    ),
+                    backgroundColor: AppColors.boisFonce,
                   ),
-                  backgroundColor: AppColors.boisFonce,
-                ),
-              );
-            }),
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -86,10 +88,7 @@ class ShopView extends ConsumerWidget {
     if (!notifier.noAdsAvailable) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Bientôt disponible',
-            style: AppTypography.bebas(),
-          ),
+          content: Text('Bientôt disponible', style: AppTypography.bebas()),
           backgroundColor: AppColors.boisFonce,
         ),
       );
@@ -100,10 +99,7 @@ class ShopView extends ConsumerWidget {
     if (!ok) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Achat non lancé',
-            style: AppTypography.bebas(),
-          ),
+          content: Text('Achat non lancé', style: AppTypography.bebas()),
           backgroundColor: AppColors.rouge,
         ),
       );
@@ -167,10 +163,7 @@ class _CaurisHeaderChip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             '$cauris',
-            style: AppTypography.bebas(
-              size: 14,
-              color: AppColors.orSoleil,
-            ),
+            style: AppTypography.bebas(size: 14, color: AppColors.orSoleil),
           ),
         ],
       ),
@@ -220,7 +213,7 @@ class _PromoBanner extends StatelessWidget {
                   'plus vite vers le sommet du Kilimandjaro.',
                   style: AppTypography.crimson(
                     size: 13,
-                    color: AppColors.ivoire.withValues(alpha: 0.85),
+                    color: AppColors.textePrimaire,
                     style: FontStyle.italic,
                   ),
                 ),
@@ -313,7 +306,7 @@ class _PackCard extends StatelessWidget {
                             : 'Bientôt disponible',
                         style: AppTypography.crimson(
                           size: 12,
-                          color: AppColors.ivoire.withValues(alpha: 0.7),
+                          color: AppColors.texteSecondaire,
                           style: FontStyle.italic,
                         ),
                       ),
@@ -336,7 +329,7 @@ class _PackCard extends StatelessWidget {
                     style: AppTypography.bebas(
                       color: offer.available
                           ? AppColors.vertForet
-                          : AppColors.ivoire.withValues(alpha: 0.5),
+                          : AppColors.texteTertiaire,
                     ),
                   ),
                 ),
@@ -368,8 +361,8 @@ class _IconBadge extends StatelessWidget {
     final size = cauris >= 1499
         ? 78.0
         : cauris >= 499
-            ? 68.0
-            : 58.0;
+        ? 68.0
+        : 58.0;
     return SizedBox(
       width: size,
       height: size,
@@ -413,10 +406,7 @@ class _NoAdsCard extends ConsumerWidget {
                 SizedBox(
                   width: 64,
                   height: 64,
-                  child: Image.asset(
-                    AppAssets.shopNoAds,
-                    fit: BoxFit.contain,
-                  ),
+                  child: Image.asset(AppAssets.shopNoAds, fit: BoxFit.contain),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -435,7 +425,7 @@ class _NoAdsCard extends ConsumerWidget {
                             : "Plus jamais d'interstitielles. Achat unique.",
                         style: AppTypography.crimson(
                           size: 12,
-                          color: AppColors.ivoire.withValues(alpha: 0.7),
+                          color: AppColors.texteSecondaire,
                           style: FontStyle.italic,
                         ),
                       ),
@@ -459,7 +449,7 @@ class _NoAdsCard extends ConsumerWidget {
                       style: AppTypography.bebas(
                         color: available
                             ? AppColors.vertForet
-                            : AppColors.ivoire.withValues(alpha: 0.5),
+                            : AppColors.texteTertiaire,
                       ),
                     ),
                   ),
@@ -486,7 +476,7 @@ class _RestoreButton extends StatelessWidget {
           'Restaurer mes achats',
           style: AppTypography.crimson(
             size: 13,
-            color: AppColors.ivoire.withValues(alpha: 0.6),
+            color: AppColors.texteSecondaire,
             style: FontStyle.italic,
           ),
         ),

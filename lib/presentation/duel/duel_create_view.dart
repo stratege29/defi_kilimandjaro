@@ -39,9 +39,7 @@ class _DuelCreateViewState extends ConsumerState<DuelCreateView> {
             // Cleanup: supprime la session en attente.
             final res = await _creation;
             if (res != null) {
-              await ref
-                  .read(duelRepositoryProvider)
-                  .deleteIfOwner(res.matchId);
+              await ref.read(duelRepositoryProvider).deleteIfOwner(res.matchId);
             }
             if (!context.mounted) return;
             context.pop();
@@ -94,17 +92,16 @@ class _WaitingBody extends ConsumerWidget {
     final asyncSession = ref.watch(duelSessionStreamProvider(matchId));
 
     // Auto-naviguer vers la game dès que le 2e joueur arrive.
-    ref.listen<AsyncValue<DuelSession?>>(
-      duelSessionStreamProvider(matchId),
-      (prev, next) {
-        final session = next.value;
-        if (session == null) return;
-        if (session.players.length >= 2 &&
-            session.phase == DuelPhase.active) {
-          context.go(AppRoutes.duelPlay, extra: session);
-        }
-      },
-    );
+    ref.listen<AsyncValue<DuelSession?>>(duelSessionStreamProvider(matchId), (
+      prev,
+      next,
+    ) {
+      final session = next.value;
+      if (session == null) return;
+      if (session.players.length >= 2 && session.phase == DuelPhase.active) {
+        context.go(AppRoutes.duelPlay, extra: session);
+      }
+    });
 
     final payload = DuelSession(
       matchId: matchId,
@@ -125,16 +122,13 @@ class _WaitingBody extends ConsumerWidget {
       child: Column(
         children: [
           const SizedBox(height: 8),
-          Text(
-            'Montre ce QR à ton ami',
-            style: AppTypography.bebas(size: 18),
-          ),
+          Text('Montre ce QR à ton ami', style: AppTypography.bebas(size: 18)),
           const SizedBox(height: 4),
           Text(
             'Il scanne avec "Rejoindre via QR".',
             style: AppTypography.crimson(
               size: 12,
-              color: AppColors.ivoire.withValues(alpha: 0.7),
+              color: AppColors.texteSecondaire,
               style: FontStyle.italic,
             ),
           ),
@@ -191,9 +185,7 @@ class _WaitingBody extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.bois.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: AppColors.orSoleil.withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -240,7 +232,7 @@ class _ManualEntryBlockState extends State<_ManualEntryBlock> {
                 : 'Saisie manuelle (sans QR)',
             style: AppTypography.crimson(
               size: 12,
-              color: AppColors.ivoire.withValues(alpha: 0.7),
+              color: AppColors.texteSecondaire,
               style: FontStyle.italic,
             ),
           ),
@@ -285,17 +277,14 @@ class _LabelValue extends StatelessWidget {
             '$label :',
             style: AppTypography.crimson(
               size: 12,
-              color: AppColors.ivoire.withValues(alpha: 0.6),
+              color: AppColors.texteSecondaire,
             ),
           ),
         ),
         Expanded(
           child: SelectableText(
             value,
-            style: AppTypography.bebas(
-              size: 13,
-              color: AppColors.orSoleil,
-            ),
+            style: AppTypography.bebas(size: 13, color: AppColors.orSoleil),
           ),
         ),
       ],

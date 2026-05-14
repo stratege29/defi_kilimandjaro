@@ -5,6 +5,7 @@ import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Phase du cycle de vie d'une partie.
@@ -83,17 +84,16 @@ class GameState {
 /// - Auto-validation quand [selectedIndices.length == answer.length].
 class GameController extends StateNotifier<GameState> {
   GameController(this._args, this._audio, this._progress)
-      : super(
-          GameState(
-            devinette: _args.devinette,
-            selectedIndices: const <int>[],
-            timeLeft: _gameDuration,
-            phase: GamePhase.playing,
-            cauris: _progress.state.cauris,
-            shuffledIndices:
-                _shuffleIndices(_args.devinette.lettersPool.length),
-          ),
-        ) {
+    : super(
+        GameState(
+          devinette: _args.devinette,
+          selectedIndices: const <int>[],
+          timeLeft: _gameDuration,
+          phase: GamePhase.playing,
+          cauris: _progress.state.cauris,
+          shuffledIndices: _shuffleIndices(_args.devinette.lettersPool.length),
+        ),
+      ) {
     _startTimer();
   }
 
@@ -131,13 +131,12 @@ class GameController extends StateNotifier<GameState> {
     if (selected.contains(gridIndex)) return;
 
     selected.add(gridIndex);
-    state = state.copyWith(
-      selectedIndices: selected,
-      validationCorrect: false,
-    );
+    state = state.copyWith(selectedIndices: selected, validationCorrect: false);
 
     // Audio: balafon note ascending (cf. maquette p.12).
     unawaited(_audio.playLetterSelect(selected.length - 1));
+    // Haptique: tick discret synchronisé avec la note.
+    unawaited(HapticFeedback.selectionClick());
 
     // Auto-validate when word is complete.
     if (state.isComplete) {
@@ -169,6 +168,7 @@ class GameController extends StateNotifier<GameState> {
     unawaited(_progress.spendOnHint(_hintCost));
     // Audio: kora 2 notes douces descendantes.
     unawaited(_audio.playHintUsed());
+    unawaited(HapticFeedback.lightImpact());
   }
 
   /// Valide le mot formé par les tuiles sélectionnées.
@@ -195,17 +195,38 @@ class GameController extends StateNotifier<GameState> {
       );
       // Audio: balafon accord 5 notes puis fanfare griot.
       unawaited(_audio.playWordComplete());
+      // Haptique victoire: medium puis heavy à 350ms (sync avec la fanfare).
+      unawaited(HapticFeedback.mediumImpact());
       Future<void>.delayed(const Duration(milliseconds: 350), () {
         unawaited(_audio.playVictory());
+        unawaited(HapticFeedback.heavyImpact());
       });
     } else {
       // Audio: djembé ×2 + effacement.
       unawaited(_audio.playWrongAnswer());
+      unawaited(HapticFeedback.heavyImpact());
       state = state.copyWith(
         selectedIndices: const <int>[],
         validationCorrect: false,
       );
     }
+  }
+
+  /// Suspend le décompte sans changer la phase. Idempotent — no-op si la
+  /// partie n'est pas en cours. Appelé quand l'app passe en arrière-plan ou
+  /// quand on ouvre un modal bloquant (confirmation, ad, IAP…).
+  void pause() {
+    if (state.phase != GamePhase.playing) return;
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  /// Reprend le décompte depuis le `timeLeft` actuel. No-op si la partie n'est
+  /// pas en phase playing ou si un timer tourne déjà.
+  void resume() {
+    if (state.phase != GamePhase.playing) return;
+    if (_timer != null && _timer!.isActive) return;
+    _startTimer();
   }
 
   /// Re-démarre la même devinette : re-shuffle, timer 30 s, sélection vide.
@@ -243,6 +264,7 @@ class GameController extends StateNotifier<GameState> {
         _timer?.cancel();
         state = state.copyWith(timeLeft: 0, phase: GamePhase.lost);
         unawaited(_audio.playFailure());
+        unawaited(HapticFeedback.heavyImpact());
       } else {
         state = state.copyWith(timeLeft: state.timeLeft - 1);
       }
@@ -266,9 +288,9 @@ class GameController extends StateNotifier<GameState> {
 /// Provider family : un [GameController] par [GameArgs].
 final gameControllerProvider = StateNotifierProvider.autoDispose
     .family<GameController, GameState, GameArgs>(
-  (ref, args) => GameController(
-    args,
-    ref.read(audioControllerProvider.notifier),
-    ref.read(playerProgressProvider.notifier),
-  ),
-);
+      (ref, args) => GameController(
+        args,
+        ref.read(audioControllerProvider.notifier),
+        ref.read(playerProgressProvider.notifier),
+      ),
+    );
