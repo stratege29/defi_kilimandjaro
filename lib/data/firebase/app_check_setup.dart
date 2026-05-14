@@ -24,4 +24,28 @@ Future<void> activateAppCheck() async {
   // Token auto-refresh: laisser activé en prod. Désactiver localement si tu
   // veux un token fixe par run de debug.
   await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
+
+  // En debug, on imprime le token via Dart pour qu'il apparaisse dans
+  // `flutter run`. La valeur retournée est le token JWT signé (long).
+  // Le debug-token UUID à allow-lister en Firebase Console est imprimé
+  // séparément par le plugin natif côté iOS/Android (cf. console Xcode /
+  // logcat), MAIS sur le simulator iOS récent il est silencieux — on peut
+  // forcer l'extraction de l'UUID en passant par les UserDefaults iOS
+  // (clé `FIRAAppCheckDebugToken`). Pour l'instant on log juste la
+  // confirmation que la procédure d'activation s'est bien terminée et que
+  // le plugin a généré un token utilisable.
+  if (kDebugMode) {
+    try {
+      final token = await FirebaseAppCheck.instance.getToken();
+      // ignore: avoid_print
+      print(
+        '🛡️ App Check activated — token len=${token?.length ?? 0} '
+        '(JWT, allow-list the debug UUID printed by native plugin in '
+        'Firebase Console > App Check > Apps > ⋮ > Manage debug tokens)',
+      );
+    } catch (e) {
+      // ignore: avoid_print
+      print('🛡️ App Check getToken failed: $e');
+    }
+  }
 }
