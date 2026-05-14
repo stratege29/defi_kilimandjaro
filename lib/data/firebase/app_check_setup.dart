@@ -13,7 +13,18 @@ import 'package:flutter/foundation.dart';
 /// authentifié. Sans cela, Cloud Functions / Firestore / RTDB rejettent les
 /// requêtes en mode "enforced".
 Future<void> activateAppCheck() async {
+  // firebase_app_check 0.4.x has both the deprecated `appleProvider`
+  // (defaulting to `AppleProvider.deviceCheck`) and the new `providerApple`
+  // (defaulting to `AppleDeviceCheckProvider()`). Both get forwarded to the
+  // native delegate, and DeviceCheck takes precedence on simulator/older
+  // devices unless we explicitly opt-into debug on the legacy param too.
   await FirebaseAppCheck.instance.activate(
+    androidProvider: kDebugMode
+        ? AndroidProvider.debug
+        : AndroidProvider.playIntegrity,
+    appleProvider: kDebugMode
+        ? AppleProvider.debug
+        : AppleProvider.deviceCheck,
     providerAndroid: kDebugMode
         ? const AndroidDebugProvider()
         : const AndroidPlayIntegrityProvider(),
