@@ -1,15 +1,15 @@
-import 'dart:math' as math;
-
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/golden_path.dart';
+import 'package:defi_kilimandjaro/presentation/game/widgets/letter_grid_pattern.dart';
 import 'package:flutter/material.dart';
 
-/// Grille circulaire de tuiles lettres avec détection de drag.
+/// Grille de tuiles lettres avec détection de drag.
 ///
-/// Les tuiles sont disposées sur un cercle (rayon calculé selon le nombre).
-/// Le drag utilise un [Listener] raw pour la précision du hit-test.
-/// Le chemin doré est dessiné par [GoldenPath] en overlay.
+/// Le pattern géométrique (cercle / arc / ovale / carré) est sélectionné
+/// déterministiquement à partir de [seed] via [selectPattern]. Le drag
+/// utilise un [Listener] raw pour la précision du hit-test. Le chemin doré
+/// est dessiné par [GoldenPath] en overlay.
 class CircularGrid extends StatefulWidget {
   const CircularGrid({
     required this.letters,
@@ -17,6 +17,7 @@ class CircularGrid extends StatefulWidget {
     required this.hintRevealedCount,
     required this.answer,
     required this.phase,
+    required this.seed,
     required this.onTileEntered,
     required this.onDragEnd,
     super.key,
@@ -37,6 +38,10 @@ class CircularGrid extends StatefulWidget {
   /// Phase du jeu.
   final Object phase;
 
+  /// Graine de sélection du pattern — `devinette.id` en solo, `answer` en duel
+  /// (partagé serveur, donc identique pour les deux joueurs).
+  final String seed;
+
   /// Appelé quand le doigt entre sur une nouvelle tuile (index dans la grille).
   final void Function(int index) onTileEntered;
 
@@ -49,32 +54,12 @@ class CircularGrid extends StatefulWidget {
 
 class _CircularGridState extends State<CircularGrid> {
   static const double _tileSize = 56;
-  static const double _minRadius = 80;
-  static const double _radiusPerTile = 10;
 
   /// Centres des tuiles en coordonnées locales (calculés dans build).
   final List<Offset> _tileCenters = <Offset>[];
 
   /// Position courante du doigt pendant le drag.
   Offset? _fingerPosition;
-
-  double _radius(int count) {
-    return _minRadius + count * _radiusPerTile;
-  }
-
-  List<Offset> _computeCenters(double cx, double cy, int count) {
-    final r = _radius(count);
-    final centers = <Offset>[];
-    for (var i = 0; i < count; i++) {
-      // Start from top (-pi/2) going clockwise.
-      final angle = -math.pi / 2 + (2 * math.pi / count) * i;
-      centers.add(Offset(
-        cx + r * math.cos(angle),
-        cy + r * math.sin(angle),
-      ));
-    }
-    return centers;
-  }
 
   int? _hitTest(Offset localPos) {
     const hitRadius = _tileSize / 2;
@@ -115,61 +100,52 @@ class _CircularGridState extends State<CircularGrid> {
   @override
   Widget build(BuildContext context) {
     final count = widget.letters.length;
-    // Minimum canvas size to fit all tiles comfortably.
-    final r = _radius(count);
-    final canvasSize = (r + _tileSize) * 2 + 16;
+    final pattern = selectPattern(widget.seed, count);
+    final layout = computeLayout(
+      pattern: pattern,
+      count: count,
+      tileSize: _tileSize,
+    );
+
+    _tileCenters
+      ..clear()
+      ..addAll(layout.centers);
 
     return SizedBox(
-      width: canvasSize,
-      height: canvasSize,
+      width: layout.size.width,
+      height: layout.size.height,
       child: Listener(
         onPointerDown: _onPointerDown,
         onPointerMove: _onPointerMove,
         onPointerUp: _onPointerUp,
-        child: LayoutBuilder(
-          builder: (_, constraints) {
-            final cx = constraints.maxWidth / 2;
-            final cy = constraints.maxHeight / 2;
-            final centers = _computeCenters(cx, cy, count);
-
-            // Sync centers list.
-            _tileCenters
-              ..clear()
-              ..addAll(centers);
-
-            return Stack(
-              children: <Widget>[
-                // Golden path drawn below tiles.
-                Positioned.fill(
-                  child: GoldenPath(
-                    centers: _selectedCenters,
-                    fingerPosition: _fingerPosition,
-                  ),
+        child: Stack(
+          children: <Widget>[
+            Positioned.fill(
+              child: GoldenPath(
+                centers: _selectedCenters,
+                fingerPosition: _fingerPosition,
+              ),
+            ),
+            ...List<Widget>.generate(count, (i) {
+              final center = layout.centers[i];
+              final isSelected = widget.selectedIndices.contains(i);
+              final isHint = i < widget.hintRevealedCount;
+              return Positioned(
+                left: center.dx - _tileSize / 2,
+                top: center.dy - _tileSize / 2,
+                width: _tileSize,
+                height: _tileSize,
+                child: _Tile(
+                  letter: widget.letters[i],
+                  isSelected: isSelected,
+                  isHint: isHint,
+                  selectionOrder: isSelected
+                      ? widget.selectedIndices.indexOf(i) + 1
+                      : null,
                 ),
-                // Tiles.
-                ...List<Widget>.generate(count, (i) {
-                  final center = centers[i];
-                  final isSelected = widget.selectedIndices.contains(i);
-                  // Hint: first N letters of answer match in order.
-                  final isHint = i < widget.hintRevealedCount;
-                  return Positioned(
-                    left: center.dx - _tileSize / 2,
-                    top: center.dy - _tileSize / 2,
-                    width: _tileSize,
-                    height: _tileSize,
-                    child: _Tile(
-                      letter: widget.letters[i],
-                      isSelected: isSelected,
-                      isHint: isHint,
-                      selectionOrder: isSelected
-                          ? widget.selectedIndices.indexOf(i) + 1
-                          : null,
-                    ),
-                  );
-                }),
-              ],
-            );
-          },
+              );
+            }),
+          ],
         ),
       ),
     );
