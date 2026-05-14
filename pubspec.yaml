@@ -8,10 +8,14 @@ environment:
   flutter: '>=3.38.0'
 
 dependencies:
+  app_links: ^6.3.0
+  archive: ^4.0.2
   cloud_firestore: ^6.3.0
   cloud_functions: ^6.2.0
   collection: ^1.19.1
+  crypto: ^3.0.6
   cupertino_icons: ^1.0.8
+  drift: ^2.20.3
   easy_localization: ^3.0.7+1
   equatable: ^2.0.7
   firebase_auth: ^6.4.0
@@ -30,22 +34,30 @@ dependencies:
   go_router: ^14.6.2
   google_fonts: ^6.2.1
   google_mobile_ads: ^8.0.0
+  http: ^1.2.2
   in_app_purchase: ^3.2.3
   intl: any
   json_annotation: ^4.9.0
   logger: ^2.5.0
   mobile_scanner: ^7.2.0
+  path: ^1.9.0
+  path_provider: ^2.1.5
   qr_flutter: ^4.1.0
   riverpod_annotation: ^2.6.1
-  shared_preferences: ^2.3.3
-  app_links: ^6.3.0
-  path_provider: ^2.1.5
   share_plus: ^11.1.0
+  shared_preferences: ^2.3.3
+  sqlite3_flutter_libs: ^0.5.26
   uuid: ^4.5.1
+
+dependency_overrides:
+  # analyzer 7.x ↔ analyzer_plugin 0.12.x mismatch (Element vs Element2 API
+  # break). On force la dernière analyzer_plugin compatible avec analyzer 7.x.
+  analyzer_plugin: ^0.13.0
 
 dev_dependencies:
   build_runner: ^2.4.13
   custom_lint: ^0.7.0
+  drift_dev: ^2.20.3
   flutter_launcher_icons: ^0.14.4
   flutter_native_splash: ^2.4.7
   flutter_test:
@@ -66,6 +78,7 @@ flutter:
   assets:
     - assets/data/
     - assets/data/devinettes/
+    - assets/data/devinettes/starter/
     - assets/data/i18n/
     - assets/svg/
     - assets/images/brand/

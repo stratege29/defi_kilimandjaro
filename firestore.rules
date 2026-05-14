@@ -1,9 +1,33 @@
 rules_version = '2';
 
+// =============================================================================
+// Firestore security rules — Kilimandjaro
+// -----------------------------------------------------------------------------
+// Domaines :
+//   - profiles / friendships / matches_history : duels ELO (PR-4)
+//   - content_index / content_packs           : manifest pack devinettes
+//   - submissions / submissions_moderation     : UGC pipeline
+//   - reports                                  : flagging communautaire
+//   - users_quota / ip_quota                   : rate-limiter Functions
+//
+// Tous les writes côté client passent par App Check (sauf debug).
+// =============================================================================
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- Profils joueurs ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isModerator() {
+      return isSignedIn()
+        && request.auth.token.role == 'moderator';
+    }
+
+    // -------------------------------------------------------------------------
+    // Profils joueurs — PR-4
+    // -------------------------------------------------------------------------
     // Lecture publique pour afficher l'ELO dans le lobby.
     // Écriture ELO/stats UNIQUEMENT via Admin SDK (Cloud Functions endMatch / requestMatch).
     // Exception : le client peut écrire uniquement fcm_token et fcm_updated_at
@@ -17,9 +41,6 @@ service cloud.firestore {
       // Le joueur peut mettre à jour uniquement les champs autorisés client-side
       // (FCM + display_name pour le leaderboard) sur son propre profil.
       // Les champs ELO/wins/losses/total_duels/peakElo restent Admin SDK-only.
-      // update : le document existe déjà (créé par Admin SDK via requestMatch).
-      //   diff().affectedKeys() garantit qu'aucun autre champ n'est touché.
-      // create : cas edge où le profil n'existe pas encore.
       allow update: if request.auth != null
         && request.auth.uid == uid
         && request.resource.data.diff(resource.data).affectedKeys()
@@ -31,10 +52,11 @@ service cloud.firestore {
              .hasOnly(['fcm_token', 'fcm_updated_at', 'display_name', 'display_name_updated_at']);
     }
 
-    // --- Friendships (unidirectional follow) ---
+    // -------------------------------------------------------------------------
+    // Friendships (unidirectional follow) — PR-4
+    // -------------------------------------------------------------------------
     // friendships/{follower_uid}/{followed_uid} : { created_at: timestamp }
-    // Le follower crée/supprime ses propres entrées. Lecture publique
-    // (utilisée par d'autres pour voir leur popularité — feature future).
+    // Le follower crée/supprime ses propres entrées. Lecture publique.
     match /friendships/{followerUid}/followed/{followedUid} {
       allow read: if request.auth != null;
       allow create, delete: if request.auth != null
@@ -42,7 +64,9 @@ service cloud.firestore {
       allow update: if false;
     }
 
-    // --- Historique des matchs ---
+    // -------------------------------------------------------------------------
+    // Historique des matchs — PR-4
+    // -------------------------------------------------------------------------
     // Lecture autorisée aux participants du match uniquement.
     // Écriture UNIQUEMENT via Admin SDK (Cloud Function endMatch).
     match /matches_history/{matchId} {
@@ -51,12 +75,78 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // --- Quotas rate-limiter (usage interne Functions) ---
+    // -------------------------------------------------------------------------
+    // Manifest packs devinettes — lecture publique, écriture serveur uniquement
+    // -------------------------------------------------------------------------
+    match /content_index/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /content_packs/{packId} {
+      allow read: if true;
+      allow write: if false;
+
+      match /versions/{versionId} {
+        allow read: if isModerator();
+        allow write: if false;
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // UGC — soumissions
+    // -------------------------------------------------------------------------
+    match /submissions/{submissionId} {
+      // Lecture : owner ou modérateur.
+      allow get, list: if isModerator()
+        || (isSignedIn() && resource.data.authorUid == request.auth.uid);
+
+      // Création : par owner uniquement, status forcé à `pending`, App Check
+      // enforced via paramètre Firebase console.
+      allow create: if isSignedIn()
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasAll([
+          'authorUid', 'status', 'lang', 'world', 'country',
+          'answer', 'answerNormalized', 'lettersPool',
+          'riddle', 'explanation', 'proverb',
+          'difficulty', 'tags', 'createdAt'
+        ]);
+
+      // Update / delete : Cloud Functions uniquement (admin SDK bypasse les
+      // règles). Aucun client n'a le droit.
+      allow update, delete: if false;
+    }
+
+    match /submissions_moderation/{submissionId} {
+      allow read: if isModerator();
+      allow write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Reports (flagging d'une devinette communautaire en jeu)
+    // -------------------------------------------------------------------------
+    match /reports/{reportId} {
+      allow create: if isSignedIn()
+        && request.resource.data.reporterUid == request.auth.uid;
+      allow read, update, delete: if isModerator();
+    }
+
+    // -------------------------------------------------------------------------
+    // Quotas rate-limiter — 100 % serveur (Cloud Function transactions)
+    // -------------------------------------------------------------------------
     match /users_quota/{uid} {
+      allow read: if isSignedIn() && uid == request.auth.uid;
+      allow write: if false;
+    }
+
+    match /ip_quota/{ipHash} {
       allow read, write: if false;
     }
 
-    // --- Tout le reste est refusé par défaut ---
+    // -------------------------------------------------------------------------
+    // Default deny
+    // -------------------------------------------------------------------------
     match /{document=**} {
       allow read, write: if false;
     }

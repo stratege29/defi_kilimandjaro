@@ -11,6 +11,7 @@ import 'package:defi_kilimandjaro/data/ads/consent_service.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/fcm_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/firebase_options.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -285,6 +286,11 @@ class KilimandjaroApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Keep DevinetteLocale aligned with easy_localization's active locale so
+    // riddle/explanation/proverb getters resolve to the right language. Runs
+    // on every locale change (build is triggered by EasyLocalization).
+    DevinetteLocale.activeLang = context.locale.languageCode;
+
     return MaterialApp.router(
       title: 'Kilimandjaro',
       debugShowCheckedModeBanner: false,

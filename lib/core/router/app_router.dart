@@ -21,6 +21,8 @@ import 'package:defi_kilimandjaro/presentation/onboarding/onboarding_view.dart';
 import 'package:defi_kilimandjaro/presentation/profile/profile_view.dart';
 import 'package:defi_kilimandjaro/presentation/shop/shop_view.dart';
 import 'package:defi_kilimandjaro/presentation/splash/splash_view.dart';
+import 'package:defi_kilimandjaro/presentation/ugc/my_submissions/my_submissions_view.dart';
+import 'package:defi_kilimandjaro/presentation/ugc/submit_devinette/submit_devinette_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -63,6 +65,10 @@ abstract final class AppRoutes {
 
   /// Construit le path de navigation vers la confirmation d'ajout d'ami.
   static String friendAddPath(String uid) => '/friend/add/$uid';
+
+  // UGC — devinettes communautaires.
+  static const ugcSubmit = '/ugc/submit';
+  static const ugcMine = '/ugc/mine';
 }
 
 /// Clé de navigation globale exposée pour DeepLinkService et le handler FCM.
@@ -237,6 +243,19 @@ final GoRouter appRouter = GoRouter(
       builder: (_, state) => AddFriendConfirmView(
         friendUid: state.pathParameters['uid'] ?? '',
       ),
+    ),
+    // -------------------------------------------------------------------------
+    // UGC — devinettes communautaires
+    // -------------------------------------------------------------------------
+    GoRoute(
+      path: AppRoutes.ugcSubmit,
+      name: 'ugc-submit',
+      builder: (_, __) => const SubmitDevinetteView(),
+    ),
+    GoRoute(
+      path: AppRoutes.ugcMine,
+      name: 'ugc-mine',
+      builder: (_, __) => const MySubmissionsView(),
     ),
   ],
 );

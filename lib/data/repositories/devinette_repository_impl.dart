@@ -1,23 +1,28 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:defi_kilimandjaro/data/repositories/composite_devinette_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/domain/repositories/devinette_repository.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Implémentation par défaut : charge les devinettes depuis les assets JSON
-/// bundlés dans `assets/data/devinettes/<worldId>.json`.
+/// Legacy : charge les devinettes depuis les assets JSON bundlés dans
+/// `assets/data/devinettes/<worldId>.json` (format v1 ou v2).
+///
+/// **Conservé pour les tests et comme filet de sécurité.** L'implémentation
+/// par défaut en production est désormais [CompositeDevinetteRepository]
+/// (bundle starter + cache Drift + packs distants).
 ///
 /// Cache mémoire — les fichiers sont chargés une fois puis réutilisés
 /// pour toutes les sessions de jeu.
 class AssetDevinetteRepository implements DevinetteRepository {
-  AssetDevinetteRepository();
+  AssetDevinetteRepository({String basePath = 'assets/data/devinettes'})
+      : _basePath = basePath;
 
+  final String _basePath;
   final Map<String, List<Devinette>> _cache = <String, List<Devinette>>{};
   final Random _rng = Random();
-
-  static const String _basePath = 'assets/data/devinettes';
 
   @override
   Future<List<Devinette>> loadWorld(String worldId) async {
@@ -53,7 +58,9 @@ class AssetDevinetteRepository implements DevinetteRepository {
   }
 }
 
-/// Riverpod singleton.
+/// Provider public du repository — délègue à la composite (bundled + cache
+/// + remote). Les tests peuvent overrider avec [AssetDevinetteRepository]
+/// pour rester complètement offline et déterministe.
 final devinetteRepositoryProvider = Provider<DevinetteRepository>((ref) {
-  return AssetDevinetteRepository();
+  return ref.watch(compositeDevinetteRepositoryProvider);
 });

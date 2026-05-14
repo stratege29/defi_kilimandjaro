@@ -1,0 +1,23 @@
+rules_version = '2';
+
+// =============================================================================
+// Storage rules — Kilimandjaro
+// -----------------------------------------------------------------------------
+// Stratégie :
+//   - `packs/` : lecture publique (CDN), écriture serveur (Cloud Functions)
+//     uniquement. Le contenu n'est pas sensible — pas de PII.
+//   - Tout le reste : deny par défaut.
+// =============================================================================
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    match /packs/{allPaths=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

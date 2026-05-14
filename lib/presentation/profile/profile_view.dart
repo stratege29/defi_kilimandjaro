@@ -106,6 +106,26 @@ class ProfileView extends ConsumerWidget {
             ),
             const SizedBox(height: 28),
             _Section(
+              title: 'DEVINETTES COMMUNAUTAIRES',
+              child: Column(
+                children: [
+                  _SettingTile(
+                    icon: Icons.add_circle_outline,
+                    label: 'Soumettre une devinette',
+                    valueLabel: '',
+                    onTap: () => context.push(AppRoutes.ugcSubmit),
+                  ),
+                  _SettingTile(
+                    icon: Icons.list_alt,
+                    label: 'Mes soumissions',
+                    valueLabel: '',
+                    onTap: () => context.push(AppRoutes.ugcMine),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 28),
+            _Section(
               title: 'PARAMÈTRES',
               child: Column(
                 children: [

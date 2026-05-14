@@ -7,6 +7,8 @@
  * Domaines :
  * - matchmaking/  : requestMatch, cancelMatch, endMatch (Phase 6)
  * - matchmaking/  : sendChallengeNotif, requestRematch (Phase 7 — social)
+ * - devinettes/   : submitDevinette, reportDevinette (UGC)
+ * - curation/     : rebuildCommunityPack (UGC pack rebuild)
  */
 import { initializeApp } from "firebase-admin/app";
 
@@ -20,3 +22,8 @@ export { endMatch } from "./matchmaking/endMatch";
 // --- Social & Viral (Phase 7) ---
 export { sendChallengeNotif } from "./matchmaking/sendChallengeNotif";
 export { requestRematch } from "./matchmaking/requestRematch";
+
+// --- UGC (user-generated devinettes) ---
+export { submitDevinette } from "./devinettes/submitDevinette";
+export { reportDevinette } from "./devinettes/reportDevinette";
+export { rebuildCommunityPack } from "./curation/rebuildCommunityPack";
