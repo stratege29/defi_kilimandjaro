@@ -82,12 +82,17 @@ Future<void> _bootstrap() async {
   try {
     // Native plugins (e.g. firebase_messaging on iOS) may auto-initialize the
     // default app from GoogleService-Info.plist before Dart gets here, which
-    // makes initializeApp() throw [core/duplicate-app]. Treat that as success
-    // so the rest of the bootstrap (App Check, emulators, auth) still runs.
-    if (Firebase.apps.isEmpty) {
+    // makes initializeApp() throw [core/duplicate-app]. Catch that specific
+    // case so the rest of the bootstrap (App Check, emulators, auth) still
+    // runs. Any other error is re-thrown into the outer catch.
+    try {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+    } on FirebaseException catch (e) {
+      if (e.code != 'duplicate-app') rethrow;
+      // ignore: avoid_print
+      print('🔧 Firebase default app already exists (native auto-init) — OK');
     }
 
     // App Check: must run right after Firebase.initializeApp and before any
