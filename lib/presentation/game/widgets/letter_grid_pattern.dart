@@ -3,18 +3,25 @@ import 'dart:ui';
 
 /// Disposition géométrique des tuiles lettres.
 ///
-/// **Phase 1** : deux formes possibles selon le nombre de lettres.
-/// - [GridPattern.circle] : universel, 4-10 lettres. Wordscapes-style.
-/// - [GridPattern.hexagon] : 7 lettres exactement (1 au centre + 6 sur
-///   l'anneau). Inspiré du NYT Spelling Bee, ancre visuelle forte.
+/// **Patterns disponibles** (sélection aléatoire par session via [pickPattern]) :
 ///
-/// **Variété** : pour `count == 7`, [pickPattern] tire au sort 50/50
-/// entre circle et hexagon à chaque session (cf. `_CircularGridState`).
-/// Pour les autres comptes, circle uniquement.
+/// | Pattern    | Counts compatibles | Variante de         |
+/// |------------|--------------------|---------------------|
+/// | circle     | 4-10 (universel)   | Wordscapes          |
+/// | hexagon    | 7 exactement       | NYT Spelling Bee    |
+/// | diamond    | 5 exactement       | Codenames           |
+/// | zigzag     | 6-8                | Custom              |
+/// | twoRows    | 6-7                | Custom (3+3 / 4+3)  |
 ///
-/// L'**ordre des lettres** dans chaque pattern reste aléatoire via le
-/// Fisher-Yates de `GameController._shuffleIndices`.
-enum GridPattern { circle, hexagon }
+/// Pour chaque count, plusieurs patterns peuvent être éligibles — le tirage
+/// est uniforme entre les candidats. Le shuffle des LETTRES dans le pattern
+/// reste indépendant (Fisher-Yates dans `GameController._shuffleIndices`).
+///
+/// **Anti-trap** : les patterns avec tuile interne (hexagon, diamond) ont
+/// `smallHitIndices = {0}` — la tuile centrale a un hit-radius réduit à
+/// 40 % pour éviter les sélections parasites quand le doigt traverse
+/// d'une extrémité à l'opposée.
+enum GridPattern { circle, hexagon, diamond, zigzag, twoRows }
 
 class GridLayout {
   const GridLayout({
@@ -29,32 +36,37 @@ class GridLayout {
   /// Taille canvas requise pour englober toutes les tuiles + padding.
   final Size size;
 
-  /// Indices des tuiles dont la zone de hit-test est volontairement réduite
-  /// (40 % du rayon visuel au lieu de 50 %). Utilisé pour les tuiles
-  /// internes — typiquement le centre de l'hexagone — où un swipe direct
-  /// d'une tuile à l'opposée risquerait de capturer la tuile centrale
-  /// alors que ce n'est pas l'intention du joueur.
+  /// Indices à hit-test réduit (40 % du rayon visuel au lieu de 50 %).
   final Set<int> smallHitIndices;
 }
 
-/// Sélectionne une pattern compatible avec [count] lettres.
+/// Patterns éligibles pour [count] lettres.
 ///
-/// Phase 1 : hexagon disponible uniquement pour count == 7 (1 centre +
-/// 6 anneau). 50 % de chance par session, sinon fallback circle. Cette
-/// décision est prise UNE SEULE FOIS dans `initState` du grid, puis
-/// stable pour toute la durée de la partie.
-GridPattern pickPattern(int count, math.Random rng) {
-  if (count == 7 && rng.nextBool()) return GridPattern.hexagon;
-  return GridPattern.circle;
+/// Toujours inclus : `circle` (universel). Les autres patterns rejoignent
+/// la liste selon leur compatibilité de count.
+List<GridPattern> _candidatesFor(int count) {
+  final list = <GridPattern>[GridPattern.circle];
+  if (count == 5) list.add(GridPattern.diamond);
+  if (count == 6 || count == 7) list.add(GridPattern.twoRows);
+  if (count >= 6 && count <= 8) list.add(GridPattern.zigzag);
+  if (count == 7) list.add(GridPattern.hexagon);
+  return list;
 }
 
-/// Calcule positions et taille canvas pour [count] tuiles dans la
-/// pattern donnée. [radiusFit] est le rayon maximum imposé par le
-/// viewport (calculé par l'appelant via `LayoutBuilder`).
+/// Tire un pattern uniformément parmi les candidats compatibles avec [count].
+/// À appeler UNE SEULE FOIS par partie (cf. `_CircularGridState.initState`).
+GridPattern pickPattern(int count, math.Random rng) {
+  final candidates = _candidatesFor(count);
+  return candidates[rng.nextInt(candidates.length)];
+}
+
+/// Calcule positions et taille canvas pour [count] tuiles dans la pattern
+/// donnée. [available] est la `Size` du viewport parent (width + height),
+/// utilisé pour borner les patterns qui débordent.
 GridLayout computeLayout({
   required GridPattern pattern,
   required int count,
-  required double radiusFit,
+  required Size available,
   required double tileSize,
   double padding = 12,
 }) {
@@ -62,22 +74,47 @@ GridLayout computeLayout({
     case GridPattern.circle:
       return _circleLayout(
         count: count,
-        radiusFit: radiusFit,
+        available: available,
         tileSize: tileSize,
         padding: padding,
       );
     case GridPattern.hexagon:
       return _hexagonLayout(
-        radiusFit: radiusFit,
+        available: available,
+        tileSize: tileSize,
+        padding: padding,
+      );
+    case GridPattern.diamond:
+      return _diamondLayout(
+        available: available,
+        tileSize: tileSize,
+        padding: padding,
+      );
+    case GridPattern.zigzag:
+      return _zigzagLayout(
+        count: count,
+        available: available,
+        tileSize: tileSize,
+        padding: padding,
+      );
+    case GridPattern.twoRows:
+      return _twoRowsLayout(
+        count: count,
+        available: available,
         tileSize: tileSize,
         padding: padding,
       );
   }
 }
 
+double _radiusFitFromAvailable(Size a, double tileSize, double padding) {
+  final smaller = math.min(a.width, a.height);
+  return (smaller - tileSize - 2 * padding) / 2;
+}
+
 GridLayout _circleLayout({
   required int count,
-  required double radiusFit,
+  required Size available,
   required double tileSize,
   required double padding,
 }) {
@@ -85,9 +122,8 @@ GridLayout _circleLayout({
     final empty = tileSize + padding * 2;
     return GridLayout(centers: const <Offset>[], size: Size.square(empty));
   }
-  // Rayon idéal pour espacer les tuiles d'au moins 1.6× leur diamètre
-  // le long de l'arc → confort visuel et tactile.
   const minRadius = 70.0;
+  final radiusFit = _radiusFitFromAvailable(available, tileSize, padding);
   final idealRadius = count * tileSize * 1.6 / (2 * math.pi);
   final r = idealRadius.clamp(minRadius, math.max(minRadius, radiusFit));
 
@@ -104,15 +140,12 @@ GridLayout _circleLayout({
 }
 
 GridLayout _hexagonLayout({
-  required double radiusFit,
+  required Size available,
   required double tileSize,
   required double padding,
 }) {
-  // ringRadius = distance centre canvas → centre de chaque tuile de l'anneau.
-  // À ringRadius = tileSize, les tuiles de l'anneau sont jointives (chord
-  // = ringRadius car angle entre adjacentes = 60°). À 1.4×, on a 24pt de
-  // gap visuel — propre et tactile.
   const idealRing = 84.0; // 60 × 1.4
+  final radiusFit = _radiusFitFromAvailable(available, tileSize, padding);
   final r = idealRing.clamp(tileSize, math.max(tileSize, radiusFit));
 
   final canvas = (r + tileSize / 2 + padding) * 2;
@@ -128,6 +161,112 @@ GridLayout _hexagonLayout({
   return GridLayout(
     centers: centers,
     size: Size.square(canvas),
-    smallHitIndices: const <int>{0}, // hit-test réduit sur le centre
+    smallHitIndices: const <int>{0},
   );
+}
+
+/// Diamant : 1 tuile centrale + 4 cardinaux (N, E, S, W).
+///
+/// La tuile centrale est en index 0 → `smallHitIndices = {0}` (mêmes
+/// considérations anti-trap que l'hexagone : swipe N→S ou E→W passe
+/// par le centre, on évite la capture parasite).
+GridLayout _diamondLayout({
+  required Size available,
+  required double tileSize,
+  required double padding,
+}) {
+  const idealArm = 90.0; // distance centre → cardinaux. Gap visuel ~30pt.
+  final radiusFit = _radiusFitFromAvailable(available, tileSize, padding);
+  final r = idealArm.clamp(tileSize, math.max(tileSize, radiusFit));
+
+  final canvas = (r + tileSize / 2 + padding) * 2;
+  final c = canvas / 2;
+  final centers = <Offset>[
+    Offset(c, c), // 0 : centre
+    Offset(c, c - r), // 1 : nord
+    Offset(c + r, c), // 2 : est
+    Offset(c, c + r), // 3 : sud
+    Offset(c - r, c), // 4 : ouest
+  ];
+  return GridLayout(
+    centers: centers,
+    size: Size.square(canvas),
+    smallHitIndices: const <int>{0},
+  );
+}
+
+/// Zigzag : 2 colonnes décalées verticalement, alternance gauche/droite.
+///
+/// Pour 6 lettres :
+///     [0]
+///         [1]
+///     [2]
+///         [3]
+///     [4]
+///         [5]
+///
+/// Pas de tuile piégée : les colonnes gauche et droite ont des x différents,
+/// donc un swipe vertical sur une colonne ne traverse jamais l'autre.
+GridLayout _zigzagLayout({
+  required int count,
+  required Size available,
+  required double tileSize,
+  required double padding,
+}) {
+  const hSpread = 100.0; // distance horizontale entre les 2 colonnes
+  final desiredVStep = tileSize * 0.92; // 55pt — légèrement chevauchant
+  // Borner vStep à la hauteur disponible.
+  final maxVStep = (count <= 1)
+      ? desiredVStep
+      : (available.height - tileSize - 2 * padding) / (count - 1);
+  final vStep = math.min(desiredVStep, math.max(tileSize * 0.7, maxVStep));
+
+  final canvasW = hSpread + tileSize + 2 * padding;
+  final canvasH = (count - 1) * vStep + tileSize + 2 * padding;
+  final xLeft = padding + tileSize / 2;
+  final xRight = xLeft + hSpread;
+  final yTop = padding + tileSize / 2;
+  final centers = <Offset>[
+    for (var i = 0; i < count; i++)
+      Offset(i.isEven ? xLeft : xRight, yTop + i * vStep),
+  ];
+  return GridLayout(centers: centers, size: Size(canvasW, canvasH));
+}
+
+/// Deux rangées horizontales.
+///
+/// - 6 lettres : 3 + 3 (top row 3, bottom row 3)
+/// - 7 lettres : 4 + 3 (top row 4 — la rangée supérieure prend l'extra)
+GridLayout _twoRowsLayout({
+  required int count,
+  required Size available,
+  required double tileSize,
+  required double padding,
+}) {
+  final topCount = (count / 2).ceil(); // 3 pour 6, 4 pour 7
+  final bottomCount = count - topCount;
+
+  const hStep = 76.0; // 60 + 16 gap → confortable
+  const vGap = 76.0; // 60 + 16 vertical entre rangées
+
+  final topWidth = (topCount - 1) * hStep + tileSize;
+  final bottomWidth = (bottomCount - 1) * hStep + tileSize;
+  final widest = math.max(topWidth, bottomWidth);
+
+  final canvasW = widest + 2 * padding;
+  final canvasH = tileSize + vGap + tileSize + 2 * padding;
+  final cx = canvasW / 2;
+  final yTop = padding + tileSize / 2;
+  final yBottom = yTop + vGap;
+
+  final centers = <Offset>[
+    // Rangée du haut
+    for (var i = 0; i < topCount; i++)
+      Offset(cx - topWidth / 2 + tileSize / 2 + i * hStep, yTop),
+    // Rangée du bas
+    for (var i = 0; i < bottomCount; i++)
+      Offset(cx - bottomWidth / 2 + tileSize / 2 + i * hStep, yBottom),
+  ];
+
+  return GridLayout(centers: centers, size: Size(canvasW, canvasH));
 }

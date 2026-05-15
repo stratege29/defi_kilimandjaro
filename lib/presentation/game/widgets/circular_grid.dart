@@ -68,10 +68,6 @@ class _CircularGridState extends State<CircularGrid> {
   /// confort pouce optimal pour ascending swipe gesture).
   static const double _tileSize = 60;
 
-  /// Padding canvas extérieur (marge entre le bord du cercle et le bord du
-  /// widget) — laisse de l'air pour l'ombre des tuiles et le hit-test.
-  static const double _canvasPadding = 12;
-
   /// Pattern choisi pour CETTE session — stable durant toute la partie.
   /// Phase 1 : circle universel, hexagon 50/50 si count == 7.
   late final GridPattern _pattern;
@@ -131,21 +127,21 @@ class _CircularGridState extends State<CircularGrid> {
       .map((i) => _tileCenters[i])
       .toList(growable: false);
 
-  /// Rayon maximum tenant dans les contraintes parent.
-  double _radiusFit(BoxConstraints c) {
-    final available = math.min(c.maxWidth, c.maxHeight);
-    return (available - _tileSize - 2 * _canvasPadding) / 2;
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final count = widget.letters.length;
+        final available = Size(
+          constraints.hasBoundedWidth ? constraints.maxWidth : double.infinity,
+          constraints.hasBoundedHeight
+              ? constraints.maxHeight
+              : double.infinity,
+        );
         final layout = computeLayout(
           pattern: _pattern,
           count: count,
-          radiusFit: _radiusFit(constraints),
+          available: available,
           tileSize: _tileSize,
         );
 
