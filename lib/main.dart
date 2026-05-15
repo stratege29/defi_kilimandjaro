@@ -62,11 +62,7 @@ Future<void> main() async {
       // ignore: avoid_print
       print('Uncaught zone error: $error');
     } else {
-      FirebaseCrashlytics.instance.recordError(
-        error,
-        stack,
-        fatal: true,
-      );
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     }
   });
 }
@@ -126,8 +122,9 @@ Future<void> _bootstrap() async {
         print('🔧 Database emulator wire failed: $e');
       }
       try {
-        FirebaseFunctions.instanceFor(region: 'europe-west1')
-            .useFunctionsEmulator(emulatorHost, 5001);
+        FirebaseFunctions.instanceFor(
+          region: 'europe-west1',
+        ).useFunctionsEmulator(emulatorHost, 5001);
       } catch (e) {
         // ignore: avoid_print
         print('🔧 Functions emulator wire failed: $e');
@@ -150,8 +147,9 @@ Future<void> _bootstrap() async {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
-    await FirebaseCrashlytics.instance
-        .setCrashlyticsCollectionEnabled(!kDebugMode);
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+      !kDebugMode,
+    );
 
     // En mode emulator, on force un fresh sign-in pour invalider tout
     // token cached d'une session prod précédente (qui ferait rejeter les
@@ -169,9 +167,9 @@ Future<void> _bootstrap() async {
 
     if (FirebaseAuth.instance.currentUser == null) {
       try {
-        final cred = await FirebaseAuth.instance
-            .signInAnonymously()
-            .timeout(const Duration(seconds: 8));
+        final cred = await FirebaseAuth.instance.signInAnonymously().timeout(
+          const Duration(seconds: 8),
+        );
         // ignore: avoid_print
         print('🔧 signInAnonymously OK uid=${cred.user?.uid}');
       } catch (e) {
@@ -189,8 +187,7 @@ Future<void> _bootstrap() async {
     FirebaseMessaging.onMessageOpenedApp.listen(_navigateToMatchFromFcm);
 
     // FCM : verifier si l'app a ete ouverte depuis une notif (app terminee).
-    final initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
+    final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
       // Delay pour laisser le router s'initialiser.
       unawaited(
@@ -208,19 +205,20 @@ Future<void> _bootstrap() async {
   final prefs = await SharedPreferences.getInstance();
 
   SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlay);
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('fr'), Locale('en')],
       path: 'assets/data/i18n',
       fallbackLocale: const Locale('fr'),
+      // Force FR au premier lancement. Sans ça, easy_localization adopte la
+      // locale système du device : un iPhone en EN affichait "Hint/Clear/
+      // Validate" sur une UI où le reste (mountains, prompts, snackbars)
+      // est en FR hardcodé. Cohérence > détection système.
+      startLocale: const Locale('fr'),
       child: ProviderScope(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-        ],
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
         child: const _BootGate(child: KilimandjaroApp()),
       ),
     ),

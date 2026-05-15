@@ -1,15 +1,26 @@
+import 'dart:math' as math;
+
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/golden_path.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/letter_grid_pattern.dart';
 import 'package:flutter/material.dart';
 
-/// Grille de tuiles lettres avec détection de drag.
+/// Grille circulaire de tuiles lettres avec détection de drag.
 ///
-/// Le pattern géométrique (cercle / arc / ovale / carré) est sélectionné
-/// déterministiquement à partir de [seed] via [selectPattern]. Le drag
-/// utilise un [Listener] raw pour la précision du hit-test. Le chemin doré
-/// est dessiné par [GoldenPath] en overlay.
+/// **Disposition** : cercle unique, rayon **adaptatif au viewport parent**
+/// via `LayoutBuilder` — plus jamais d'overflow horizontal ni de tuile
+/// clippée en bas d'écran. Les variantes géométriques (arc/oval/square)
+/// supprimées : un Word Connect world-class garde un arrangement
+/// reconnaissable et constant.
+///
+/// **Aléa préservé** : l'ordre des lettres autour du cercle est shufflé
+/// au démarrage de chaque partie (`GameController._shuffleIndices`,
+/// Fisher-Yates). Deux sessions de la même devinette → cercles avec
+/// lettres dans un ordre différent.
+///
+/// **Hit-test** : `Listener` raw pour la précision pendant le drag.
+/// **Chemin doré** : dessiné par [GoldenPath] en overlay.
 class CircularGrid extends StatefulWidget {
   const CircularGrid({
     required this.letters,
@@ -17,9 +28,9 @@ class CircularGrid extends StatefulWidget {
     required this.hintRevealedCount,
     required this.answer,
     required this.phase,
-    required this.seed,
     required this.onTileEntered,
     required this.onDragEnd,
+    this.seed,
     super.key,
   });
 
@@ -38,9 +49,9 @@ class CircularGrid extends StatefulWidget {
   /// Phase du jeu.
   final Object phase;
 
-  /// Graine de sélection du pattern — `devinette.id` en solo, `answer` en duel
-  /// (partagé serveur, donc identique pour les deux joueurs).
-  final String seed;
+  /// Conservé pour compat (anciennement seed de sélection de pattern).
+  /// Désormais ignoré — le cercle est la seule forme.
+  final String? seed;
 
   /// Appelé quand le doigt entre sur une nouvelle tuile (index dans la grille).
   final void Function(int index) onTileEntered;
@@ -53,9 +64,15 @@ class CircularGrid extends StatefulWidget {
 }
 
 class _CircularGridState extends State<CircularGrid> {
-  static const double _tileSize = 56;
+  /// Diamètre d'une tuile — 60pt (au-dessus du 48pt minimum tactile Material,
+  /// confort pouce optimal pour ascending swipe gesture).
+  static const double _tileSize = 60;
 
-  /// Centres des tuiles en coordonnées locales (calculés dans build).
+  /// Padding canvas extérieur (marge entre le bord du cercle et le bord du
+  /// widget) — laisse de l'air pour l'ombre des tuiles et le hit-test.
+  static const double _canvasPadding = 12;
+
+  /// Centres des tuiles en coordonnées locales (mis à jour à chaque layout).
   final List<Offset> _tileCenters = <Offset>[];
 
   /// Position courante du doigt pendant le drag.
@@ -97,62 +114,82 @@ class _CircularGridState extends State<CircularGrid> {
       .map((i) => _tileCenters[i])
       .toList(growable: false);
 
+  /// Rayon adaptatif : on prend le plus petit côté du viewport disponible,
+  /// on retranche le diamètre d'une tuile + 2× padding pour que le canvas
+  /// englobant tienne, puis on divise par 2. Borné par `[_minRadius, _maxRadius]`.
+  double _computeRadius(BoxConstraints c, int count) {
+    if (count == 0) return _minRadius;
+    final available = math.min(c.maxWidth, c.maxHeight);
+    final fitRadius = (available - _tileSize - 2 * _canvasPadding) / 2;
+    // Rayon idéal pour confort visuel : on espace les tuiles d'au moins
+    // 1.6× leur diamètre le long de l'arc → r ≥ count × tile × 1.6 / (2π).
+    final idealRadius = count * _tileSize * 1.6 / (2 * math.pi);
+    return idealRadius.clamp(_minRadius, math.max(_minRadius, fitRadius));
+  }
+
+  static const double _minRadius = 70;
+
   @override
   Widget build(BuildContext context) {
-    final count = widget.letters.length;
-    final pattern = selectPattern(widget.seed, count);
-    final layout = computeLayout(
-      pattern: pattern,
-      count: count,
-      tileSize: _tileSize,
-    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final count = widget.letters.length;
+        final radius = _computeRadius(constraints, count);
+        final layout = computeCircleLayout(
+          count: count,
+          radius: radius,
+          tileSize: _tileSize,
+          padding: _canvasPadding,
+        );
 
-    _tileCenters
-      ..clear()
-      ..addAll(layout.centers);
+        _tileCenters
+          ..clear()
+          ..addAll(layout.centers);
 
-    return SizedBox(
-      width: layout.size.width,
-      height: layout.size.height,
-      child: Listener(
-        onPointerDown: _onPointerDown,
-        onPointerMove: _onPointerMove,
-        onPointerUp: _onPointerUp,
-        child: Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: GoldenPath(
-                centers: _selectedCenters,
-                fingerPosition: _fingerPosition,
-              ),
-            ),
-            ...List<Widget>.generate(count, (i) {
-              final center = layout.centers[i];
-              final isSelected = widget.selectedIndices.contains(i);
-              final isHint = i < widget.hintRevealedCount;
-              return Positioned(
-                left: center.dx - _tileSize / 2,
-                top: center.dy - _tileSize / 2,
-                width: _tileSize,
-                height: _tileSize,
-                child: _Tile(
-                  letter: widget.letters[i],
-                  isSelected: isSelected,
-                  isHint: isHint,
-                  selectionOrder: isSelected
-                      ? widget.selectedIndices.indexOf(i) + 1
-                      : null,
+        return SizedBox(
+          width: layout.size.width,
+          height: layout.size.height,
+          child: Listener(
+            onPointerDown: _onPointerDown,
+            onPointerMove: _onPointerMove,
+            onPointerUp: _onPointerUp,
+            child: Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: GoldenPath(
+                    centers: _selectedCenters,
+                    fingerPosition: _fingerPosition,
+                  ),
                 ),
-              );
-            }),
-          ],
-        ),
-      ),
+                ...List<Widget>.generate(count, (i) {
+                  final center = layout.centers[i];
+                  final isSelected = widget.selectedIndices.contains(i);
+                  final isHint = i < widget.hintRevealedCount;
+                  return Positioned(
+                    left: center.dx - _tileSize / 2,
+                    top: center.dy - _tileSize / 2,
+                    width: _tileSize,
+                    height: _tileSize,
+                    child: _Tile(
+                      letter: widget.letters[i],
+                      isSelected: isSelected,
+                      isHint: isHint,
+                      selectionOrder: isSelected
+                          ? widget.selectedIndices.indexOf(i) + 1
+                          : null,
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
 
-/// Tuile lettre individuelle.
+/// Tuile lettre individuelle (60pt).
 class _Tile extends StatelessWidget {
   const _Tile({
     required this.letter,
@@ -211,7 +248,7 @@ class _Tile extends StatelessWidget {
         child: Text(
           letter,
           style: AppTypography.bebas(
-            size: 24,
+            size: 26,
             color: textColor,
             letterSpacing: 0,
           ),
