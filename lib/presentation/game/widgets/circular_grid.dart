@@ -72,17 +72,34 @@ class _CircularGridState extends State<CircularGrid> {
   /// widget) — laisse de l'air pour l'ombre des tuiles et le hit-test.
   static const double _canvasPadding = 12;
 
+  /// Pattern choisi pour CETTE session — stable durant toute la partie.
+  /// Phase 1 : circle universel, hexagon 50/50 si count == 7.
+  late final GridPattern _pattern;
+
   /// Centres des tuiles en coordonnées locales (mis à jour à chaque layout).
   final List<Offset> _tileCenters = <Offset>[];
+
+  /// Indices dont le hit-test est volontairement réduit (typiquement la
+  /// tuile centrale de l'hexagone, pour éviter les captures parasites
+  /// quand le doigt glisse d'une tuile à l'opposée).
+  Set<int> _smallHitIndices = const <int>{};
 
   /// Position courante du doigt pendant le drag.
   Offset? _fingerPosition;
 
+  @override
+  void initState() {
+    super.initState();
+    _pattern = pickPattern(widget.letters.length, math.Random());
+  }
+
   int? _hitTest(Offset localPos) {
-    const hitRadius = _tileSize / 2;
+    const fullRadius = _tileSize / 2;
+    const smallRadius = _tileSize * 0.40;
     for (var i = 0; i < _tileCenters.length; i++) {
       final dist = (_tileCenters[i] - localPos).distance;
-      if (dist <= hitRadius) return i;
+      final r = _smallHitIndices.contains(i) ? smallRadius : fullRadius;
+      if (dist <= r) return i;
     }
     return null;
   }
@@ -114,37 +131,28 @@ class _CircularGridState extends State<CircularGrid> {
       .map((i) => _tileCenters[i])
       .toList(growable: false);
 
-  /// Rayon adaptatif : on prend le plus petit côté du viewport disponible,
-  /// on retranche le diamètre d'une tuile + 2× padding pour que le canvas
-  /// englobant tienne, puis on divise par 2. Borné par `[_minRadius, _maxRadius]`.
-  double _computeRadius(BoxConstraints c, int count) {
-    if (count == 0) return _minRadius;
+  /// Rayon maximum tenant dans les contraintes parent.
+  double _radiusFit(BoxConstraints c) {
     final available = math.min(c.maxWidth, c.maxHeight);
-    final fitRadius = (available - _tileSize - 2 * _canvasPadding) / 2;
-    // Rayon idéal pour confort visuel : on espace les tuiles d'au moins
-    // 1.6× leur diamètre le long de l'arc → r ≥ count × tile × 1.6 / (2π).
-    final idealRadius = count * _tileSize * 1.6 / (2 * math.pi);
-    return idealRadius.clamp(_minRadius, math.max(_minRadius, fitRadius));
+    return (available - _tileSize - 2 * _canvasPadding) / 2;
   }
-
-  static const double _minRadius = 70;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final count = widget.letters.length;
-        final radius = _computeRadius(constraints, count);
-        final layout = computeCircleLayout(
+        final layout = computeLayout(
+          pattern: _pattern,
           count: count,
-          radius: radius,
+          radiusFit: _radiusFit(constraints),
           tileSize: _tileSize,
-          padding: _canvasPadding,
         );
 
         _tileCenters
           ..clear()
           ..addAll(layout.centers);
+        _smallHitIndices = layout.smallHitIndices;
 
         return SizedBox(
           width: layout.size.width,
