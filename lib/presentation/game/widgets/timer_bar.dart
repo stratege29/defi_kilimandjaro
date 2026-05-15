@@ -30,8 +30,10 @@ class _TimerBarState extends State<TimerBar>
       duration: const Duration(milliseconds: 800),
     )..repeat(reverse: true);
 
+    // Plage de pulsation élargie (0.4-1.0) pour rendre le danger lisible
+    // de loin — l'alpha shimmer module fortement la barre rouge en sub-8s.
     _shimmerAnim = Tween<double>(
-      begin: 0.6,
+      begin: 0.4,
       end: 1,
     ).animate(CurvedAnimation(parent: _shimmerCtrl, curve: Curves.easeInOut));
   }
@@ -64,12 +66,13 @@ class _TimerBarState extends State<TimerBar>
             // Icône timer — Material rounded, cohérent avec le système d'icônes.
             Icon(Icons.timer_outlined, size: 18, color: barColor),
             const SizedBox(width: 8),
-            // Progress bar
+            // Progress bar — scale subtilement (0.97-1.03) en danger pour
+            // accentuer la tension visuelle au-delà du shimmer alpha.
             Expanded(
               child: AnimatedBuilder(
                 animation: _shimmerAnim,
                 builder: (_, __) {
-                  return ClipRRect(
+                  final bar = ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: progress,
@@ -84,6 +87,10 @@ class _TimerBarState extends State<TimerBar>
                       ),
                     ),
                   );
+                  if (!isDanger) return bar;
+                  // 0.0 → scale 1.03, 1.0 → scale 0.97, sync avec shimmer.
+                  final scale = 1.03 - (1 - _shimmerAnim.value) * 0.06;
+                  return Transform.scale(scaleY: scale, child: bar);
                 },
               ),
             ),

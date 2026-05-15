@@ -18,7 +18,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// pour toutes les sessions de jeu.
 class AssetDevinetteRepository implements DevinetteRepository {
   AssetDevinetteRepository({String basePath = 'assets/data/devinettes'})
-      : _basePath = basePath;
+    : _basePath = basePath;
 
   final String _basePath;
   final Map<String, List<Devinette>> _cache = <String, List<Devinette>>{};
@@ -46,6 +46,23 @@ class AssetDevinetteRepository implements DevinetteRepository {
       throw StateError('Aucune devinette dans le monde "$worldId"');
     }
     return list[_rng.nextInt(list.length)];
+  }
+
+  @override
+  Future<Devinette> randomFromWorldExcluding(
+    String worldId,
+    Iterable<String> excludeIds,
+  ) async {
+    final list = await loadWorld(worldId);
+    if (list.isEmpty) {
+      throw StateError('Aucune devinette dans le monde "$worldId"');
+    }
+    final exclude = excludeIds.toSet();
+    final pool = list.where((d) => !exclude.contains(d.id)).toList();
+    // Pool trop petit : fallback sur la liste complète (mieux que de
+    // bloquer le jeu).
+    if (pool.isEmpty) return list[_rng.nextInt(list.length)];
+    return pool[_rng.nextInt(pool.length)];
   }
 
   @override

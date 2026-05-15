@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
@@ -29,68 +31,76 @@ class AppBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentIdx = NavTab.values.indexOf(current);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.6),
-        border: Border(
-          top: BorderSide(color: AppColors.orJour.withValues(alpha: 0.2)),
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: _barHeight,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final tabWidth = constraints.maxWidth / NavTab.values.length;
-              return Stack(
-                children: [
-                  // Pill indicator — glisse d'un onglet à l'autre.
-                  AnimatedPositioned(
-                    duration: const Duration(milliseconds: 350),
-                    curve: Curves.easeOutCubic,
-                    left: currentIdx * tabWidth + _pillMarginH,
-                    top: _pillMarginV,
-                    bottom: _pillMarginV,
-                    width: tabWidth - 2 * _pillMarginH,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: AppColors.orJour.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(
-                          (_barHeight - 2 * _pillMarginV) / 2,
-                        ),
-                        border: Border.all(
-                          color: AppColors.orJour.withValues(alpha: 0.35),
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Row d'onglets — au-dessus de la pill.
-                  Row(
+    // Frosted glass : BackdropFilter blur 18 sur le contenu sous la nav,
+    // puis tint vertForet @ 65 % par-dessus pour préserver l'identité
+    // colorimétrique et garantir le contraste des labels.
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.65),
+            border: Border(
+              top: BorderSide(color: AppColors.orJour.withValues(alpha: 0.25)),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: SizedBox(
+              height: _barHeight,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final tabWidth = constraints.maxWidth / NavTab.values.length;
+                  return Stack(
                     children: [
-                      _NavItem(
-                        assetPath: AppAssets.iconNavPlay,
-                        label: 'Défi',
-                        active: current == NavTab.defi,
-                        onTap: () => onTabSelected(NavTab.defi),
+                      // Pill indicator — glisse d'un onglet à l'autre.
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 350),
+                        curve: Curves.easeOutCubic,
+                        left: currentIdx * tabWidth + _pillMarginH,
+                        top: _pillMarginV,
+                        bottom: _pillMarginV,
+                        width: tabWidth - 2 * _pillMarginH,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppColors.orJour.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(
+                              (_barHeight - 2 * _pillMarginV) / 2,
+                            ),
+                            border: Border.all(
+                              color: AppColors.orJour.withValues(alpha: 0.35),
+                            ),
+                          ),
+                        ),
                       ),
-                      _NavItem(
-                        assetPath: AppAssets.iconNavMap,
-                        label: 'Sommets',
-                        active: current == NavTab.sommets,
-                        onTap: () => onTabSelected(NavTab.sommets),
-                      ),
-                      _NavItem(
-                        assetPath: AppAssets.iconNavProfile,
-                        label: 'Profil',
-                        active: current == NavTab.profil,
-                        onTap: () => onTabSelected(NavTab.profil),
+                      // Row d'onglets — au-dessus de la pill.
+                      Row(
+                        children: [
+                          _NavItem(
+                            assetPath: AppAssets.iconNavPlay,
+                            label: 'Défi',
+                            active: current == NavTab.defi,
+                            onTap: () => onTabSelected(NavTab.defi),
+                          ),
+                          _NavItem(
+                            assetPath: AppAssets.iconNavMap,
+                            label: 'Sommets',
+                            active: current == NavTab.sommets,
+                            onTap: () => onTabSelected(NavTab.sommets),
+                          ),
+                          _NavItem(
+                            assetPath: AppAssets.iconNavProfile,
+                            label: 'Profil',
+                            active: current == NavTab.profil,
+                            onTap: () => onTabSelected(NavTab.profil),
+                          ),
+                        ],
                       ),
                     ],
-                  ),
-                ],
-              );
-            },
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ),

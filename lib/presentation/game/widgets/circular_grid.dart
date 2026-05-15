@@ -194,7 +194,12 @@ class _CircularGridState extends State<CircularGrid> {
 }
 
 /// Tuile lettre individuelle (60pt).
-class _Tile extends StatelessWidget {
+///
+/// **Micro-scale à la sélection** : quand `isSelected` passe à `true`, la
+/// tuile bondit de 0.88 → 1.0 sur 120 ms (`Curves.easeOutCirc`). Couplé à
+/// la sélection-click haptic du `GameController`, ça crée le moment
+/// satisfaisant "Duolingo-like" reconnu en swipe Word Connect.
+class _Tile extends StatefulWidget {
   const _Tile({
     required this.letter,
     required this.isSelected,
@@ -208,16 +213,52 @@ class _Tile extends StatelessWidget {
   final int? selectionOrder;
 
   @override
+  State<_Tile> createState() => _TileState();
+}
+
+class _TileState extends State<_Tile> with SingleTickerProviderStateMixin {
+  late final AnimationController _selectCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+      value: 1,
+    );
+    // Si la tuile naît déjà sélectionnée (rare — restart partie en cours),
+    // on n'anime pas — état stable directement à 1.0.
+  }
+
+  @override
+  void didUpdateWidget(_Tile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isSelected && widget.isSelected) {
+      // Première sélection : bondir 0.88 → 1.0.
+      _selectCtrl
+        ..value = 0.88
+        ..animateTo(1, curve: Curves.easeOutCirc);
+    }
+  }
+
+  @override
+  void dispose() {
+    _selectCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Color bg;
     final Color textColor;
     final Color borderColor;
 
-    if (isSelected) {
+    if (widget.isSelected) {
       bg = AppColors.orSoleil;
       textColor = AppColors.vertForet;
       borderColor = AppColors.orChaud;
-    } else if (isHint) {
+    } else if (widget.isHint) {
       bg = AppColors.vertClair.withValues(alpha: 0.8);
       textColor = AppColors.ivoire;
       borderColor = AppColors.vertClair;
@@ -227,22 +268,22 @@ class _Tile extends StatelessWidget {
       borderColor = AppColors.boisFonce;
     }
 
-    return AnimatedContainer(
+    final tile = AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: bg,
         border: Border.all(color: borderColor, width: 2),
         boxShadow: <BoxShadow>[
-          // Bottom shadow.
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.35),
             offset: const Offset(0, 3),
             blurRadius: 6,
           ),
-          // Top highlight reflect.
           BoxShadow(
-            color: Colors.white.withValues(alpha: isSelected ? 0.4 : 0.15),
+            color: Colors.white.withValues(
+              alpha: widget.isSelected ? 0.4 : 0.15,
+            ),
             offset: const Offset(0, -2),
             blurRadius: 4,
           ),
@@ -250,7 +291,7 @@ class _Tile extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          letter,
+          widget.letter,
           style: AppTypography.bebas(
             size: 26,
             color: textColor,
@@ -258,6 +299,13 @@ class _Tile extends StatelessWidget {
           ),
         ),
       ),
+    );
+
+    return AnimatedBuilder(
+      animation: _selectCtrl,
+      builder: (_, child) =>
+          Transform.scale(scale: _selectCtrl.value, child: child),
+      child: tile,
     );
   }
 }

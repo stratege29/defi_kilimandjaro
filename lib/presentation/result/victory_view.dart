@@ -213,10 +213,12 @@ class _VictoryCard extends StatelessWidget {
               borderColor: AppColors.orSoleil,
             ),
             const SizedBox(height: 16),
-            // Answer word.
+            // Answer word — Fraunces displayMd 40pt w700, moment éditorial fort.
+            // C'est la première fois que le joueur voit le mot culturel
+            // ivoirien : on lui donne la fonte la plus noble du DS.
             Text(
               devinette.answer,
-              style: AppTypography.bebas(size: 42, color: AppColors.orSoleil),
+              style: AppTypography.displayMd,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 14),

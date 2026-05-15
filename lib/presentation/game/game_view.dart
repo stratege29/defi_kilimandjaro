@@ -408,7 +408,16 @@ class _GameViewState extends ConsumerState<GameView>
       final repo = ref.read(devinetteRepositoryProvider);
       // Phase 2.2 stub : devinette aléatoire de "village_des_or".
       // Phase 4 : tag par pays / région (cohérent avec mountain_detail_view).
-      final next = await repo.randomFromWorld('village_des_or');
+      // Anti-répétition : exclut les 5 dernières devinettes jouées
+      // (incluant celle qu'on vient de gagner).
+      final progress = ref.read(playerProgressProvider);
+      final next = await repo.randomFromWorldExcluding(
+        'village_des_or',
+        progress.recentDevinetteIds,
+      );
+      await ref
+          .read(playerProgressProvider.notifier)
+          .recordRecentDevinette(next.id);
       if (!mounted) return;
       context.pushReplacement(
         AppRoutes.game,
