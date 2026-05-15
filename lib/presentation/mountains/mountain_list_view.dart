@@ -173,6 +173,12 @@ class _MountainListViewState extends ConsumerState<MountainListView>
                 ),
               ),
 
+              // 2.5. Scrim contextuel : dégradé sombre top + bottom pour
+              // garantir le contraste du HUD (nom, altitude, étoiles, CTA)
+              // sur les biomes clairs (savanne, altitude). Le milieu de
+              // l'écran reste pure atmosphère.
+              const Positioned.fill(child: _HudScrim()),
+
               // 3. PageView principal — 1 montagne = 1 viewport.
               PageView.builder(
                 controller: _pageController,
@@ -511,6 +517,41 @@ class _CtaButton extends StatelessWidget {
         child: Text(
           label,
           style: AppTypography.bebas(size: 15, color: textColor),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// Scrim HUD — dégradé vertical sombre sur les bords haut/bas
+// ============================================================
+
+/// Voile sombre sur les 22 % du haut et 30 % du bas de l'écran, transparent
+/// au milieu. Garantit le contraste du HUD (nom, altitude, étoiles, CTA)
+/// sur les biomes clairs (savanne, altitude), sans dénaturer l'atmosphère
+/// au centre de la composition.
+///
+/// `IgnorePointer` : laisse passer les taps vers les widgets sous-jacents.
+class _HudScrim extends StatelessWidget {
+  const _HudScrim();
+
+  @override
+  Widget build(BuildContext context) {
+    return const IgnorePointer(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0x99000000), // 60 % black — derrière nom + altitude
+              Color(0x00000000), // transparent
+              Color(0x00000000), // transparent
+              Color(0xB3000000), // 70 % black — derrière étoiles + CTA
+            ],
+            stops: [0.0, 0.22, 0.62, 1.0],
+          ),
         ),
       ),
     );

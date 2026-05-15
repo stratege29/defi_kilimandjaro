@@ -13,10 +13,13 @@ AtmosphereBiome biomeForAltitude(int altitudeM) {
 }
 
 /// Couleur principale de la silhouette selon le biome.
+///
+/// **Savanne** : `boisFonce` (terre rouge sombre du Sahel) au lieu de
+/// `savanneFonce` qui blend totalement avec le ciel ocre — contraste 7:1.
 Color silhouetteColorForBiome(AtmosphereBiome biome) {
   switch (biome) {
     case AtmosphereBiome.savanne:
-      return AppColors.savanneFonce;
+      return AppColors.boisFonce;
     case AtmosphereBiome.foret:
       return AppColors.vertForet;
     case AtmosphereBiome.roche:
@@ -31,10 +34,7 @@ Color silhouetteColorForBiome(AtmosphereBiome biome) {
 /// Interpolé via [AnimatedContainer] entre les dégradés de biome.
 /// Place cette couche en premier dans le Stack de l'écran Sommets.
 class AtmosphereLayer extends StatelessWidget {
-  const AtmosphereLayer({
-    required this.biome,
-    super.key,
-  });
+  const AtmosphereLayer({required this.biome, super.key});
 
   final AtmosphereBiome biome;
 
@@ -88,10 +88,7 @@ class ParallaxBgLayer extends StatelessWidget {
 
     return ClipRect(
       child: CustomPaint(
-        painter: _BgMountainsPainter(
-          offsetY: parallaxOffset,
-          biome: biome,
-        ),
+        painter: _BgMountainsPainter(offsetY: parallaxOffset, biome: biome),
         child: const SizedBox.expand(),
       ),
     );
@@ -99,10 +96,7 @@ class ParallaxBgLayer extends StatelessWidget {
 }
 
 class _BgMountainsPainter extends CustomPainter {
-  const _BgMountainsPainter({
-    required this.offsetY,
-    required this.biome,
-  });
+  const _BgMountainsPainter({required this.offsetY, required this.biome});
 
   final double offsetY;
   final AtmosphereBiome biome;
@@ -110,7 +104,8 @@ class _BgMountainsPainter extends CustomPainter {
   Color get _mountainColor {
     switch (biome) {
       case AtmosphereBiome.savanne:
-        return AppColors.savanneFonce.withValues(alpha: 0.35);
+        // Brun terre Sahel sur ciel ocre — silhouettes lointaines lisibles.
+        return AppColors.boisFonce.withValues(alpha: 0.30);
       case AtmosphereBiome.foret:
         return AppColors.vertForet.withValues(alpha: 0.55);
       case AtmosphereBiome.roche:
