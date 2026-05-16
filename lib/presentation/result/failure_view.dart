@@ -2,13 +2,25 @@ import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-/// Écran 05 — Overlay Échec (cf. maquette p.7).
+/// Écran 05 — Overlay Échec (refonte world-class 2026, alignée VictoryView).
 ///
-/// Ton non-punitif : révèle le mot, encourage à réessayer.
-/// Affiché via [showDialog] avec fond noir à 92 % d'opacité.
+/// Ton non-punitif : révèle le mot, encourage à réessayer. Affiché via
+/// [showDialog] avec fond noir à 92 % d'opacité.
+///
+/// **Architecture visuelle** : card centrée, accent rouge `error`.
+/// - Griot triste 96pt en haut
+/// - Mot-réponse révélé en Fraunces displayMd (rouge error)
+/// - Explication culturelle complète bodyMd `textePrimaire` (scrollable si
+///   débordement) — c'est le moment d'apprentissage principal
+/// - Ligne d'encouragement Crimson italic 15pt `texteSecondaire`
+/// - CTA RÉESSAYER via AppButton.danger
+///
+/// **Bugfix** : wrap en `Material(transparency)` — sans Material ancestor
+/// le `Text` rendait les soulignés debug "missing material".
 class FailureView extends StatefulWidget {
   const FailureView({
     required this.devinette,
@@ -50,41 +62,20 @@ class _FailureViewState extends State<FailureView>
     super.dispose();
   }
 
-  String _subjectEmoji() {
-    final tags = widget.devinette.tags;
-    if (tags.any((t) => t.contains('cuisine') || t.contains('food'))) {
-      return '🍲';
-    }
-    if (tags.any((t) => t.contains('nature') || t.contains('plante'))) {
-      return '🌿';
-    }
-    if (tags.any((t) => t.contains('animal'))) return '🦁';
-    if (tags.any((t) => t.contains('musique') || t.contains('music'))) {
-      return '🎵';
-    }
-    if (tags.any((t) => t.contains('art') || t.contains('tissu'))) {
-      return '🎨';
-    }
-    return '🌍';
-  }
-
-  String _truncatedExplanation(String text, {int maxChars = 120}) {
-    if (text.length <= maxChars) return text;
-    return '${text.substring(0, maxChars).trimRight()}…';
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ScaleTransition(
-        scale: _cardScale,
-        child: _FailureCard(
-          devinette: widget.devinette,
-          subjectEmoji: _subjectEmoji(),
-          truncatedExplanation: _truncatedExplanation(
-            widget.devinette.explanation,
+    // Material(transparency) : fournit le DefaultTextStyle ancestor pour
+    // que les Text n'aient pas le souligné debug "missing material"
+    // (même bugfix que VictoryView et MountainConquestView).
+    return Material(
+      type: MaterialType.transparency,
+      child: Center(
+        child: ScaleTransition(
+          scale: _cardScale,
+          child: _FailureCard(
+            devinette: widget.devinette,
+            onRetry: widget.onRetry,
           ),
-          onRetry: widget.onRetry,
         ),
       ),
     );
@@ -98,14 +89,10 @@ class _FailureViewState extends State<FailureView>
 class _FailureCard extends StatelessWidget {
   const _FailureCard({
     required this.devinette,
-    required this.subjectEmoji,
-    required this.truncatedExplanation,
     required this.onRetry,
   });
 
   final Devinette devinette;
-  final String subjectEmoji;
-  final String truncatedExplanation;
   final VoidCallback onRetry;
 
   @override
@@ -114,154 +101,91 @@ class _FailureCard extends StatelessWidget {
     return Container(
       width: screenWidth * 0.88,
       constraints: const BoxConstraints(maxWidth: 420),
-      padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
       decoration: BoxDecoration(
-        color: AppColors.boisFonce.withValues(alpha: 0.95),
+        // Palette 2026 — surface opaque + accent rouge `error`.
+        color: AppColors.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.rouge, width: 3),
+        border: Border.all(color: AppColors.error, width: 1.5),
         boxShadow: <BoxShadow>[
+          // Halo rouge subtil (signature failure).
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.6),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
+            color: AppColors.error.withValues(alpha: 0.18),
+            blurRadius: 28,
+          ),
+          // Profondeur sous la card.
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.55),
+            blurRadius: 32,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            // Griot mascot — empathetic consolation pose.
-            Image.asset(AppAssets.griotSad, width: 140, height: 140),
-            const SizedBox(height: 12),
-            // Subject circle — red border.
-            _SubjectCircle(emoji: subjectEmoji, borderColor: AppColors.rouge),
-            const SizedBox(height: 16),
-            // Revealed answer.
-            Text(
-              devinette.answer,
-              style: AppTypography.bebas(size: 42, color: AppColors.rouge),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            // "La réponse était {answer}"
-            Text(
-              'result.failure.answer_was'.tr(
-                namedArgs: <String, String>{'answer': devinette.answer},
-              ),
-              style: AppTypography.crimson(
-                size: 15,
-                color: AppColors.textePrimaire,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            // Short explanation.
-            Text(
-              truncatedExplanation,
-              textAlign: TextAlign.center,
-              style: AppTypography.crimson(
-                size: 15,
-                color: AppColors.textePrimaire,
-                style: FontStyle.italic,
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Consolation proverb box.
-            _ProverbBox(proverb: devinette.proverb),
-            const SizedBox(height: 10),
-            // Encouragement line.
-            Text(
-              'result.failure.consolation'.tr(),
-              style: AppTypography.crimson(style: FontStyle.italic),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            // Retry button.
-            _RetryButton(onTap: onRetry),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SubjectCircle extends StatelessWidget {
-  const _SubjectCircle({required this.emoji, required this.borderColor});
-
-  final String emoji;
-  final Color borderColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.boisFonce,
-        border: Border.all(color: borderColor, width: 2),
-      ),
-      alignment: Alignment.center,
-      child: Text(emoji, style: const TextStyle(fontSize: 56)),
-    );
-  }
-}
-
-class _ProverbBox extends StatelessWidget {
-  const _ProverbBox({required this.proverb});
-
-  final String proverb;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.bois.withValues(alpha: 0.20),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: AppColors.rouge.withValues(alpha: 0.7),
-          width: 1.5,
-        ),
-      ),
-      child: Text(
-        '"$proverb"',
-        textAlign: TextAlign.center,
-        style: AppTypography.crimson(
-          color: AppColors.tagline,
-          style: FontStyle.italic,
-        ),
-      ),
-    );
-  }
-}
-
-class _RetryButton extends StatelessWidget {
-  const _RetryButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 52,
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.rouge.withValues(alpha: 0.70),
-          foregroundColor: AppColors.ivoire,
-          minimumSize: const Size(240, 52),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          // Mascotte griot triste 96pt — pose empathique.
+          Image.asset(AppAssets.griotSad, width: 96, height: 96),
+          const SizedBox(height: 16),
+          // Mot-réponse révélé — Fraunces displayMd, rouge error.
+          Text(
+            devinette.answer,
+            style: AppTypography.displayMd.copyWith(color: AppColors.error),
+            textAlign: TextAlign.center,
           ),
-          elevation: 4,
-        ),
-        child: Text(
-          'result.failure.retry'.tr(),
-          style: AppTypography.bebas(size: 18),
-        ),
+          const SizedBox(height: 8),
+          // "La réponse était {answer}" — caption.
+          Text(
+            'result.failure.answer_was'.tr(
+              namedArgs: <String, String>{'answer': devinette.answer},
+            ),
+            textAlign: TextAlign.center,
+            style: AppTypography.crimson(
+              size: 13,
+              color: AppColors.texteSecondaire,
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Explication culturelle — moment d'apprentissage principal.
+          // bodyMd non-italique sur textePrimaire, contenu intégral (la
+          // troncature précédente à 120 chars amputait la pédagogie).
+          // Scrollable si débordement extrême sur petit device.
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 160),
+            child: SingleChildScrollView(
+              child: Text(
+                devinette.explanation,
+                textAlign: TextAlign.center,
+                style: AppTypography.bodyMd.copyWith(
+                  color: AppColors.textePrimaire,
+                  height: 1.5,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Ligne d'encouragement (« Tu y arriveras à la prochaine ! »).
+          // Italique conservée (ton littéraire), 15pt en secondaire pour
+          // rester sous le seuil AA sans descendre en tertiaire (3.2:1).
+          Text(
+            'result.failure.consolation'.tr(),
+            textAlign: TextAlign.center,
+            style: AppTypography.crimson(
+              size: 15,
+              color: AppColors.texteSecondaire,
+              style: FontStyle.italic,
+            ),
+          ),
+          const SizedBox(height: 24),
+          // CTA RÉESSAYER — variant danger (errorSoft + border error).
+          // Ton non-punitif : rouge subtil, pas un bouton agressif.
+          AppButton(
+            label: 'result.failure.retry'.tr(),
+            onPressed: onRetry,
+            variant: AppButtonVariant.danger,
+            fullWidth: true,
+          ),
+        ],
       ),
     );
   }

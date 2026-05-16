@@ -54,6 +54,35 @@ class GameState {
 
   bool get isComplete => selectedIndices.length == devinette.answer.length;
 
+  /// Indices de tuiles (positions dans la grille shufflée) révélées par
+  /// l'indice — pour les `hintRevealedCount` premières lettres de la
+  /// réponse. Chaque entrée pointe sur la prochaine occurrence disponible
+  /// dans le pool (gestion des doublons type "FOUTOU" avec 2× O et 2× U).
+  ///
+  /// L'ancienne logique `i < hintRevealedCount` dans la grille traitait
+  /// `hintRevealedCount` comme un index sur l'ordre physique du cercle,
+  /// ce qui révélait une tuile aléatoire au lieu de pointer la prochaine
+  /// lettre de la réponse.
+  List<int> get hintTileIndices {
+    final n = hintRevealedCount.clamp(0, devinette.answer.length);
+    if (n == 0) return const <int>[];
+    final used = <int>{};
+    final result = <int>[];
+    for (var k = 0; k < n; k++) {
+      final target = devinette.answer[k];
+      for (var gridIdx = 0; gridIdx < shuffledIndices.length; gridIdx++) {
+        if (used.contains(gridIdx)) continue;
+        final letter = devinette.lettersPool[shuffledIndices[gridIdx]];
+        if (letter == target) {
+          result.add(gridIdx);
+          used.add(gridIdx);
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
   GameState copyWith({
     Devinette? devinette,
     List<int>? selectedIndices,
@@ -111,23 +140,45 @@ class GameController extends StateNotifier<GameState> {
   // ---------------------------------------------------------------------------
 
   /// Sélectionne une tuile par son index dans la grille shufflée.
-  /// Gère le slide-back (pointer revient sur l'avant-dernier → supprime le dernier).
+  ///
+  /// Règles (volontairement restrictives pour éviter qu'un tap accidentel
+  /// au milieu du chemin n'explose la sélection) :
+  /// - Tuile **pas encore sélectionnée** → ajoutée en fin.
+  /// - Tuile **avant-dernière** (slide-back classique : le doigt revient
+  ///   en arrière pendant un drag) → retire la dernière. Cascade naturelle
+  ///   lettre par lettre si l'utilisateur continue à reculer.
+  /// - Tuile **dernière sélectionnée** → retirée (re-tap discret = effacer).
+  /// - Tuile **antérieure mais ni avant-dernière ni dernière** → ignorée.
+  ///   La troncature mid-chemin serait trop destructrice sur un toucher
+  ///   imprécis.
   void selectTile(int gridIndex) {
     if (state.phase != GamePhase.playing) return;
 
     final selected = List<int>.from(state.selectedIndices);
 
-    // Slide-back.
+    // Slide-back classique : entrer sur l'avant-dernière retire la dernière.
     if (selected.length >= 2 && selected[selected.length - 2] == gridIndex) {
       selected.removeLast();
       state = state.copyWith(
         selectedIndices: selected,
         validationCorrect: false,
       );
+      unawaited(HapticFeedback.selectionClick());
       return;
     }
 
-    // Ne pas re-sélectionner un index déjà dans la liste.
+    // Re-tap sur la dernière lettre : on la retire.
+    if (selected.isNotEmpty && selected.last == gridIndex) {
+      selected.removeLast();
+      state = state.copyWith(
+        selectedIndices: selected,
+        validationCorrect: false,
+      );
+      unawaited(HapticFeedback.selectionClick());
+      return;
+    }
+
+    // Lettre antérieure (ni avant-dernière ni dernière) : ignorée.
     if (selected.contains(gridIndex)) return;
 
     selected.add(gridIndex);

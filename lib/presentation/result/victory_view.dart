@@ -6,14 +6,27 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
-/// Écran 04 — Overlay Victoire (cf. maquette p.6).
+/// Écran 04 — Overlay Victoire (refonte world-class 2026).
 ///
 /// Affiché via [showDialog] avec fond noir à 92 % d'opacité.
-/// 12 particules emoji projetées en fan depuis le centre (CustomPainter).
+///
+/// **Architecture visuelle** : card centrée éditoriale.
+/// - Griot 96pt en haut (mascotte célèbre, scale-bounce continu)
+/// - Mot-réponse en Fraunces display (la plus belle fonte du DS)
+/// - Explication culturelle 2-3 lignes Crimson italic
+/// - **Proverbe** dans son cadre éditorial dédié — séparateurs gold
+///   fins haut+bas, guillemets typographiques « », attribution
+///   « — Sagesse Ivoirienne » en bas droit
+/// - Reward cauris en chip pill animée (tween 0→N)
+/// - CTA SUIVANT via AppButton.primary
+///
+/// **Bugfix** : wrap en `Material(transparency)` — sans Material ancestor
+/// le `Text` Flutter rendait les soulignés debug "missing material".
 class VictoryView extends StatefulWidget {
   const VictoryView({
     required this.devinette,
@@ -61,8 +74,7 @@ class _VictoryViewState extends State<VictoryView>
       duration: const Duration(milliseconds: 800),
     )..repeat(reverse: true);
 
-    // Spring damped : 1 overshoot puis stabilisation (Duolingo-style).
-    // upperBound:2 autorise le bond visuel sans clipping.
+    // Spring damped — 1 overshoot puis stabilisation (Duolingo-style).
     _cardCtrl = AnimationController(vsync: this, upperBound: 2)
       ..animateWith(
         SpringSimulation(
@@ -74,16 +86,12 @@ class _VictoryViewState extends State<VictoryView>
       );
 
     _celebScale = Tween<double>(
-      begin: 0.85,
-      end: 1.2,
+      begin: 0.92,
+      end: 1.08,
     ).animate(CurvedAnimation(parent: _celebCtrl, curve: Curves.easeInOut));
 
-    // Tween piloté par le ressort : la valeur du controller oscille en
-    // amorti, le Tween la mappe sur l'échelle visuelle 0.7 → 1.0+.
     _cardScale = Tween<double>(begin: 0.7, end: 1).animate(_cardCtrl);
 
-    // Compteur cauris : décale après le pop-in de la carte pour que le tween
-    // 0 → N soit perçu comme une récompense distincte.
     _caurisCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -106,51 +114,37 @@ class _VictoryViewState extends State<VictoryView>
     super.dispose();
   }
 
-  String _subjectEmoji() {
-    final tags = widget.devinette.tags;
-    if (tags.any((t) => t.contains('cuisine') || t.contains('food'))) {
-      return '🍲';
-    }
-    if (tags.any((t) => t.contains('nature') || t.contains('plante'))) {
-      return '🌿';
-    }
-    if (tags.any((t) => t.contains('animal'))) return '🦁';
-    if (tags.any((t) => t.contains('musique') || t.contains('music'))) {
-      return '🎵';
-    }
-    if (tags.any((t) => t.contains('art') || t.contains('tissu'))) {
-      return '🎨';
-    }
-    return '✨';
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        // Particle layer behind the card.
-        Positioned.fill(
-          child: AnimatedBuilder(
-            animation: _particleCtrl,
-            builder: (context, _) => CustomPaint(
-              painter: _ParticlePainter(progress: _particleCtrl.value),
+    // Material(transparency) : fournit le DefaultTextStyle ancestor pour
+    // que les Text n'aient pas le souligné debug "missing material".
+    return Material(
+      type: MaterialType.transparency,
+      child: Stack(
+        children: <Widget>[
+          // 1. Particules en éventail (derrière la card).
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _particleCtrl,
+              builder: (context, _) => CustomPaint(
+                painter: _ParticlePainter(progress: _particleCtrl.value),
+              ),
             ),
           ),
-        ),
-        // Card.
-        Center(
-          child: ScaleTransition(
-            scale: _cardScale,
-            child: _VictoryCard(
-              devinette: widget.devinette,
-              caurisAnim: _caurisAnim,
-              celebScale: _celebScale,
-              subjectEmoji: _subjectEmoji(),
-              onNext: widget.onNext,
+          // 2. Card éditoriale (spring pop-in).
+          Center(
+            child: ScaleTransition(
+              scale: _cardScale,
+              child: _VictoryCard(
+                devinette: widget.devinette,
+                caurisAnim: _caurisAnim,
+                celebScale: _celebScale,
+                onNext: widget.onNext,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -164,14 +158,12 @@ class _VictoryCard extends StatelessWidget {
     required this.devinette,
     required this.caurisAnim,
     required this.celebScale,
-    required this.subjectEmoji,
     required this.onNext,
   });
 
   final Devinette devinette;
   final Animation<int> caurisAnim;
   final Animation<double> celebScale;
-  final String subjectEmoji;
   final VoidCallback onNext;
 
   @override
@@ -180,131 +172,126 @@ class _VictoryCard extends StatelessWidget {
     return Container(
       width: screenWidth * 0.88,
       constraints: const BoxConstraints(maxWidth: 420),
-      padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
       decoration: BoxDecoration(
-        color: AppColors.boisFonce.withValues(alpha: 0.95),
+        color: AppColors.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.orSoleil, width: 3),
+        border: Border.all(color: AppColors.orJour, width: 1.5),
         boxShadow: <BoxShadow>[
+          // Halo doré subtil (signature 2026).
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.6),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
+            color: AppColors.orJour.withValues(alpha: 0.18),
+            blurRadius: 28,
+          ),
+          // Profondeur sous la card.
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.55),
+            blurRadius: 32,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            // Griot mascot — bouncing victory pose.
-            ScaleTransition(
-              scale: celebScale,
-              child: Image.asset(
-                AppAssets.griotVictory,
-                width: 140,
-                height: 140,
-              ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          // Mascotte griot 96pt — bouncing victory pose.
+          ScaleTransition(
+            scale: celebScale,
+            child: Image.asset(AppAssets.griotVictory, width: 96, height: 96),
+          ),
+          const SizedBox(height: 16),
+          // Mot-réponse — Fraunces displayMd 40pt w700, gold.
+          // Moment éditorial fort : la 1re fois que le mot ivoirien
+          // apparaît au joueur. Centré, sans décoration.
+          Text(
+            devinette.answer,
+            style: AppTypography.displayMd,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          // Explication culturelle (2-3 lignes max).
+          // bodyMd non-italique sur textePrimaire : c'est le moment
+          // pédagogique principal, il mérite la couleur primaire et la
+          // lisibilité maximale (la chute Fraunces 40pt → 14pt italic était
+          // trop violente hiérarchiquement).
+          Text(
+            devinette.explanation,
+            textAlign: TextAlign.center,
+            style: AppTypography.bodyMd.copyWith(
+              color: AppColors.textePrimaire,
+              height: 1.5,
             ),
-            const SizedBox(height: 12),
-            // Subject illustration circle.
-            _SubjectCircle(
-              emoji: subjectEmoji,
-              borderColor: AppColors.orSoleil,
+          ),
+          const SizedBox(height: 24),
+          // Reward cauris — chip pill animé (ka-ching).
+          _CaurisRewardChip(caurisAnim: caurisAnim),
+          const SizedBox(height: 24),
+          // CTA primaire — design system 2026.
+          AppButton(
+            label: 'result.victory.next'.tr(),
+            onPressed: onNext,
+            fullWidth: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Chip pill animée affichant les cauris gagnés (icon + tween 0→N + label).
+///
+/// Remplace l'ancien `Text` plat — c'est le moment "ka-ching" qui doit être
+/// visuellement reconnu comme une récompense, pas comme du texte courant.
+class _CaurisRewardChip extends StatelessWidget {
+  const _CaurisRewardChip({required this.caurisAnim});
+
+  final Animation<int> caurisAnim;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: caurisAnim,
+      builder: (_, __) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.orJour.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(100),
+            border: Border.all(
+              color: AppColors.orJour.withValues(alpha: 0.45),
+              width: 1.5,
             ),
-            const SizedBox(height: 16),
-            // Answer word.
-            Text(
-              devinette.answer,
-              style: AppTypography.bebas(size: 42, color: AppColors.orSoleil),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 14),
-            // Cultural explanation.
-            Text(
-              devinette.explanation,
-              textAlign: TextAlign.center,
-              style: AppTypography.crimson(style: FontStyle.italic),
-            ),
-            const SizedBox(height: 16),
-            // Proverb box.
-            _ProverbBox(proverb: devinette.proverb),
-            const SizedBox(height: 14),
-            // Cauris earned — compteur tween 0 → N (ka-ching).
-            AnimatedBuilder(
-              animation: caurisAnim,
-              builder: (_, __) => Text(
-                'result.victory.cauris_earned'.tr(
-                  namedArgs: <String, String>{'cauris': '${caurisAnim.value}'},
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CaurisIcon(),
+              const SizedBox(width: 8),
+              Text(
+                '+${caurisAnim.value}',
+                style: AppTypography.headingMd.copyWith(
+                  color: AppColors.orJour,
+                  letterSpacing: 1,
                 ),
-                style: AppTypography.bebas(size: 18, color: AppColors.orSoleil),
               ),
-            ),
-            const SizedBox(height: 20),
-            // Next button — design system 2026 (AppButton primary, scale-on-press).
-            AppButton(
-              label: 'result.victory.next'.tr(),
-              onPressed: onNext,
-              fullWidth: true,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SubjectCircle extends StatelessWidget {
-  const _SubjectCircle({required this.emoji, required this.borderColor});
-
-  final String emoji;
-  final Color borderColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.boisFonce,
-        border: Border.all(color: borderColor, width: 2),
-      ),
-      alignment: Alignment.center,
-      child: Text(emoji, style: const TextStyle(fontSize: 56)),
-    );
-  }
-}
-
-class _ProverbBox extends StatelessWidget {
-  const _ProverbBox({required this.proverb});
-
-  final String proverb;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.bois.withValues(alpha: 0.28),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.orSoleil, width: 1.5),
-      ),
-      child: Text(
-        '"$proverb"',
-        textAlign: TextAlign.center,
-        style: AppTypography.crimson(
-          size: 18,
-          color: AppColors.orSoleil,
-          style: FontStyle.italic,
-        ),
-      ),
+              const SizedBox(width: 6),
+              Text(
+                'CAURIS',
+                style: AppTypography.labelSm.copyWith(
+                  color: AppColors.orJour.withValues(alpha: 0.75),
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// Particle system — 12 emoji shot in fan from centre outwards
+// Particle system — 12 emojis projetés en éventail depuis le centre
 // ---------------------------------------------------------------------------
 
 const List<String> _kParticleEmojis = <String>['✨', '🌟', '🪙'];
@@ -321,7 +308,6 @@ class _ParticlePainter extends CustomPainter {
     final maxRadius = size.shortestSide * 0.55;
 
     for (var i = 0; i < particleCount; i++) {
-      // Even fan across 360°.
       final angle = (2 * math.pi / particleCount) * i;
 
       // easeOutCubic curve.

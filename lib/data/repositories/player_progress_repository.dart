@@ -46,8 +46,9 @@ final sharedPreferencesProvider = Provider<SharedPreferences>(
   ),
 );
 
-final playerProgressRepositoryProvider =
-    Provider<PlayerProgressRepository>((ref) {
+final playerProgressRepositoryProvider = Provider<PlayerProgressRepository>((
+  ref,
+) {
   return PlayerProgressRepository(ref.watch(sharedPreferencesProvider));
 });
 
@@ -123,9 +124,33 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     await _repo.reset();
     state = PlayerProgress.initial();
   }
+
+  /// Mémorise l'id d'une devinette qui vient d'être servie au joueur, en
+  /// tête de la liste `recentDevinetteIds` (limitée à 5 entrées).
+  /// Sert l'anti-répétition : ces ids sont exclus du prochain
+  /// `randomFromWorldExcluding`.
+  Future<void> recordRecentDevinette(String devinetteId) async {
+    final list = <String>[devinetteId];
+    for (final id in state.recentDevinetteIds) {
+      if (id == devinetteId) continue; // dédup si déjà en tête plus loin
+      list.add(id);
+      if (list.length >= _recentDevinetteCacheSize) break;
+    }
+    final newState = state.copyWith(recentDevinetteIds: list);
+    state = newState;
+    await _repo.save(newState);
+  }
+
+  /// Taille de la mémoire anti-répétition. 5 suffit en pratique : le pool
+  /// `village_des_or` actuel contient bien plus que 5 devinettes, donc la
+  /// branche fallback de `randomFromWorldExcluding` ne sera quasi-jamais
+  /// déclenchée.
+  static const int _recentDevinetteCacheSize = 5;
 }
 
 final playerProgressProvider =
     StateNotifierProvider<PlayerProgressNotifier, PlayerProgress>((ref) {
-  return PlayerProgressNotifier(ref.watch(playerProgressRepositoryProvider));
-});
+      return PlayerProgressNotifier(
+        ref.watch(playerProgressRepositoryProvider),
+      );
+    });

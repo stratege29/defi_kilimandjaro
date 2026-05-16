@@ -82,6 +82,44 @@ class _GameViewState extends ConsumerState<GameView>
     ref.read(gameControllerProvider(widget.args).notifier).resume();
   }
 
+  /// Construit le header avec contexte montagne (nom + niveau N/M + drapeau).
+  /// Lit `mountainsProvider` pour récupérer le détail vivant. En mode Hub
+  /// (sans `mountainId`), tombe sur le défaut "KILIMANDJARO" sans niveau.
+  Widget _buildHeader(int cauris) {
+    final mountainId = widget.args.mountainId;
+    if (mountainId == null) {
+      return _GameHeader(cauris: cauris, onBack: _confirmBack);
+    }
+
+    final mountainsAsync = ref.watch(mountainsProvider);
+    final mountain = mountainsAsync.maybeWhen(
+      data: (list) => list.cast<Mountain?>().firstWhere(
+        (m) => m?.id == mountainId,
+        orElse: () => null,
+      ),
+      orElse: () => null,
+    );
+
+    if (mountain == null) {
+      return _GameHeader(cauris: cauris, onBack: _confirmBack);
+    }
+
+    // Niveau affiché = celui que le joueur est en train d'essayer
+    // (completedLevels + 1, clampé à totalLevels).
+    final currentLevel = (mountain.completedLevels + 1).clamp(
+      1,
+      mountain.totalLevels,
+    );
+
+    return _GameHeader(
+      cauris: cauris,
+      onBack: _confirmBack,
+      mountainName: mountain.name,
+      levelLabel: 'Niveau $currentLevel / ${mountain.totalLevels}',
+      flagEmoji: mountain.flagEmoji,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = gameControllerProvider(widget.args);
@@ -119,35 +157,30 @@ class _GameViewState extends ConsumerState<GameView>
         body: SafeArea(
           child: Column(
             children: <Widget>[
-              // Header.
-              _GameHeader(cauris: gameState.cauris, onBack: _confirmBack),
+              // Header — montagne en cours + niveau (au lieu du nom d'app).
+              _buildHeader(gameState.cauris),
               const SizedBox(height: 8),
-              // World banner.
-              _WorldBanner(world: widget.args.devinette.world),
-              const SizedBox(height: 12),
               // Riddle card.
               _RiddleCard(riddle: widget.args.devinette.riddle),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               // Timer bar.
               TimerBar(timeLeft: gameState.timeLeft, totalTime: 30),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               // Answer cells.
               AnswerCells(
                 answer: widget.args.devinette.answer,
                 formedLetters: gameState.formedWord,
                 isValidated: gameState.validationCorrect,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               // Circular tile grid (expands to fill space).
               Expanded(
                 child: Center(
                   child: CircularGrid(
                     letters: gameState.displayLetters,
                     selectedIndices: gameState.selectedIndices,
-                    hintRevealedCount: gameState.hintRevealedCount,
-                    answer: widget.args.devinette.answer,
+                    hintTileIndices: gameState.hintTileIndices,
                     phase: gameState.phase,
-                    seed: widget.args.devinette.id,
                     onTileEntered: controller.selectTile,
                     onDragEnd: () {
                       // validate() is called automatically on complete word;
@@ -374,7 +407,16 @@ class _GameViewState extends ConsumerState<GameView>
       final repo = ref.read(devinetteRepositoryProvider);
       // Phase 2.2 stub : devinette aléatoire de "village_des_or".
       // Phase 4 : tag par pays / région (cohérent avec mountain_detail_view).
-      final next = await repo.randomFromWorld('village_des_or');
+      // Anti-répétition : exclut les 5 dernières devinettes jouées
+      // (incluant celle qu'on vient de gagner).
+      final progress = ref.read(playerProgressProvider);
+      final next = await repo.randomFromWorldExcluding(
+        'village_des_or',
+        progress.recentDevinetteIds,
+      );
+      await ref
+          .read(playerProgressProvider.notifier)
+          .recordRecentDevinette(next.id);
       if (!mounted) return;
       context.pushReplacement(
         AppRoutes.game,
@@ -497,15 +539,30 @@ class _RewardedAdChip extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _GameHeader extends StatelessWidget {
-  const _GameHeader({required this.cauris, required this.onBack});
+  const _GameHeader({
+    required this.cauris,
+    required this.onBack,
+    this.mountainName,
+    this.levelLabel,
+    this.flagEmoji,
+  });
 
   final int cauris;
   final VoidCallback onBack;
 
+  /// Nom de la montagne en cours (ex. "MONT NIMBA"). `null` en mode Hub.
+  final String? mountainName;
+
+  /// Sous-titre niveau (ex. "Niveau 3/6"). `null` si pas pertinent.
+  final String? levelLabel;
+
+  /// Drapeau emoji de la montagne (ex. "🇨🇮"). `null` en mode Hub.
+  final String? flagEmoji;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 16, 0),
+      padding: const EdgeInsets.fromLTRB(4, 8, 12, 4),
       child: Row(
         children: <Widget>[
           IconButton(
@@ -514,15 +571,34 @@ class _GameHeader extends StatelessWidget {
             onPressed: onBack,
             tooltip: 'game.back'.tr(),
           ),
-          Text('KILIMANDJARO', style: AppTypography.bebas()),
-          const Spacer(),
-          // Audio indicator (static, toggle handled in profile).
-          Opacity(
-            opacity: 0.85,
-            child: Image.asset(AppAssets.iconAudioOn, width: 24, height: 24),
+          if (flagEmoji != null) ...[
+            Text(flagEmoji!, style: const TextStyle(fontSize: 22)),
+            const SizedBox(width: 8),
+          ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  (mountainName ?? 'KILIMANDJARO').toUpperCase(),
+                  style: AppTypography.bebas(size: 18, letterSpacing: 1.5),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (levelLabel != null)
+                  Text(
+                    levelLabel!,
+                    style: AppTypography.crimson(
+                      size: 12,
+                      color: AppColors.texteSecondaire,
+                      style: FontStyle.italic,
+                    ),
+                  ),
+              ],
+            ),
           ),
-          const SizedBox(width: 12),
-          // Cauris chip.
+          const SizedBox(width: 8),
+          // Cauris chip (la pile de cauris du joueur).
           _CaurisChip(cauris: cauris),
         ],
       ),
@@ -559,40 +635,6 @@ class _CaurisChip extends StatelessWidget {
   }
 }
 
-class _WorldBanner extends StatelessWidget {
-  const _WorldBanner({required this.world});
-
-  final String world;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.bois.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const Text('🏘️', style: TextStyle(fontSize: 16)),
-          const SizedBox(width: 6),
-          Text(
-            world.replaceAll('_', ' ').toUpperCase(),
-            style: AppTypography.bebas(
-              size: 13,
-              color: AppColors.tagline,
-              letterSpacing: 1.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _RiddleCard extends StatelessWidget {
   const _RiddleCard({required this.riddle});
 
@@ -601,13 +643,13 @@ class _RiddleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.fromLTRB(14, 14, 16, 14),
       decoration: BoxDecoration(
-        color: AppColors.boisFonce.withValues(alpha: 0.85),
+        color: AppColors.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.orChaud.withValues(alpha: 0.5),
+          color: AppColors.orJour.withValues(alpha: 0.6),
           width: 1.5,
         ),
         boxShadow: <BoxShadow>[
@@ -621,14 +663,19 @@ class _RiddleCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // Griot avatar.
-          Image.asset(AppAssets.griotIdle, width: 64, height: 64),
-          const SizedBox(width: 10),
-          // Riddle text.
+          // Griot avatar — réduit à 48pt pour libérer largeur texte.
+          Image.asset(AppAssets.griotIdle, width: 48, height: 48),
+          const SizedBox(width: 12),
+          // Énoncé — bodyMd non-italique sur textePrimaire pour scan rapide.
+          // L'italique est réservé aux proverbes/encouragements.
           Expanded(
             child: Text(
               riddle,
-              style: AppTypography.crimson(size: 15, style: FontStyle.italic),
+              style: AppTypography.bodyMd.copyWith(
+                fontSize: 16,
+                height: 1.45,
+                color: AppColors.textePrimaire,
+              ),
             ),
           ),
         ],

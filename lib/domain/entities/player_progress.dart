@@ -13,15 +13,16 @@ class PlayerProgress extends Equatable {
     this.lastPlayDate,
     this.consecutiveFailures = 0,
     this.noAdsPurchased = false,
+    this.recentDevinetteIds = const <String>[],
   });
 
   /// État initial pour un nouveau joueur.
   factory PlayerProgress.initial() => const PlayerProgress(
-        cauris: 120,
-        completedLevelsByMountain: <String, int>{},
-        totalLevelsCompleted: 0,
-        dailyStreak: 0,
-      );
+    cauris: 120,
+    completedLevelsByMountain: <String, int>{},
+    totalLevelsCompleted: 0,
+    dailyStreak: 0,
+  );
 
   factory PlayerProgress.fromJson(Map<String, dynamic> json) {
     // Tolère l'ancienne clé `coins` pour ne pas perdre le solde des
@@ -38,6 +39,10 @@ class PlayerProgress extends Equatable {
           : DateTime.tryParse(json['last_play'] as String),
       consecutiveFailures: (json['consecutive_failures'] as int?) ?? 0,
       noAdsPurchased: (json['no_ads'] as bool?) ?? false,
+      recentDevinetteIds:
+          ((json['recent_devinettes'] as List<dynamic>?) ?? <dynamic>[])
+              .map((e) => e as String)
+              .toList(growable: false),
     );
   }
 
@@ -63,19 +68,25 @@ class PlayerProgress extends Equatable {
   /// Achat non-consumable "Supprimer les pubs" (4,99 €).
   final bool noAdsPurchased;
 
+  /// Ids des dernières devinettes jouées (les plus récentes en tête).
+  /// Limité à 5 entrées dans le notifier. Utilisé pour exclure ces ids
+  /// du tirage `randomFromWorldExcluding` → évite la frustration de
+  /// retomber sur la même devinette deux fois de suite.
+  final List<String> recentDevinetteIds;
+
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'cauris': cauris,
-        'levels': completedLevelsByMountain,
-        'total': totalLevelsCompleted,
-        'streak': dailyStreak,
-        'last_play': lastPlayDate?.toIso8601String(),
-        'consecutive_failures': consecutiveFailures,
-        'no_ads': noAdsPurchased,
-      };
+    'cauris': cauris,
+    'levels': completedLevelsByMountain,
+    'total': totalLevelsCompleted,
+    'streak': dailyStreak,
+    'last_play': lastPlayDate?.toIso8601String(),
+    'consecutive_failures': consecutiveFailures,
+    'no_ads': noAdsPurchased,
+    'recent_devinettes': recentDevinetteIds,
+  };
 
   /// Combien de niveaux complétés sur cette montagne.
-  int levelsOn(String mountainId) =>
-      completedLevelsByMountain[mountainId] ?? 0;
+  int levelsOn(String mountainId) => completedLevelsByMountain[mountainId] ?? 0;
 
   PlayerProgress copyWith({
     int? cauris,
@@ -85,6 +96,7 @@ class PlayerProgress extends Equatable {
     DateTime? lastPlayDate,
     int? consecutiveFailures,
     bool? noAdsPurchased,
+    List<String>? recentDevinetteIds,
   }) {
     return PlayerProgress(
       cauris: cauris ?? this.cauris,
@@ -95,17 +107,19 @@ class PlayerProgress extends Equatable {
       lastPlayDate: lastPlayDate ?? this.lastPlayDate,
       consecutiveFailures: consecutiveFailures ?? this.consecutiveFailures,
       noAdsPurchased: noAdsPurchased ?? this.noAdsPurchased,
+      recentDevinetteIds: recentDevinetteIds ?? this.recentDevinetteIds,
     );
   }
 
   @override
   List<Object?> get props => [
-        cauris,
-        completedLevelsByMountain,
-        totalLevelsCompleted,
-        dailyStreak,
-        lastPlayDate,
-        consecutiveFailures,
-        noAdsPurchased,
-      ];
+    cauris,
+    completedLevelsByMountain,
+    totalLevelsCompleted,
+    dailyStreak,
+    lastPlayDate,
+    consecutiveFailures,
+    noAdsPurchased,
+    recentDevinetteIds,
+  ];
 }

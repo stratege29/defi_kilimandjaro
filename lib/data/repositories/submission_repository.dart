@@ -15,9 +15,9 @@ class SubmissionDraft {
     required this.answer,
     required this.riddle,
     required this.explanation,
-    required this.proverb,
     required this.difficulty,
     required this.tags,
+    this.proverb = '',
     this.authorDisplayName,
   });
 
@@ -27,24 +27,28 @@ class SubmissionDraft {
   final String answer;
   final String riddle;
   final String explanation;
+
+  /// Proverbe — optionnel (champ retiré du formulaire de soumission, mais
+  /// conservé dans le DTO pour la rétro-compat des drafts en queue locale
+  /// + tolérance future si on réintroduit le champ).
   final String proverb;
   final int difficulty;
   final List<String> tags;
   final String? authorDisplayName;
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'world': world,
-        'country': country,
-        'lang': lang,
-        'answer': answer,
-        'riddle': riddle,
-        'explanation': explanation,
-        'proverb': proverb,
-        'difficulty': difficulty,
-        'tags': tags,
-        if (authorDisplayName != null && authorDisplayName!.isNotEmpty)
-          'authorDisplayName': authorDisplayName,
-      };
+    'world': world,
+    'country': country,
+    'lang': lang,
+    'answer': answer,
+    'riddle': riddle,
+    'explanation': explanation,
+    if (proverb.isNotEmpty) 'proverb': proverb,
+    'difficulty': difficulty,
+    'tags': tags,
+    if (authorDisplayName != null && authorDisplayName!.isNotEmpty)
+      'authorDisplayName': authorDisplayName,
+  };
 }
 
 /// Erreurs métier remontées par la Cloud Function `submitDevinette`.
@@ -62,9 +66,9 @@ class SubmissionRepository {
     required FirebaseFunctions functions,
     required FirebaseAuth auth,
     required FirebaseFirestore firestore,
-  })  : _functions = functions,
-        _auth = auth,
-        _firestore = firestore;
+  }) : _functions = functions,
+       _auth = auth,
+       _firestore = firestore;
 
   final FirebaseFunctions _functions;
   final FirebaseAuth _auth;
@@ -98,10 +102,13 @@ class SubmissionRepository {
         .where('authorUid', isEqualTo: uid)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-            .map((d) =>
-                DevinetteSubmission.fromJson({...d.data(), 'id': d.id}))
-            .toList(growable: false));
+        .map(
+          (snap) => snap.docs
+              .map(
+                (d) => DevinetteSubmission.fromJson({...d.data(), 'id': d.id}),
+              )
+              .toList(growable: false),
+        );
   }
 }
 
@@ -121,5 +128,5 @@ final submissionRepositoryProvider = Provider<SubmissionRepository>((ref) {
 
 final mySubmissionsProvider =
     StreamProvider.autoDispose<List<DevinetteSubmission>>((ref) {
-  return ref.watch(submissionRepositoryProvider).watchMine();
-});
+      return ref.watch(submissionRepositoryProvider).watchMine();
+    });

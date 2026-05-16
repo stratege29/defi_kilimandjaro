@@ -8,11 +8,7 @@ import 'package:flutter/material.dart';
 /// - Orange si timeLeft < 15 s
 /// - Rouge avec shimmer si timeLeft < 8 s
 class TimerBar extends StatefulWidget {
-  const TimerBar({
-    required this.timeLeft,
-    required this.totalTime,
-    super.key,
-  });
+  const TimerBar({required this.timeLeft, required this.totalTime, super.key});
 
   final int timeLeft;
   final int totalTime;
@@ -34,9 +30,12 @@ class _TimerBarState extends State<TimerBar>
       duration: const Duration(milliseconds: 800),
     )..repeat(reverse: true);
 
-    _shimmerAnim = Tween<double>(begin: 0.6, end: 1).animate(
-      CurvedAnimation(parent: _shimmerCtrl, curve: Curves.easeInOut),
-    );
+    // Plage de pulsation élargie (0.4-1.0) pour rendre le danger lisible
+    // de loin — l'alpha shimmer module fortement la barre rouge en sub-8s.
+    _shimmerAnim = Tween<double>(
+      begin: 0.4,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _shimmerCtrl, curve: Curves.easeInOut));
   }
 
   @override
@@ -53,31 +52,34 @@ class _TimerBarState extends State<TimerBar>
 
   @override
   Widget build(BuildContext context) {
-    final progress =
-        widget.totalTime == 0 ? 0.0 : widget.timeLeft / widget.totalTime;
+    final progress = widget.totalTime == 0
+        ? 0.0
+        : widget.timeLeft / widget.totalTime;
     final barColor = _barColor();
     final isDanger = widget.timeLeft < 8;
 
     return RepaintBoundary(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
-            // Tam-tam icon
-            const Text('🥁', style: TextStyle(fontSize: 18)),
+            // Icône timer — Material rounded, cohérent avec le système d'icônes.
+            Icon(Icons.timer_outlined, size: 18, color: barColor),
             const SizedBox(width: 8),
-            // Progress bar
+            // Progress bar — scale subtilement (0.97-1.03) en danger pour
+            // accentuer la tension visuelle au-delà du shimmer alpha.
             Expanded(
               child: AnimatedBuilder(
                 animation: _shimmerAnim,
                 builder: (_, __) {
-                  return ClipRRect(
+                  final bar = ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 8,
-                      backgroundColor:
-                          AppColors.boisFonce.withValues(alpha: 0.5),
+                      backgroundColor: AppColors.boisFonce.withValues(
+                        alpha: 0.5,
+                      ),
                       valueColor: AlwaysStoppedAnimation<Color>(
                         isDanger
                             ? barColor.withValues(alpha: _shimmerAnim.value)
@@ -85,6 +87,10 @@ class _TimerBarState extends State<TimerBar>
                       ),
                     ),
                   );
+                  if (!isDanger) return bar;
+                  // 0.0 → scale 1.03, 1.0 → scale 0.97, sync avec shimmer.
+                  final scale = 1.03 - (1 - _shimmerAnim.value) * 0.06;
+                  return Transform.scale(scaleY: scale, child: bar);
                 },
               ),
             ),
@@ -93,15 +99,9 @@ class _TimerBarState extends State<TimerBar>
             SizedBox(
               width: 28,
               child: AnimatedDefaultTextStyle(
-                style: AppTypography.bebas(
-                  size: 18,
-                  color: barColor,
-                ),
+                style: AppTypography.bebas(size: 18, color: barColor),
                 duration: const Duration(milliseconds: 300),
-                child: Text(
-                  '${widget.timeLeft}',
-                  textAlign: TextAlign.center,
-                ),
+                child: Text('${widget.timeLeft}', textAlign: TextAlign.center),
               ),
             ),
           ],

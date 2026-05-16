@@ -86,28 +86,34 @@ class _MountainConquestViewState extends State<MountainConquestView>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: AnimatedBuilder(
-            animation: _particleCtrl,
-            builder: (_, __) => CustomPaint(
-              painter: _StarBurstPainter(progress: _particleCtrl.value),
+    // Material(transparency) : fournit le DefaultTextStyle ancestor pour
+    // que les Text n'aient pas le souligné debug "missing material"
+    // (même bugfix que VictoryView).
+    return Material(
+      type: MaterialType.transparency,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: _particleCtrl,
+              builder: (_, __) => CustomPaint(
+                painter: _StarBurstPainter(progress: _particleCtrl.value),
+              ),
             ),
           ),
-        ),
-        Center(
-          child: ScaleTransition(
-            scale: _cardScale,
-            child: _ConquestCard(
-              mountain: widget.mountain,
-              altitudeLabel: _formatAltitude(widget.mountain.altitude),
-              haloPulse: _haloPulse,
-              onContinue: widget.onContinue,
+          Center(
+            child: ScaleTransition(
+              scale: _cardScale,
+              child: _ConquestCard(
+                mountain: widget.mountain,
+                altitudeLabel: _formatAltitude(widget.mountain.altitude),
+                haloPulse: _haloPulse,
+                onContinue: widget.onContinue,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -131,28 +137,29 @@ class _ConquestCard extends StatelessWidget {
     return Container(
       width: screenWidth * 0.88,
       constraints: const BoxConstraints(maxWidth: 440),
-      padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
       decoration: BoxDecoration(
-        color: AppColors.boisFonce.withValues(alpha: 0.97),
+        // Palette 2026 : surface opaque + border or fin + double shadow
+        // (halo subtil + profondeur). Aligné avec VictoryView refondu.
+        color: AppColors.surfaceContainer,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppColors.orSoleil, width: 3),
+        border: Border.all(color: AppColors.orJour, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: AppColors.orSoleil.withValues(alpha: 0.25),
+            color: AppColors.orJour.withValues(alpha: 0.20),
             blurRadius: 32,
-            spreadRadius: 2,
           ),
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.6),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.55),
+            blurRadius: 32,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Halo pulsant derrière le drapeau.
+          // Halo pulsant derrière le drapeau — signature anim de l'écran.
           SizedBox(
             width: 160,
             height: 160,
@@ -166,7 +173,7 @@ class _ConquestCard extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.orSoleil.withValues(
+                        color: AppColors.orJour.withValues(
                           alpha: 0.18 * (1 - haloPulse.value),
                         ),
                       ),
@@ -178,7 +185,7 @@ class _ConquestCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColors.bois.withValues(alpha: 0.4),
-                      border: Border.all(color: AppColors.orSoleil, width: 2.5),
+                      border: Border.all(color: AppColors.orJour, width: 1.5),
                     ),
                     alignment: Alignment.center,
                     child: child,
@@ -191,24 +198,23 @@ class _ConquestCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
+          // Eyebrow — sobre, Barlow Cond 14pt all-caps espacé.
           Text(
             'TU AS CONQUIS',
             style: AppTypography.bebas(
-              size: 18,
+              size: 14,
               color: AppColors.texteSecondaire,
               letterSpacing: 4,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
+          // Nom de la montagne — Fraunces displaySm (32pt w700).
+          // Moment éditorial fort : naming d'un sommet ivoirien conquis.
           Text(
             mountain.name.toUpperCase(),
             textAlign: TextAlign.center,
-            style: AppTypography.bebas(
-              size: 34,
-              color: AppColors.orSoleil,
-              letterSpacing: 1.5,
-            ),
+            style: AppTypography.displaySm.copyWith(letterSpacing: 1),
           ),
           const SizedBox(height: 4),
           Text(
@@ -219,23 +225,18 @@ class _ConquestCard extends StatelessWidget {
               style: FontStyle.italic,
             ),
           ),
-          const SizedBox(height: 14),
-          // Altitude — chiffre fort.
+          const SizedBox(height: 16),
+          // Altitude — Fraunces displayLg (48pt w800), chiffre prestige
+          // type scoreboard athlétique.
           Text.rich(
             TextSpan(
               children: [
-                TextSpan(
-                  text: altitudeLabel,
-                  style: AppTypography.bebas(
-                    size: 56,
-                    color: AppColors.orSoleil,
-                  ),
-                ),
+                TextSpan(text: altitudeLabel, style: AppTypography.displayLg),
                 TextSpan(
                   text: ' m',
-                  style: AppTypography.bebas(
-                    size: 24,
-                    color: AppColors.orSoleil.withValues(alpha: 0.7),
+                  style: AppTypography.displayLg.copyWith(
+                    fontSize: 22,
+                    color: AppColors.orJour.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -246,7 +247,7 @@ class _ConquestCard extends StatelessWidget {
             '${mountain.totalLevels} devinettes maîtrisées',
             style: AppTypography.crimson(
               size: 13,
-              color: AppColors.texteSecondaire,
+              color: AppColors.texteTertiaire,
               style: FontStyle.italic,
             ),
           ),

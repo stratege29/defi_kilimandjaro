@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
@@ -81,13 +82,21 @@ class _SplashViewState extends ConsumerState<SplashView>
                 ),
               ),
             ),
-            // Logo central
+            // Logo central — PNG stylé (cohérent avec le native splash).
+            // Pas de Text('K') ici : on conserve l'identité visuelle du
+            // logo design tout au long du démarrage (zéro flash de
+            // transition entre native splash et SplashView Flutter).
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('K', style: AppTypography.logoK),
-                const SizedBox(height: 8),
+                Image.asset(
+                  AppAssets.logoK,
+                  width: 140,
+                  height: 140,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(height: 12),
                 Text('KILIMANDJARO', style: AppTypography.logoTitle),
                 const SizedBox(height: 6),
                 Text(
@@ -101,10 +110,7 @@ class _SplashViewState extends ConsumerState<SplashView>
               bottom: 80,
               child: ScaleTransition(
                 scale: Tween<double>(begin: 0.8, end: 1.2).animate(
-                  CurvedAnimation(
-                    parent: _pulseCtrl,
-                    curve: Curves.easeInOut,
-                  ),
+                  CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
                 ),
                 child: Container(
                   width: 14,

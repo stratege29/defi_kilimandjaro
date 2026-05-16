@@ -27,9 +27,9 @@ class CompositeDevinetteRepository implements DevinetteRepository {
     required BundledDevinetteDatasource bundled,
     required LocalDevinetteCacheDatasource cache,
     Random? rng,
-  })  : _bundled = bundled,
-        _cache = cache,
-        _rng = rng ?? Random();
+  }) : _bundled = bundled,
+       _cache = cache,
+       _rng = rng ?? Random();
 
   final BundledDevinetteDatasource _bundled;
   final LocalDevinetteCacheDatasource _cache;
@@ -48,9 +48,7 @@ class CompositeDevinetteRepository implements DevinetteRepository {
 
     // Merge : `cached` peut contenir remotePack ET community ; on dédup par
     // `id`. Les entrées cached supplantent les bundlées.
-    final byId = <String, Devinette>{
-      for (final d in bundled) d.id: d,
-    };
+    final byId = <String, Devinette>{for (final d in bundled) d.id: d};
     for (final d in cached) {
       byId[d.id] = d;
     }
@@ -64,6 +62,21 @@ class CompositeDevinetteRepository implements DevinetteRepository {
       throw StateError('Aucune devinette dans le monde "$worldId"');
     }
     return list[_rng.nextInt(list.length)];
+  }
+
+  @override
+  Future<Devinette> randomFromWorldExcluding(
+    String worldId,
+    Iterable<String> excludeIds,
+  ) async {
+    final list = await loadWorld(worldId);
+    if (list.isEmpty) {
+      throw StateError('Aucune devinette dans le monde "$worldId"');
+    }
+    final exclude = excludeIds.toSet();
+    final pool = list.where((d) => !exclude.contains(d.id)).toList();
+    if (pool.isEmpty) return list[_rng.nextInt(list.length)];
+    return pool[_rng.nextInt(pool.length)];
   }
 
   @override
@@ -87,23 +100,26 @@ final devinetteDatabaseProvider = Provider<DevinetteDatabase>((ref) {
   return db;
 });
 
-final bundledDevinetteDatasourceProvider =
-    Provider<BundledDevinetteDatasource>((ref) {
-  return BundledDevinetteDatasource();
-});
+final bundledDevinetteDatasourceProvider = Provider<BundledDevinetteDatasource>(
+  (ref) {
+    return BundledDevinetteDatasource();
+  },
+);
 
 final localDevinetteCacheDatasourceProvider =
     Provider<LocalDevinetteCacheDatasource>((ref) {
-  return LocalDevinetteCacheDatasource(ref.watch(devinetteDatabaseProvider));
-});
+      return LocalDevinetteCacheDatasource(
+        ref.watch(devinetteDatabaseProvider),
+      );
+    });
 
 /// Datasource Firestore + Storage. Tests : override avec un fake.
 final remoteDevinettePackDatasourceProvider =
     Provider<RemoteDevinettePackDatasource>((ref) {
-  return RemoteDevinettePackDatasource(
-    firestore: FirebaseFirestore.instance,
-  );
-});
+      return RemoteDevinettePackDatasource(
+        firestore: FirebaseFirestore.instance,
+      );
+    });
 
 /// Service de synchro des manifests Firestore (+ download des packs Storage).
 /// À déclencher en fire-and-forget après le first-frame.
@@ -124,8 +140,9 @@ final manifestSyncServiceProvider = Provider<ManifestSyncService>((ref) {
 /// Provider du repository composite — c'est l'implémentation par défaut
 /// utilisée à travers l'app via `devinetteRepositoryProvider` (cf.
 /// `devinette_repository_impl.dart`).
-final compositeDevinetteRepositoryProvider =
-    Provider<DevinetteRepository>((ref) {
+final compositeDevinetteRepositoryProvider = Provider<DevinetteRepository>((
+  ref,
+) {
   return CompositeDevinetteRepository(
     bundled: ref.watch(bundledDevinetteDatasourceProvider),
     cache: ref.watch(localDevinetteCacheDatasourceProvider),
