@@ -81,10 +81,62 @@ class _CircularGridState extends State<CircularGrid> {
   /// Position courante du doigt pendant le drag.
   Offset? _fingerPosition;
 
+  /// Dernière tuile touchée par le hit-test, pour ne notifier
+  /// `onTileEntered` qu'aux transitions et éviter le toggle en boucle.
+  int? _lastHitIdx;
+
+  /// Tracé brut du doigt depuis le début de la sélection.
+  ///
+  /// Contient à la fois les positions enregistrées pendant le drag et les
+  /// centres des tuiles « snappés » à chaque ajout de lettre. Permet au
+  /// `GoldenPath` de dessiner exactement le chemin pris par l'utilisateur
+  /// (y compris s'il passe à l'extérieur du cercle des lettres pour relier
+  /// deux tuiles).
+  final List<Offset> _trail = <Offset>[];
+
+  /// Pour chaque lettre actuellement sélectionnée (dans l'ordre), l'index
+  /// dans `_trail` du point « snap » correspondant. Permet de tronquer
+  /// proprement le tracé quand la sélection rétrécit (re-tap, slide-back).
+  final List<int> _letterTrailIndices = <int>[];
+
   @override
   void initState() {
     super.initState();
     _pattern = pickPattern(widget.letters.length, math.Random());
+  }
+
+  @override
+  void didUpdateWidget(CircularGrid oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncTrailWithSelection(oldWidget.selectedIndices.length);
+  }
+
+  /// Aligne `_trail` / `_letterTrailIndices` sur l'état courant de la
+  /// sélection. Appelé après chaque changement de `selectedIndices`.
+  void _syncTrailWithSelection(int oldLen) {
+    final newLen = widget.selectedIndices.length;
+    if (newLen == oldLen) return;
+    if (newLen == 0) {
+      _trail.clear();
+      _letterTrailIndices.clear();
+      return;
+    }
+    if (newLen > oldLen) {
+      for (var i = oldLen; i < newLen; i++) {
+        final tileIdx = widget.selectedIndices[i];
+        if (tileIdx >= _tileCenters.length) continue;
+        _trail.add(_tileCenters[tileIdx]);
+        _letterTrailIndices.add(_trail.length - 1);
+      }
+      return;
+    }
+    // newLen < oldLen : sélection rétrécie → on coupe le tracé après la
+    // nouvelle dernière lettre pour repartir proprement de son centre.
+    final keepUntil = _letterTrailIndices[newLen - 1] + 1;
+    if (keepUntil < _trail.length) {
+      _trail.removeRange(keepUntil, _trail.length);
+    }
+    _letterTrailIndices.removeRange(newLen, _letterTrailIndices.length);
   }
 
   int? _hitTest(Offset localPos) {
@@ -101,29 +153,56 @@ class _CircularGridState extends State<CircularGrid> {
   void _onPointerDown(PointerDownEvent event) {
     final idx = _hitTest(event.localPosition);
     if (idx != null) {
+      _lastHitIdx = idx;
+      // Tap discret : on délègue toujours (ajoute si nouvelle, retire/tronque
+      // si déjà sélectionnée — intentionnel et explicite côté utilisateur).
       widget.onTileEntered(idx);
     }
     setState(() => _fingerPosition = event.localPosition);
   }
 
   void _onPointerMove(PointerMoveEvent event) {
+    // Enregistre la position du doigt dans le tracé tant qu'au moins une
+    // lettre est sélectionnée (sinon on traînerait des points orphelins).
+    if (widget.selectedIndices.isNotEmpty) {
+      _trail.add(event.localPosition);
+    }
     final idx = _hitTest(event.localPosition);
-    if (idx != null) {
-      widget.onTileEntered(idx);
+    if (idx != _lastHitIdx) {
+      _lastHitIdx = idx;
+      if (idx != null) {
+        // Anti-wobble : pendant un drag, on ignore la ré-entrée sur la
+        // DERNIÈRE lettre sélectionnée (sinon un léger tremblement du
+        // doigt la ferait clignoter). Le retrait reste possible via un
+        // tap discret (pointer down) ou un slide-back sur une lettre
+        // antérieure du chemin.
+        final isLastSelected = widget.selectedIndices.isNotEmpty &&
+            widget.selectedIndices.last == idx;
+        if (!isLastSelected) {
+          widget.onTileEntered(idx);
+        }
+      }
     }
     setState(() => _fingerPosition = event.localPosition);
   }
 
   void _onPointerUp(PointerUpEvent event) {
     widget.onDragEnd();
+    _lastHitIdx = null;
+    // Si la course a été interrompue entre deux lettres (doigt levé à
+    // mi-chemin), on retaille le tracé jusqu'au centre de la dernière
+    // lettre validée. Sans ça, une « queue » orpheline reste affichée
+    // entre la dernière tuile et l'endroit où le doigt s'est levé.
+    if (_letterTrailIndices.isNotEmpty) {
+      final keepUntil = _letterTrailIndices.last + 1;
+      if (keepUntil < _trail.length) {
+        _trail.removeRange(keepUntil, _trail.length);
+      }
+    } else {
+      _trail.clear();
+    }
     setState(() => _fingerPosition = null);
   }
-
-  // Centers of selected tiles for the golden path.
-  List<Offset> get _selectedCenters => widget.selectedIndices
-      .where((i) => i < _tileCenters.length)
-      .map((i) => _tileCenters[i])
-      .toList(growable: false);
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +238,7 @@ class _CircularGridState extends State<CircularGrid> {
               children: <Widget>[
                 Positioned.fill(
                   child: GoldenPath(
-                    centers: _selectedCenters,
+                    points: _trail,
                     fingerPosition: _fingerPosition,
                   ),
                 ),
