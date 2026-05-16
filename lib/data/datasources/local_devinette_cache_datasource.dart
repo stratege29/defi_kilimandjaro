@@ -10,38 +10,38 @@ class LocalDevinetteCacheDatasource {
 
   final DevinetteDatabase _db;
 
-  /// Charge toutes les devinettes en cache pour un monde (packs distants +
+  /// Charge toutes les devinettes en cache pour un pack (packs distants +
   /// communautaires). Le starter pack bundlé est lu ailleurs.
-  Future<List<Devinette>> loadByWorld(String world) {
-    return _db.devinetteDao.loadByWorld(world);
+  Future<List<Devinette>> loadByPack(String pack) {
+    return _db.devinetteDao.loadByPack(pack);
   }
 
   /// Remplace le contenu d'un pack atomiquement (delete + insert dans une
   /// transaction). À appeler après un download + hash verify réussi.
   Future<void> replacePackContents({
-    required String world,
+    required String pack,
     required DevinetteSource source,
     required List<Devinette> devinettes,
     required int packVersion,
   }) {
     return _db.devinetteDao.replacePackContents(
-      world: world,
+      pack: pack,
       source: source,
       devinettes: devinettes,
       packVersion: packVersion,
     );
   }
 
-  /// Compte les entrées en cache pour un monde.
-  Future<int> countByWorld(String world) =>
-      _db.devinetteDao.countByWorld(world);
+  /// Compte les entrées en cache pour un pack.
+  Future<int> countByPack(String pack) =>
+      _db.devinetteDao.countByPack(pack);
 
   /// Supprime un pack spécifique (kill-switch via Remote Config par exemple).
   Future<void> deletePack({
-    required String world,
+    required String pack,
     required DevinetteSource source,
   }) {
-    return _db.devinetteDao.deletePack(world: world, source: source);
+    return _db.devinetteDao.deletePack(pack: pack, source: source);
   }
 
   /// État local d'un pack (version installée, hash, comptage).
@@ -50,7 +50,7 @@ class LocalDevinetteCacheDatasource {
 
   Future<void> upsertPackState({
     required String packId,
-    required String world,
+    required String pack,
     required int packVersion,
     required String hashSha256,
     required int sizeBytes,
@@ -58,7 +58,7 @@ class LocalDevinetteCacheDatasource {
   }) {
     return _db.packStateDao.upsert(
       packId: packId,
-      world: world,
+      pack: pack,
       packVersion: packVersion,
       hashSha256: hashSha256,
       sizeBytes: sizeBytes,

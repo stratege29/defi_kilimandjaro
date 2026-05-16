@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -128,7 +129,7 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
   /// Mémorise l'id d'une devinette qui vient d'être servie au joueur, en
   /// tête de la liste `recentDevinetteIds` (limitée à 5 entrées).
   /// Sert l'anti-répétition : ces ids sont exclus du prochain
-  /// `randomFromWorldExcluding`.
+  /// `randomFromPackExcluding`.
   Future<void> recordRecentDevinette(String devinetteId) async {
     final list = <String>[devinetteId];
     for (final id in state.recentDevinetteIds) {
@@ -142,10 +143,75 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
   }
 
   /// Taille de la mémoire anti-répétition. 5 suffit en pratique : le pool
-  /// `village_des_or` actuel contient bien plus que 5 devinettes, donc la
-  /// branche fallback de `randomFromWorldExcluding` ne sera quasi-jamais
+  /// `culture_ci` actuel contient bien plus que 5 devinettes, donc la
+  /// branche fallback de `randomFromPackExcluding` ne sera quasi-jamais
   /// déclenchée.
   static const int _recentDevinetteCacheSize = 5;
+
+  // ---------------------------------------------------------------------
+  // Packs thématiques (Phase 2 — sprint contenu)
+  // ---------------------------------------------------------------------
+
+  /// Sélectionne le pack gratuit initial — **opération à usage unique**.
+  ///
+  /// Règle produit verrouillée par le PO : le pack gratuit est définitif.
+  /// Appel ultérieur ignoré silencieusement (retourne `false`) pour ne pas
+  /// casser un re-tap accidentel sur l'écran d'onboarding.
+  ///
+  /// Effets de bord :
+  /// - ajoute `packId` à [PlayerProgress.ownedPacks] ;
+  /// - définit [PlayerProgress.freePackChosen] = `packId` ;
+  /// - bascule [PlayerProgress.activePackMix] sur `PackMix.single(packId)`.
+  Future<bool> chooseFreePack(String packId) async {
+    if (state.hasChosenFreePack) return false;
+    if (packId.isEmpty) {
+      throw ArgumentError.value(packId, 'packId', 'must not be empty');
+    }
+    final owned = <String>{...state.ownedPacks, packId};
+    final newState = state.copyWith(
+      ownedPacks: owned,
+      freePackChosen: packId,
+      activePackMix: PackMix.single(packId),
+    );
+    state = newState;
+    await _repo.save(newState);
+    return true;
+  }
+
+  /// Marque un pack comme acquis (post-achat IAP ou cauris).
+  ///
+  /// N'affecte PAS [PlayerProgress.activePackMix] — l'utilisateur devra
+  /// explicitement ajouter le nouveau pack à son mix via [setPackMix]
+  /// (écran "Mes packs" de la Phase 3). Idempotent.
+  Future<void> grantPack(String packId) async {
+    if (packId.isEmpty) {
+      throw ArgumentError.value(packId, 'packId', 'must not be empty');
+    }
+    if (state.ownedPacks.contains(packId)) return;
+    final newState = state.copyWith(
+      ownedPacks: <String>{...state.ownedPacks, packId},
+    );
+    state = newState;
+    await _repo.save(newState);
+  }
+
+  /// Met à jour la pondération active. Valide que tous les `packId` du mix
+  /// sont possédés — lève [ArgumentError] sinon (l'UI doit pré-valider avant
+  /// d'appeler ce setter).
+  Future<void> setPackMix(PackMix mix) async {
+    final unknown = mix.packIds.difference(state.ownedPacks);
+    if (unknown.isNotEmpty) {
+      throw ArgumentError.value(
+        mix,
+        'mix',
+        'PackMix references packs not owned by the player: $unknown',
+      );
+    }
+    if (mix == state.activePackMix) return;
+    final newState = state.copyWith(activePackMix: mix);
+    state = newState;
+    await _repo.save(newState);
+  }
 }
 
 final playerProgressProvider =
@@ -154,3 +220,36 @@ final playerProgressProvider =
         ref.watch(playerProgressRepositoryProvider),
       );
     });
+
+// ---------------------------------------------------------------------------
+// Providers dérivés — packs thématiques.
+//
+// Pourquoi des providers dérivés plutôt qu'un nouveau StateNotifier dédié :
+// la source unique de persistance est [PlayerProgressNotifier]. Dériver
+// évite les race conditions multi-stores et reste cohérent avec le reste
+// du projet (cauris, achats no-ads, streaks vivent déjà dans
+// [PlayerProgress]). L'API en lecture reste granulaire pour ne pas
+// re-rendre toute l'UI à chaque mutation non-pack.
+// ---------------------------------------------------------------------------
+
+/// Set des packs possédés par le joueur (inclut le pack gratuit initial).
+final ownedPacksProvider = Provider<Set<String>>((ref) {
+  return ref.watch(playerProgressProvider.select((p) => p.ownedPacks));
+});
+
+/// ID du pack gratuit choisi à l'onboarding (immuable une fois défini).
+/// `null` tant que l'utilisateur n'a pas choisi.
+final freePackChosenProvider = Provider<String?>((ref) {
+  return ref.watch(playerProgressProvider.select((p) => p.freePackChosen));
+});
+
+/// Drapeau d'onboarding : true quand l'utilisateur a fait son choix.
+final hasChosenFreePackProvider = Provider<bool>((ref) {
+  return ref.watch(playerProgressProvider.select((p) => p.hasChosenFreePack));
+});
+
+/// Pondération active pour le tirage des devinettes.
+/// Setter via `ref.read(playerProgressProvider.notifier).setPackMix(mix)`.
+final packMixProvider = Provider<PackMix>((ref) {
+  return ref.watch(playerProgressProvider.select((p) => p.activePackMix));
+});

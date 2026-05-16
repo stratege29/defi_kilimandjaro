@@ -1,12 +1,12 @@
 /// Représentation Dart d'un manifest pack tel que stocké dans Firestore
-/// (`content_packs/{worldId}` ou `content_packs/{worldId}_community`).
+/// (`content_packs/{packId}` ou `content_packs/{packId}_community`).
 ///
 /// Voir `firestore.rules` et le script `tool/seed_content_packs.dart` pour
 /// le schéma serveur authoritatif.
 class ContentPackManifest {
   const ContentPackManifest({
     required this.packId,
-    required this.world,
+    required this.pack,
     required this.currentVersion,
     required this.formatVersion,
     required this.hashSha256,
@@ -27,9 +27,9 @@ class ContentPackManifest {
   }) {
     return ContentPackManifest(
       packId: docId,
-      world: data['world'] as String,
+      pack: data['pack'] as String,
       currentVersion: (data['current_version'] as num).toInt(),
-      formatVersion: (data['format_version'] as num?)?.toInt() ?? 2,
+      formatVersion: (data['format_version'] as num?)?.toInt() ?? 3,
       hashSha256: data['hash_sha256'] as String,
       sizeBytes: (data['size_bytes'] as num?)?.toInt() ?? 0,
       count: (data['count'] as num?)?.toInt() ?? 0,
@@ -46,10 +46,13 @@ class ContentPackManifest {
     );
   }
 
-  /// Identifiant du document Firestore (e.g. `village_des_or` ou
-  /// `village_des_or_community`).
+  /// Identifiant du document Firestore (e.g. `culture_ci` ou
+  /// `culture_ci_community`).
   final String packId;
-  final String world;
+
+  /// Identifiant logique du pack thématique (`culture_ci`, `crack_nouchi`, ...).
+  /// Remplace le champ `world` v2.
+  final String pack;
   final int currentVersion;
   final int formatVersion;
   final String hashSha256;

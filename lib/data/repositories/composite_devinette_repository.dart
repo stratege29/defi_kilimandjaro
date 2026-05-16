@@ -36,10 +36,10 @@ class CompositeDevinetteRepository implements DevinetteRepository {
   final Random _rng;
 
   @override
-  Future<List<Devinette>> loadWorld(String worldId) async {
+  Future<List<Devinette>> loadPack(String packId) async {
     final results = await Future.wait<List<Devinette>>([
-      _bundled.loadWorld(worldId),
-      _cache.loadByWorld(worldId),
+      _bundled.loadPack(packId),
+      _cache.loadByPack(packId),
     ]);
     final bundled = results[0];
     final cached = results[1];
@@ -56,22 +56,22 @@ class CompositeDevinetteRepository implements DevinetteRepository {
   }
 
   @override
-  Future<Devinette> randomFromWorld(String worldId) async {
-    final list = await loadWorld(worldId);
+  Future<Devinette> randomFromPack(String packId) async {
+    final list = await loadPack(packId);
     if (list.isEmpty) {
-      throw StateError('Aucune devinette dans le monde "$worldId"');
+      throw StateError('Aucune devinette dans le pack "$packId"');
     }
     return list[_rng.nextInt(list.length)];
   }
 
   @override
-  Future<Devinette> randomFromWorldExcluding(
-    String worldId,
+  Future<Devinette> randomFromPackExcluding(
+    String packId,
     Iterable<String> excludeIds,
   ) async {
-    final list = await loadWorld(worldId);
+    final list = await loadPack(packId);
     if (list.isEmpty) {
-      throw StateError('Aucune devinette dans le monde "$worldId"');
+      throw StateError('Aucune devinette dans le pack "$packId"');
     }
     final exclude = excludeIds.toSet();
     final pool = list.where((d) => !exclude.contains(d.id)).toList();
@@ -80,10 +80,10 @@ class CompositeDevinetteRepository implements DevinetteRepository {
   }
 
   @override
-  Future<Devinette> atIndex(String worldId, int index) async {
-    final list = await loadWorld(worldId);
+  Future<Devinette> atIndex(String packId, int index) async {
+    final list = await loadPack(packId);
     if (index < 0 || index >= list.length) {
-      throw RangeError.index(index, list, 'devinette index for "$worldId"');
+      throw RangeError.index(index, list, 'devinette index for "$packId"');
     }
     return list[index];
   }

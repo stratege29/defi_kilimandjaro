@@ -1,0 +1,542 @@
+[
+  {
+    "id": "crack_nouchi_001",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ENJAILLE",
+    "answer_normalized": "enjaille",
+    "letters_pool": ["E","N","J","A","I","L","L","E"],
+    "riddle": {
+      "fr": "Quand le DJ joue le morceau parfait, c'est mon état. Je suis trop heureux."
+    },
+    "explanation": {
+      "fr": "Enjaillé = très content, ravi, transporté de joie. Du verbe anglais 'enjoy', popularisé par Magic System et DJ Arafat dans la musique abidjanaise."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["emotion", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_002",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GAOU",
+    "answer_normalized": "gaou",
+    "letters_pool": ["G","A","O","U"],
+    "riddle": {
+      "fr": "Frais débarqué du village, je crois encore que la pluie tombe d'en haut."
+    },
+    "explanation": {
+      "fr": "Gaou = naïf, simplet, paysan ignorant des réalités de la ville. Terme urbain très courant pour désigner un novice, souvent sans méchanceté."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["personne", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_003",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KPATA",
+    "answer_normalized": "kpata",
+    "letters_pool": ["K","P","A","T","A"],
+    "riddle": {
+      "fr": "Quand elle passe dans la rue, les regards arrêtent le temps. Elle est magnifique."
+    },
+    "explanation": {
+      "fr": "Kpata = très belle femme, beauté spectaculaire, canon. Expression admirative, souvent neutre, célèbre dans les maquis et la musique abidjanaise."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["personne", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_004",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FAROTER",
+    "answer_normalized": "faroter",
+    "letters_pool": ["F","A","R","O","T","E","R"],
+    "riddle": {
+      "fr": "Sortir les mille billets juste pour montrer qu'on a, c'est mon jeu favori."
+    },
+    "explanation": {
+      "fr": "Faroter = frimer avec son argent, étaler sa richesse, se la raconter. Action très courante en milieu urbain, thème célèbre des chansons Coupé Décalé."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": ["attitude", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_005",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBANGBAN",
+    "answer_normalized": "gbangban",
+    "letters_pool": ["G","B","A","N","G","B","A","N"],
+    "riddle": {
+      "fr": "Confus, désorienté, je ne sais plus où j'en suis."
+    },
+    "explanation": {
+      "fr": "Gbangban = confus, interloqué, déstabilisé, pas au clair. Terme onomatopéique très expressif, couramment utilisé pour décrire une personne sous le choc ou perdue."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": ["emotion", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_006",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MAQUIS",
+    "answer_normalized": "maquis",
+    "letters_pool": ["M","A","Q","U","I","S"],
+    "riddle": {
+      "fr": "Bar de quartier où on danse, on boit, on rigole tard le soir."
+    },
+    "explanation": {
+      "fr": "Maquis = petit bar typiquement ivoirien, lieu de vie nocturne et festive des quartiers populaires où on écoute la musique ivoirienne et on passe la nuit."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["lieu", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_007",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CALER",
+    "answer_normalized": "caler",
+    "letters_pool": ["C","A","L","E","R"],
+    "riddle": {
+      "fr": "Arrêter quelqu'un, le bloquer, l'empêcher de bouger. C'est un art abidjanais."
+    },
+    "explanation": {
+      "fr": "Caler = arrêter, bloquer, séduire et retenir quelqu'un. Peut aussi signifier avoir du caractère, tenir bon. Très utilisé dans le contexte de séduction urbaine."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["action", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_008",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CHAUD",
+    "answer_normalized": "chaud",
+    "letters_pool": ["C","H","A","U","D"],
+    "riddle": {
+      "fr": "C'est mon état quand je suis excité, agressif ou très en forme."
+    },
+    "explanation": {
+      "fr": "Chaud = excité, agressif, en colère, ou très en forme. Utilisé aussi pour décrire une situation intense ou dangereuse dans les contextes urbains."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["emotion", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_009",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "PIPO",
+    "answer_normalized": "pipo",
+    "letters_pool": ["P","I","P","O"],
+    "riddle": {
+      "fr": "Faux ami, hypocrite qui fait semblant. On ne peut pas lui faire confiance."
+    },
+    "explanation": {
+      "fr": "Pipo = faux, hypocrite, personne qui fait semblant ou se la raconte. Très utilisé pour qualifier quelqu'un d'inauthentique ou de mensonger."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["personne", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_010",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MOGO",
+    "answer_normalized": "mogo",
+    "letters_pool": ["M","O","G","O"],
+    "riddle": {
+      "fr": "Quelqu'un, une personne. En Nouchi, c'est le mot universel."
+    },
+    "explanation": {
+      "fr": "Mogo = personne, quelqu'un (du mot baoulé/malinké). Très courant pour désigner un individu de façon neutre, comme 'type' ou 'gars' en français."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["personne", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_011",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ZOZO",
+    "answer_normalized": "zozo",
+    "letters_pool": ["Z","O","Z","O"],
+    "riddle": {
+      "fr": "Fou, dingue, je pète un câble. Mon cerveau n'est plus là."
+    },
+    "explanation": {
+      "fr": "Zozo = fou, dément, débile. Terme léger et courant pour dire que quelqu'un déconne ou s'est perdu."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["emotion", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_012",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BLEDARD",
+    "answer_normalized": "bledard",
+    "letters_pool": ["B","L","E","D","A","R","D"],
+    "riddle": {
+      "fr": "Originaire du bled, du village lointain. Un vrai campagnard."
+    },
+    "explanation": {
+      "fr": "Bledard = personne originaire du bled (village), campagnard. Proche de 'gaou' mais plus neutre, désignant simplement quelqu'un des zones rurales."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": ["personne", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_013",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BOUCAN",
+    "answer_normalized": "boucan",
+    "letters_pool": ["B","O","U","C","A","N"],
+    "riddle": {
+      "fr": "Tapage, bruit intense, fête sauvage. C'est de la folie sonore."
+    },
+    "explanation": {
+      "fr": "Boucan = vacarme, bruit de folie, tapage infernal, fête intense. Très utilisé pour décrire l'ambiance déchaînée d'un maquis ou d'une soirée dansante."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["objet", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_014",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BABTOU",
+    "answer_normalized": "babtou",
+    "letters_pool": ["B","A","B","T","O","U"],
+    "riddle": {
+      "fr": "Étranger blanc qui débarque à Abidjan, nouveau dans le coin."
+    },
+    "explanation": {
+      "fr": "Babtou = Blanc, expatrié, étranger occidental. Terme neutre utilisé pour désigner les touristes ou expatriés français, belges, etc. qui visitent la Côte d'Ivoire."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["personne", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_015",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BANGALA",
+    "answer_normalized": "bangala",
+    "letters_pool": ["B","A","N","G","A","L","A"],
+    "riddle": {
+      "fr": "Maison typique du quartier, construction en dur ou en tôle. C'est là qu'on vit."
+    },
+    "explanation": {
+      "fr": "Bangala = petit immeuble ou maison de quartier où vivent plusieurs familles. Habitat typiquement urbain abidjanais, lieu de vie collective."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": ["lieu", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_016",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJANDJOU",
+    "answer_normalized": "djandjou",
+    "letters_pool": ["D","J","A","N","D","J","O","U"],
+    "riddle": {
+      "fr": "Femme fatale, bombe qui fait tourner les têtes. Elle a un charme irrésistible."
+    },
+    "explanation": {
+      "fr": "Djandjou = très belle femme, bombe, canon. Terme admiratif et enjoué pour qualifier une femme d'une grande beauté et d'un charme magnétique."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_017",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "WOUBI",
+    "answer_normalized": "woubi",
+    "letters_pool": ["W","O","U","B","I"],
+    "riddle": {
+      "fr": "Beau gosse bien habillé, qui séduit au premier coup d'oeil."
+    },
+    "explanation": {
+      "fr": "Woubi = beau garçon, jeune homme séduisant et charismatique. Terme admiratif très populaire pour décrire un mec attirant."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_018",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BRAMOGO",
+    "answer_normalized": "bramogo",
+    "letters_pool": ["B","R","A","M","O","G","O"],
+    "riddle": {
+      "fr": "Type bizarre, un peu chelou, qui ne rentre dans aucune case."
+    },
+    "explanation": {
+      "fr": "Bramogo = bizarre, étrange, type louche ou original. Mélange de 'bra' (étrange) et 'mogo' (personne), pour décrire quelqu'un de curieux ou d'excentrique."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_019",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FARADJE",
+    "answer_normalized": "faradje",
+    "letters_pool": ["F","A","R","A","D","J","E"],
+    "riddle": {
+      "fr": "Fouiller, chercher partout. Je veux tout trouver, tout savoir."
+    },
+    "explanation": {
+      "fr": "Faradje = fouiller, chercher avec insistance, enquêter. Verbe très utilisé pour dire 'vérifier', 'fouiller dans les affaires' ou 'chercher à savoir'."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["action", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_020",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "COXER",
+    "answer_normalized": "coxer",
+    "letters_pool": ["C","O","X","E","R"],
+    "riddle": {
+      "fr": "Critiquer, se moquer de quelqu'un en public. C'est vache mais courant."
+    },
+    "explanation": {
+      "fr": "Coxer = critiquer, se moquer, humilier verbalement. Très commun en milieu urbain pour désigner une moquerie ou une humiliation sociale."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": ["action", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_021",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ZIGUEHI",
+    "answer_normalized": "ziguehi",
+    "letters_pool": ["Z","I","G","U","E","H","I"],
+    "riddle": {
+      "fr": "Petite arnaque, petit jeu, petite combine sans gravité."
+    },
+    "explanation": {
+      "fr": "Ziguehi = petite escroquerie, petit jeu ou combine facile. Terme léger pour décrire une arnaque mineure ou un jeu de mots."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["action", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_022",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KPACOLO",
+    "answer_normalized": "kpacolo",
+    "letters_pool": ["K","P","A","C","O","L","O"],
+    "riddle": {
+      "fr": "Tête de pioche, imbécile, débile qui comprend rien."
+    },
+    "explanation": {
+      "fr": "Kpacolo = idiot, débile, personne stupide ou qui n'écoute pas. Insulte légère et très populaire dans l'argot urbain abidjanais."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_023",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBONHI",
+    "answer_normalized": "gbonhi",
+    "letters_pool": ["G","B","O","N","H","I"],
+    "riddle": {
+      "fr": "Coin reculé, zone cachée de la ville où les gens se retrouvent."
+    },
+    "explanation": {
+      "fr": "Gbonhi = endroit reculé, coin perdu, zone éloignée. Peut aussi désigner une zone dangereuse ou peu fréquentée d'Abidjan."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": ["lieu", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_024",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FRAYA",
+    "answer_normalized": "fraya",
+    "letters_pool": ["F","R","A","Y","A"],
+    "riddle": {
+      "fr": "Femme compliquée, délicate, qui crée du drama. Pas simple du tout."
+    },
+    "explanation": {
+      "fr": "Fraya = femme chiante, compliquée, à problèmes. De l'anglais 'fray' (chaos), désigne une femme qui cause du problème ou du drame."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_025",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBAKA",
+    "answer_normalized": "gbaka",
+    "letters_pool": ["G","B","A","K","A"],
+    "riddle": {
+      "fr": "Bus blanc de transport qui voyage entre les villes. Trop chargé de passagers."
+    },
+    "explanation": {
+      "fr": "Gbaka = minibus blanc de transport interurbain très populaire en Côte d'Ivoire. Symbole de la vie quotidienne, toujours bondé."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_026",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJOSS",
+    "answer_normalized": "djoss",
+    "letters_pool": ["D","J","O","S","S"],
+    "riddle": {
+      "fr": "Fille facile, sans morale, qui couche avec n'importe qui."
+    },
+    "explanation": {
+      "fr": "Djoss = femme réputée pour sa permissivité sexuelle. Terme très péjoratif et humiliant en Nouchi, à utiliser avec prudence."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_027",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GLOH",
+    "answer_normalized": "gloh",
+    "letters_pool": ["G","L","O","H"],
+    "riddle": {
+      "fr": "Foutre le camps, partir vite, s'enfuir sans explication."
+    },
+    "explanation": {
+      "fr": "Gloh = partir précipitamment, s'enfuir, décamper. Onomatopée très expressive du Nouchi urbain."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": ["action", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_028",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBAGBA",
+    "answer_normalized": "gbagba",
+    "letters_pool": ["G","B","A","G","B","A"],
+    "riddle": {
+      "fr": "Solide, fort, vrai de vrai. Pas de blague, c'est sérieux."
+    },
+    "explanation": {
+      "fr": "Gbagba = solide, sincère, légitime, vrai. Utilisé pour approuver, valider ou affirmer l'authenticité de quelque chose."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["attitude", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_029",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CASSER",
+    "answer_normalized": "casser",
+    "letters_pool": ["C","A","S","S","E","R"],
+    "riddle": {
+      "fr": "Faire échouer, ruiner quelqu'un. C'est brutal comme action."
+    },
+    "explanation": {
+      "fr": "Casser = ruiner, faire échouer, détruire. Utilisé pour décrire une défaite, une rupture ou une situation catastrophique."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": ["action", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_030",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "AGBADJA",
+    "answer_normalized": "agbadja",
+    "letters_pool": ["A","G","B","A","D","J","A"],
+    "riddle": {
+      "fr": "Qui crâne trop, qui se montre, qui fait l'intéressant. C'est un vantard."
+    },
+    "explanation": {
+      "fr": "Agbadja = prétentieux, vantard, qui se vante beaucoup. Personne qui crâne sans arrêt et se met en avant de façon exagérée."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["attitude", "intermediaire"],
+    "format_version": 3
+  }
+]

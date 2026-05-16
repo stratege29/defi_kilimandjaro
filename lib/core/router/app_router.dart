@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
@@ -17,13 +18,16 @@ import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_view.dart'
 import 'package:defi_kilimandjaro/presentation/leaderboard/leaderboard_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_detail_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_list_view.dart';
+import 'package:defi_kilimandjaro/presentation/my_packs/my_packs_view.dart';
 import 'package:defi_kilimandjaro/presentation/onboarding/onboarding_view.dart';
+import 'package:defi_kilimandjaro/presentation/pack_chooser/pack_chooser_view.dart';
 import 'package:defi_kilimandjaro/presentation/profile/profile_view.dart';
 import 'package:defi_kilimandjaro/presentation/shop/shop_view.dart';
 import 'package:defi_kilimandjaro/presentation/splash/splash_view.dart';
 import 'package:defi_kilimandjaro/presentation/ugc/my_submissions/my_submissions_view.dart';
 import 'package:defi_kilimandjaro/presentation/ugc/submit_devinette/submit_devinette_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Routes nommées de l'application.
@@ -69,6 +73,10 @@ abstract final class AppRoutes {
   // UGC — devinettes communautaires.
   static const ugcSubmit = '/ugc/submit';
   static const ugcMine = '/ugc/mine';
+
+  // Phase 3 — packs thématiques.
+  static const packChooser = '/pack-chooser';
+  static const myPacks = '/my-packs';
 }
 
 /// Clé de navigation globale exposée pour DeepLinkService et le handler FCM.
@@ -78,32 +86,59 @@ abstract final class AppRoutes {
 final GlobalKey<NavigatorState> appRouterNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'appRouter');
 
-final GoRouter appRouter = GoRouter(
-  navigatorKey: appRouterNavigatorKey,
-  initialLocation: AppRoutes.splash,
-  debugLogDiagnostics: true,
-  // Quand iOS/Android forwarde un URI custom-scheme (kilimandjaro://X/Y),
-  // go_router le reçoit comme location avant que DeepLinkService ne puisse
-  // intervenir. On réécrit :
-  // - kilimandjaro://duel/<matchId>   → /duel/join/<matchId>
-  // - kilimandjaro://friend/<uid>     → /friend/add/<uid>
-  redirect: (context, state) {
-    final uri = state.uri;
-    if (uri.scheme == 'kilimandjaro') {
-      if (uri.host == 'duel') {
-        final segments = uri.pathSegments;
-        if (segments.isNotEmpty && segments.first.isNotEmpty) {
-          return AppRoutes.duelJoinPath(segments.first);
-        }
-      } else if (uri.host == 'friend') {
-        final segments = uri.pathSegments;
-        if (segments.isNotEmpty && segments.first.isNotEmpty) {
-          return AppRoutes.friendAddPath(segments.first);
+/// Notifier qui réévalue le redirect go_router quand [hasChosenFreePackProvider]
+/// change. Pattern officiel recommandé par go_router + Riverpod.
+///
+/// Voir : https://pub.dev/packages/go_router#refreshing-with-listenable
+class _RouterNotifier extends ChangeNotifier {
+  _RouterNotifier(Ref ref) {
+    ref.listen<bool>(hasChosenFreePackProvider, (_, __) => notifyListeners());
+  }
+}
+
+/// Provider du [GoRouter] configuré avec le gate "hasChosenFreePack".
+///
+/// Exposé comme provider pour que le notifier ait accès au [Ref] Riverpod.
+/// Consommé dans [KilimandjaroApp] via `ref.watch(appRouterProvider)`.
+final appRouterProvider = Provider<GoRouter>((ref) {
+  final notifier = _RouterNotifier(ref);
+  return GoRouter(
+    navigatorKey: appRouterNavigatorKey,
+    initialLocation: AppRoutes.splash,
+    debugLogDiagnostics: true,
+    refreshListenable: notifier,
+    redirect: (context, state) {
+      // ---- Deep-link scheme rewriting (unchanged) ----
+      final uri = state.uri;
+      if (uri.scheme == 'kilimandjaro') {
+        if (uri.host == 'duel') {
+          final segments = uri.pathSegments;
+          if (segments.isNotEmpty && segments.first.isNotEmpty) {
+            return AppRoutes.duelJoinPath(segments.first);
+          }
+        } else if (uri.host == 'friend') {
+          final segments = uri.pathSegments;
+          if (segments.isNotEmpty && segments.first.isNotEmpty) {
+            return AppRoutes.friendAddPath(segments.first);
+          }
         }
       }
-    }
-    return null;
-  },
+
+      // ---- Pack-chooser gate ----
+      // Splash et onboarding sont autorisés sans vérification (le joueur
+      // n'a pas encore vu le flow et hasChosenFreePack est forcément false).
+      final loc = state.matchedLocation;
+      final isSplash = loc == AppRoutes.splash;
+      final isOnboarding = loc == AppRoutes.onboarding;
+      if (isSplash || isOnboarding) return null;
+
+      final hasChosen = ref.read(hasChosenFreePackProvider);
+      final goingToChooser = loc == AppRoutes.packChooser;
+
+      if (!hasChosen && !goingToChooser) return AppRoutes.packChooser;
+      if (hasChosen && goingToChooser) return AppRoutes.mountains;
+      return null;
+    },
   routes: <RouteBase>[
     GoRoute(
       path: AppRoutes.splash,
@@ -257,5 +292,19 @@ final GoRouter appRouter = GoRouter(
       name: 'ugc-mine',
       builder: (_, __) => const MySubmissionsView(),
     ),
+    // -------------------------------------------------------------------------
+    // Phase 3 — packs thématiques
+    // -------------------------------------------------------------------------
+    GoRoute(
+      path: AppRoutes.packChooser,
+      name: 'pack-chooser',
+      builder: (_, __) => const PackChooserView(),
+    ),
+    GoRoute(
+      path: AppRoutes.myPacks,
+      name: 'my-packs',
+      builder: (_, __) => const MyPacksView(),
+    ),
   ],
-);
+  );
+});

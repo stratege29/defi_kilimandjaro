@@ -249,5 +249,40 @@
       "body": "QR code en main, lance un duel temps réel. Le plus rapide remporte la sagesse."
     },
     "start": "C'EST PARTI"
+  },
+  "pack": {
+    "culture_ci": {
+      "name": "Culture CI",
+      "description": "Cuisine, traditions, lieux et histoire de Côte d'Ivoire"
+    },
+    "crack_nouchi": {
+      "name": "Crack Nouchi",
+      "description": "L'argot d'Abidjan, du gaou au boss"
+    }
+  },
+  "pack_chooser": {
+    "title": "Choisis ton cadeau de bienvenue",
+    "subtitle": "Ce choix est définitif.",
+    "question_count": "{count} énigmes",
+    "enriched_hint": "Contenu enrichi régulièrement",
+    "confirm_button": "Confirmer mon choix",
+    "dialog_title": "Confirmer le choix",
+    "dialog_body": "Tu choisis {packName} comme pack gratuit. Cette décision est définitive. L'autre pack sera disponible à l'achat plus tard.",
+    "dialog_back": "Retour",
+    "dialog_confirm": "Je confirme",
+    "load_error": "Impossible de charger les packs"
+  },
+  "my_packs": {
+    "title": "Mes packs",
+    "mix_title": "Mix des questions",
+    "mix_subtitle": "Glisse pour ajuster la pondération.",
+    "total_label": "Total : {total}%",
+    "total_ok": "Total : 100%",
+    "current_pack_label": "Ton pack actuel — {count} énigmes",
+    "unlock_section": "Débloquer un pack",
+    "owned_section": "Packs possédés",
+    "available_section": "Packs disponibles",
+    "coming_soon": "Bientôt disponible",
+    "coming_soon_sub": "Achat avec cauris ou IAP — Phase 4"
   }
 }

@@ -80,15 +80,15 @@ class ManifestSyncService {
     }
   }
 
-  /// Synchronise un pack précis (utile pour `onWorldEntry` à priorité haute).
-  Future<void> syncWorldPack(String world) async {
+  /// Synchronise un pack précis (utile pour `onPackEntry` à priorité haute).
+  Future<void> syncPack(String pack) async {
     try {
-      final manifest = await _remote.fetchManifest(world);
+      final manifest = await _remote.fetchManifest(pack);
       if (manifest != null) {
         await _syncSinglePack(manifest);
       }
       // Tente aussi le pack communautaire si présent.
-      final community = await _remote.fetchManifest('${world}_community');
+      final community = await _remote.fetchManifest('${pack}_community');
       if (community != null) {
         await _syncSinglePack(community);
       }
@@ -133,7 +133,7 @@ class ManifestSyncService {
         : DevinetteSource.remotePack;
 
     await _cache.replacePackContents(
-      world: manifest.world,
+      pack: manifest.pack,
       source: source,
       devinettes: devinettes,
       packVersion: manifest.currentVersion,
@@ -141,7 +141,7 @@ class ManifestSyncService {
 
     await _cache.upsertPackState(
       packId: manifest.packId,
-      world: manifest.world,
+      pack: manifest.pack,
       packVersion: manifest.currentVersion,
       hashSha256: manifest.hashSha256,
       sizeBytes: manifest.sizeBytes,

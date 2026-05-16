@@ -9,15 +9,15 @@ class DevinetteDao extends DatabaseAccessor<DevinetteDatabase>
     with _$DevinetteDaoMixin {
   DevinetteDao(super.db);
 
-  /// Charge toutes les devinettes en cache pour un monde donné.
-  Future<List<Devinette>> loadByWorld(String world) async {
+  /// Charge toutes les devinettes en cache pour un pack donné.
+  Future<List<Devinette>> loadByPack(String pack) async {
     final rows = await (select(devinettesCache)
-          ..where((t) => t.world.equals(world)))
+          ..where((t) => t.pack.equals(pack)))
         .get();
     return rows.map((r) => r.toEntity()).toList(growable: false);
   }
 
-  /// Remplace atomiquement le contenu d'un pack : delete-all-by-source-and-world
+  /// Remplace atomiquement le contenu d'un pack : delete-all-by-source-and-pack
   /// puis insert. Garantit qu'une nouvelle version supplante l'ancienne sans
   /// états intermédiaires visibles.
   ///
@@ -26,7 +26,7 @@ class DevinetteDao extends DatabaseAccessor<DevinetteDatabase>
   /// `DevinetteSource` différente. Ça évite que le starter pack pollue
   /// accidentellement le cache distant.
   Future<void> replacePackContents({
-    required String world,
+    required String pack,
     required DevinetteSource source,
     required List<Devinette> devinettes,
     required int packVersion,
@@ -34,7 +34,7 @@ class DevinetteDao extends DatabaseAccessor<DevinetteDatabase>
     await transaction(() async {
       await (delete(devinettesCache)
             ..where((t) =>
-                t.world.equals(world) & t.source.equals(source.name)))
+                t.pack.equals(pack) & t.source.equals(source.name)))
           .go();
       for (final d in devinettes) {
         final companion = d
@@ -53,21 +53,21 @@ class DevinetteDao extends DatabaseAccessor<DevinetteDatabase>
 
   /// Supprime un pack spécifique (e.g. kill-switch via Remote Config).
   Future<void> deletePack({
-    required String world,
+    required String pack,
     required DevinetteSource source,
   }) async {
     await (delete(devinettesCache)
           ..where(
-              (t) => t.world.equals(world) & t.source.equals(source.name)))
+              (t) => t.pack.equals(pack) & t.source.equals(source.name)))
         .go();
   }
 
-  /// Compte les entrées en cache pour un monde — utile pour décider d'un
+  /// Compte les entrées en cache pour un pack — utile pour décider d'un
   /// fallback bundled-only à la volée.
-  Future<int> countByWorld(String world) async {
+  Future<int> countByPack(String pack) async {
     final query = selectOnly(devinettesCache)
       ..addColumns([devinettesCache.id.count()])
-      ..where(devinettesCache.world.equals(world));
+      ..where(devinettesCache.pack.equals(pack));
     final row = await query.getSingle();
     return row.read<int>(devinettesCache.id.count()) ?? 0;
   }

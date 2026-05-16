@@ -4,7 +4,7 @@ import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:flutter/foundation.dart' show FlutterError;
 import 'package:flutter/services.dart' show rootBundle;
 
-/// Charge le starter pack bundlé depuis `assets/data/devinettes/starter/<world>.json`.
+/// Charge le starter pack bundlé depuis `assets/data/devinettes/starter/<packId>.json`.
 ///
 /// Toujours disponible, même offline first-launch — c'est la base que la
 /// composite repository augmente avec les packs téléchargés.
@@ -15,27 +15,27 @@ class BundledDevinetteDatasource {
   final String _basePath;
   final Map<String, List<Devinette>> _memCache = <String, List<Devinette>>{};
 
-  Future<List<Devinette>> loadWorld(String worldId) async {
-    final cached = _memCache[worldId];
+  Future<List<Devinette>> loadPack(String packId) async {
+    final cached = _memCache[packId];
     if (cached != null) return cached;
 
     final String raw;
     try {
-      raw = await rootBundle.loadString('$_basePath/$worldId.json');
+      raw = await rootBundle.loadString('$_basePath/$packId.json');
       // ignore: avoid_catching_errors
     } on FlutterError {
       // rootBundle.loadString lève un FlutterError quand l'asset est absent.
-      // Pour un monde non encore curé, on retombe sur un starter vide plutôt
+      // Pour un pack non encore curé, on retombe sur un starter vide plutôt
       // que de propager — la composite peut alors compléter avec le cache
       // remote. Voir aussi `pubspec.yaml > assets`.
-      _memCache[worldId] = const <Devinette>[];
-      return _memCache[worldId]!;
+      _memCache[packId] = const <Devinette>[];
+      return _memCache[packId]!;
     }
 
     final decoded = jsonDecode(raw);
     if (decoded is! List) {
-      _memCache[worldId] = const <Devinette>[];
-      return _memCache[worldId]!;
+      _memCache[packId] = const <Devinette>[];
+      return _memCache[packId]!;
     }
 
     final list = decoded
@@ -43,7 +43,7 @@ class BundledDevinetteDatasource {
         .map(Devinette.fromJson)
         .toList(growable: false);
 
-    _memCache[worldId] = list;
+    _memCache[packId] = list;
     return list;
   }
 

@@ -2,10 +2,11 @@ import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/core/utils/difficulty_curve.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
-import 'package:defi_kilimandjaro/data/repositories/devinette_repository_impl.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
@@ -404,15 +405,26 @@ class _GameViewState extends ConsumerState<GameView>
 
   Future<void> _pushNextDevinette(String mountainId) async {
     try {
-      final repo = ref.read(devinetteRepositoryProvider);
-      // Phase 2.2 stub : devinette aléatoire de "village_des_or".
-      // Phase 4 : tag par pays / région (cohérent avec mountain_detail_view).
-      // Anti-répétition : exclut les 5 dernières devinettes jouées
-      // (incluant celle qu'on vient de gagner).
+      final selectionService = ref.read(devinetteSelectionServiceProvider);
       final progress = ref.read(playerProgressProvider);
-      final next = await repo.randomFromWorldExcluding(
-        'village_des_or',
-        progress.recentDevinetteIds,
+
+      // Résoudre la montagne courante pour calculer la difficulté cible.
+      final asyncMountains = ref.read(mountainsProvider);
+      final mountain = asyncMountains.maybeWhen(
+        data: (list) => list.cast<Mountain?>().firstWhere(
+          (m) => m?.id == mountainId,
+          orElse: () => null,
+        ),
+        orElse: () => null,
+      );
+      final targetDifficulty = mountain != null
+          ? difficultyForAltitude(mountain.altitude)
+          : 1;
+
+      final next = await selectionService.nextDevinette(
+        mix: progress.activePackMix,
+        targetDifficulty: targetDifficulty,
+        excludeIds: progress.recentDevinetteIds.toSet(),
       );
       await ref
           .read(playerProgressProvider.notifier)

@@ -249,5 +249,40 @@
       "body": "QR code in hand, launch a real-time duel. Fastest player wins the wisdom."
     },
     "start": "LET'S GO"
+  },
+  "pack": {
+    "culture_ci": {
+      "name": "Culture CI",
+      "description": "Cuisine, traditions, places and history of Côte d'Ivoire"
+    },
+    "crack_nouchi": {
+      "name": "Crack Nouchi",
+      "description": "Abidjan street slang, from gaou to boss"
+    }
+  },
+  "pack_chooser": {
+    "title": "Choose your welcome gift",
+    "subtitle": "This choice is permanent.",
+    "question_count": "{count} riddles",
+    "enriched_hint": "Content enriched regularly",
+    "confirm_button": "Confirm my choice",
+    "dialog_title": "Confirm choice",
+    "dialog_body": "You are choosing {packName} as your free pack. This decision is permanent. The other pack will be available for purchase later.",
+    "dialog_back": "Back",
+    "dialog_confirm": "I confirm",
+    "load_error": "Unable to load packs"
+  },
+  "my_packs": {
+    "title": "My packs",
+    "mix_title": "Question mix",
+    "mix_subtitle": "Slide to adjust the weighting.",
+    "total_label": "Total: {total}%",
+    "total_ok": "Total: 100%",
+    "current_pack_label": "Your current pack — {count} riddles",
+    "unlock_section": "Unlock a pack",
+    "owned_section": "Owned packs",
+    "available_section": "Available packs",
+    "coming_soon": "Coming soon",
+    "coming_soon_sub": "Purchase with cauris or IAP — Phase 4"
   }
 }

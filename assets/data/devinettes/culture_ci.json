@@ -1,7 +1,7 @@
 [
   {
-    "id": "village_or_001",
-    "world": "village_des_or",
+    "id": "culture_ci_001",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "FOUTOU",
     "answer_normalized": "foutou",
@@ -19,9 +19,6 @@
     "explanation": {
       "fr": "Le foutou est une pâte pilée emblématique ivoirienne, préparée à base d'igname, de banane plantain ou de manioc, servie avec une sauce."
     },
-    "proverb": {
-      "fr": "Ensemble on pile mieux."
-    },
     "difficulty": 1,
     "estimated_time_s": 25,
     "tags": [
@@ -29,11 +26,11 @@
       "tradition",
       "village"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_002",
-    "world": "village_des_or",
+    "id": "culture_ci_002",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "ATTIEKE",
     "answer_normalized": "attieke",
@@ -52,20 +49,17 @@
     "explanation": {
       "fr": "L'attieke est une semoule de manioc fermenté, plat populaire d'origine ébrié, souvent accompagné de poisson, viande ou sauce claire."
     },
-    "proverb": {
-      "fr": "Le bon repas se partage."
-    },
     "difficulty": 1,
     "estimated_time_s": 25,
     "tags": [
       "cuisine",
       "tradition"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_003",
-    "world": "village_des_or",
+    "id": "culture_ci_003",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "MAIS",
     "answer_normalized": "mais",
@@ -81,9 +75,6 @@
     "explanation": {
       "fr": "Le maïs est une céréale très consommée en Côte d'Ivoire, grillée, bouillie ou transformée en farine pour diverses préparations."
     },
-    "proverb": {
-      "fr": "Chaque grain compte."
-    },
     "difficulty": 1,
     "estimated_time_s": 20,
     "tags": [
@@ -91,11 +82,11 @@
       "cereale",
       "village"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_004",
-    "world": "village_des_or",
+    "id": "culture_ci_004",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "GOMBO",
     "answer_normalized": "gombo",
@@ -112,20 +103,17 @@
     "explanation": {
       "fr": "Le gombo est un legume tres utilise en cote d'ivoire pour sa texture filante, base de la fameuse sauce gombo accompagnant foutou ou riz."
     },
-    "proverb": {
-      "fr": "Sauce gombo lie les convives."
-    },
     "difficulty": 1,
     "estimated_time_s": 20,
     "tags": [
       "cuisine",
       "legume"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_005",
-    "world": "village_des_or",
+    "id": "culture_ci_005",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "ALLOCO",
     "answer_normalized": "alloco",
@@ -143,20 +131,17 @@
     "explanation": {
       "fr": "L'alloco désigne des bananes plantains mûres frites, servies en accompagnement ou en street food, parfois avec piment et oignons."
     },
-    "proverb": {
-      "fr": "Ce qui est mûr se cuisine bien."
-    },
     "difficulty": 1,
     "estimated_time_s": 25,
     "tags": [
       "cuisine",
       "street-food"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_006",
-    "world": "village_des_or",
+    "id": "culture_ci_006",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "POULE",
     "answer_normalized": "poule",
@@ -173,20 +158,17 @@
     "explanation": {
       "fr": "La poule est un animal domestique courant dans la cour des concessions villageoises, élevée pour ses œufs et sa viande."
     },
-    "proverb": {
-      "fr": "La poule patiente trouve toujours son grain."
-    },
     "difficulty": 1,
     "estimated_time_s": 20,
     "tags": [
       "animaux",
       "village"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_007",
-    "world": "village_des_or",
+    "id": "culture_ci_007",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "NATTE",
     "answer_normalized": "natte",
@@ -203,20 +185,17 @@
     "explanation": {
       "fr": "La natte est un objet domestique tressé, utilisée pour s'asseoir, dormir ou recevoir, présente dans toutes les cours villageoises."
     },
-    "proverb": {
-      "fr": "Sur la natte, on se retrouve."
-    },
     "difficulty": 1,
     "estimated_time_s": 20,
     "tags": [
       "objets",
       "village"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_008",
-    "world": "village_des_or",
+    "id": "culture_ci_008",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "PAGNE",
     "answer_normalized": "pagne",
@@ -233,20 +212,17 @@
     "explanation": {
       "fr": "Le pagne est un textile imprimé porté quotidiennement, élément central du vestiaire féminin ivoirien et symbole d'élégance."
     },
-    "proverb": {
-      "fr": "Beau pagne, fière allure."
-    },
     "difficulty": 1,
     "estimated_time_s": 20,
     "tags": [
       "objets",
       "tradition"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_009",
-    "world": "village_des_or",
+    "id": "culture_ci_009",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "SEAU",
     "answer_normalized": "seau",
@@ -262,20 +238,17 @@
     "explanation": {
       "fr": "Le seau est un récipient utilisé pour puiser et transporter l'eau au village, souvent porté sur la tête."
     },
-    "proverb": {
-      "fr": "Goutte à goutte, le seau se remplit."
-    },
     "difficulty": 1,
     "estimated_time_s": 20,
     "tags": [
       "objets",
       "village"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_010",
-    "world": "village_des_or",
+    "id": "culture_ci_010",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "FOYER",
     "answer_normalized": "foyer",
@@ -292,9 +265,6 @@
     "explanation": {
       "fr": "Le foyer traditionnel se compose souvent de trois pierres soutenant la marmite au-dessus du feu, lieu central de la cuisine villageoise."
     },
-    "proverb": {
-      "fr": "Le foyer rassemble la famille."
-    },
     "difficulty": 1,
     "estimated_time_s": 25,
     "tags": [
@@ -302,11 +272,11 @@
       "village",
       "cuisine"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_011",
-    "world": "village_des_or",
+    "id": "culture_ci_011",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "CASE",
     "answer_normalized": "case",
@@ -322,20 +292,17 @@
     "explanation": {
       "fr": "La case désigne l'habitation traditionnelle villageoise, généralement construite en banco avec un toit végétal."
     },
-    "proverb": {
-      "fr": "Chaque case a son histoire."
-    },
     "difficulty": 1,
     "estimated_time_s": 25,
     "tags": [
       "habitat",
       "village"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_012",
-    "world": "village_des_or",
+    "id": "culture_ci_012",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "BOEUF",
     "answer_normalized": "boeuf",
@@ -352,20 +319,17 @@
     "explanation": {
       "fr": "Le boeuf est un animal d'elevage important au village, utilise pour les travaux agricoles et la viande lors des grandes occasions."
     },
-    "proverb": {
-      "fr": "Le boeuf avance d'un pas sur, le sillon le suit."
-    },
     "difficulty": 2,
     "estimated_time_s": 25,
     "tags": [
       "animaux",
       "village"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_013",
-    "world": "village_des_or",
+    "id": "culture_ci_013",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "IGNAME",
     "answer_normalized": "igname",
@@ -383,20 +347,17 @@
     "explanation": {
       "fr": "L'igname est un tubercule fondamental dans la cuisine ivoirienne, base du foutou et célébrée lors de fêtes des récoltes en pays Akan."
     },
-    "proverb": {
-      "fr": "Bonne terre, belle igname."
-    },
     "difficulty": 2,
     "estimated_time_s": 30,
     "tags": [
       "cuisine",
       "agriculture"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_014",
-    "world": "village_des_or",
+    "id": "culture_ci_014",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "MANIOC",
     "answer_normalized": "manioc",
@@ -414,20 +375,17 @@
     "explanation": {
       "fr": "Le manioc est une racine cultivée largement, transformée en attieke, placali ou farine, base alimentaire essentielle."
     },
-    "proverb": {
-      "fr": "La racine nourrit le tronc."
-    },
     "difficulty": 2,
     "estimated_time_s": 30,
     "tags": [
       "cuisine",
       "agriculture"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_015",
-    "world": "village_des_or",
+    "id": "culture_ci_015",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "PILON",
     "answer_normalized": "pilon",
@@ -444,20 +402,17 @@
     "explanation": {
       "fr": "Le pilon est un long bâton de bois utilisé pour piler igname, banane ou céréales dans le mortier."
     },
-    "proverb": {
-      "fr": "Sans pilon, le mortier est vide."
-    },
     "difficulty": 2,
     "estimated_time_s": 25,
     "tags": [
       "objets",
       "cuisine"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_016",
-    "world": "village_des_or",
+    "id": "culture_ci_016",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "MARCHE",
     "answer_normalized": "marche",
@@ -475,20 +430,17 @@
     "explanation": {
       "fr": "Le marché est un lieu central de la vie communautaire, espace d'échanges commerciaux et sociaux."
     },
-    "proverb": {
-      "fr": "Au marché, tout se rencontre."
-    },
     "difficulty": 2,
     "estimated_time_s": 25,
     "tags": [
       "lieux",
       "village"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_017",
-    "world": "village_des_or",
+    "id": "culture_ci_017",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "PUITS",
     "answer_normalized": "puits",
@@ -505,20 +457,17 @@
     "explanation": {
       "fr": "Le puits est une source d'eau commune au village, indispensable pour les besoins quotidiens des familles."
     },
-    "proverb": {
-      "fr": "Le puits ne refuse personne."
-    },
     "difficulty": 2,
     "estimated_time_s": 25,
     "tags": [
       "lieux",
       "village"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_018",
-    "world": "village_des_or",
+    "id": "culture_ci_018",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "CHEVRE",
     "answer_normalized": "chevre",
@@ -536,20 +485,17 @@
     "explanation": {
       "fr": "La chèvre est un animal domestique très répandu au village, élevé pour son lait, sa viande et son rôle dans les cérémonies."
     },
-    "proverb": {
-      "fr": "Chèvre attachée broute selon sa corde."
-    },
     "difficulty": 2,
     "estimated_time_s": 25,
     "tags": [
       "animaux",
       "village"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_019",
-    "world": "village_des_or",
+    "id": "culture_ci_019",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "MOUTON",
     "answer_normalized": "mouton",
@@ -567,20 +513,17 @@
     "explanation": {
       "fr": "Le mouton est un animal domestique courant, élevé pour la viande et présent lors de fêtes familiales et célébrations."
     },
-    "proverb": {
-      "fr": "Mouton sage suit le troupeau."
-    },
     "difficulty": 2,
     "estimated_time_s": 25,
     "tags": [
       "animaux",
       "village"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_020",
-    "world": "village_des_or",
+    "id": "culture_ci_020",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "SAUCE",
     "answer_normalized": "sauce",
@@ -597,20 +540,17 @@
     "explanation": {
       "fr": "La sauce accompagne riz, foutou ou attieke, déclinée en de nombreuses variantes : graine, gombo, arachide, claire."
     },
-    "proverb": {
-      "fr": "La sauce fait le repas."
-    },
     "difficulty": 2,
     "estimated_time_s": 20,
     "tags": [
       "cuisine",
       "tradition"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_021",
-    "world": "village_des_or",
+    "id": "culture_ci_021",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "MORTIER",
     "answer_normalized": "mortier",
@@ -629,20 +569,17 @@
     "explanation": {
       "fr": "Le mortier est un récipient en bois sculpté servant à piler ignames, manioc ou condiments avec un pilon."
     },
-    "proverb": {
-      "fr": "Le mortier se souvient de chaque coup."
-    },
     "difficulty": 3,
     "estimated_time_s": 30,
     "tags": [
       "objets",
       "cuisine"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_022",
-    "world": "village_des_or",
+    "id": "culture_ci_022",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "GARBA",
     "answer_normalized": "garba",
@@ -659,20 +596,17 @@
     "explanation": {
       "fr": "Le garba est un plat populaire de street food associant attieke et thon frit, emblématique des villes ivoiriennes."
     },
-    "proverb": {
-      "fr": "Le bon plat se partage debout."
-    },
     "difficulty": 2,
     "estimated_time_s": 30,
     "tags": [
       "cuisine",
       "street-food"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_023",
-    "world": "village_des_or",
+    "id": "culture_ci_023",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "GRIOT",
     "answer_normalized": "griot",
@@ -689,20 +623,17 @@
     "explanation": {
       "fr": "Le griot est un dépositaire de la tradition orale, conteur, généalogiste et musicien, gardien de la mémoire communautaire."
     },
-    "proverb": {
-      "fr": "La parole est une semence."
-    },
     "difficulty": 3,
     "estimated_time_s": 30,
     "tags": [
       "tradition",
       "oralite"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_024",
-    "world": "village_des_or",
+    "id": "culture_ci_024",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "FAMILLE",
     "answer_normalized": "famille",
@@ -721,20 +652,17 @@
     "explanation": {
       "fr": "La famille étendue est au cœur de la société ivoirienne, regroupant plusieurs générations et liens élargis au-delà du foyer immédiat."
     },
-    "proverb": {
-      "fr": "Une seule main n'attache pas un fagot."
-    },
     "difficulty": 1,
     "estimated_time_s": 30,
     "tags": [
       "tradition",
       "village"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_025",
-    "world": "village_des_or",
+    "id": "culture_ci_025",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "KEDJENOU",
     "answer_normalized": "kedjenou",
@@ -754,20 +682,17 @@
     "explanation": {
       "fr": "Le kedjenou est un mets baoulé mijoté en marmite fermée, à base de poulet ou de pintade et de légumes, cuisson lente sans eau ajoutée."
     },
-    "proverb": {
-      "fr": "La patience parfume la marmite."
-    },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
       "cuisine",
       "tradition"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_026",
-    "world": "village_des_or",
+    "id": "culture_ci_026",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "GNAGNAN",
     "answer_normalized": "gnagnan",
@@ -786,20 +711,17 @@
     "explanation": {
       "fr": "Le gnagnan est une petite baie utilisée comme légume amer dans les sauces traditionnelles ivoiriennes, notamment chez les Akan."
     },
-    "proverb": {
-      "fr": "L'amertume aujourd'hui, le goût demain."
-    },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
       "cuisine",
       "tradition"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_027",
-    "world": "village_des_or",
+    "id": "culture_ci_027",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "MARMITE",
     "answer_normalized": "marmite",
@@ -818,20 +740,17 @@
     "explanation": {
       "fr": "La marmite est l'ustensile central du foyer villageois, posee sur les trois pierres du feu pour cuire sauces et ragouts."
     },
-    "proverb": {
-      "fr": "Ce que la marmite cache, le couvercle le sait."
-    },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
       "objets",
       "cuisine"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_028",
-    "world": "village_des_or",
+    "id": "culture_ci_028",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "PLACALI",
     "answer_normalized": "placali",
@@ -850,20 +769,17 @@
     "explanation": {
       "fr": "Le placali est une pâte préparée à base de manioc fermenté, accompagnée souvent de sauce graine, plat très apprécié en Côte d'Ivoire."
     },
-    "proverb": {
-      "fr": "Le temps lisse la pâte."
-    },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
       "cuisine",
       "tradition"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_029",
-    "world": "village_des_or",
+    "id": "culture_ci_029",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "ARACHIDE",
     "answer_normalized": "arachide",
@@ -883,20 +799,17 @@
     "explanation": {
       "fr": "L'arachide est une légumineuse cultivée largement, consommée grillée ou transformée en pâte pour les sauces traditionnelles."
     },
-    "proverb": {
-      "fr": "Ce qui est caché finit par mûrir."
-    },
     "difficulty": 4,
     "estimated_time_s": 40,
     "tags": [
       "cuisine",
       "agriculture"
     ],
-    "format_version": 2
+    "format_version": 3
   },
   {
-    "id": "village_or_030",
-    "world": "village_des_or",
+    "id": "culture_ci_030",
+    "pack": "culture_ci",
     "country": "ci",
     "answer": "TAMTAM",
     "answer_normalized": "tamtam",
@@ -914,9 +827,6 @@
     "explanation": {
       "fr": "Le tam-tam est un instrument à percussion traditionnel, utilisé pour la communication, les fêtes et les cérémonies villageoises."
     },
-    "proverb": {
-      "fr": "Quand le tam-tam parle, le village écoute."
-    },
     "difficulty": 4,
     "estimated_time_s": 40,
     "tags": [
@@ -924,6 +834,6 @@
       "tradition",
       "musique"
     ],
-    "format_version": 2
+    "format_version": 3
   }
 ]
