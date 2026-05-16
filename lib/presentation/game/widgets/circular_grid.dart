@@ -218,27 +218,33 @@ class _Tile extends StatefulWidget {
 
 class _TileState extends State<_Tile> with SingleTickerProviderStateMixin {
   late final AnimationController _selectCtrl;
+  late final Animation<double> _scaleAnim;
 
   @override
   void initState() {
     super.initState();
+    // Controller en mode forward 0→1 sur 220ms. La Tween mappe sur
+    // l'échelle visuelle 0.80 → 1.0 et la curve easeOutBack ajoute un
+    // léger overshoot (~1.06 pic). Valeur initiale = 1 pour rester
+    // stable à scale 1.0 au repos.
     _selectCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 120),
+      duration: const Duration(milliseconds: 220),
       value: 1,
     );
-    // Si la tuile naît déjà sélectionnée (rare — restart partie en cours),
-    // on n'anime pas — état stable directement à 1.0.
+    _scaleAnim = Tween<double>(
+      begin: 0.80,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _selectCtrl, curve: Curves.easeOutBack));
   }
 
   @override
   void didUpdateWidget(_Tile oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!oldWidget.isSelected && widget.isSelected) {
-      // Première sélection : bondir 0.88 → 1.0.
-      _selectCtrl
-        ..value = 0.88
-        ..animateTo(1, curve: Curves.easeOutCirc);
+      // Première sélection : reset à 0 puis forward → tween 0.80 → 1.0
+      // avec overshoot easeOutBack. Visible et satisfaisant.
+      _selectCtrl.forward(from: 0);
     }
   }
 
@@ -302,9 +308,9 @@ class _TileState extends State<_Tile> with SingleTickerProviderStateMixin {
     );
 
     return AnimatedBuilder(
-      animation: _selectCtrl,
+      animation: _scaleAnim,
       builder: (_, child) =>
-          Transform.scale(scale: _selectCtrl.value, child: child),
+          Transform.scale(scale: _scaleAnim.value, child: child),
       child: tile,
     );
   }
