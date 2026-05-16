@@ -10,6 +10,7 @@ import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/ads/consent_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/app_check_setup.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
+import 'package:defi_kilimandjaro/data/repositories/composite_devinette_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/fcm_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
@@ -261,6 +262,11 @@ class _BootGateState extends ConsumerState<_BootGate> {
 
       // Deep links : ecoute les URL scheme kilimandjaro://duel/*
       unawaited(ref.read(deepLinkServiceProvider).init());
+
+      // OTA content sync : télécharge les packs distants depuis Firebase
+      // Storage et peuple le cache Drift. Fire-and-forget — les échecs
+      // sont loggés mais l'app continue sur le starter pack bundlé.
+      unawaited(ref.read(manifestSyncServiceProvider).refresh());
     });
   }
 
