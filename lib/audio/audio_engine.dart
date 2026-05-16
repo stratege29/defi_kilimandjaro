@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:audio_session/audio_session.dart';
 import 'package:defi_kilimandjaro/audio/instruments/balafon.dart';
 import 'package:defi_kilimandjaro/audio/instruments/djembe.dart';
 import 'package:defi_kilimandjaro/audio/instruments/griot_fanfare.dart';
@@ -92,6 +93,33 @@ class AudioEngine with WidgetsBindingObserver {
   Future<void> init() async {
     if (_initialized) return;
     try {
+      // Configure AVAudioSession AVANT SoLoud — sans ça, miniaudio (sous
+      // flutter_soloud) hérite de la category `.ambient` par défaut sur iOS,
+      // qui se fait évincer dès que google_mobile_ads active `.playback`
+      // exclusif pour une pub. Résultat : SoLoud reste muet jusqu'à un
+      // deinit/init complet. `playback` + `mixWithOthers` laisse coexister
+      // les pubs et la synthèse sans conflit de session.
+      final session = await AudioSession.instance;
+      await session.configure(
+        const AudioSessionConfiguration(
+          avAudioSessionCategory: AVAudioSessionCategory.playback,
+          avAudioSessionCategoryOptions:
+              AVAudioSessionCategoryOptions.mixWithOthers,
+          avAudioSessionMode: AVAudioSessionMode.defaultMode,
+          avAudioSessionRouteSharingPolicy:
+              AVAudioSessionRouteSharingPolicy.defaultPolicy,
+          avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+          androidAudioAttributes: AndroidAudioAttributes(
+            contentType: AndroidAudioContentType.music,
+            usage: AndroidAudioUsage.game,
+          ),
+          androidAudioFocusGainType:
+              AndroidAudioFocusGainType.gainTransientMayDuck,
+          androidWillPauseWhenDucked: false,
+        ),
+      );
+      await session.setActive(true);
+
       await SoLoud.instance.init();
       WidgetsBinding.instance.addObserver(this);
       await _preloadAll();
