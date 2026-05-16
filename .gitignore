@@ -84,6 +84,9 @@ serviceAccountKey.json
 functions/node_modules/
 functions/lib/
 functions/.runtimeconfig.json
+
+# ====== Tools (one-off scripts) ======
+tools/scripts/node_modules/
 functions/coverage/
 functions/.eslintcache
 functions/npm-debug.log
