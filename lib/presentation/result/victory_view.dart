@@ -210,13 +210,16 @@ class _VictoryCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           // Explication culturelle (2-3 lignes max).
+          // bodyMd non-italique sur textePrimaire : c'est le moment
+          // pédagogique principal, il mérite la couleur primaire et la
+          // lisibilité maximale (la chute Fraunces 40pt → 14pt italic était
+          // trop violente hiérarchiquement).
           Text(
             devinette.explanation,
             textAlign: TextAlign.center,
-            style: AppTypography.crimson(
-              size: 14,
-              color: AppColors.texteSecondaire,
-              style: FontStyle.italic,
+            style: AppTypography.bodyMd.copyWith(
+              color: AppColors.textePrimaire,
+              height: 1.5,
             ),
           ),
           const SizedBox(height: 24),

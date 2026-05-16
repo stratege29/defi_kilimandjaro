@@ -14,8 +14,9 @@ import 'package:flutter/material.dart';
 /// **Architecture visuelle** : card centrée, accent rouge `error`.
 /// - Griot triste 96pt en haut
 /// - Mot-réponse révélé en Fraunces displayMd (rouge error)
-/// - Explication courte Crimson italic
-/// - Ligne d'encouragement Crimson italic
+/// - Explication culturelle complète bodyMd `textePrimaire` (scrollable si
+///   débordement) — c'est le moment d'apprentissage principal
+/// - Ligne d'encouragement Crimson italic 15pt `texteSecondaire`
 /// - CTA RÉESSAYER via AppButton.danger
 ///
 /// **Bugfix** : wrap en `Material(transparency)` — sans Material ancestor
@@ -61,11 +62,6 @@ class _FailureViewState extends State<FailureView>
     super.dispose();
   }
 
-  String _truncatedExplanation(String text, {int maxChars = 120}) {
-    if (text.length <= maxChars) return text;
-    return '${text.substring(0, maxChars).trimRight()}…';
-  }
-
   @override
   Widget build(BuildContext context) {
     // Material(transparency) : fournit le DefaultTextStyle ancestor pour
@@ -78,9 +74,6 @@ class _FailureViewState extends State<FailureView>
           scale: _cardScale,
           child: _FailureCard(
             devinette: widget.devinette,
-            truncatedExplanation: _truncatedExplanation(
-              widget.devinette.explanation,
-            ),
             onRetry: widget.onRetry,
           ),
         ),
@@ -96,12 +89,10 @@ class _FailureViewState extends State<FailureView>
 class _FailureCard extends StatelessWidget {
   const _FailureCard({
     required this.devinette,
-    required this.truncatedExplanation,
     required this.onRetry,
   });
 
   final Devinette devinette;
-  final String truncatedExplanation;
   final VoidCallback onRetry;
 
   @override
@@ -151,28 +142,37 @@ class _FailureCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: AppTypography.crimson(
               size: 13,
-              color: AppColors.texteTertiaire,
+              color: AppColors.texteSecondaire,
             ),
           ),
           const SizedBox(height: 16),
-          // Explication culturelle courte (2-3 lignes max via truncate).
-          Text(
-            truncatedExplanation,
-            textAlign: TextAlign.center,
-            style: AppTypography.crimson(
-              size: 14,
-              color: AppColors.texteSecondaire,
-              style: FontStyle.italic,
+          // Explication culturelle — moment d'apprentissage principal.
+          // bodyMd non-italique sur textePrimaire, contenu intégral (la
+          // troncature précédente à 120 chars amputait la pédagogie).
+          // Scrollable si débordement extrême sur petit device.
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 160),
+            child: SingleChildScrollView(
+              child: Text(
+                devinette.explanation,
+                textAlign: TextAlign.center,
+                style: AppTypography.bodyMd.copyWith(
+                  color: AppColors.textePrimaire,
+                  height: 1.5,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 16),
           // Ligne d'encouragement (« Tu y arriveras à la prochaine ! »).
+          // Italique conservée (ton littéraire), 15pt en secondaire pour
+          // rester sous le seuil AA sans descendre en tertiaire (3.2:1).
           Text(
             'result.failure.consolation'.tr(),
             textAlign: TextAlign.center,
             style: AppTypography.crimson(
-              size: 14,
-              color: AppColors.texteTertiaire,
+              size: 15,
+              color: AppColors.texteSecondaire,
               style: FontStyle.italic,
             ),
           ),

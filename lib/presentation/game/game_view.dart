@@ -645,12 +645,12 @@ class _RiddleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.fromLTRB(14, 14, 16, 14),
       decoration: BoxDecoration(
-        color: AppColors.boisFonce.withValues(alpha: 0.85),
+        color: AppColors.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.orChaud.withValues(alpha: 0.5),
+          color: AppColors.orJour.withValues(alpha: 0.6),
           width: 1.5,
         ),
         boxShadow: <BoxShadow>[
@@ -664,14 +664,19 @@ class _RiddleCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // Griot avatar.
-          Image.asset(AppAssets.griotIdle, width: 64, height: 64),
-          const SizedBox(width: 10),
-          // Riddle text.
+          // Griot avatar — réduit à 48pt pour libérer largeur texte.
+          Image.asset(AppAssets.griotIdle, width: 48, height: 48),
+          const SizedBox(width: 12),
+          // Énoncé — bodyMd non-italique sur textePrimaire pour scan rapide.
+          // L'italique est réservé aux proverbes/encouragements.
           Expanded(
             child: Text(
               riddle,
-              style: AppTypography.crimson(size: 15, style: FontStyle.italic),
+              style: AppTypography.bodyMd.copyWith(
+                fontSize: 16,
+                height: 1.45,
+                color: AppColors.textePrimaire,
+              ),
             ),
           ),
         ],
