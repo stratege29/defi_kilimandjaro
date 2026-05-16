@@ -1,0 +1,1674 @@
+[
+  {
+    "id": "culture_ci_001",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FOUTOU",
+    "answer_normalized": "foutou",
+    "letters_pool": [
+      "F",
+      "O",
+      "U",
+      "T",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Dans le mortier on me pile longtemps. Igname ou banane, je deviens pâte tendre."
+    },
+    "explanation": {
+      "fr": "Le foutou est une pâte pilée emblématique ivoirienne, préparée à base d'igname, de banane plantain ou de manioc, servie avec une sauce."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "cuisine",
+      "tradition",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_002",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ATTIEKE",
+    "answer_normalized": "attieke",
+    "letters_pool": [
+      "A",
+      "T",
+      "T",
+      "I",
+      "E",
+      "K",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Semoule de manioc, je viens d'Abidjan. Avec poisson braisé, je fais le bonheur du midi."
+    },
+    "explanation": {
+      "fr": "L'attieke est une semoule de manioc fermenté, plat populaire d'origine ébrié, souvent accompagné de poisson, viande ou sauce claire."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_003",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MAIS",
+    "answer_normalized": "mais",
+    "letters_pool": [
+      "M",
+      "A",
+      "I",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Grain doré sur l'épi, on me grille au feu de bois pour le goûter."
+    },
+    "explanation": {
+      "fr": "Le maïs est une céréale très consommée en Côte d'Ivoire, grillée, bouillie ou transformée en farine pour diverses préparations."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "cuisine",
+      "cereale",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_004",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GOMBO",
+    "answer_normalized": "gombo",
+    "letters_pool": [
+      "G",
+      "O",
+      "M",
+      "B",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Vert et long sur la branche, je rends la sauce onctueuse et glissante."
+    },
+    "explanation": {
+      "fr": "Le gombo est un legume tres utilise en cote d'ivoire pour sa texture filante, base de la fameuse sauce gombo accompagnant foutou ou riz."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "cuisine",
+      "legume"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_005",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ALLOCO",
+    "answer_normalized": "alloco",
+    "letters_pool": [
+      "A",
+      "L",
+      "L",
+      "O",
+      "C",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Banane bien mûre coupée en rondelles, je grésille dans l'huile et je dore au soleil."
+    },
+    "explanation": {
+      "fr": "L'alloco désigne des bananes plantains mûres frites, servies en accompagnement ou en street food, parfois avec piment et oignons."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "cuisine",
+      "street-food"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_006",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POULE",
+    "answer_normalized": "poule",
+    "letters_pool": [
+      "P",
+      "O",
+      "U",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Je gratte la cour du matin au soir. Mes œufs nourrissent toute la maison."
+    },
+    "explanation": {
+      "fr": "La poule est un animal domestique courant dans la cour des concessions villageoises, élevée pour ses œufs et sa viande."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "animaux",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_007",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NATTE",
+    "answer_normalized": "natte",
+    "letters_pool": [
+      "N",
+      "A",
+      "T",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Tressée en feuilles ou en raphia, je deviens lit ou tapis pour la sieste."
+    },
+    "explanation": {
+      "fr": "La natte est un objet domestique tressé, utilisée pour s'asseoir, dormir ou recevoir, présente dans toutes les cours villageoises."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "objets",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_008",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PAGNE",
+    "answer_normalized": "pagne",
+    "letters_pool": [
+      "P",
+      "A",
+      "G",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Tissu coloré qu'on noue à la taille, je m'orne de motifs et raconte une histoire."
+    },
+    "explanation": {
+      "fr": "Le pagne est un textile imprimé porté quotidiennement, élément central du vestiaire féminin ivoirien et symbole d'élégance."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "objets",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_009",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SEAU",
+    "answer_normalized": "seau",
+    "letters_pool": [
+      "S",
+      "E",
+      "A",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Du puits au foyer, je porte sur la tête l'eau du matin."
+    },
+    "explanation": {
+      "fr": "Le seau est un récipient utilisé pour puiser et transporter l'eau au village, souvent porté sur la tête."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "objets",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_010",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FOYER",
+    "answer_normalized": "foyer",
+    "letters_pool": [
+      "F",
+      "O",
+      "Y",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Trois pierres rondes, une marmite dessus. C'est ici que la famille se réchauffe."
+    },
+    "explanation": {
+      "fr": "Le foyer traditionnel se compose souvent de trois pierres soutenant la marmite au-dessus du feu, lieu central de la cuisine villageoise."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "objets",
+      "village",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_011",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CASE",
+    "answer_normalized": "case",
+    "letters_pool": [
+      "C",
+      "A",
+      "S",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Murs de banco, toit de paille, je suis l'abri du soir."
+    },
+    "explanation": {
+      "fr": "La case désigne l'habitation traditionnelle villageoise, généralement construite en banco avec un toit végétal."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "habitat",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_012",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BOEUF",
+    "answer_normalized": "boeuf",
+    "letters_pool": [
+      "B",
+      "O",
+      "E",
+      "U",
+      "F"
+    ],
+    "riddle": {
+      "fr": "Lourd et lent, mes cornes fendent l'air. Sans moi, peu de labours, peu de festins."
+    },
+    "explanation": {
+      "fr": "Le boeuf est un animal d'elevage important au village, utilise pour les travaux agricoles et la viande lors des grandes occasions."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "animaux",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_013",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "IGNAME",
+    "answer_normalized": "igname",
+    "letters_pool": [
+      "I",
+      "G",
+      "N",
+      "A",
+      "M",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Tubercule qu'on déterre avec soin. Pilée, bouillie ou frite, je régale la table."
+    },
+    "explanation": {
+      "fr": "L'igname est un tubercule fondamental dans la cuisine ivoirienne, base du foutou et célébrée lors de fêtes des récoltes en pays Akan."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": [
+      "cuisine",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_014",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MANIOC",
+    "answer_normalized": "manioc",
+    "letters_pool": [
+      "M",
+      "A",
+      "N",
+      "I",
+      "O",
+      "C"
+    ],
+    "riddle": {
+      "fr": "De ma racine on tire farine, attieke et placali. Sans moi, le marché perd ses couleurs."
+    },
+    "explanation": {
+      "fr": "Le manioc est une racine cultivée largement, transformée en attieke, placali ou farine, base alimentaire essentielle."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": [
+      "cuisine",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_015",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PILON",
+    "answer_normalized": "pilon",
+    "letters_pool": [
+      "P",
+      "I",
+      "L",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Bras de bois lourd, je danse dans le mortier au rythme des mains."
+    },
+    "explanation": {
+      "fr": "Le pilon est un long bâton de bois utilisé pour piler igname, banane ou céréales dans le mortier."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "objets",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_016",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MARCHE",
+    "answer_normalized": "marche",
+    "letters_pool": [
+      "M",
+      "A",
+      "R",
+      "C",
+      "H",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Étals colorés, voix qui s'appellent, prix qu'on négocie, je suis le cœur du village."
+    },
+    "explanation": {
+      "fr": "Le marché est un lieu central de la vie communautaire, espace d'échanges commerciaux et sociaux."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lieux",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_017",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PUITS",
+    "answer_normalized": "puits",
+    "letters_pool": [
+      "P",
+      "U",
+      "I",
+      "T",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Trou profond, eau fraîche au fond, on me visite chaque matin avec une corde."
+    },
+    "explanation": {
+      "fr": "Le puits est une source d'eau commune au village, indispensable pour les besoins quotidiens des familles."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lieux",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_018",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CHEVRE",
+    "answer_normalized": "chevre",
+    "letters_pool": [
+      "C",
+      "H",
+      "E",
+      "V",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cornes courtes, barbe au menton, je broute autour de la case et donne mon lait."
+    },
+    "explanation": {
+      "fr": "La chèvre est un animal domestique très répandu au village, élevé pour son lait, sa viande et son rôle dans les cérémonies."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "animaux",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_019",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MOUTON",
+    "answer_normalized": "mouton",
+    "letters_pool": [
+      "M",
+      "O",
+      "U",
+      "T",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Toison épaisse, pas tranquille, je suis l'invité d'honneur des grandes fêtes."
+    },
+    "explanation": {
+      "fr": "Le mouton est un animal domestique courant, élevé pour la viande et présent lors de fêtes familiales et célébrations."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "animaux",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_020",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SAUCE",
+    "answer_normalized": "sauce",
+    "letters_pool": [
+      "S",
+      "A",
+      "U",
+      "C",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Graine, gombo ou arachide, je nappe le riz et fais danser les papilles."
+    },
+    "explanation": {
+      "fr": "La sauce accompagne riz, foutou ou attieke, déclinée en de nombreuses variantes : graine, gombo, arachide, claire."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_021",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MORTIER",
+    "answer_normalized": "mortier",
+    "letters_pool": [
+      "M",
+      "O",
+      "R",
+      "T",
+      "I",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Bois creusé en gros bol, j'attends le pilon pour faire chanter les ignames."
+    },
+    "explanation": {
+      "fr": "Le mortier est un récipient en bois sculpté servant à piler ignames, manioc ou condiments avec un pilon."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "objets",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_022",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GARBA",
+    "answer_normalized": "garba",
+    "letters_pool": [
+      "G",
+      "A",
+      "R",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Attieke et thon frit, vendu au coin de la rue. Le ventre vide me trouve toujours."
+    },
+    "explanation": {
+      "fr": "Le garba est un plat populaire de street food associant attieke et thon frit, emblématique des villes ivoiriennes."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": [
+      "cuisine",
+      "street-food"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_023",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GRIOT",
+    "answer_normalized": "griot",
+    "letters_pool": [
+      "G",
+      "R",
+      "I",
+      "O",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Mémoire vivante, ma parole tisse l'histoire des familles aux soirs de pleine lune."
+    },
+    "explanation": {
+      "fr": "Le griot est un dépositaire de la tradition orale, conteur, généalogiste et musicien, gardien de la mémoire communautaire."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "tradition",
+      "oralite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_024",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FAMILLE",
+    "answer_normalized": "famille",
+    "letters_pool": [
+      "F",
+      "A",
+      "M",
+      "I",
+      "L",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Plus large qu'un toit, plus solide qu'un mur, je relie les générations."
+    },
+    "explanation": {
+      "fr": "La famille étendue est au cœur de la société ivoirienne, regroupant plusieurs générations et liens élargis au-delà du foyer immédiat."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 30,
+    "tags": [
+      "tradition",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_025",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KEDJENOU",
+    "answer_normalized": "kedjenou",
+    "letters_pool": [
+      "K",
+      "E",
+      "D",
+      "J",
+      "E",
+      "N",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Marmite scellée, mijoté lent, poulet ou pintade, je garde tous mes parfums."
+    },
+    "explanation": {
+      "fr": "Le kedjenou est un mets baoulé mijoté en marmite fermée, à base de poulet ou de pintade et de légumes, cuisson lente sans eau ajoutée."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_026",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GNAGNAN",
+    "answer_normalized": "gnagnan",
+    "letters_pool": [
+      "G",
+      "N",
+      "A",
+      "G",
+      "N",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Petite baie verte, parfois amère, je relève sauces et ragoûts au village."
+    },
+    "explanation": {
+      "fr": "Le gnagnan est une petite baie utilisée comme légume amer dans les sauces traditionnelles ivoiriennes, notamment chez les Akan."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_027",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MARMITE",
+    "answer_normalized": "marmite",
+    "letters_pool": [
+      "M",
+      "A",
+      "R",
+      "M",
+      "I",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Ventre rond noirci de fumee, je mijote sur trois pierres et garde les saveurs."
+    },
+    "explanation": {
+      "fr": "La marmite est l'ustensile central du foyer villageois, posee sur les trois pierres du feu pour cuire sauces et ragouts."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "objets",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_028",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PLACALI",
+    "answer_normalized": "placali",
+    "letters_pool": [
+      "P",
+      "L",
+      "A",
+      "C",
+      "A",
+      "L",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Pâte fermentée de manioc, douce et lisse, je glisse avec la sauce graine."
+    },
+    "explanation": {
+      "fr": "Le placali est une pâte préparée à base de manioc fermenté, accompagnée souvent de sauce graine, plat très apprécié en Côte d'Ivoire."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_029",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ARACHIDE",
+    "answer_normalized": "arachide",
+    "letters_pool": [
+      "A",
+      "R",
+      "A",
+      "C",
+      "H",
+      "I",
+      "D",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Sous la terre je pousse en gousses. Grillée ou en pâte, je parfume la sauce."
+    },
+    "explanation": {
+      "fr": "L'arachide est une légumineuse cultivée largement, consommée grillée ou transformée en pâte pour les sauces traditionnelles."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": [
+      "cuisine",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_030",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TAMTAM",
+    "answer_normalized": "tamtam",
+    "letters_pool": [
+      "T",
+      "A",
+      "M",
+      "T",
+      "A",
+      "M"
+    ],
+    "riddle": {
+      "fr": "Peau tendue sur le bois, mes battements appellent au rassemblement et à la danse."
+    },
+    "explanation": {
+      "fr": "Le tam-tam est un instrument à percussion traditionnel, utilisé pour la communication, les fêtes et les cérémonies villageoises."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": [
+      "objets",
+      "tradition",
+      "musique"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_031",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "LION",
+    "answer_normalized": "lion",
+    "letters_pool": [
+      "L",
+      "I",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Roi de la brousse, crinière d'or, mon rugissement fait trembler la savane."
+    },
+    "explanation": {
+      "fr": "Le lion est un grand félin emblématique de la faune africaine, symbole de force et de puissance dans les traditions ivoiriennes."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "faune",
+      "savane"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_032",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BUFFLE",
+    "answer_normalized": "buffle",
+    "letters_pool": [
+      "B",
+      "U",
+      "F",
+      "F",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cornes larges, silhouette massive, je traverse la rivière en troupeau lors de la saison sèche."
+    },
+    "explanation": {
+      "fr": "Le buffle est un animal sauvage de grande taille, vivant en Côte d'Ivoire dans les zones de savane et de forêt, animal de puissance culturelle."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "faune",
+      "savane"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_033",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GAZELLE",
+    "answer_normalized": "gazelle",
+    "letters_pool": [
+      "G",
+      "A",
+      "Z",
+      "E",
+      "L",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Yeux doux et jambes fines, je bondie légère à travers les herbes dorées de la brousse."
+    },
+    "explanation": {
+      "fr": "La gazelle est une antilope gracile habitant les savanes ivoiriennes, symbole d'agilité et de délicatesse dans les traditions."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "faune",
+      "savane"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_034",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CALAO",
+    "answer_normalized": "calao",
+    "letters_pool": [
+      "C",
+      "A",
+      "L",
+      "A",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Oiseau bruyant du grand bec creux, j'annonce l'aube dans la forêt sacrée."
+    },
+    "explanation": {
+      "fr": "Le calao est un grand oiseau forestier, reconnaissable à son bec imposant, présent dans les légendes et traditions des peuples ivoiriens."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "faune",
+      "foret"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_035",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "IBIS",
+    "answer_normalized": "ibis",
+    "letters_pool": [
+      "I",
+      "B",
+      "I",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Long cou recourbé, je picote dans les bas-fonds près de la lagune."
+    },
+    "explanation": {
+      "fr": "L'ibis est un oiseau échassier habitant les zones humides et les lagunes, symbole de prudence dans certaines traditions ivoiriennes."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "faune",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_036",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GORILLE",
+    "answer_normalized": "gorille",
+    "letters_pool": [
+      "G",
+      "O",
+      "R",
+      "I",
+      "L",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Grand singe des montagnes de Nimba, force et sagesse résident en mon poitrail."
+    },
+    "explanation": {
+      "fr": "Le gorille est un grand singe endémique au Mont Nimba, site UNESCO partagé avec la Guinée, symbole de la faune remarquable ivoirienne."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "faune",
+      "montagne"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_037",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BALAFON",
+    "answer_normalized": "balafon",
+    "letters_pool": [
+      "B",
+      "A",
+      "L",
+      "A",
+      "F",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Lames de bois sous les mains, calebasse sonore, je chante le ciel et la terre."
+    },
+    "explanation": {
+      "fr": "Le balafon est un xylophone africain à calebasses, instrument fondamental de la musique mandingue, joué par les griots ivoiriens."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "musique",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_038",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DJEMBE",
+    "answer_normalized": "djembe",
+    "letters_pool": [
+      "D",
+      "J",
+      "E",
+      "M",
+      "B",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Coupe de peau tendre, je parle par trois sons : grave, tonique, aigu."
+    },
+    "explanation": {
+      "fr": "Le djembe est un tambour ouest-africain en forme de calice, utilisé pour les cérémonies et le divertissement, joué largement en Côte d'Ivoire."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "musique",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_039",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KORA",
+    "answer_normalized": "kora",
+    "letters_pool": [
+      "K",
+      "O",
+      "R",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Harpe du Mandingue, mes cordes chantent l'amour et la guerre depuis la nuit des temps."
+    },
+    "explanation": {
+      "fr": "La kora est une harpe-luth mandingue caractérisée par ses cordes pincées, instrument noble des griots et symbole musical de l'Afrique de l'Ouest."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "musique",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_040",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SANZA",
+    "answer_normalized": "sanza",
+    "letters_pool": [
+      "S",
+      "A",
+      "N",
+      "Z",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Petites lames métalliques, je tinte entre vos pouces, musique hypnotique des veillées."
+    },
+    "explanation": {
+      "fr": "La sanza (ou mbira) est un idiophone à lamelles métalliques, instrument miniature créateur de mélodies complexes, utilisé pour la méditation et la danse."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "musique",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_041",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KPALOGO",
+    "answer_normalized": "kpalogo",
+    "letters_pool": [
+      "K",
+      "P",
+      "A",
+      "L",
+      "O",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Tambour dioula tendu de cordes, ma voix grave appelle les esprits lors des nuits de danse."
+    },
+    "explanation": {
+      "fr": "Le kpalogo est un tambour traditionnel dioula, utilisé lors des fêtes et cérémonies, symbole de la musique percussive ivoirienne."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "musique",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_042",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ABIDJAN",
+    "answer_normalized": "abidjan",
+    "letters_pool": [
+      "A",
+      "B",
+      "I",
+      "D",
+      "J",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Capitale économique sur la lagune, je suis le cœur battant de la Côte d'Ivoire."
+    },
+    "explanation": {
+      "fr": "Abidjan est la capitale économique et la plus grande ville de Côte d'Ivoire, centre urbain majeur situé sur la Lagune Ébrié."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "lieux",
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_043",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BOUAKE",
+    "answer_normalized": "bouake",
+    "letters_pool": [
+      "B",
+      "O",
+      "U",
+      "A",
+      "K",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Ville du centre, je suis le marché de la forêt baoulé et capitale de la fierté."
+    },
+    "explanation": {
+      "fr": "Bouaké est la deuxième ville de Côte d'Ivoire, située au cœur du pays Baoulé, centre commercial et cultural important."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lieux",
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_044",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KORHOGO",
+    "answer_normalized": "korhogo",
+    "letters_pool": [
+      "K",
+      "O",
+      "R",
+      "H",
+      "O",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Ville du nord, toile teintée et tissus sénoufo, je suis la fierté artisanale."
+    },
+    "explanation": {
+      "fr": "Korhogo est une ville du nord ivoirien renommée pour ses tissus teints et ses motifs sénoufo, centre cultural et artisanal majeur."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lieux",
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_045",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ASSINIE",
+    "answer_normalized": "assinie",
+    "letters_pool": [
+      "A",
+      "S",
+      "S",
+      "I",
+      "N",
+      "I",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Plage du sud-est, palmiers et lagune bleue, j'accueille les cœurs en paix."
+    },
+    "explanation": {
+      "fr": "Assinie est une station balnéaire côtière du sud-est ivoirien, lieu touristique réputé pour ses plages et sa beauté naturelle."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lieux",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_046",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "LAGUNE",
+    "answer_normalized": "lagune",
+    "letters_pool": [
+      "L",
+      "A",
+      "G",
+      "U",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Eaux calmes d'Ébrié, pirogues chargées, je suis la mère nourricière des pêcheurs."
+    },
+    "explanation": {
+      "fr": "La Lagune Ébrié est le grand plan d'eau côtier ivoirien, source de vie pour les pêcheurs et point d'ancrage de la culture maritime."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lieux",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_047",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DANANE",
+    "answer_normalized": "danane",
+    "letters_pool": [
+      "D",
+      "A",
+      "N",
+      "A",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cité de l'Ouest aux dix-huit montagnes, là où le pays Yacouba touche la frontière guinéenne."
+    },
+    "explanation": {
+      "fr": "Danané est une ville de l'extrême Ouest ivoirien, cœur du pays Yacouba (Dan), nichée dans les contreforts du Mont Nimba."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lieux",
+      "ville",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_048",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GOLI",
+    "answer_normalized": "goli",
+    "letters_pool": [
+      "G",
+      "O",
+      "L",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Masque sénoufo aux yeux spiralés, je viens de la nuit pour danser la création du monde."
+    },
+    "explanation": {
+      "fr": "Le Goli est un masque sénoufo dont les motifs spiralés représentent le feu et l'eau, utilisé lors de cérémonies d'initiation et de deuil."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "tradition",
+      "masque"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_049",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POPO",
+    "answer_normalized": "popo",
+    "letters_pool": [
+      "P",
+      "O",
+      "P",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Masque rond du visage lisse, je suis l'esprit féminin de la brousse."
+    },
+    "explanation": {
+      "fr": "Le Popo est un masque féminin de la tradition sénoufo, représentant la beauté et la fécondité, apparu lors des festivités villageoises."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "tradition",
+      "masque"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_050",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ABISSA",
+    "answer_normalized": "abissa",
+    "letters_pool": [
+      "A",
+      "B",
+      "I",
+      "S",
+      "S",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Fête alladian de la pardon et des rires, je rassemble les cœurs sous le ciel."
+    },
+    "explanation": {
+      "fr": "L'Abissa est une fête traditionnelle des peuples Alladian du littoral, célébration annuelle de pardon et de réjouissances."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "tradition",
+      "fete"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_051",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GORI",
+    "answer_normalized": "gori",
+    "letters_pool": [
+      "G",
+      "O",
+      "R",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Cérémonie baoulé d'honneur aux anciens, je marque le respect et la transmission."
+    },
+    "explanation": {
+      "fr": "Le Gori est une cérémonie baoulé de respect envers les anciens et les chefs, marquant les moments clés de la vie communautaire."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "tradition",
+      "ceremony"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_052",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KENTE",
+    "answer_normalized": "kente",
+    "letters_pool": [
+      "K",
+      "E",
+      "N",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Tissu royal aux motifs complexes, je suis porté aux grandes occasions par les rois akan."
+    },
+    "explanation": {
+      "fr": "Le kente est un tissu royal akan tissé, caractérisé par ses motifs géométriques complexes, symbole de prestige et de cérémonie."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "artisanat",
+      "tissu"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_053",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BANGUI",
+    "answer_normalized": "bangui",
+    "letters_pool": [
+      "B",
+      "A",
+      "N",
+      "G",
+      "U",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Banane très mûre, je suis transformée en purée sucrée ou en farine pour les enfants."
+    },
+    "explanation": {
+      "fr": "Le bangui désigne une banane plantain très mûre, utilisée pour préparer un plat sucré ou une farine nourrissante pour les jeunes enfants."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "cuisine",
+      "banane"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_054",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KABATO",
+    "answer_normalized": "kabato",
+    "letters_pool": [
+      "K",
+      "A",
+      "B",
+      "A",
+      "T",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Riz et haricots cuits ensemble, je suis le réconfort du pauvre et la fierté du riche."
+    },
+    "explanation": {
+      "fr": "Le kabato (ou kabato kabato) est un plat ivoirien d'arachides, riz et haricots mélangés, nourriture simple mais enrichissante."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_055",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AKWABA",
+    "answer_normalized": "akwaba",
+    "letters_pool": [
+      "A",
+      "K",
+      "W",
+      "A",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Mot de bienvenue chaud, on m'appelle quand un ami franchit le seuil."
+    },
+    "explanation": {
+      "fr": "Akwaba est un mot akan signifiant bienvenue, expression chaleureuse d'accueil et d'hospitalité centrale à la culture ivoirienne."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "langage",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_056",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NIMBA",
+    "answer_normalized": "nimba",
+    "letters_pool": [
+      "N",
+      "I",
+      "M",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Sommet montagneux sacré du sud-ouest, je suis patrimoine UNESCO et berceau de légendes."
+    },
+    "explanation": {
+      "fr": "Le Mont Nimba est un site UNESCO partagé entre la Côte d'Ivoire, la Guinée et le Liberia, montagne sacrée de biodiversité exceptionnelle."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "geographie",
+      "patrimoine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_057",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GAGNOA",
+    "answer_normalized": "gagnoa",
+    "letters_pool": [
+      "G",
+      "A",
+      "G",
+      "N",
+      "O",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Ville du sud-ouest, carrefour des routes et des peuples dioula."
+    },
+    "explanation": {
+      "fr": "Gagnoa est une ville du sud-ouest ivoirien, carrefour commercial et centre cultural important, capitale historique du pays Gagou."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lieux",
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_058",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AVIKAM",
+    "answer_normalized": "avikam",
+    "letters_pool": [
+      "A",
+      "V",
+      "I",
+      "K",
+      "A",
+      "M"
+    ],
+    "riddle": {
+      "fr": "Peuple des lagunes du Sud, pêcheurs entre l'eau et le sable, mes pirogues fendent Grand-Lahou."
+    },
+    "explanation": {
+      "fr": "Les Avikam sont un peuple lagunaire du Sud-Ouest ivoirien, vivant principalement à Grand-Lahou, reconnus pour leur tradition de pêche et leurs masques sacrés."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "peuple",
+      "tradition",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_059",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ANCETRE",
+    "answer_normalized": "ancetre",
+    "letters_pool": [
+      "A",
+      "N",
+      "C",
+      "E",
+      "T",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Absent du corps mais présent en l'esprit, je guide les vivants depuis l'au-delà."
+    },
+    "explanation": {
+      "fr": "L'ancêtre est une figure centrale dans les croyances ivoiriennes, intercesseur entre le monde des vivants et celui des esprits."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "spiritualite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_060",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PALAVER",
+    "answer_normalized": "palaver",
+    "letters_pool": [
+      "P",
+      "A",
+      "L",
+      "A",
+      "V",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Parole publique sous l'arbre, on m'utilise pour résoudre les conflits avec sagesse."
+    },
+    "explanation": {
+      "fr": "La palabre est un système traditionnel de débat public ivoirien, où chacun peut s'exprimer sous un arbre communal pour trancher les litiges."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "justice"
+    ],
+    "format_version": 3
+  }
+]

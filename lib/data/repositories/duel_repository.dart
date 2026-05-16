@@ -54,11 +54,15 @@ class DuelRepository {
   }
 
   /// Crée un duel et retourne ses identifiants. La devinette est tirée au
-  /// hasard du monde [worldId] (par défaut "village_des_or").
+  /// hasard du pack [packId] (par défaut "culture_ci").
+  ///
+  /// NB : le schema RTDB conserve la clé `proverb` (vide) pour la rétro-compat
+  /// du parsing [DuelSession.fromJson] tant que l'UI du duel n'a pas été
+  /// rebatie en Phase 3.
   Future<({String matchId, String secret})> createDuel({
-    String worldId = 'village_des_or',
+    String packId = 'culture_ci',
   }) async {
-    final devinette = await devinetteRepo.randomFromWorld(worldId);
+    final devinette = await devinetteRepo.randomFromPack(packId);
     final shuffled = _shuffle(devinette.lettersPool);
 
     final matchId = _generateMatchId();
@@ -75,7 +79,7 @@ class DuelRepository {
       'letters_pool': shuffled,
       'riddle': devinette.riddle,
       'explanation': devinette.explanation,
-      'proverb': devinette.proverb,
+      'proverb': '',
       'players': <String, dynamic>{
         uid: const DuelPlayer(uid: 'self', progress: 0).toJson()
           ..remove('finished_at'),
@@ -282,19 +286,16 @@ final duelSessionStreamProvider =
 Devinette devinetteFromDuel(DuelSession session) {
   return Devinette(
     id: 'duel_${session.matchId}',
-    world: 'duel',
+    pack: 'duel',
     country: 'ci',
     answer: session.answer,
     lettersPool: session.lettersPool,
-    // v2 schema: monolingual duel payload wrapped under active locale.
+    // v3 schema: monolingual duel payload wrapped under active locale.
     riddleByLang: <String, String>{
       DevinetteLocale.activeLang: session.riddle,
     },
     explanationByLang: <String, String>{
       DevinetteLocale.activeLang: session.explanation,
-    },
-    proverbByLang: <String, String>{
-      DevinetteLocale.activeLang: session.proverb,
     },
     difficulty: 1,
     estimatedTimeS: 30,

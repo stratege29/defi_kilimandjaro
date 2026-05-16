@@ -17,21 +17,24 @@ part 'devinette_database.g.dart';
 /// depuis `rootBundle` à chaque session par `BundledDevinetteDatasource`.
 /// Cette table accueille uniquement le contenu téléchargé : packs officiels
 /// et pack communautaire.
+///
+/// Schema v2 (format_version 3) :
+///   - `world` renommé en `pack`
+///   - colonne `proverbJson` supprimée
 @DataClassName('CachedDevinetteRow')
 class DevinettesCache extends Table {
   TextColumn get id => text()();
-  TextColumn get world => text()();
+  TextColumn get pack => text()();
   TextColumn get country => text()();
   TextColumn get answer => text()();
   TextColumn get answerNormalized => text().nullable()();
   TextColumn get lettersPoolJson => text()();
   TextColumn get riddleJson => text()();
   TextColumn get explanationJson => text()();
-  TextColumn get proverbJson => text()();
   IntColumn get difficulty => integer()();
   IntColumn get estimatedTimeS => integer()();
   TextColumn get tagsJson => text()();
-  IntColumn get formatVersion => integer().withDefault(const Constant(2))();
+  IntColumn get formatVersion => integer().withDefault(const Constant(3))();
   TextColumn get source => text()();
   TextColumn get imageSvg => text().nullable()();
   TextColumn get imageUrl => text().nullable()();
@@ -46,10 +49,10 @@ class DevinettesCache extends Table {
 /// avec le manifest Firestore pour décider d'un re-download.
 @DataClassName('PackStateRow')
 class PackState extends Table {
-  /// Identifiant du pack — `<world>` pour les packs officiels et
-  /// `<world>_community` pour le pack communautaire.
+  /// Identifiant du pack — `<pack>` pour les packs officiels et
+  /// `<pack>_community` pour le pack communautaire.
   TextColumn get packId => text()();
-  TextColumn get world => text()();
+  TextColumn get pack => text()();
   IntColumn get packVersion => integer()();
   TextColumn get hashSha256 => text()();
   IntColumn get sizeBytes => integer().withDefault(const Constant(0))();
@@ -86,7 +89,21 @@ class DevinetteDatabase extends _$DevinetteDatabase {
   DevinetteDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onUpgrade: (m, from, to) async {
+          // v1 → v2 : refonte format JSON v2 → v3 (world → pack, suppression
+          // du proverbe). Aucune prod déployée → on drop le cache, il sera
+          // rebati au prochain sync (ManifestSyncService).
+          if (from < 2) {
+            await m.deleteTable(devinettesCache.actualTableName);
+            await m.deleteTable(packState.actualTableName);
+            await m.createAll();
+          }
+        },
+      );
 }
 
 LazyDatabase _openConnection() {
@@ -102,14 +119,13 @@ extension DevinetteCacheMapping on Devinette {
   DevinettesCacheCompanion toCacheCompanion({required int packVersion}) {
     return DevinettesCacheCompanion.insert(
       id: id,
-      world: world,
+      pack: pack,
       country: country,
       answer: answer,
       answerNormalized: Value(answerNormalized),
       lettersPoolJson: jsonEncode(lettersPool),
       riddleJson: jsonEncode(riddleByLang),
       explanationJson: jsonEncode(explanationByLang),
-      proverbJson: jsonEncode(proverbByLang),
       difficulty: difficulty,
       estimatedTimeS: estimatedTimeS,
       tagsJson: jsonEncode(tags),
@@ -127,7 +143,7 @@ extension CachedDevinetteRowMapping on CachedDevinetteRow {
   Devinette toEntity() {
     return Devinette(
       id: id,
-      world: world,
+      pack: pack,
       country: country,
       answer: answer,
       answerNormalized: answerNormalized,
@@ -136,9 +152,6 @@ extension CachedDevinetteRowMapping on CachedDevinetteRow {
         (k, v) => MapEntry(k.toString(), v.toString()),
       ),
       explanationByLang: (jsonDecode(explanationJson) as Map).map(
-        (k, v) => MapEntry(k.toString(), v.toString()),
-      ),
-      proverbByLang: (jsonDecode(proverbJson) as Map).map(
         (k, v) => MapEntry(k.toString(), v.toString()),
       ),
       difficulty: difficulty,

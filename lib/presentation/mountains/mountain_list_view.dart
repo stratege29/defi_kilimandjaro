@@ -9,6 +9,7 @@ import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/altimeter_rail.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/atmosphere_layer.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_painter.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -210,6 +211,35 @@ class _MountainListViewState extends ConsumerState<MountainListView>
                     child: AltimeterRail(
                       currentAltitude: interpolatedAlt,
                       bestAltitude: bestAlt,
+                    ),
+                  ),
+                ),
+              ),
+
+              // 5. Bouton "Mes packs" — coin supérieur droit (icon-only).
+              // Libère l'espace pour le nom de la montagne en haut-gauche.
+              Positioned(
+                top: 0,
+                right: 0,
+                child: SafeArea(
+                  child: Semantics(
+                    button: true,
+                    label: 'my_packs.title'.tr(),
+                    child: Material(
+                      color: AppColors.surfaceContainer.withValues(alpha: 0.85),
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () => context.push(AppRoutes.myPacks),
+                        child: const Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Icon(
+                            Icons.layers_outlined,
+                            color: AppColors.orJour,
+                            size: 22,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),

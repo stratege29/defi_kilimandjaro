@@ -8,7 +8,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Legacy : charge les devinettes depuis les assets JSON bundlés dans
-/// `assets/data/devinettes/<worldId>.json` (format v1 ou v2).
+/// `assets/data/devinettes/<packId>.json` (format v3).
 ///
 /// **Conservé pour les tests et comme filet de sécurité.** L'implémentation
 /// par défaut en production est désormais [CompositeDevinetteRepository]
@@ -25,37 +25,37 @@ class AssetDevinetteRepository implements DevinetteRepository {
   final Random _rng = Random();
 
   @override
-  Future<List<Devinette>> loadWorld(String worldId) async {
-    final cached = _cache[worldId];
+  Future<List<Devinette>> loadPack(String packId) async {
+    final cached = _cache[packId];
     if (cached != null) return cached;
 
-    final raw = await rootBundle.loadString('$_basePath/$worldId.json');
+    final raw = await rootBundle.loadString('$_basePath/$packId.json');
     final list = (jsonDecode(raw) as List<dynamic>)
         .cast<Map<String, dynamic>>()
         .map(Devinette.fromJson)
         .toList(growable: false);
 
-    _cache[worldId] = list;
+    _cache[packId] = list;
     return list;
   }
 
   @override
-  Future<Devinette> randomFromWorld(String worldId) async {
-    final list = await loadWorld(worldId);
+  Future<Devinette> randomFromPack(String packId) async {
+    final list = await loadPack(packId);
     if (list.isEmpty) {
-      throw StateError('Aucune devinette dans le monde "$worldId"');
+      throw StateError('Aucune devinette dans le pack "$packId"');
     }
     return list[_rng.nextInt(list.length)];
   }
 
   @override
-  Future<Devinette> randomFromWorldExcluding(
-    String worldId,
+  Future<Devinette> randomFromPackExcluding(
+    String packId,
     Iterable<String> excludeIds,
   ) async {
-    final list = await loadWorld(worldId);
+    final list = await loadPack(packId);
     if (list.isEmpty) {
-      throw StateError('Aucune devinette dans le monde "$worldId"');
+      throw StateError('Aucune devinette dans le pack "$packId"');
     }
     final exclude = excludeIds.toSet();
     final pool = list.where((d) => !exclude.contains(d.id)).toList();
@@ -66,10 +66,10 @@ class AssetDevinetteRepository implements DevinetteRepository {
   }
 
   @override
-  Future<Devinette> atIndex(String worldId, int index) async {
-    final list = await loadWorld(worldId);
+  Future<Devinette> atIndex(String packId, int index) async {
+    final list = await loadPack(packId);
     if (index < 0 || index >= list.length) {
-      throw RangeError.index(index, list, 'devinette index for "$worldId"');
+      throw RangeError.index(index, list, 'devinette index for "$packId"');
     }
     return list[index];
   }

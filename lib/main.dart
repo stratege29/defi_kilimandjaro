@@ -296,11 +296,11 @@ class _BootGateState extends ConsumerState<_BootGate> {
   Widget build(BuildContext context) => widget.child;
 }
 
-class KilimandjaroApp extends StatelessWidget {
+class KilimandjaroApp extends ConsumerWidget {
   const KilimandjaroApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // Keep DevinetteLocale aligned with easy_localization's active locale so
     // riddle/explanation/proverb getters resolve to the right language. Runs
     // on every locale change (build is triggered by EasyLocalization).
@@ -312,7 +312,7 @@ class KilimandjaroApp extends StatelessWidget {
       theme: AppTheme.dark,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.dark,
-      routerConfig: appRouter,
+      routerConfig: ref.watch(appRouterProvider),
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,

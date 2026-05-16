@@ -1,9 +1,8 @@
 {
-  "worlds": {
-    "village_des_or": { "count": 30, "file": "village_des_or.json" },
-    "foret_sacree": { "count": 0, "file": "foret_sacree.json" },
-    "lagune_des_saveurs": { "count": 0, "file": "lagune_des_saveurs.json" },
-    "monts_des_legendes": { "count": 0, "file": "monts_des_legendes.json" }
+  "format_version": 3,
+  "packs": {
+    "culture_ci": { "count": 60, "file": "culture_ci.json" },
+    "crack_nouchi": { "count": 30, "file": "crack_nouchi.json" }
   },
-  "total": 30
+  "total": 90
 }

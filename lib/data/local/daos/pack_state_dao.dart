@@ -21,7 +21,7 @@ class PackStateDao extends DatabaseAccessor<DevinetteDatabase>
   /// Upsert d'un état de pack après un download réussi.
   Future<void> upsert({
     required String packId,
-    required String world,
+    required String pack,
     required int packVersion,
     required String hashSha256,
     required int sizeBytes,
@@ -30,7 +30,7 @@ class PackStateDao extends DatabaseAccessor<DevinetteDatabase>
     await into(packState).insertOnConflictUpdate(
       PackStateCompanion.insert(
         packId: packId,
-        world: world,
+        pack: pack,
         packVersion: packVersion,
         hashSha256: hashSha256,
         sizeBytes: Value(sizeBytes),

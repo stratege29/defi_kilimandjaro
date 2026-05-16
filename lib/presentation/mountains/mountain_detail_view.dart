@@ -4,9 +4,10 @@ import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
-import 'package:defi_kilimandjaro/data/repositories/devinette_repository_impl.dart';
+import 'package:defi_kilimandjaro/core/utils/difficulty_curve.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
@@ -73,14 +74,13 @@ class _MountainDetailViewState extends ConsumerState<MountainDetailView>
     }
 
     try {
-      final repo = ref.read(devinetteRepositoryProvider);
-      // Phase 2.2 stub : devinette aléatoire de "village_des_or" (seul peuplé).
-      // Phase 4 : tag par pays / région.
-      // Anti-répétition : exclut les 5 dernières devinettes jouées.
+      final selectionService = ref.read(devinetteSelectionServiceProvider);
       final progress = ref.read(playerProgressProvider);
-      final devinette = await repo.randomFromWorldExcluding(
-        'village_des_or',
-        progress.recentDevinetteIds,
+      final targetDifficulty = difficultyForAltitude(liveMountain.altitude);
+      final devinette = await selectionService.nextDevinette(
+        mix: progress.activePackMix,
+        targetDifficulty: targetDifficulty,
+        excludeIds: progress.recentDevinetteIds.toSet(),
       );
       await ref
           .read(playerProgressProvider.notifier)

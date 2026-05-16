@@ -11,24 +11,23 @@ class _FakeBundled extends BundledDevinetteDatasource {
   _FakeBundled(this.entries);
   final List<Devinette> entries;
   @override
-  Future<List<Devinette>> loadWorld(String worldId) async => entries;
+  Future<List<Devinette>> loadPack(String packId) async => entries;
 }
 
 Devinette _make({
   required String id,
-  String world = 'w',
+  String pack = 'culture_ci',
   DevinetteSource source = DevinetteSource.bundled,
   String riddle = 'r',
 }) {
   return Devinette(
     id: id,
-    world: world,
+    pack: pack,
     country: 'ci',
     answer: id.toUpperCase(),
     lettersPool: id.toUpperCase().split(''),
     riddleByLang: <String, String>{'fr': riddle},
     explanationByLang: const {'fr': 'expl'},
-    proverbByLang: const {'fr': 'prov'},
     difficulty: 1,
     estimatedTimeS: 10,
     tags: const [],
@@ -49,18 +48,18 @@ void main() {
     await db.close();
   });
 
-  test('loadWorld retourne le starter quand le cache est vide', () async {
+  test('loadPack retourne le starter quand le cache est vide', () async {
     final repo = CompositeDevinetteRepository(
       bundled: _FakeBundled([_make(id: 'a'), _make(id: 'b')]),
       cache: cache,
     );
-    final list = await repo.loadWorld('w');
+    final list = await repo.loadPack('culture_ci');
     expect(list.map((d) => d.id), ['a', 'b']);
   });
 
   test('cache distant supplante starter sur même id', () async {
     await cache.replacePackContents(
-      world: 'w',
+      pack: 'culture_ci',
       source: DevinetteSource.remotePack,
       devinettes: [
         _make(id: 'a', source: DevinetteSource.remotePack, riddle: 'remote-a'),
@@ -77,7 +76,7 @@ void main() {
       cache: cache,
     );
 
-    final list = await repo.loadWorld('w');
+    final list = await repo.loadPack('culture_ci');
     final byId = {for (final d in list) d.id: d};
     expect(byId.keys.toSet(), {'a', 'b', 'c'});
     expect(byId['a']!.riddleByLang['fr'], 'remote-a',
@@ -88,14 +87,14 @@ void main() {
 
   test('upsertPackState + packState (drift roundtrip)', () async {
     await cache.upsertPackState(
-      packId: 'w',
-      world: 'w',
+      packId: 'culture_ci',
+      pack: 'culture_ci',
       packVersion: 7,
       hashSha256: 'abc',
       sizeBytes: 1024,
       count: 42,
     );
-    final state = await cache.packState('w');
+    final state = await cache.packState('culture_ci');
     expect(state, isNotNull);
     expect(state!.packVersion, 7);
     expect(state.hashSha256, 'abc');
@@ -105,20 +104,20 @@ void main() {
   test('replacePackContents est atomique (delete-by-source-puis-insert)',
       () async {
     await cache.replacePackContents(
-      world: 'w',
+      pack: 'culture_ci',
       source: DevinetteSource.remotePack,
       devinettes: [_make(id: 'old1'), _make(id: 'old2')],
       packVersion: 1,
     );
-    expect(await cache.countByWorld('w'), 2);
+    expect(await cache.countByPack('culture_ci'), 2);
 
     await cache.replacePackContents(
-      world: 'w',
+      pack: 'culture_ci',
       source: DevinetteSource.remotePack,
       devinettes: [_make(id: 'new1')],
       packVersion: 2,
     );
-    final list = await cache.loadByWorld('w');
+    final list = await cache.loadByPack('culture_ci');
     expect(list.map((d) => d.id), ['new1']);
   });
 

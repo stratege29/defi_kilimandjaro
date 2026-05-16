@@ -1,22 +1,24 @@
 {
-  "format_version": 2,
-  "worlds": {
-    "village_des_or": {
+  "format_version": 3,
+  "packs": {
+    "culture_ci": {
+      "file": "culture_ci.json",
+      "count": 60,
+      "name_key": "pack.culture_ci.name",
+      "description_key": "pack.culture_ci.description",
+      "free_choice_eligible": true,
+      "price_eur": 2.99,
+      "price_cauris": 2000
+    },
+    "crack_nouchi": {
+      "file": "crack_nouchi.json",
       "count": 30,
-      "file": "village_des_or.json"
-    },
-    "foret_sacree": {
-      "count": 0,
-      "file": "foret_sacree.json"
-    },
-    "lagune_des_saveurs": {
-      "count": 0,
-      "file": "lagune_des_saveurs.json"
-    },
-    "monts_des_legendes": {
-      "count": 0,
-      "file": "monts_des_legendes.json"
+      "name_key": "pack.crack_nouchi.name",
+      "description_key": "pack.crack_nouchi.description",
+      "free_choice_eligible": true,
+      "price_eur": 2.99,
+      "price_cauris": 2000
     }
   },
-  "total": 30
+  "total": 90
 }

@@ -12,7 +12,7 @@ enum DevinetteSource { bundled, remotePack, community }
 const String kDevinetteDefaultLang = 'fr';
 
 /// Langue active à utiliser quand on lit les getters localisés (`riddle`,
-/// `explanation`, `proverb`). Mise à jour au boot de l'app depuis
+/// `explanation`). Mise à jour au boot de l'app depuis
 /// `context.locale.languageCode` (easy_localization).
 ///
 /// Wrapper mutable plutôt que paramètre passé partout : les call-sites existants
@@ -25,44 +25,43 @@ abstract final class DevinetteLocale {
 
 /// Une devinette culturelle ivoirienne (cf. devinette-curator.md pour le format JSON).
 ///
-/// Schema **format_version 2** (multilingue) :
-/// - `riddle`/`explanation`/`proverb` sont stockés en `Map<String, String>`
-///   indexé par code langue ISO (`fr`, `en`, ...).
+/// Schema **format_version 3** (packs thématiques) :
+/// - `pack` : identifiant du pack thématique (`culture_ci`, `crack_nouchi`, ...).
+///   Remplace le champ `world` v2 (mondes verrouillables, désormais retirés).
+/// - `riddle`/`explanation` sont stockés en `Map<String, String>` indexé par
+///   code langue ISO (`fr`, `en`, ...).
 /// - `answer` reste mono-langue (mot canonique majuscules sans accent).
+/// - Le champ `proverb` est supprimé (UGC + popup victoire ne l'affichent plus).
 ///
-/// Compatibilité v1 (legacy) : `Devinette.fromJson` accepte aussi les anciens
-/// fichiers où `riddle`/`explanation`/`proverb` sont des `String` plats — ils
-/// sont automatiquement enrobés sous la clé `'fr'`.
+/// Pas de compatibilité ascendante avec v1/v2 (pas de prod déployée).
 class Devinette extends Equatable {
   const Devinette({
     required this.id,
-    required this.world,
+    required this.pack,
     required this.country,
     required this.answer,
     required this.lettersPool,
     required this.riddleByLang,
     required this.explanationByLang,
-    required this.proverbByLang,
     required this.difficulty,
     required this.estimatedTimeS,
     required this.tags,
     this.answerNormalized,
     this.imageSvg,
     this.imageUrl,
-    this.formatVersion = 2,
+    this.formatVersion = 3,
     this.source = DevinetteSource.bundled,
   });
 
-  /// Parse un Map JSON en Devinette. Accepte v1 (riddle/explanation/proverb en
-  /// `String`) et v2 (en `Map<String, String>`).
+  /// Parse un Map JSON en Devinette (format_version 3 attendu).
   factory Devinette.fromJson(
     Map<String, dynamic> json, {
     DevinetteSource source = DevinetteSource.bundled,
   }) {
-    final formatVersion = (json['format_version'] as int?) ?? 1;
+    final formatVersion = (json['format_version'] as int?) ?? 3;
     return Devinette(
       id: json['id'] as String,
-      world: json['world'] as String,
+      pack: json['pack'] as String,
       country: json['country'] as String,
       answer: (json['answer'] as String).toUpperCase(),
       answerNormalized: json['answer_normalized'] as String?,
@@ -71,7 +70,6 @@ class Devinette extends Equatable {
       ),
       riddleByLang: _parseLocalizedField(json['riddle']),
       explanationByLang: _parseLocalizedField(json['explanation']),
-      proverbByLang: _parseLocalizedField(json['proverb']),
       imageSvg: json['image_svg'] as String?,
       imageUrl: json['image_url'] as String?,
       difficulty: json['difficulty'] as int,
@@ -84,19 +82,18 @@ class Devinette extends Equatable {
     );
   }
 
-  /// Sérialise en JSON v2 (multilingue). Utilisé par le cache local Drift et
-  /// les outils de migration.
+  /// Sérialise en JSON v3. Utilisé par le cache local Drift et les outils
+  /// de migration.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,
-      'world': world,
+      'pack': pack,
       'country': country,
       'answer': answer,
       if (answerNormalized != null) 'answer_normalized': answerNormalized,
       'letters_pool': lettersPool,
       'riddle': riddleByLang,
       'explanation': explanationByLang,
-      'proverb': proverbByLang,
       if (imageSvg != null) 'image_svg': imageSvg,
       if (imageUrl != null) 'image_url': imageUrl,
       'difficulty': difficulty,
@@ -110,7 +107,8 @@ class Devinette extends Equatable {
   static Map<String, String> _parseLocalizedField(dynamic raw) {
     if (raw == null) return const <String, String>{};
     if (raw is String) {
-      // v1 fallback : on enrobe sous la langue par défaut.
+      // Tolérance : si jamais une devinette legacy livre un String plat,
+      // on l'enrobe sous la langue par défaut plutôt que de planter.
       return <String, String>{kDevinetteDefaultLang: raw};
     }
     if (raw is Map) {
@@ -130,7 +128,10 @@ class Devinette extends Equatable {
   }
 
   final String id;
-  final String world;
+
+  /// Identifiant du pack thématique (`culture_ci`, `crack_nouchi`, ...).
+  /// Remplace le champ `world` v2.
+  final String pack;
   final String country;
 
   /// Mot réponse en majuscules sans accent (ex. 'FOUTOU', 'ATTIEKE').
@@ -148,7 +149,6 @@ class Devinette extends Equatable {
   /// Devinette texte par code langue ISO (`fr`, `en`, ...).
   final Map<String, String> riddleByLang;
   final Map<String, String> explanationByLang;
-  final Map<String, String> proverbByLang;
 
   final String? imageSvg;
   final String? imageUrl;
@@ -156,7 +156,7 @@ class Devinette extends Equatable {
   final int estimatedTimeS;
   final List<String> tags;
 
-  /// Version du schema de cette devinette. v2 = multilingue.
+  /// Version du schema de cette devinette. v3 = packs thématiques (sans `proverb`).
   final int formatVersion;
 
   /// Origine du contenu (bundle / pack distant / communautaire).
@@ -168,9 +168,6 @@ class Devinette extends Equatable {
 
   /// Explication dans la langue active.
   String get explanation => localized(explanationByLang);
-
-  /// Proverbe dans la langue active.
-  String get proverb => localized(proverbByLang);
 
   /// Récupère un champ localisé avec fallback `lang` → `fr` → première valeur.
   String localized(Map<String, String> field, {String? lang}) {
@@ -188,20 +185,18 @@ class Devinette extends Equatable {
     return <String>{
       ...riddleByLang.keys,
       ...explanationByLang.keys,
-      ...proverbByLang.keys,
     };
   }
 
   Devinette copyWith({
     String? id,
-    String? world,
+    String? pack,
     String? country,
     String? answer,
     String? answerNormalized,
     List<String>? lettersPool,
     Map<String, String>? riddleByLang,
     Map<String, String>? explanationByLang,
-    Map<String, String>? proverbByLang,
     String? imageSvg,
     String? imageUrl,
     int? difficulty,
@@ -212,14 +207,13 @@ class Devinette extends Equatable {
   }) {
     return Devinette(
       id: id ?? this.id,
-      world: world ?? this.world,
+      pack: pack ?? this.pack,
       country: country ?? this.country,
       answer: answer ?? this.answer,
       answerNormalized: answerNormalized ?? this.answerNormalized,
       lettersPool: lettersPool ?? this.lettersPool,
       riddleByLang: riddleByLang ?? this.riddleByLang,
       explanationByLang: explanationByLang ?? this.explanationByLang,
-      proverbByLang: proverbByLang ?? this.proverbByLang,
       imageSvg: imageSvg ?? this.imageSvg,
       imageUrl: imageUrl ?? this.imageUrl,
       difficulty: difficulty ?? this.difficulty,
@@ -233,14 +227,13 @@ class Devinette extends Equatable {
   @override
   List<Object?> get props => [
         id,
-        world,
+        pack,
         country,
         answer,
         answerNormalized,
         lettersPool,
         riddleByLang,
         explanationByLang,
-        proverbByLang,
         imageSvg,
         imageUrl,
         difficulty,
