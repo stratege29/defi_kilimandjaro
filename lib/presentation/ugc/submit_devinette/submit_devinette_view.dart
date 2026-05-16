@@ -22,7 +22,6 @@ class _SubmitDevinetteViewState extends ConsumerState<SubmitDevinetteView> {
   final _answerCtrl = TextEditingController();
   final _riddleCtrl = TextEditingController();
   final _explanationCtrl = TextEditingController();
-  final _proverbCtrl = TextEditingController();
   final _tagsCtrl = TextEditingController();
   final _displayNameCtrl = TextEditingController();
   String _world = 'village_des_or';
@@ -57,7 +56,6 @@ class _SubmitDevinetteViewState extends ConsumerState<SubmitDevinetteView> {
     _answerCtrl.dispose();
     _riddleCtrl.dispose();
     _explanationCtrl.dispose();
-    _proverbCtrl.dispose();
     _tagsCtrl.dispose();
     _displayNameCtrl.dispose();
     super.dispose();
@@ -72,7 +70,6 @@ class _SubmitDevinetteViewState extends ConsumerState<SubmitDevinetteView> {
       answer: _answerCtrl.text.trim(),
       riddle: _riddleCtrl.text.trim(),
       explanation: _explanationCtrl.text.trim(),
-      proverb: _proverbCtrl.text.trim(),
       difficulty: _difficulty,
       tags: _tagsCtrl.text
           .split(',')
@@ -91,30 +88,29 @@ class _SubmitDevinetteViewState extends ConsumerState<SubmitDevinetteView> {
   Widget build(BuildContext context) {
     final state = ref.watch(submitDevinetteControllerProvider);
 
-    ref.listen<SubmitDevinetteState>(
-      submitDevinetteControllerProvider,
-      (prev, next) {
-        if (next.success != null && prev?.success != next.success) {
-          _formKey.currentState?.reset();
-          _answerCtrl.clear();
-          _riddleCtrl.clear();
-          _explanationCtrl.clear();
-          _proverbCtrl.clear();
-          _tagsCtrl.clear();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Devinette soumise — en attente de modération.'),
-            ),
-          );
-        }
-        if (next.errorMessage != null &&
-            prev?.errorMessage != next.errorMessage) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(next.errorMessage!)),
-          );
-        }
-      },
-    );
+    ref.listen<SubmitDevinetteState>(submitDevinetteControllerProvider, (
+      prev,
+      next,
+    ) {
+      if (next.success != null && prev?.success != next.success) {
+        _formKey.currentState?.reset();
+        _answerCtrl.clear();
+        _riddleCtrl.clear();
+        _explanationCtrl.clear();
+        _tagsCtrl.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Devinette soumise — en attente de modération.'),
+          ),
+        );
+      }
+      if (next.errorMessage != null &&
+          prev?.errorMessage != next.errorMessage) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Proposer une devinette')),
@@ -178,15 +174,6 @@ class _SubmitDevinetteViewState extends ConsumerState<SubmitDevinetteView> {
                     (v == null || v.trim().length < 30) ? '30 min' : null,
               ),
               const SizedBox(height: 12),
-              TextFormField(
-                controller: _proverbCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Proverbe (5–140 caractères)',
-                ),
-                validator: (v) =>
-                    (v == null || v.trim().length < 5) ? '5 min' : null,
-              ),
-              const SizedBox(height: 12),
               Row(
                 children: [
                   const Text('Difficulté'),
@@ -198,8 +185,7 @@ class _SubmitDevinetteViewState extends ConsumerState<SubmitDevinetteView> {
                       divisions: 4,
                       value: _difficulty.toDouble(),
                       label: '$_difficulty',
-                      onChanged: (v) =>
-                          setState(() => _difficulty = v.round()),
+                      onChanged: (v) => setState(() => _difficulty = v.round()),
                     ),
                   ),
                 ],

@@ -220,9 +220,6 @@ class _VictoryCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          // Proverbe éditorialisé — séparateurs gold + attribution.
-          _ProverbBlock(proverb: devinette.proverb),
-          const SizedBox(height: 24),
           // Reward cauris — chip pill animé (ka-ching).
           _CaurisRewardChip(caurisAnim: caurisAnim),
           const SizedBox(height: 24),
@@ -234,58 +231,6 @@ class _VictoryCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Bloc éditorial du proverbe — séparateurs gold haut+bas, citation en
-/// Crimson italic 18pt or, attribution « — Sagesse Ivoirienne » en bas.
-class _ProverbBlock extends StatelessWidget {
-  const _ProverbBlock({required this.proverb});
-
-  final String proverb;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _GoldDivider(),
-        const SizedBox(height: 16),
-        Text(
-          '« $proverb »',
-          textAlign: TextAlign.center,
-          style: AppTypography.crimson(
-            size: 18,
-            color: AppColors.orJour,
-            style: FontStyle.italic,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '— Sagesse Ivoirienne',
-          textAlign: TextAlign.center,
-          style: AppTypography.crimson(
-            size: 11,
-            color: AppColors.texteTertiaire,
-            style: FontStyle.italic,
-          ),
-        ),
-        const SizedBox(height: 16),
-        _GoldDivider(),
-      ],
-    );
-  }
-}
-
-/// Filet doré subtil — 1pt de haut, alpha 35%, longueur 80pt centré.
-/// Signature éditoriale légère pour encadrer le proverbe sans cadre lourd.
-class _GoldDivider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 80,
-      height: 1,
-      color: AppColors.orJour.withValues(alpha: 0.35),
     );
   }
 }
