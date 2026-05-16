@@ -25,8 +25,7 @@ class CircularGrid extends StatefulWidget {
   const CircularGrid({
     required this.letters,
     required this.selectedIndices,
-    required this.hintRevealedCount,
-    required this.answer,
+    required this.hintTileIndices,
     required this.phase,
     required this.onTileEntered,
     required this.onDragEnd,
@@ -40,11 +39,10 @@ class CircularGrid extends StatefulWidget {
   /// Indices des tuiles sélectionnées.
   final List<int> selectedIndices;
 
-  /// Nombre de lettres révélées par l'indice.
-  final int hintRevealedCount;
-
-  /// Mot réponse (pour colorer les tuiles indice).
-  final String answer;
+  /// Indices des tuiles à mettre en surbrillance « indice » — calculés
+  /// par `GameState.hintTileIndices` pour pointer la prochaine lettre
+  /// de la réponse (et non une tuile aléatoire de la grille).
+  final List<int> hintTileIndices;
 
   /// Phase du jeu.
   final Object phase;
@@ -168,7 +166,7 @@ class _CircularGridState extends State<CircularGrid> {
                 ...List<Widget>.generate(count, (i) {
                   final center = layout.centers[i];
                   final isSelected = widget.selectedIndices.contains(i);
-                  final isHint = i < widget.hintRevealedCount;
+                  final isHint = widget.hintTileIndices.contains(i);
                   return Positioned(
                     left: center.dx - _tileSize / 2,
                     top: center.dy - _tileSize / 2,

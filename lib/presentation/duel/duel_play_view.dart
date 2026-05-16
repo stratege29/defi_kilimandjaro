@@ -107,8 +107,7 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
                 child: CircularGrid(
                   letters: liveSession.lettersPool,
                   selectedIndices: localState.selectedIndices,
-                  hintRevealedCount: 0,
-                  answer: liveSession.answer,
+                  hintTileIndices: const <int>[],
                   phase: localState.submitted
                       ? GamePhase.won
                       : (localState.timeLeft == 0

@@ -179,8 +179,7 @@ class _GameViewState extends ConsumerState<GameView>
                   child: CircularGrid(
                     letters: gameState.displayLetters,
                     selectedIndices: gameState.selectedIndices,
-                    hintRevealedCount: gameState.hintRevealedCount,
-                    answer: widget.args.devinette.answer,
+                    hintTileIndices: gameState.hintTileIndices,
                     phase: gameState.phase,
                     onTileEntered: controller.selectTile,
                     onDragEnd: () {

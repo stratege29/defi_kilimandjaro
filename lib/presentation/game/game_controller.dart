@@ -54,6 +54,35 @@ class GameState {
 
   bool get isComplete => selectedIndices.length == devinette.answer.length;
 
+  /// Indices de tuiles (positions dans la grille shufflée) révélées par
+  /// l'indice — pour les `hintRevealedCount` premières lettres de la
+  /// réponse. Chaque entrée pointe sur la prochaine occurrence disponible
+  /// dans le pool (gestion des doublons type "FOUTOU" avec 2× O et 2× U).
+  ///
+  /// L'ancienne logique `i < hintRevealedCount` dans la grille traitait
+  /// `hintRevealedCount` comme un index sur l'ordre physique du cercle,
+  /// ce qui révélait une tuile aléatoire au lieu de pointer la prochaine
+  /// lettre de la réponse.
+  List<int> get hintTileIndices {
+    final n = hintRevealedCount.clamp(0, devinette.answer.length);
+    if (n == 0) return const <int>[];
+    final used = <int>{};
+    final result = <int>[];
+    for (var k = 0; k < n; k++) {
+      final target = devinette.answer[k];
+      for (var gridIdx = 0; gridIdx < shuffledIndices.length; gridIdx++) {
+        if (used.contains(gridIdx)) continue;
+        final letter = devinette.lettersPool[shuffledIndices[gridIdx]];
+        if (letter == target) {
+          result.add(gridIdx);
+          used.add(gridIdx);
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
   GameState copyWith({
     Devinette? devinette,
     List<int>? selectedIndices,
