@@ -57,23 +57,20 @@ class ManifestSyncService {
         '(${packIds.length} déclarés).',
       );
 
-      // Déclenche les downloads en parallèle, mais bornés à 2 simultanés via
-      // un sémaphore léger.
+      // Downloads par batches bornés à `maxConcurrent` — chaque batch est
+      // entièrement attendu avant de démarrer le suivant. Plus simple et
+      // sans race condition vs Future.any + whenComplete.
       const maxConcurrent = 2;
-      final queue = List<ContentPackManifest>.from(manifests);
-      final inFlight = <Future<void>>[];
-
-      while (queue.isNotEmpty || inFlight.isNotEmpty) {
-        while (inFlight.length < maxConcurrent && queue.isNotEmpty) {
-          final manifest = queue.removeAt(0);
-          inFlight.add(
-            _syncSinglePack(manifest).catchError(_swallowAndLog),
-          );
-        }
-        if (inFlight.isEmpty) break;
-        await Future.any(inFlight);
-        // Nettoie les terminés.
-        inFlight.removeWhere(_isCompleted);
+      for (var i = 0; i < manifests.length; i += maxConcurrent) {
+        final end = (i + maxConcurrent < manifests.length)
+            ? i + maxConcurrent
+            : manifests.length;
+        final batch = manifests.sublist(i, end);
+        await Future.wait(
+          batch.map(
+            (m) => _syncSinglePack(m).catchError(_swallowAndLog),
+          ),
+        );
       }
     } on Object catch (e, st) {
       _swallowAndLog(e, st);
