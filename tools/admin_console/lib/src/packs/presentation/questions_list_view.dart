@@ -70,23 +70,25 @@ class _QuestionsListViewState extends ConsumerState<QuestionsListView> {
             ],
           ),
           const SizedBox(height: 16),
-          qs.when(
-            loading: () => const Padding(
-              padding: EdgeInsets.all(32),
-              child: Center(child: CircularProgressIndicator()),
+          Expanded(
+            child: qs.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.all(32),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (e, _) => Text('Erreur : $e'),
+              data: (all) {
+                final tags = {for (final q in all) ...q.tags}.toList()..sort();
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _filtersBar(tags, all.length),
+                    const SizedBox(height: 16),
+                    Expanded(child: _table(_filter(all))),
+                  ],
+                );
+              },
             ),
-            error: (e, _) => Text('Erreur : $e'),
-            data: (all) {
-              final tags = {for (final q in all) ...q.tags}.toList()..sort();
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _filtersBar(tags, all.length),
-                  const SizedBox(height: 16),
-                  Expanded(child: _table(_filter(all))),
-                ],
-              );
-            },
           ),
         ],
       ),
