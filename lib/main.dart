@@ -153,8 +153,10 @@ Future<void> _bootstrap() async {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
-      !kDebugMode,
+    // Fire-and-forget : Crashlytics est déjà registered via Firebase.initializeApp,
+    // on n'a pas besoin d'attendre l'enable des collections pour booter.
+    unawaited(
+      FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode),
     );
 
     // En mode emulator, on force un fresh sign-in pour invalider tout
@@ -171,17 +173,24 @@ Future<void> _bootstrap() async {
       }
     }
 
+    // signInAnonymously fire-and-forget : pas besoin d'attendre l'UID pour
+    // afficher le splash + onboarding. Le user pourra démarrer une partie
+    // solo immédiatement ; les duels (qui ont besoin d'un UID) ne sont
+    // accessibles qu'après l'onboarding, donc l'auth aura largement eu
+    // le temps de se faire en background.
     if (FirebaseAuth.instance.currentUser == null) {
-      try {
-        final cred = await FirebaseAuth.instance.signInAnonymously().timeout(
-          const Duration(seconds: 8),
-        );
-        // ignore: avoid_print
-        print('🔧 signInAnonymously OK uid=${cred.user?.uid}');
-      } catch (e) {
-        // ignore: avoid_print
-        print('🔧 signInAnonymously failed/timeout: $e');
-      }
+      unawaited(
+        FirebaseAuth.instance
+            .signInAnonymously()
+            .then((cred) {
+              // ignore: avoid_print
+              print('🔧 signInAnonymously OK uid=${cred.user?.uid}');
+            })
+            .catchError((Object e) {
+              // ignore: avoid_print
+              print('🔧 signInAnonymously failed: $e');
+            }),
+      );
     }
 
     // FCM : enregistrer le handler background AVANT toute autre init FCM.
@@ -193,14 +202,23 @@ Future<void> _bootstrap() async {
     FirebaseMessaging.onMessageOpenedApp.listen(_navigateToMatchFromFcm);
 
     // FCM : verifier si l'app a ete ouverte depuis une notif (app terminee).
-    final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-    if (initialMessage != null) {
-      // Delay pour laisser le router s'initialiser.
-      unawaited(
-        Future<void>.delayed(const Duration(milliseconds: 500), () {
-          _navigateToMatchFromFcm(initialMessage);
-        }),
-      );
+    // Timeout 3s — getInitialMessage() peut hanger indéfiniment sur iOS si
+    // APNs n'est pas encore prêt (cas typique : 1er lancement en TestFlight
+    // sans embedded.mobileprovision). On accepte de rater le deep-link plutôt
+    // que de bloquer le splash.
+    try {
+      final initialMessage = await FirebaseMessaging.instance
+          .getInitialMessage()
+          .timeout(const Duration(seconds: 3));
+      if (initialMessage != null) {
+        unawaited(
+          Future<void>.delayed(const Duration(milliseconds: 500), () {
+            _navigateToMatchFromFcm(initialMessage);
+          }),
+        );
+      }
+    } on Object {
+      // Timeout ou erreur FCM — l'app boot quand même.
     }
   } catch (e) {
     // Fail-soft: solo gameplay continues without backend if Firebase fails.
