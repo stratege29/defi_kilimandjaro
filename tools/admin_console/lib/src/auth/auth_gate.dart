@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -75,6 +76,15 @@ class _SignInScreen extends StatelessWidget {
   const _SignInScreen();
 
   Future<void> _signIn() async {
+    // Web : signInWithRedirect plutôt que popup. Safari/iOS bloquent les
+    // popups cross-origin sans throw catchable. Le redirect navigue vers
+    // Google, l'utilisateur autorise, retour automatique — la session est
+    // restaurée via authStateChanges() au reload.
+    final provider = GoogleAuthProvider()..addScope('email');
+    if (kIsWeb) {
+      await FirebaseAuth.instance.signInWithRedirect(provider);
+      return;
+    }
     final googleUser = await GoogleSignIn().signIn();
     final googleAuth = await googleUser?.authentication;
     if (googleAuth == null) return;

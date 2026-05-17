@@ -3,8 +3,11 @@
   "private": true,
   "type": "module",
   "description": "One-off scripts (seed Firestore, etc.). Not deployed.",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
-    "firebase-admin": "^12.7.0"
+    "firebase-admin": "^12.7.0",
+    "googleapis": "^171.4.0"
   }
 }

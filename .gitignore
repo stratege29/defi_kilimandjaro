@@ -87,6 +87,9 @@ functions/.runtimeconfig.json
 
 # ====== Tools (one-off scripts) ======
 tools/scripts/node_modules/
+
+# flutterfire-generated tracking config (per-machine)
+tools/admin_console/firebase.json
 functions/coverage/
 functions/.eslintcache
 functions/npm-debug.log
