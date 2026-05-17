@@ -1,0 +1,542 @@
+[
+  {
+    "id": "crack_nouchi_091",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BOSS",
+    "answer_normalized": "boss",
+    "letters_pool": ["B","O","S","S"],
+    "riddle": {
+      "fr": "Je suis le chef, celui qu'on respecte et qu'on écoute."
+    },
+    "explanation": {
+      "fr": "Boss = chef, patron, leader respecté. Terme ultra-mainstream du Nouchi urbain pour désigner l'autorité ou la figure de respect."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["personne", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_092",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FETE",
+    "answer_normalized": "fete",
+    "letters_pool": ["F","E","T","E"],
+    "riddle": {
+      "fr": "Soirée dansante, ambiance folle au maquis. On s'éclate."
+    },
+    "explanation": {
+      "fr": "Fête = soirée festive, party dansante. Terme simple mais fondamental du Nouchi pour tout événement joyeux et musical."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["lieu", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_093",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "COOL",
+    "answer_normalized": "cool",
+    "letters_pool": ["C","O","O","L"],
+    "riddle": {
+      "fr": "Calme, tranquille, pas de stress. Je suis relax."
+    },
+    "explanation": {
+      "fr": "Cool = calme, décontracté, sans problème. Emprunt à l'anglais très naturalisé en Nouchi pour exprimer la détente et l'absence de tension."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["attitude", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_094",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CHEF",
+    "answer_normalized": "chef",
+    "letters_pool": ["C","H","E","F"],
+    "riddle": {
+      "fr": "Responsable du quartier, celui qui décide pour tous."
+    },
+    "explanation": {
+      "fr": "Chef = leader, responsable, celui qui commande. Terme français très enraciné en Nouchi pour l'autorité locale et le respect hiérarchique."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["personne", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_095",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FRERE",
+    "answer_normalized": "frere",
+    "letters_pool": ["F","R","E","R","E"],
+    "riddle": {
+      "fr": "Mon ami très proche, comme un frère de sang. De confiance."
+    },
+    "explanation": {
+      "fr": "Frère = ami intime, frère de quartier, compagnon fidèle. Usage Nouchi du terme familial pour exprimer la fraternité urbaine authentique."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["personne", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_096",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BIEN",
+    "answer_normalized": "bien",
+    "letters_pool": ["B","I","E","N"],
+    "riddle": {
+      "fr": "C'est bon, c'est correct, tout va bien. Pas de souci."
+    },
+    "explanation": {
+      "fr": "Bien = en ordre, correct, satisfaisant. Terme léger du Nouchi pour valider une situation positive ou accepter une proposition."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["attitude", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_097",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MACHIN",
+    "answer_normalized": "machin",
+    "letters_pool": ["M","A","C","H","I","N"],
+    "riddle": {
+      "fr": "Truc, bidule, chose dont on ne se souvient pas du nom."
+    },
+    "explanation": {
+      "fr": "Machin = truc, bidule, chose indéterminée. Emprunt français très naturalisé en Nouchi pour désigner un objet quand on oublie son nom."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["objet", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_098",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "POMPE",
+    "answer_normalized": "pompe",
+    "letters_pool": ["P","O","M","P","E"],
+    "riddle": {
+      "fr": "Chaussure, basket, godasse qu'on porte aux pieds."
+    },
+    "explanation": {
+      "fr": "Pompe = chaussure, basket, soulier. Terme Nouchi populaire dérivé du français pour désigner n'importe quel type de chaussure urbaine."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["objet", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_099",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DOUX",
+    "answer_normalized": "doux",
+    "letters_pool": ["D","O","U","X"],
+    "riddle": {
+      "fr": "Gentil, aimable, sans agressivité. Un type cool."
+    },
+    "explanation": {
+      "fr": "Doux = gentle, soft, sans dureté. Terme simple du Nouchi pour qualifier quelqu'un de nature tendre ou une situation paisible."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["attitude", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_100",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "COSTAU",
+    "answer_normalized": "costau",
+    "letters_pool": ["C","O","S","T","A","U"],
+    "riddle": {
+      "fr": "Musclé, costaud, qui a du poids physique."
+    },
+    "explanation": {
+      "fr": "Costau = costaud, musclé, imposant physiquement. Variante Nouchi de 'costaud' pour décrire quelqu'un de fort et imposant."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_101",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DAGBA",
+    "answer_normalized": "dagba",
+    "letters_pool": ["D","A","G","B","A"],
+    "riddle": {
+      "fr": "Truc sérieux, chose lourde, pas un jeu."
+    },
+    "explanation": {
+      "fr": "Dagba = sérieux, lourd, chose importante. Terme Nouchi intermédiaire pour qualifier quelque chose de significatif ou d'impressionnant."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["attitude", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_102",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BOZON",
+    "answer_normalized": "bozon",
+    "letters_pool": ["B","O","Z","O","N"],
+    "riddle": {
+      "fr": "Fou, débile, qui ne réfléchit pas bien."
+    },
+    "explanation": {
+      "fr": "Bozon = débile, idiot, fou sans cervelle. Terme Nouchi intermédiaire plus dur que 'zozo', exprimant l'imbécillité avec plus de force."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_103",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CARTON",
+    "answer_normalized": "carton",
+    "letters_pool": ["C","A","R","T","O","N"],
+    "riddle": {
+      "fr": "Succès fou, très bon score, je gagne gros."
+    },
+    "explanation": {
+      "fr": "Carton = succès remarquable, victoire écrasante, score excellent. Terme Nouchi intermédiaire très utilisé pour approuver une performance."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["attitude", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_104",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJAMBA",
+    "answer_normalized": "djamba",
+    "letters_pool": ["D","J","A","M","B","A"],
+    "riddle": {
+      "fr": "Un peu fou, pas tout à fait sain d'esprit. Chelou."
+    },
+    "explanation": {
+      "fr": "Djamba = légèrement fou, dérangé mentalement, bizarre. Terme Nouchi intermédiaire pour décrire quelqu'un de comportement étrange."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_105",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GOUMBE",
+    "answer_normalized": "goumbe",
+    "letters_pool": ["G","O","U","M","B","E"],
+    "riddle": {
+      "fr": "Musique populaire des quartiers, rythme dansant traditionnel."
+    },
+    "explanation": {
+      "fr": "Goumbe = musique traditionelle urbaine ivoirienne, rythme populaire. Terme Nouchi intermédiaire pour un genre musical distinctif abidjanais."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_106",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "HABLER",
+    "answer_normalized": "habler",
+    "letters_pool": ["H","A","B","L","E","R"],
+    "riddle": {
+      "fr": "Parler beaucoup, raconter des histoires sans fin. C'est un bavard."
+    },
+    "explanation": {
+      "fr": "Habler = bavarder excessivement, raconter sans arrêt. Terme Nouchi intermédiaire pour quelqu'un qui parle trop et trop longtemps."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["action", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_107",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CALOTTE",
+    "answer_normalized": "calotte",
+    "letters_pool": ["C","A","L","O","T","T","E"],
+    "riddle": {
+      "fr": "Claque, gifle, coup sur la tête. Ça fait bobo."
+    },
+    "explanation": {
+      "fr": "Calotte = gifle, claque, coup léger sur la tête. Terme Nouchi intermédiaire français pour une correction physique sans gravité."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["action", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_108",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ZOUKLOU",
+    "answer_normalized": "zouklou",
+    "letters_pool": ["Z","O","U","K","L","O","U"],
+    "riddle": {
+      "fr": "Musique festive des quartiers pauvres, très dansante et populaire."
+    },
+    "explanation": {
+      "fr": "Zouklou = genre musical ivoirien parodique et festif, danse populaire. Terme Nouchi intermédiaire pour un mouvement culturel urbain authentique CI."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_109",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DECALE",
+    "answer_normalized": "decale",
+    "letters_pool": ["D","E","C","A","L","E"],
+    "riddle": {
+      "fr": "Danse nouvelle, style qui tue, mouvement très populaire."
+    },
+    "explanation": {
+      "fr": "Décalé = mouvement de danse ivoirien moderne, style urbain. Terme Nouchi pour un genre et une attitude liée à la musique Coupé Décalé."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_110",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KOSSO",
+    "answer_normalized": "kosso",
+    "letters_pool": ["K","O","S","S","O"],
+    "riddle": {
+      "fr": "Jeu de hasard, loterie, tu peux tout perdre."
+    },
+    "explanation": {
+      "fr": "Kosso = jeu de hasard, pari urbain, loto. Terme Nouchi intermédiaire pour un jeu de chance populaire dans les quartiers abidjanais."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_111",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SLAYER",
+    "answer_normalized": "slayer",
+    "letters_pool": ["S","L","A","Y","E","R"],
+    "riddle": {
+      "fr": "Celui qui brille, qui tue sur la piste. Un vrai tueur."
+    },
+    "explanation": {
+      "fr": "Slayer = tueur, gagnant absolu, celui qui domine. Terme Nouchi moderne emprunté à l'anglais pour exprimer l'excellence et la domination."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_112",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MOOD",
+    "answer_normalized": "mood",
+    "letters_pool": ["M","O","O","D"],
+    "riddle": {
+      "fr": "Ambiance, vibe, énergie du moment. C'est l'atmosphère."
+    },
+    "explanation": {
+      "fr": "Mood = ambiance, atmosphere, énergie présente. Terme Nouchi très récent (2023+) emprunté à l'anglais pour décrire le ressenti collectif."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["attitude", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_113",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "HYPER",
+    "answer_normalized": "hyper",
+    "letters_pool": ["H","Y","P","E","R"],
+    "riddle": {
+      "fr": "Excessif, trop intense, au-delà des limites."
+    },
+    "explanation": {
+      "fr": "Hyper = excessif, trop, intense. Terme Nouchi moderne très naturalisé pour exprimer l'excès d'émotion ou d'intensité."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["attitude", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_114",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJAGA",
+    "answer_normalized": "djaga",
+    "letters_pool": ["D","J","A","G","A"],
+    "riddle": {
+      "fr": "Fric, argent, sous. J'en manque toujours."
+    },
+    "explanation": {
+      "fr": "Djaga = argent, monnaie, fric. Terme Nouchi moderne très authentique pour l'argent, variation de 'doss' avec nuance personnelle."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["objet", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_115",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BLAGUE",
+    "answer_normalized": "blague",
+    "letters_pool": ["B","L","A","G","U","E"],
+    "riddle": {
+      "fr": "Mensonge, pipeau, histoire qu'on raconte pour rire."
+    },
+    "explanation": {
+      "fr": "Blague = mensonge léger, plaisanterie, histoire amusante. Terme français très enraciné en Nouchi pour décrire une farce ou une fausse histoire."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_116",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBALA",
+    "answer_normalized": "gbala",
+    "letters_pool": ["G","B","A","L","A"],
+    "riddle": {
+      "fr": "Mauvais, négatif, pas bon du tout. C'est nul."
+    },
+    "explanation": {
+      "fr": "Gbala = mauvais, négatif, sans valeur. Terme Nouchi moderne pour rejeter ou critiquer quelque chose de manière catégorique."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["attitude", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_117",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "COMBINE",
+    "answer_normalized": "combine",
+    "letters_pool": ["C","O","M","B","I","N","E"],
+    "riddle": {
+      "fr": "Plan secret, astuce, manigance pour réussir."
+    },
+    "explanation": {
+      "fr": "Combine = plan secret, stratégie, arnaque intelligente. Terme Nouchi moderne emprunté au français pour désigner une combine ou un stratagème urbain."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_118",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "WERE",
+    "answer_normalized": "were",
+    "letters_pool": ["W","E","R","E"],
+    "riddle": {
+      "fr": "Fou, délire complètement. T'es cinglé."
+    },
+    "explanation": {
+      "fr": "Were = fou, délire, folie. Terme Nouchi moderne très court et expressif pour décrire quelqu'un de totalement fou ou dérangé."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_119",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "PAYER",
+    "answer_normalized": "payer",
+    "letters_pool": ["P","A","Y","E","R"],
+    "riddle": {
+      "fr": "Verser de l'argent, participer aux frais. Partager le coût."
+    },
+    "explanation": {
+      "fr": "Payer = payer, contribuer, donner de l'argent. Terme français très naturalisé en Nouchi pour l'action de financer ou participer."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_120",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FRIME",
+    "answer_normalized": "frime",
+    "letters_pool": ["F","R","I","M","E"],
+    "riddle": {
+      "fr": "Pose, apparence, faire semblant pour plaire. Purement superficiel."
+    },
+    "explanation": {
+      "fr": "Frime = pose, superficialité, faire l'intéressant. Terme Nouchi classique emprunté au français pour critiquer quelqu'un de prétentieux."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["attitude", "recent"],
+    "format_version": 3
+  }
+]

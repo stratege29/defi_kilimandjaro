@@ -1,0 +1,542 @@
+[
+  {
+    "id": "culture_ci_121",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PLAGE",
+    "answer_normalized": "plage",
+    "letters_pool": ["P", "L", "A", "G", "E"],
+    "riddle": {
+      "fr": "Sable blanc et vagues chaudes, on me visite l'été pour nager et rire avec les enfants."
+    },
+    "explanation": {
+      "fr": "La plage est le rivage côtier ivoirien, lieu de détente et de loisirs, particulièrement apprécié lors des vacances scolaires."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["lieux", "lagune", "tourisme"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_122",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "VILLAGE",
+    "answer_normalized": "village",
+    "letters_pool": ["V", "I", "L", "L", "A", "G", "E"],
+    "riddle": {
+      "fr": "Cases alignées, puits central, je suis le cœur battant du monde rural."
+    },
+    "explanation": {
+      "fr": "Le village est l'unité de vie communautaire traditionnelle ivoirienne, organisé autour du chef et de la solidarité entre habitants."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["lieux", "village", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_123",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MANGUE",
+    "answer_normalized": "mangue",
+    "letters_pool": ["M", "A", "N", "G", "U", "E"],
+    "riddle": {
+      "fr": "Fruit sucré de l'arbre, je dégouline du menton lors de la saison sèche."
+    },
+    "explanation": {
+      "fr": "La mangue est un fruit tropical très consommé en Côte d'Ivoire, savourée fraîche ou en jus, symbole de l'abondance saisonnière."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["cuisine", "fruit"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_124",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PAPAYE",
+    "answer_normalized": "papaye",
+    "letters_pool": ["P", "A", "P", "A", "Y", "E"],
+    "riddle": {
+      "fr": "Fruit vert jaunissant à la cueille, ma chair douce aide à la digestion."
+    },
+    "explanation": {
+      "fr": "La papaye est un fruit tropical ivoirien reconnu pour ses propriétés digestives, consommée fraîche ou en smoothie, plante médicinale."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["cuisine", "fruit", "sante"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_125",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GOYAVE",
+    "answer_normalized": "goyave",
+    "letters_pool": ["G", "O", "Y", "A", "V", "E"],
+    "riddle": {
+      "fr": "Fruit à pépins rouges, je pousse partout et j'apaise les maux du ventre."
+    },
+    "explanation": {
+      "fr": "La goyave est un fruit tropical commun en Côte d'Ivoire, riche en vitamine C, consommée fraîche ou transformée en jus et confiture."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["cuisine", "fruit"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_126",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CITRON",
+    "answer_normalized": "citron",
+    "letters_pool": ["C", "I", "T", "R", "O", "N"],
+    "riddle": {
+      "fr": "Jaune acide, je relève le poisson et chasse la soif du midday."
+    },
+    "explanation": {
+      "fr": "Le citron est un agrume utilisé largement dans la cuisine ivoirienne pour parfumer les plats et rafraîchir les boissons."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["cuisine", "fruit"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_127",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ANANAS",
+    "answer_normalized": "ananas",
+    "letters_pool": ["A", "N", "A", "N", "A", "S"],
+    "riddle": {
+      "fr": "Fruit couronné d'épines verte, mon cœur sucré éclaire les petits matins."
+    },
+    "explanation": {
+      "fr": "L'ananas est un fruit tropical cultivé largement en Côte d'Ivoire, consommé frais ou transformé en jus, symbole de l'abondance."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["cuisine", "fruit", "agriculture"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_128",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "HUILE",
+    "answer_normalized": "huile",
+    "letters_pool": ["H", "U", "I", "L", "E"],
+    "riddle": {
+      "fr": "Or liquide du palmier, je grésille dans la marmite et frit l'alloco."
+    },
+    "explanation": {
+      "fr": "L'huile de palme est l'élément fondamental de la cuisine ivoirienne, extraite du palmier à huile, essentielle pour frire et mijoter."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["cuisine", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_129",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SOUPE",
+    "answer_normalized": "soupe",
+    "letters_pool": ["S", "O", "U", "P", "E"],
+    "riddle": {
+      "fr": "Bouillon riche au lever du jour, je réchauffe le ventre et rassemble la famille."
+    },
+    "explanation": {
+      "fr": "La soupe est un plat traditionnel ivoirien servi le matin ou en début de repas, souvent à base de légumes, viande et arachides."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["cuisine", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_130",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POISSON",
+    "answer_normalized": "poisson",
+    "letters_pool": ["P", "O", "I", "S", "S", "O", "N"],
+    "riddle": {
+      "fr": "Créature du fleuve et de la mer, je nourris la table avec mes écailles dorées."
+    },
+    "explanation": {
+      "fr": "Le poisson est une source de protéines majeure en Côte d'Ivoire, consommé frais, braisé, séché ou en sauce, base alimentaire côtière."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["cuisine", "pêche"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_131",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "VIANDE",
+    "answer_normalized": "viande",
+    "letters_pool": ["V", "I", "A", "N", "D", "E"],
+    "riddle": {
+      "fr": "Chair de bête tuée, on m'apprête aux grandes fêtes pour honorer l'invité."
+    },
+    "explanation": {
+      "fr": "La viande est la protéine majeure des repas de fête en Côte d'Ivoire, présente lors des cérémonies et des jours de marché."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["cuisine", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_132",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BOUBOU",
+    "answer_normalized": "boubou",
+    "letters_pool": ["B", "O", "U", "B", "O", "U"],
+    "riddle": {
+      "fr": "Grand vêtement ample qui cache la peau, je suis porté à la mosquée et aux cérémonies."
+    },
+    "explanation": {
+      "fr": "Le boubou (ou bazin) est un vêtement traditionnel d'Afrique de l'Ouest porté par les hommes lors des occasions formelles, symbole de prestige."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["vetements", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_133",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TIGNON",
+    "answer_normalized": "tignon",
+    "letters_pool": ["T", "I", "G", "N", "O", "N"],
+    "riddle": {
+      "fr": "Foulard tordu qu'on entoile sur la tête, je protège les cheveux et orne l'élégance."
+    },
+    "explanation": {
+      "fr": "Le tignon est un couvre-chef traditionnel féminin ivoirien, nouage élaboré du pagne sur la tête, symbole d'identité et de beauté."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["vetements", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_134",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KABA",
+    "answer_normalized": "kaba",
+    "letters_pool": ["K", "A", "B", "A"],
+    "riddle": {
+      "fr": "Robe de femme à manches, je suis portée avec le pagne pour les déplacements en ville."
+    },
+    "explanation": {
+      "fr": "Le kaba est une robe traditionnelle portée avec le pagne, vêtement de base féminin ivoirien, particulièrement chez les peuples Akan."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["vetements", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_135",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GANDOURA",
+    "answer_normalized": "gandoura",
+    "letters_pool": ["G", "A", "N", "D", "O", "U", "R", "A"],
+    "riddle": {
+      "fr": "Tunique large du Sahel, je suis portée par les hommes du nord lors des fêtes religieuses."
+    },
+    "explanation": {
+      "fr": "La gandoura est un vêtement traditionnel du Sahel, longue tunique portée par les hommes dioula et malinké lors des occasions."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["vetements", "tradition", "nord"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_136",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TOILE",
+    "answer_normalized": "toile",
+    "letters_pool": ["T", "O", "I", "L", "E"],
+    "riddle": {
+      "fr": "Tissu tissé au métier, je suis peinte aux motifs et vendue au marché."
+    },
+    "explanation": {
+      "fr": "La toile est un tissu simple ivoirien, souvent imprimé de motifs traditionnels ou peint à la main, base du pagne populaire."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["artisanat", "tissu"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_137",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TAMIS",
+    "answer_normalized": "tamis",
+    "letters_pool": ["T", "A", "M", "I", "S"],
+    "riddle": {
+      "fr": "Panier à mailles fines, on m'utilise pour passer la farine et chasser les résidus."
+    },
+    "explanation": {
+      "fr": "Le tamis est un ustensile de cuisine traditionnel ivoirien, utilisé pour cribler la farine, le manioc râpé et autres produits granuleux."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["objets", "cuisine"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_138",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CALEBA",
+    "answer_normalized": "caleba",
+    "letters_pool": ["C", "A", "L", "E", "B", "A"],
+    "riddle": {
+      "fr": "Panier tressé d'osier, je garde le riz et les graines dans le grenier du village."
+    },
+    "explanation": {
+      "fr": "La calebasse (ou caleba) est un panier de stockage traditionnel tressé, utilisé pour conserver riz, manioc et autres réserves domestiques."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["objets", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_139",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POTIER",
+    "answer_normalized": "potier",
+    "letters_pool": ["P", "O", "T", "I", "E", "R"],
+    "riddle": {
+      "fr": "Je façonne l'argile rouge des rivières en marmites et jarres pour l'eau."
+    },
+    "explanation": {
+      "fr": "Le potier est un artisan ivoirien traditionnel qui crée marmites, jarres et récipients en terre cuite, métier très valorisé au village."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["metiers", "artisanat"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_140",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TISSEUR",
+    "answer_normalized": "tisseur",
+    "letters_pool": ["T", "I", "S", "S", "E", "U", "R"],
+    "riddle": {
+      "fr": "Mon métier loom ose passe les couleurs pour créer kente et bogolan."
+    },
+    "explanation": {
+      "fr": "Le tisseur est un artisan ivoirien qui tisse les pagnes et tissus ornementaux, métier spécialisé chez les peuples akan et mandingues."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["metiers", "artisanat"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_141",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FORGERON",
+    "answer_normalized": "forgeron",
+    "letters_pool": ["F", "O", "R", "G", "E", "R", "O", "N"],
+    "riddle": {
+      "fr": "Le feu est mon ami, j'aplatisse le fer pour faire houes et couteaux du village."
+    },
+    "explanation": {
+      "fr": "Le forgeron est un artisan ivoirien très respecté, créateur d'outils agricoles et d'armes, maître du feu et du métal."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["metiers", "artisanat"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_142",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PECHEUR",
+    "answer_normalized": "pecheur",
+    "letters_pool": ["P", "E", "C", "H", "E", "U", "R"],
+    "riddle": {
+      "fr": "Je jette mes filets à l'aube, la lagune me nourrit et nourrit ma famille."
+    },
+    "explanation": {
+      "fr": "Le pêcheur est un professionnel ivoirien de la côte et des lagunes, utilisant filets et pirogues pour récolter le poisson quotidien."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["metiers", "lagune"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_143",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MARIAGE",
+    "answer_normalized": "mariage",
+    "letters_pool": ["M", "A", "R", "I", "A", "G", "E"],
+    "riddle": {
+      "fr": "Deux familles s'unissent, les griots chantent, les marmites bouillent pour la fête."
+    },
+    "explanation": {
+      "fr": "Le mariage est une cérémonie majeure ivoirienne, alliant traditions familiales, échanges de cadeaux, festins et danses célébrant l'union."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["ceremonie", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_144",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BAPTEME",
+    "answer_normalized": "bapteme",
+    "letters_pool": ["B", "A", "P", "T", "E", "M", "E"],
+    "riddle": {
+      "fr": "L'enfant reçoit son nom à l'aube, libations versées, le village danse de joie."
+    },
+    "explanation": {
+      "fr": "Le baptême ivoirien est une cérémonie de présentation de l'enfant à la communauté, marquée par libations, festin et attribution du nom."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["ceremonie", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_145",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DOTE",
+    "answer_normalized": "dote",
+    "letters_pool": ["D", "O", "T", "E"],
+    "riddle": {
+      "fr": "Cadeau d'engagement, on me négocie entre les familles pour sceller l'union."
+    },
+    "explanation": {
+      "fr": "La dot est une prestation traditionnelle ivoirienne versée par la famille du fiancé à celle de la fiancée, symbolisant l'engagement."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["ceremonie", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_146",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CADEAU",
+    "answer_normalized": "cadeau",
+    "letters_pool": ["C", "A", "D", "E", "A", "U"],
+    "riddle": {
+      "fr": "Offrande d'amitié, on m'échange aux fêtes et aux visites importantes."
+    },
+    "explanation": {
+      "fr": "Le cadeau est un élément social fondamental ivoirien, marqueur de respect, de reconnaissance et de solidarité dans les relations."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["tradition", "social"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_147",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MOSQUE",
+    "answer_normalized": "mosque",
+    "letters_pool": ["M", "O", "S", "Q", "U", "E"],
+    "riddle": {
+      "fr": "Maison de prière du Nord, je marque les points cardinaux avec mon appel du muezzin."
+    },
+    "explanation": {
+      "fr": "La mosquée est le lieu de culte majeur au nord ivoirien, centre spirituel et communautaire pour les populations musulmanes."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["religion", "lieux"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_148",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "EGLISE",
+    "answer_normalized": "eglise",
+    "letters_pool": ["E", "G", "L", "I", "S", "E"],
+    "riddle": {
+      "fr": "Temple de prière chrétienne, je rassemble les fidèles le dimanche au son des cloches."
+    },
+    "explanation": {
+      "fr": "L'église est un lieu de culte chrétien implanté largement en Côte d'Ivoire, centre de communion et d'aide sociale communautaire."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["religion", "lieux"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_149",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MARABOUT",
+    "answer_normalized": "marabout",
+    "letters_pool": ["M", "A", "R", "A", "B", "O", "U", "T"],
+    "riddle": {
+      "fr": "Saint homme de l'Islam, on vient me chercher pour protection et bénédiction."
+    },
+    "explanation": {
+      "fr": "Le marabout est un sage musulman ivoirien, maître religieux et thérapeute traditionnel, consultant respecté pour ses avis spirituels."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["religion", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_150",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "IMAM",
+    "answer_normalized": "imam",
+    "letters_pool": ["I", "M", "A", "M"],
+    "riddle": {
+      "fr": "Guide du culte musulman, je dirige les prières du vendredi et les enseignements coraniques."
+    },
+    "explanation": {
+      "fr": "L'imam est le responsable religieux musulman en Côte d'Ivoire, leader spiritual et guide des fidèles à la mosquée."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["religion", "tradition"],
+    "format_version": 3
+  }
+]
