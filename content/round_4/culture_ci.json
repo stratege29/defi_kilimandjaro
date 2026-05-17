@@ -1,0 +1,542 @@
+[
+  {
+    "id": "culture_ci_151",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CRABE",
+    "answer_normalized": "crabe",
+    "letters_pool": ["C", "R", "A", "B", "E"],
+    "riddle": {
+      "fr": "Créature des eaux lagunes aux pinces redoutables, on me cuit dans les marmites du littoral."
+    },
+    "explanation": {
+      "fr": "Le crabe est un crustacé de la Lagune Ébrié et des côtes ivoiriennes, mets apprécié, préparé à la vapeur ou frit."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": ["cuisine", "lagune", "pêche"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_152",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "HERON",
+    "answer_normalized": "heron",
+    "letters_pool": ["H", "E", "R", "O", "N"],
+    "riddle": {
+      "fr": "Oiseau aux longues pattes, je me tiens aux bords des eaux stagnantes en chasse silencieuse."
+    },
+    "explanation": {
+      "fr": "Le héron est un échassier lagune ivoirien, animal gracieux des zones humides, symbole de patience dans les traditions."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": ["faune", "lagune", "oiseau"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_153",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ZEBU",
+    "answer_normalized": "zebu",
+    "letters_pool": ["Z", "E", "B", "U"],
+    "riddle": {
+      "fr": "Boeuf à grosse bosse du Sahel, on m'élève au nord pour mon lait et mes cornes."
+    },
+    "explanation": {
+      "fr": "Le zébu est un bovin domestique des zones sahéliennes ivoiriennes, animal robust adapté à la chaleur et aux sécheresses."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": ["faune", "elevage", "nord"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_154",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "COROSSOL",
+    "answer_normalized": "corossol",
+    "letters_pool": ["C", "O", "R", "O", "S", "S", "O", "L"],
+    "riddle": {
+      "fr": "Fruit vert chiffonné, ma chair blanche et sucrée crée jus et sorbet au goût d'anges."
+    },
+    "explanation": {
+      "fr": "Le corossol est un fruit tropical exotique cultivé en Côte d'Ivoire, consommé frais ou transformé en boisson rafraîchissante."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": ["cuisine", "fruit"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_155",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TAMARIN",
+    "answer_normalized": "tamarin",
+    "letters_pool": ["T", "A", "M", "A", "R", "I", "N"],
+    "riddle": {
+      "fr": "Gousse brune du Sahel, ma pulpe aigre-sucrée relève les sauces et les boissons."
+    },
+    "explanation": {
+      "fr": "Le tamarin est un fruit utilisé en cuisine ivoirienne pour son acidité, rehaussant les sauces et boissons traditionnelles."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": ["cuisine", "fruit", "sauce"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_156",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "JUJUBE",
+    "answer_normalized": "jujube",
+    "letters_pool": ["J", "U", "J", "U", "B", "E"],
+    "riddle": {
+      "fr": "Petite baie rouge douce, je pousse sur l'arbre épineux et je suis croquée fraîche."
+    },
+    "explanation": {
+      "fr": "La jujube est un petit fruit rouge consommé frais en Côte d'Ivoire, poussant sur un arbre épineux adapté au Sahel."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": ["cuisine", "fruit"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_157",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CREVETTE",
+    "answer_normalized": "crevette",
+    "letters_pool": ["C", "R", "E", "V", "E", "T", "T", "E"],
+    "riddle": {
+      "fr": "Petite coquille rose des eaux lagunes, je grille au feu et parfume le riz."
+    },
+    "explanation": {
+      "fr": "La crevette est un crustacé côtier et lagunaire, mets réputé des côtes ivoiriennes, préparé grillé ou en sauce."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 35,
+    "tags": ["cuisine", "lagune", "pêche"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_158",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PASTEQUE",
+    "answer_normalized": "pasteque",
+    "letters_pool": ["P", "A", "S", "T", "E", "Q", "U", "E"],
+    "riddle": {
+      "fr": "Grosse boule verte à chair rouge, je suis le réconfort du midi brûlant."
+    },
+    "explanation": {
+      "fr": "La pastèque est un fruit estival très aimé en Côte d'Ivoire, consommé frais en tranches pour se rafraîchir."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 35,
+    "tags": ["cuisine", "fruit"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_159",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AWALE",
+    "answer_normalized": "awale",
+    "letters_pool": ["A", "W", "A", "L", "E"],
+    "riddle": {
+      "fr": "Jeu ancien des lignées, on joue avec cailloux et cases, l'esprit stratège y brille."
+    },
+    "explanation": {
+      "fr": "L'awalé est un jeu de stratégie africain millénaire très joué en Côte d'Ivoire, jeu de famille et de sagesse."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": ["loisirs", "jeu", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_160",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FORGE",
+    "answer_normalized": "forge",
+    "letters_pool": ["F", "O", "R", "G", "E"],
+    "riddle": {
+      "fr": "Atelier du feu où le fer rougit et se transforme en outils du village."
+    },
+    "explanation": {
+      "fr": "La forge est l'atelier traditionnel ivoirien où le forgeron façonne les outils métalliques, lieu de transformation du fer."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": ["metiers", "objets"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_161",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FAMA",
+    "answer_normalized": "fama",
+    "letters_pool": ["F", "A", "M", "A"],
+    "riddle": {
+      "fr": "Chef du village mandingue, c'est à moi que le peuple se fie et se rassemble."
+    },
+    "explanation": {
+      "fr": "Le fama est un chef traditionnel mandingue et dioula, autorité respectée chez les peuples du nord ivoirien."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": ["personnage", "tradition", "nord"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_162",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MORINGA",
+    "answer_normalized": "moringa",
+    "letters_pool": ["M", "O", "R", "I", "N", "G", "A"],
+    "riddle": {
+      "fr": "Arbre du bien-être, mes feuilles vertes alimentent et guérissent, je suis l'or vert des guérisseurs."
+    },
+    "explanation": {
+      "fr": "Le moringa est une plante médicinale très utilisée en Côte d'Ivoire, riche en nutriments et propriétés curatives reconnues."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": ["plante", "medecine", "sante"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_163",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KENAF",
+    "answer_normalized": "kenaf",
+    "letters_pool": ["K", "E", "N", "A", "F"],
+    "riddle": {
+      "fr": "Plante textile du Sahel, mes fibres tressées créent cordes et toiles rustiques."
+    },
+    "explanation": {
+      "fr": "Le kénaf est une plante fibreuse cultivée au nord ivoirien, utilisée pour les tissus rustiques et les cordages."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": ["plante", "artisanat"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_164",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ALEPE",
+    "answer_normalized": "alepe",
+    "letters_pool": ["A", "L", "E", "P", "E"],
+    "riddle": {
+      "fr": "Petite ville portuaire du sud-est, je suis le carrefour des commerce côtiers."
+    },
+    "explanation": {
+      "fr": "Alépé est une petite ville portuaire du sud-est ivoirien, centre de commerce côtier et de pêche traditionnelle."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": ["lieux", "ville", "lagune"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_165",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AKOUPE",
+    "answer_normalized": "akoupe",
+    "letters_pool": ["A", "K", "O", "U", "P", "E"],
+    "riddle": {
+      "fr": "Village de potiers baoulé près du fleuve, mes mains façonnent l'argile depuis les ancêtres."
+    },
+    "explanation": {
+      "fr": "Akoupe est un village traditionnel baoulé réputé pour ses poteries, centre artisanal de fabrication de marmites et jarres."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": ["lieux", "village", "artisanat"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_166",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "VIPERE",
+    "answer_normalized": "vipere",
+    "letters_pool": ["V", "I", "P", "E", "R", "E"],
+    "riddle": {
+      "fr": "Serpent redouté aux crochets venimeux, je me cache dans les hautes herbes de la brousse."
+    },
+    "explanation": {
+      "fr": "La vipère est un serpent venimeux des savanes ivoiriennes, animal craint et respecté, présent dans les contes."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": ["faune", "reptile"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_167",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KAPOK",
+    "answer_normalized": "kapok",
+    "letters_pool": ["K", "A", "P", "O", "K"],
+    "riddle": {
+      "fr": "Arbre géant du coeur de la forêt, mes graines molles remplissent les coussins et matelas."
+    },
+    "explanation": {
+      "fr": "Le kapok (fromager) est un arbre forestier géant ivoirien, dont les graines fournissent une fibre légère pour le rembourrage."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": ["plante", "artisanat"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_168",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOULANGO",
+    "answer_normalized": "koulango",
+    "letters_pool": ["K", "O", "U", "L", "A", "N", "G", "O"],
+    "riddle": {
+      "fr": "Peuple des savanes du sud-est, je cultive le coton et je parle une langue des Akan lointains."
+    },
+    "explanation": {
+      "fr": "Les Koulango sont un peuple akan mineur du sud-est ivoirien, agriculteurs et pasteurs peu documentés des zones de savane."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": ["peuple", "culture"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_169",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AKOUE",
+    "answer_normalized": "akoue",
+    "letters_pool": ["A", "K", "O", "U", "E"],
+    "riddle": {
+      "fr": "Petit peuple de la forêt côtière, mes traditions de pêche et de cueillette remontent aux origines."
+    },
+    "explanation": {
+      "fr": "Les Akoué sont un peuple autochtone des zones côtières ivoiriennes, reconnus pour leur connaissance profonde de la nature."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": ["peuple", "culture", "lagune"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_170",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TAMARIS",
+    "answer_normalized": "tamaris",
+    "letters_pool": ["T", "A", "M", "A", "R", "I", "S"],
+    "riddle": {
+      "fr": "Arbre épineux des terres sèches, mes fleurs roses parsèment les villages du nord."
+    },
+    "explanation": {
+      "fr": "Le tamaris est un arbre sahélien aux fleurs roses, adapté aux zones arides du nord ivoirien, symbole de résilience."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": ["plante", "nord"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_171",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DODOO",
+    "answer_normalized": "dodoo",
+    "letters_pool": ["D", "O", "D", "O", "O"],
+    "riddle": {
+      "fr": "Danse guerrière du nord, on me pratique avec les boucliers lors des célébrations."
+    },
+    "explanation": {
+      "fr": "Le dodoo est une danse traditionnelle guerrière du nord ivoirien, danse ritualisée de fierté et de puissance."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": ["danse", "tradition", "nord"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_172",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AGBOU",
+    "answer_normalized": "agbou",
+    "letters_pool": ["A", "G", "B", "O", "U"],
+    "riddle": {
+      "fr": "Danse de commémoration akan, on me danse lors du deuil pour honorer l'ancêtre décédé."
+    },
+    "explanation": {
+      "fr": "L'agbou est une danse funéraire akan, pratiquée lors du deuil pour célébrer le défunt et affirmer la continuité."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": ["danse", "ceremonie"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_173",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DZEZE",
+    "answer_normalized": "dzeze",
+    "letters_pool": ["D", "Z", "E", "Z", "E"],
+    "riddle": {
+      "fr": "Instrument à cordes pincées, on me joue lors des célébrations et des veillées."
+    },
+    "explanation": {
+      "fr": "Le dzeze est un instrument de musique traditionnel ouest-africain, harpe-luth mineure jouée aux fêtes ivoiriennes."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": ["musique", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_174",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "LIKAH",
+    "answer_normalized": "likah",
+    "letters_pool": ["L", "I", "K", "A", "H"],
+    "riddle": {
+      "fr": "Système de divination akan secret, les cauries parlent et révèlent les vérités cachées."
+    },
+    "explanation": {
+      "fr": "Le likah est un système divinatoire akan traditionnel utilisant des cauries, pratique de connaissance occulte très respectée."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": ["tradition", "spiritualite"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_175",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POUI",
+    "answer_normalized": "poui",
+    "letters_pool": ["P", "O", "U", "I"],
+    "riddle": {
+      "fr": "Cérémonie d'initiation lobi cachée, on me pratique dans le secret de la forêt pour transformer les jeunes."
+    },
+    "explanation": {
+      "fr": "Le poui est un rite initiatique lobi très secret, cérémonie de passage conférant l'appartenance au groupe."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": ["tradition", "ceremonie"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_176",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KAGOU",
+    "answer_normalized": "kagou",
+    "letters_pool": ["K", "A", "G", "O", "U"],
+    "riddle": {
+      "fr": "Plante magique du thérapeute, on m'utilise dans les philtres contre l'envoutement."
+    },
+    "explanation": {
+      "fr": "Le kagou est une plante médicinale traditionnelle ivoirienne, utilisée par les guérisseurs dans les traitements anti-sorcellerie."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": ["plante", "medecine"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_177",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ALOMA",
+    "answer_normalized": "aloma",
+    "letters_pool": ["A", "L", "O", "M", "A"],
+    "riddle": {
+      "fr": "Plante du guérisseur baoulé, mes racines et feuilles soulèvent les douleurs articulaires."
+    },
+    "explanation": {
+      "fr": "L'aloma est une plante médicinale baoulé traditionnelle, utilisée pour traiter les rhumatismes et douleurs du corps."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": ["plante", "medecine"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_178",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AGYIN",
+    "answer_normalized": "agyin",
+    "letters_pool": ["A", "G", "Y", "I", "N"],
+    "riddle": {
+      "fr": "Ancêtre divinisé dans la croyance akan, on m'invoque pour protection et guidance spirituelle."
+    },
+    "explanation": {
+      "fr": "L'agyin est un ancêtre vénéré dans la cosmologie akan, figure protectrice et guide spirituel de la communauté."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": ["spiritualite", "tradition"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_179",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TOMA",
+    "answer_normalized": "toma",
+    "letters_pool": ["T", "O", "M", "A"],
+    "riddle": {
+      "fr": "Instrument sacré de la parole mandingue, on m'utilise pour sceller les serments et les traités."
+    },
+    "explanation": {
+      "fr": "Le toma est un objet rituel mandingue très ancien, utilisé dans les cérémonies de serment et d'alliance."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": ["tradition", "objet"],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_180",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AKWA",
+    "answer_normalized": "akwa",
+    "letters_pool": ["A", "K", "W", "A"],
+    "riddle": {
+      "fr": "Esprit féminin de la source akan, on me craint et on me vénère pour ma puissance mystérieuse."
+    },
+    "explanation": {
+      "fr": "L'akwa est un esprit féminin de l'eau dans les croyances akan, entité surnaturelle vénérée et redoutée."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": ["spiritualite", "mythe"],
+    "format_version": 3
+  }
+]

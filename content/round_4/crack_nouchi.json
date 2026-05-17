@@ -1,0 +1,542 @@
+[
+  {
+    "id": "crack_nouchi_121",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJADJI",
+    "answer_normalized": "djadji",
+    "letters_pool": ["D","J","A","D","J","I"],
+    "riddle": {
+      "fr": "Oncle, parent âgé, celui qu'on respecte dans la famille."
+    },
+    "explanation": {
+      "fr": "Djadji = oncle, parent respectable. Terme Nouchi issu du bambara/dioula pour désigner un oncle ou un aîné auquel on doit le respect."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire", "famille"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_122",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CAILLOU",
+    "answer_normalized": "caillou",
+    "letters_pool": ["C","A","I","L","L","O","U"],
+    "riddle": {
+      "fr": "Dur, insensible, qui ne se laisse pas faire. Un roc."
+    },
+    "explanation": {
+      "fr": "Caillou = insensible, dur, sans sentiment. Terme Nouchi figuré pour quelqu'un d'impitoyable ou d'inébranlable."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_123",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "POUM",
+    "answer_normalized": "poum",
+    "letters_pool": ["P","O","U","M"],
+    "riddle": {
+      "fr": "Force, vigueur, puissance physique. Je suis solide."
+    },
+    "explanation": {
+      "fr": "Poum = force, vigueur, robustesse. Terme Nouchi onomatopéique pour exprimer la force brute et la solidité."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["attitude", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_124",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MOUSSO",
+    "answer_normalized": "mousso",
+    "letters_pool": ["M","O","U","S","S","O"],
+    "riddle": {
+      "fr": "Fille, jeune femme, belle femme. Une nana."
+    },
+    "explanation": {
+      "fr": "Mousso = fille, femme, jeune femme. Terme Nouchi issu du bambara pour désigner une jeune femme ou une copine."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_125",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CAILLE",
+    "answer_normalized": "caille",
+    "letters_pool": ["C","A","I","L","L","E"],
+    "riddle": {
+      "fr": "Difficile, dur, pas facile à faire. C'est costaud."
+    },
+    "explanation": {
+      "fr": "Caille = difficile, ardu, exigeant. Terme Nouchi intermédiaire pour exprimer la difficulté ou la rigueur d'une tâche."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["attitude", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_126",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBASS",
+    "answer_normalized": "gbass",
+    "letters_pool": ["G","B","A","S","S"],
+    "riddle": {
+      "fr": "Gros monsieur, homme corpulent, quelqu'un d'imposant."
+    },
+    "explanation": {
+      "fr": "Gbass = gros, corpulent, homme bedonnant. Terme Nouchi pour désigner quelqu'un de corpulence généreuse avec humour affectueux."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_127",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "LEKE",
+    "answer_normalized": "leke",
+    "letters_pool": ["L","E","K","E"],
+    "riddle": {
+      "fr": "Regarder fixement, observer intensément. Surveille bien."
+    },
+    "explanation": {
+      "fr": "Leke = regarder, observer, épier. Terme Nouchi récent pour l'action de fixer du regard ou de surveiller quelque chose."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_128",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SCOTTI",
+    "answer_normalized": "scotti",
+    "letters_pool": ["S","C","O","T","T","I"],
+    "riddle": {
+      "fr": "Espion, mouchard, celui qui dénonce ses frères."
+    },
+    "explanation": {
+      "fr": "Scotti = espion, informateur, délateur. Terme Nouchi récent pour celui qui rapporte ou surveille pour une autorité."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_129",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CABOSS",
+    "answer_normalized": "caboss",
+    "letters_pool": ["C","A","B","O","S","S"],
+    "riddle": {
+      "fr": "Bourrique, idiot, complètement con. Sans cervelle."
+    },
+    "explanation": {
+      "fr": "Caboss = imbécile, con, débile. Terme Nouchi récent très vulgaire pour exprimer l'imbécillité avec force."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_130",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GROUILLE",
+    "answer_normalized": "grouille",
+    "letters_pool": ["G","R","O","U","I","L","L","E"],
+    "riddle": {
+      "fr": "Astuce, débrouille, plan malin pour survivre."
+    },
+    "explanation": {
+      "fr": "Grouille = débrouille, stratégie urbaine, système D. Terme Nouchi récent pour l'art de se dépatouiller intelligemment."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_131",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KOUME",
+    "answer_normalized": "koume",
+    "letters_pool": ["K","O","U","M","E"],
+    "riddle": {
+      "fr": "Prendre, saisir, attraper. Je te braque."
+    },
+    "explanation": {
+      "fr": "Koume = prendre, saisir, voler. Terme Nouchi récent du contexte urbain pour s'approprier quelque chose illicitement."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_132",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ASKABA",
+    "answer_normalized": "askaba",
+    "letters_pool": ["A","S","K","A","B","A"],
+    "riddle": {
+      "fr": "Bling, bijoux, or et brillance. On me voit de loin."
+    },
+    "explanation": {
+      "fr": "Askaba = bling, luxe visible, bijoux ostentatoires. Terme Nouchi récent pour l'étalage de richesse avec assurance."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["objet", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_133",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBANG",
+    "answer_normalized": "gbang",
+    "letters_pool": ["G","B","A","N","G"],
+    "riddle": {
+      "fr": "Gros, imposant, massif. Pas discret."
+    },
+    "explanation": {
+      "fr": "Gbang = gros, volumineux, imposant. Terme Nouchi récent onomatopéique pour exprimer la taille et l'importance."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["attitude", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_134",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJALOL",
+    "answer_normalized": "djalol",
+    "letters_pool": ["D","J","A","L","O","L"],
+    "riddle": {
+      "fr": "Rigolo, drôle, qui fait rire les gens."
+    },
+    "explanation": {
+      "fr": "Djalol = rigolo, drôle, comique. Terme Nouchi récent pour quelqu'un d'amusant et de bon vivant."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_135",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CHAGRIN",
+    "answer_normalized": "chagrin",
+    "letters_pool": ["C","H","A","G","R","I","N"],
+    "riddle": {
+      "fr": "Tristesse, peine, souci profond. Ça fait du mal."
+    },
+    "explanation": {
+      "fr": "Chagrin = tristesse, douleur morale, peine. Terme français très enraciné en Nouchi pour exprimer une affliction personnelle."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["attitude", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_136",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DOPE",
+    "answer_normalized": "dope",
+    "letters_pool": ["D","O","P","E"],
+    "riddle": {
+      "fr": "Fort, excellent, super. Ça tue franchement."
+    },
+    "explanation": {
+      "fr": "Dope = excellent, fort, killer. Terme Nouchi récent emprunté à l'anglais street pour approuver quelque chose d'authentiquement bon."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["attitude", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_137",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BOBOUYA",
+    "answer_normalized": "bobouya",
+    "letters_pool": ["B","O","B","O","U","Y","A"],
+    "riddle": {
+      "fr": "Blagueur, celui qui raconte des histoires drôles sans arrêt."
+    },
+    "explanation": {
+      "fr": "Bobouya = blagueur, conteur, amuseur public. Terme Nouchi insider pour un personnage amusant qui maîtrise l'art de faire rire."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["personne", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_138",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SAKABO",
+    "answer_normalized": "sakabo",
+    "letters_pool": ["S","A","K","A","B","O"],
+    "riddle": {
+      "fr": "Costaud, solide, bien musclé. On ne le titille pas."
+    },
+    "explanation": {
+      "fr": "Sakabo = costaud, musclé, imposant physiquement. Terme Nouchi insider pour un homme de force respectable."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["personne", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_139",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FALLA",
+    "answer_normalized": "falla",
+    "letters_pool": ["F","A","L","L","A"],
+    "riddle": {
+      "fr": "Sortir, partir, s'en aller. Je me casse."
+    },
+    "explanation": {
+      "fr": "Falla = partir, sortir, s'évader. Terme Nouchi insider pour l'action de se tirer rapidement d'une situation."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["action", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_140",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KORONI",
+    "answer_normalized": "koroni",
+    "letters_pool": ["K","O","R","O","N","I"],
+    "riddle": {
+      "fr": "Blanche, étrangère, femme occidentale. Pas d'ici."
+    },
+    "explanation": {
+      "fr": "Koroni = femme blanche, étrangère. Terme Nouchi insider neutre/descriptif pour une femme occidentale vue depuis Abidjan."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["personne", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_141",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ADAGOU",
+    "answer_normalized": "adagou",
+    "letters_pool": ["A","D","A","G","O","U"],
+    "riddle": {
+      "fr": "Ami solide, frère de confiance, celui sur qui on peut compter."
+    },
+    "explanation": {
+      "fr": "Adagou = ami loyal, frère d'armes, complice sûr. Terme Nouchi insider pour un camarade sur lequel on peut réellement compter."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["personne", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_142",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TCHASS",
+    "answer_normalized": "tchass",
+    "letters_pool": ["T","C","H","A","S","S"],
+    "riddle": {
+      "fr": "Alcool fort, gnôle, vin qui monte à la tête."
+    },
+    "explanation": {
+      "fr": "Tchass = alcool fort, brandy, vin épais. Terme Nouchi insider pour toute boisson alcoolisée puissante consommée au maquis."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["objet", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_143",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KEKEZAN",
+    "answer_normalized": "kekezan",
+    "letters_pool": ["K","E","K","E","Z","A","N"],
+    "riddle": {
+      "fr": "Vraie patte, vrai style, authenticité du quartier. C'est ça."
+    },
+    "explanation": {
+      "fr": "Kekezan = authenticité, vraie patte urbaine, style personnel marqué. Terme Nouchi insider pour la véracité streetwear abidjanaise."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["attitude", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_144",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ANAKLI",
+    "answer_normalized": "anakli",
+    "letters_pool": ["A","N","A","K","L","I"],
+    "riddle": {
+      "fr": "Traître, délateur, celui qui vend ses frères."
+    },
+    "explanation": {
+      "fr": "Anakli = traître, judas, informateur des flics. Terme Nouchi insider pour quelqu'un qui trahit le code du quartier."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["personne", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_145",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TCHANGUE",
+    "answer_normalized": "tchangue",
+    "letters_pool": ["T","C","H","A","N","G","U","E"],
+    "riddle": {
+      "fr": "Danser avec violence, bouger sec. Je me démène."
+    },
+    "explanation": {
+      "fr": "Tchangue = danser avec force et énergie, se déchaîner. Terme Nouchi insider pour l'action de danser intensément au Coupé Décalé."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["action", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_146",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TOPOTOPO",
+    "answer_normalized": "topotopo",
+    "letters_pool": ["T","O","P","O","T","O","P","O"],
+    "riddle": {
+      "fr": "Vite, rapido, sans traîner. Expédition sec."
+    },
+    "explanation": {
+      "fr": "Topotopo = vite, rapidement, à la vitesse de l'éclair. Terme Nouchi insider onomatopéique pour l'urgence et la célérité."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["attitude", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_147",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BARAGUI",
+    "answer_normalized": "baragui",
+    "letters_pool": ["B","A","R","A","G","U","I"],
+    "riddle": {
+      "fr": "Jeune homme fier, costaud, qui fait l'important."
+    },
+    "explanation": {
+      "fr": "Baragui = jeune homme fier, gaillard, celui qui s'impose. Terme Nouchi expert pour un personnage urbain de caractère affirmé."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": ["personne", "expert"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_148",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJIDIRI",
+    "answer_normalized": "djidiri",
+    "letters_pool": ["D","J","I","D","I","R","I"],
+    "riddle": {
+      "fr": "Vraie patte, authenticité brute, sans fard. Le truc vrai."
+    },
+    "explanation": {
+      "fr": "Djidiri = authenticité totale, réalité crue, sans compromis. Terme Nouchi expert pour la véracité absolue du street abidjanais."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": ["attitude", "expert"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_149",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ZOUMI",
+    "answer_normalized": "zoumi",
+    "letters_pool": ["Z","O","U","M","I"],
+    "riddle": {
+      "fr": "Drôle, burlesque, qui crée l'hilarité. Tu me fais rire."
+    },
+    "explanation": {
+      "fr": "Zoumi = drôle, amusant, burlesque. Terme Nouchi expert pour quelqu'un ou quelque chose d'authentiquement comique et farfelu."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": ["attitude", "expert"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_150",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GLAGLA",
+    "answer_normalized": "glagla",
+    "letters_pool": ["G","L","A","G","L","A"],
+    "riddle": {
+      "fr": "Frisson de peur, panique, sensation de terreur froide."
+    },
+    "explanation": {
+      "fr": "Glagla = frisson, peur, appréhension physique. Terme Nouchi expert onomatopéique pour l'expérience viscérale de la frayeur."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": ["attitude", "expert"],
+    "format_version": 3
+  }
+]
