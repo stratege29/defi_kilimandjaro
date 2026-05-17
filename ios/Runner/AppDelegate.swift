@@ -40,9 +40,15 @@ import UserNotifications
     // Messaging delegate — relaie le token APNs vers FCM via didReceiveRegistrationToken.
     Messaging.messaging().delegate = self
 
-    // Force iOS à demander la permission "Réseau local" en lançant un browse
-    // Bonjour. Indispensable pour atteindre Firebase emulator sur le LAN.
+    // Local Network permission trigger : RESTREINT au DEBUG uniquement.
+    // En Release on n'a plus NSLocalNetworkUsageDescription dans Info.plist
+    // (retiré pour le rejet App Store ITMS sur "development only" text),
+    // donc l'API NetServiceBrowser throw une exception sur iOS 17+/26 et
+    // peut tuer l'app au boot. L'emulator Firebase n'est jamais utilisé
+    // en prod de toute façon.
+    #if DEBUG
     triggerLocalNetworkPermission()
+    #endif
 
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
