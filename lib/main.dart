@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -71,17 +72,16 @@ Future<void> main() async {
 Future<void> _bootstrap() async {
   // [BOOT] timeline : ces prints survivent en release et sortent dans
   // Console.app / log stream pour debug d'un freeze au splash.
-  // ignore: avoid_print
-  print('[BOOT] 0 _bootstrap entered');
+  // dart:developer.log() utilise os_log nativement sur iOS → visible
+  // dans Console.app et `log stream` même en mode Release. À l'inverse,
+  // Flutter's print() en release est silencieux sur iOS device.
+  developer.log('0 _bootstrap entered', name: 'BOOT');
   WidgetsFlutterBinding.ensureInitialized();
-  // ignore: avoid_print
-  print('[BOOT] 1 WidgetsFlutterBinding OK');
+  developer.log('1 WidgetsFlutterBinding OK', name: 'BOOT');
   await EasyLocalization.ensureInitialized();
-  // ignore: avoid_print
-  print('[BOOT] 2 EasyLocalization OK');
+  developer.log('2 EasyLocalization OK', name: 'BOOT');
   await AudioEngine.instance.init();
-  // ignore: avoid_print
-  print('[BOOT] 3 AudioEngine OK');
+  developer.log('3 AudioEngine OK', name: 'BOOT');
 
   // Firebase: initialize then ensure an anonymous session exists so
   // every player has a UID for duels even before signing in with
@@ -230,22 +230,18 @@ Future<void> _bootstrap() async {
     } on Object {
       // Timeout ou erreur FCM — l'app boot quand même.
     }
-    // ignore: avoid_print
-    print('[BOOT] 4 Firebase block OK');
+    developer.log('4 Firebase block OK', name: 'BOOT');
   } catch (e) {
     // Fail-soft: solo gameplay continues without backend if Firebase fails.
-    // ignore: avoid_print
-    print('[BOOT] 4 Firebase bootstrap failed: $e');
+    developer.log('4 Firebase bootstrap failed: $e', name: 'BOOT');
   }
 
   final prefs = await SharedPreferences.getInstance();
-  // ignore: avoid_print
-  print('[BOOT] 5 SharedPreferences OK');
+  developer.log('5 SharedPreferences OK', name: 'BOOT');
 
   SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlay);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  // ignore: avoid_print
-  print('[BOOT] 6 SystemChrome OK — calling runApp');
+  developer.log('6 SystemChrome OK — calling runApp', name: 'BOOT');
 
   runApp(
     EasyLocalization(
