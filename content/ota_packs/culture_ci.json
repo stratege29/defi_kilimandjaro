@@ -865,5 +865,857 @@
       "feminin"
     ],
     "format_version": 3
+  },
+  {
+    "id": "culture_ci_091",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TIDJANI",
+    "answer_normalized": "tidjani",
+    "letters_pool": [
+      "T",
+      "I",
+      "D",
+      "J",
+      "A",
+      "N",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Guerrier mandingue du XIXe siècle, j'ai porté l'Islam et la résistance contre l'invasion coloniale."
+    },
+    "explanation": {
+      "fr": "El-Hadj Tidjani (1755-1821) est une figure historique majeure, fondateur de la confrérie Tijaniyya, présente en Côte d'Ivoire, résistant à la colonisation."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "histoire",
+      "personnalite",
+      "spiritualite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_092",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DIPRI",
+    "answer_normalized": "dipri",
+    "letters_pool": [
+      "D",
+      "I",
+      "P",
+      "R",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Rite adioukrou d'ablution des morts, je purifie avant le retour à la terre ancestrale."
+    },
+    "explanation": {
+      "fr": "Le Dipri est un rite funéraire adioukrou du littoral ivoirien, cérémonie sacrée de purification du défunt avant l'inhumation."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "ceremonie",
+      "rite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_093",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "HEVEA",
+    "answer_normalized": "hevea",
+    "letters_pool": [
+      "H",
+      "E",
+      "V",
+      "E",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Arbre de la richesse caoutchoutière, le pays en est deuxième producteur mondial."
+    },
+    "explanation": {
+      "fr": "L'hévéa est l'arbre produisant le caoutchouc, cultivé largement en Côte d'Ivoire qui est le 2ème producteur mondial de latex brut."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "agriculture",
+      "economie",
+      "plante"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_094",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "COBRA",
+    "answer_normalized": "cobra",
+    "letters_pool": [
+      "C",
+      "O",
+      "B",
+      "R",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Serpent sacré qui se dresse, mon capuchon écarté sème la crainte et le respect."
+    },
+    "explanation": {
+      "fr": "Le cobra est un serpent redouté des forêts ivoiriennes, vénéré dans certains rites et contes du folklore."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "faune",
+      "serpent",
+      "mystique"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_095",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PYTHON",
+    "answer_normalized": "python",
+    "letters_pool": [
+      "P",
+      "Y",
+      "T",
+      "H",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Serpent géant qui étouffe sa proie, je suis gardien de la forêt sacrée."
+    },
+    "explanation": {
+      "fr": "Le python est un grand serpent présent en Côte d'Ivoire, animal mystique respecté et intégré aux légendes de protection des forêts."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "faune",
+      "serpent",
+      "foret"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_096",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GALAGO",
+    "answer_normalized": "galago",
+    "letters_pool": [
+      "G",
+      "A",
+      "L",
+      "A",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Petit primate nocturne aux grands yeux, je suis le revenant discret de la nuit forestière."
+    },
+    "explanation": {
+      "fr": "Le galago est un petit primate forestier nocturne habitant les forêts ivoiriennes, animal du folklore animalier local."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "faune",
+      "foret",
+      "nocturne"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_097",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOLA",
+    "answer_normalized": "kola",
+    "letters_pool": [
+      "K",
+      "O",
+      "L",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Noix amère qu'on offre à l'ami, symbole d'hospitalité et signe d'alliance."
+    },
+    "explanation": {
+      "fr": "La noix de kola est un fruit sacré offert en signe de bienvenue et de respect dans les traditions ivoiriennes, utilisée dans les rites sociaux."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "plante",
+      "tradition",
+      "sacre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_098",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TECK",
+    "answer_normalized": "teck",
+    "letters_pool": [
+      "T",
+      "E",
+      "C",
+      "K"
+    ],
+    "riddle": {
+      "fr": "Bois dur de la forêt dense, je donne les canots et les meubles indestructibles."
+    },
+    "explanation": {
+      "fr": "Le teck est un bois précieux des forêts ivoiriennes, très valorisé pour la construction navale et l'ébénisterie traditionnelle."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "plante",
+      "artisanat",
+      "bois"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_099",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ACAJOU",
+    "answer_normalized": "acajou",
+    "letters_pool": [
+      "A",
+      "C",
+      "A",
+      "J",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Bois rouge de prestige, on me travaille finement pour les trônes et les masques."
+    },
+    "explanation": {
+      "fr": "L'acajou est un bois d'exception des forêts ivoiriennes, apprécié pour la sculpture rituelle et l'ébénisterie de haut rang."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "plante",
+      "artisanat",
+      "bois"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_100",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TIASSALE",
+    "answer_normalized": "tiassale",
+    "letters_pool": [
+      "T",
+      "I",
+      "A",
+      "S",
+      "S",
+      "A",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cascades du sud baoulé, les eaux chantent sur la roche et attirent les pèlerins."
+    },
+    "explanation": {
+      "fr": "Tiassalé est un village du sud baoulé célèbre pour ses cascades spectaculaires, site naturel d'importance culturelle et touristique."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "geographie",
+      "lieux",
+      "nature"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_101",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DUEKOUE",
+    "answer_normalized": "duekoue",
+    "letters_pool": [
+      "D",
+      "U",
+      "E",
+      "K",
+      "O",
+      "U",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Ville de l'extrême ouest, entre montagnes et frontière libérienne, carrefour du commerce."
+    },
+    "explanation": {
+      "fr": "Duékoué est une ville de l'extrême Ouest ivoirien, centre commercial et carrefour régional, cœur du pays Toura et Yacouba."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "lieux",
+      "ville",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_102",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BANGOLO",
+    "answer_normalized": "bangolo",
+    "letters_pool": [
+      "B",
+      "A",
+      "N",
+      "G",
+      "O",
+      "L",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Petite ville du sud-ouest malinké, je garde les secrets des routes d'or noir."
+    },
+    "explanation": {
+      "fr": "Bangolo est une ville du sud-ouest ivoirien, petite cité malinké historiquement liée aux routes commerciales de l'hinterland."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "lieux",
+      "ville",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_103",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MEAGUI",
+    "answer_normalized": "meagui",
+    "letters_pool": [
+      "M",
+      "E",
+      "A",
+      "G",
+      "U",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Fleuve côtier du sud-ouest, mes eaux sacrées séparent la Côte d'Ivoire du Liberia."
+    },
+    "explanation": {
+      "fr": "Le Méagui est un fleuve côtier du sud-ouest ivoirien formant partiellement la frontière avec le Liberia, site culturel d'importance spirituelle."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "geographie",
+      "lieux",
+      "nature"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_104",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AGBE",
+    "answer_normalized": "agbe",
+    "letters_pool": [
+      "A",
+      "G",
+      "B",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Divinité de la mer ébrié, tu règnes sur les vagues et protèges les pêcheurs."
+    },
+    "explanation": {
+      "fr": "Agbé est une divinité aquatique ébrié-mina, esprit tutélaire des lagunes, vénérée pour sa protection sur les pêcheurs et les eaux."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": [
+      "spiritualite",
+      "deite",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_105",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DJOMBA",
+    "answer_normalized": "djomba",
+    "letters_pool": [
+      "D",
+      "J",
+      "O",
+      "M",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Esprit mauvais qui rôde sous les arbres, les sages me craignent et les enfants m'evitent."
+    },
+    "explanation": {
+      "fr": "Le Djomba est un esprit maléfique du folklore ivoirien, créature des espaces sauvages, mentionné dans contes et légendes pour mettre en garde."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": [
+      "spiritualite",
+      "esprit",
+      "folklore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_106",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ZUNON",
+    "answer_normalized": "zunon",
+    "letters_pool": [
+      "Z",
+      "U",
+      "N",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Créateur primordial dioula, tu établis le ciel et la terre dès les origines."
+    },
+    "explanation": {
+      "fr": "Zunon (ou Zoom) est le créateur suprême dans la cosmologie dioula-mandingue ivoirienne, équivalent du concept d'éternité primordiale."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": [
+      "spiritualite",
+      "deite",
+      "dioula"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_107",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GORA",
+    "answer_normalized": "gora",
+    "letters_pool": [
+      "G",
+      "O",
+      "R",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Génie de la brousse baoulé, j'habite les clairières et guidais les chasseurs d'autrefois."
+    },
+    "explanation": {
+      "fr": "Gora est un génie ou esprit intermédiaire baoulé, figure tutélaire de la brousse, protecteur des chasseurs et guide spirituel."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": [
+      "spiritualite",
+      "esprit",
+      "baoulé"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_108",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SIKAN",
+    "answer_normalized": "sikan",
+    "letters_pool": [
+      "S",
+      "I",
+      "K",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Ancêtre tutélaire et protecteur du clan, tu veilles sur les descendants de ta lignée."
+    },
+    "explanation": {
+      "fr": "Sikan désigne un ancêtre vénéré et divinisé, figure protectrice d'une famille ou d'un clan dans les traditions akan ivoiriennes."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": [
+      "spiritualite",
+      "ancetre",
+      "akan"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_109",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NYOLE",
+    "answer_normalized": "nyole",
+    "letters_pool": [
+      "N",
+      "Y",
+      "O",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Sagesse des anciens qui traverse les âges, je suis transmise par la parole du griot."
+    },
+    "explanation": {
+      "fr": "Nyolé signifie sagesse en baoulé, connaissance ancestrale transmise oralement, trésor spirituel des communautés."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": [
+      "tradition",
+      "sagesse",
+      "baoulé"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_110",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KAGBOLO",
+    "answer_normalized": "kagbolo",
+    "letters_pool": [
+      "K",
+      "A",
+      "G",
+      "B",
+      "O",
+      "L",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Génie des forêts profondes, chef des esprits sylvestres, j'accorde puissance aux sorciers."
+    },
+    "explanation": {
+      "fr": "Kagbolo est un génie puissant du folklore ivoirien, chef des esprits de la brousse et des forêts, mentionné dans les rites d'initiation."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": [
+      "spiritualite",
+      "esprit",
+      "foret"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_111",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOMBO",
+    "answer_normalized": "kombo",
+    "letters_pool": [
+      "K",
+      "O",
+      "M",
+      "B",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Rite d'honneur et de fraternité aboure, je scelle les alliances entre guerriers."
+    },
+    "explanation": {
+      "fr": "Le Kombo est un rite aboure du littoral ivoirien, cérémonie d'alliance et de renforcement des liens guerriers ou familiaux."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": [
+      "tradition",
+      "ceremonie",
+      "rite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_112",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DAOU",
+    "answer_normalized": "daou",
+    "letters_pool": [
+      "D",
+      "A",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Rite agni de purification et de protection, je ramène la paix après les malheurs."
+    },
+    "explanation": {
+      "fr": "Le Daou est un rite agni de Côte d'Ivoire, cérémonie de purification et de restauration de l'harmonie après le malheur ou la transgression."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": [
+      "tradition",
+      "ceremonie",
+      "agni"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_113",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "VOVI",
+    "answer_normalized": "vovi",
+    "letters_pool": [
+      "V",
+      "O",
+      "V",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Esprit familial protecteur, je veille depuis le monde invisible sur le bien-être des miens."
+    },
+    "explanation": {
+      "fr": "Le Vovi est un esprit tutélaire familial dans les traditions yoruba-ivoiriennes, figure bienveillante de protection domestique et lignagère."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": [
+      "spiritualite",
+      "esprit",
+      "famille"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_114",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GBONNE",
+    "answer_normalized": "gbonne",
+    "letters_pool": [
+      "G",
+      "B",
+      "O",
+      "N",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Lac sacré des eaux rouges, les pélerins viennent y chercher guérison et révélation."
+    },
+    "explanation": {
+      "fr": "Gbonné est un site sacré d'eaux rousses près de Bouaké, lieu de pèlerinage spirituel ivoirien, réputé pour ses vertus curatives."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": [
+      "geographie",
+      "sacre",
+      "spiritualite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_115",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ASLATOUA",
+    "answer_normalized": "aslatoua",
+    "letters_pool": [
+      "A",
+      "S",
+      "L",
+      "A",
+      "T",
+      "O",
+      "U",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Panier sénoufo tissé finement, j'emporte les moissons et témoigne du savoir-faire."
+    },
+    "explanation": {
+      "fr": "L'Aslatoua est un type de panier sénoufo du Nord ivoirien, tressé avec finesse pour le transport agricole et l'artisanat."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "senoufo",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_116",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KORYA",
+    "answer_normalized": "korya",
+    "letters_pool": [
+      "K",
+      "O",
+      "R",
+      "Y",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Panier tressé dioula, mes mailles fines gardent le mil et la fierté du foyer."
+    },
+    "explanation": {
+      "fr": "Le Korya est un panier traditionnel dioula du Nord, tressé serré pour le stockage des céréales et objets précieux."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "dioula",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_117",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TAMA",
+    "answer_normalized": "tama",
+    "letters_pool": [
+      "T",
+      "A",
+      "M",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Tambour parlant d'aisselle, je communique sous la peau du joueur mandingue."
+    },
+    "explanation": {
+      "fr": "Le Tama est un petit tambour à cordes mandingue, serré sous l'aisselle, produisant des tonalités qui imitent la parole."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "musique",
+      "instrument",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_118",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NEEM",
+    "answer_normalized": "neem",
+    "letters_pool": [
+      "N",
+      "E",
+      "E",
+      "M"
+    ],
+    "riddle": {
+      "fr": "Arbre amer du Nord, tu soignes mille maux et chasses les mauvais esprits."
+    },
+    "explanation": {
+      "fr": "Le neem (Azadirachta indica) est un arbre médicinal du Sahel ivoirien, utilisé traditionnellement pour ses propriétés curatives et purifiantes."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "plante",
+      "sante",
+      "medecine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_119",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DABA",
+    "answer_normalized": "daba",
+    "letters_pool": [
+      "D",
+      "A",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Houe du paysan africain, je retourne la terre et nourris la famille."
+    },
+    "explanation": {
+      "fr": "La daba est une houe traditionnelle du Sahel, outil agricole emblématique utilisé pour cultiver igname, mil et maïs."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "objets",
+      "agriculture",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_120",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MANGUS",
+    "answer_normalized": "mangus",
+    "letters_pool": [
+      "M",
+      "A",
+      "N",
+      "G",
+      "U",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Petit carnivore rayé, je glisse entre les arbres et suis gardien des secrets forestiers."
+    },
+    "explanation": {
+      "fr": "La mangouste est un petit carnivore des forêts ivoiriennes, animal agile et vigilant, parfois associée au folklore de protection."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "faune",
+      "foret",
+      "carnivore"
+    ],
+    "format_version": 3
   }
 ]
