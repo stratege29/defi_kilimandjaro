@@ -27,3 +27,4 @@ export { requestRematch } from "./matchmaking/requestRematch";
 export { submitDevinette } from "./devinettes/submitDevinette";
 export { reportDevinette } from "./devinettes/reportDevinette";
 export { rebuildCommunityPack } from "./curation/rebuildCommunityPack";
+export { publishPack } from "./curation/publishPack";

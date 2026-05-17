@@ -2,8 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kilimandjaro_admin/firebase_options.dart';
-import 'package:kilimandjaro_admin/src/auth/auth_gate.dart';
-import 'package:kilimandjaro_admin/src/moderation/moderation_queue_screen.dart';
+import 'package:kilimandjaro_admin/src/router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,12 +14,14 @@ Future<void> main() async {
   );
 }
 
+/// Root widget de la console (MaterialApp.router + thème).
 class AdminApp extends StatelessWidget {
+  /// Constructeur const standard.
   const AdminApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Kilimandjaro Admin',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -30,7 +31,7 @@ class AdminApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const AuthGate(child: ModerationQueueScreen()),
+      routerConfig: buildRouter(),
     );
   }
 }

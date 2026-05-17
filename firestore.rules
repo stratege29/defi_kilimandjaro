@@ -22,7 +22,13 @@ service cloud.firestore {
 
     function isModerator() {
       return isSignedIn()
-        && request.auth.token.role == 'moderator';
+        && (request.auth.token.role == 'moderator'
+            || request.auth.token.role == 'admin');
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && request.auth.token.role == 'admin';
     }
 
     // -------------------------------------------------------------------------
@@ -85,7 +91,19 @@ service cloud.firestore {
 
     match /content_packs/{packId} {
       allow read: if true;
-      allow write: if false;
+      // Admin peut écrire les métadonnées éditables via le backoffice
+      // (name, description, enabled, prices...). Les champs maintenus par
+      // la Cloud Function `publishPack` (current_version, hash_sha256,
+      // size_bytes, count, storage_path, download_url, last_published_at)
+      // sont également écrits par l'admin SDK qui bypasse les règles ; le
+      // backoffice évite de les toucher en passant par `set(..., merge:true)`
+      // restreint au `toEditableMap()`.
+      allow write: if isAdmin();
+
+      match /questions/{questionId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
 
       match /versions/{versionId} {
         allow read: if isModerator();
