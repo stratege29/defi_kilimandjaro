@@ -92,10 +92,15 @@ Future<void> _bootstrap() async {
       print('🔧 Firebase default app already exists (native auto-init) — OK');
     }
 
-    // App Check: must run right after Firebase.initializeApp and before any
-    // authenticated call (Auth, Firestore, RTDB, Cloud Functions). See
-    // lib/data/firebase/app_check_setup.dart for provider configuration.
-    await activateAppCheck();
+    // App Check: fire-and-forget pour ne PAS bloquer le boot. Si le
+    // serveur Firebase App Check rame ou si l'app n'est pas encore
+    // enregistrée côté console, on ne veut pas un splash forever — les
+    // requêtes Firebase passeront sans token (mode unenforced) jusqu'à
+    // ce que l'activation se termine en arrière-plan.
+    //
+    // Une fois App Check enforced en backend (post-stabilisation prod),
+    // remettre `await` ici + ajouter un timeout de 5s avec fallback.
+    unawaited(activateAppCheck());
 
     // Local emulator wiring — opt-in via --dart-define USE_FIREBASE_EMULATOR=true
     // (cf. README emulator section). Doit être appelé AVANT toute requête
@@ -255,8 +260,18 @@ class _BootGateState extends ConsumerState<_BootGate> {
         _onForegroundMessage,
       );
 
-      // UMP consent before AdMob (RGPD UE compliance).
-      await ref.read(consentServiceProvider).requestConsent();
+      // UMP consent before AdMob (RGPD UE compliance). Timeout de 8s
+      // pour ne pas bloquer indéfiniment si le serveur Google répond en
+      // HTTP 500 (cas observé en prod) — on init quand même AdMob qui
+      // tournera sans personnalisation jusqu'au prochain consent réussi.
+      try {
+        await ref
+            .read(consentServiceProvider)
+            .requestConsent()
+            .timeout(const Duration(seconds: 8));
+      } on Object {
+        // Silencieusement : ni le user ni la prod ne doivent voir le détail.
+      }
       if (!mounted) return;
       unawaited(ref.read(adsServiceProvider).init());
 
