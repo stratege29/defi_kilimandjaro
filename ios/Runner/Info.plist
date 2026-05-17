@@ -39,22 +39,8 @@
 	<string>ca-app-pub-3940256099942544~1458002511</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-		<key>NSAllowsLocalNetworking</key>
-		<true/>
-	</dict>
-	<key>NSBonjourServices</key>
-	<array>
-		<string>_http._tcp</string>
-		<string>_dartobservatory._tcp</string>
-	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Pour scanner le QR code de ton ami et lancer un duel temps réel.</string>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>Connexion aux services Firebase locaux (mode développement uniquement).</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
