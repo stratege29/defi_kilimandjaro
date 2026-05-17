@@ -1,0 +1,542 @@
+[
+  {
+    "id": "crack_nouchi_031",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MORTEL",
+    "answer_normalized": "mortel",
+    "letters_pool": ["M","O","R","T","E","L"],
+    "riddle": {
+      "fr": "C'est trop cool, trop bien. Franchement, c'est dingue comme réussi."
+    },
+    "explanation": {
+      "fr": "Mortel = super cool, excellent, génial. Expression admirative très commune en Nouchi urbain pour approuver quelque chose ou quelqu'un."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["attitude", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_032",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BORO",
+    "answer_normalized": "boro",
+    "letters_pool": ["B","O","R","O"],
+    "riddle": {
+      "fr": "Un petit peu, juste un peu. Pas beaucoup, tu vois."
+    },
+    "explanation": {
+      "fr": "Boro = petit, un peu, légèrement. Du baoulé, très courant pour exprimer une quantité mineure ou une intensité faible."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["quantite", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_033",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "VIEUX",
+    "answer_normalized": "vieux",
+    "letters_pool": ["V","I","E","U","X"],
+    "riddle": {
+      "fr": "Mon ami qui a beaucoup d'expérience, qu'on respecte. Un ancien du quartier."
+    },
+    "explanation": {
+      "fr": "Vieux = ami de longue date, aîné respecté, figure d'autorité. Terme affectueux et respectueux pour un camarade plus âgé ou expérimenté."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_034",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BANDJI",
+    "answer_normalized": "bandji",
+    "letters_pool": ["B","A","N","D","J","I"],
+    "riddle": {
+      "fr": "Alcool du pauvre, vin de palme sucré. On en boit beaucoup au maquis."
+    },
+    "explanation": {
+      "fr": "Bandji = vin de palme, alcool traditionnel ivoirien très populaire dans les quartiers. Boisson festive des maquis, symbole de la vie nocturne."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_035",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KOUITRE",
+    "answer_normalized": "kouitre",
+    "letters_pool": ["K","O","U","I","T","R","E"],
+    "riddle": {
+      "fr": "Gros, costaud, qui pèse lourd. Pas une plume, c'est clair."
+    },
+    "explanation": {
+      "fr": "Kouitre = gros, obèse, lourd. Terme descriptif du Nouchi pour désigner quelqu'un de corpulent, généralement sans jugement méchant."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_036",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KIFFANCE",
+    "answer_normalized": "kiffance",
+    "letters_pool": ["K","I","F","F","A","N","C","E"],
+    "riddle": {
+      "fr": "État de bonheur parfait, euphorie sans limites. Je pète de joie, c'est incroyable."
+    },
+    "explanation": {
+      "fr": "Kiffance = bonheur extrême, state de joie pure et délire heureux. Terme très récent du Nouchi (depuis 5 ans), popularisé par les jeunes d'Abidjan."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["emotion", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_037",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CHAPCHAP",
+    "answer_normalized": "chapchap",
+    "letters_pool": ["C","H","A","P","C","H","A","P"],
+    "riddle": {
+      "fr": "Vite fait bien fait, sans traîner. Je n'ai pas le temps de zoner."
+    },
+    "explanation": {
+      "fr": "Chap-chap = rapide, vite, sans délai. Onomatopée du Nouchi moderne exprimant la vitesse et l'efficacité."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_038",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BAZOOKA",
+    "answer_normalized": "bazooka",
+    "letters_pool": ["B","A","Z","O","O","K","A"],
+    "riddle": {
+      "fr": "Impressionnant, énorme, un truc de fou. Ça éclate tout sur son passage."
+    },
+    "explanation": {
+      "fr": "Bazooka = impressionnant, énorme, dévastateur. Terme du Nouchi moderne pour qualifier quelque chose ou quelqu'un de puissant et remarquable."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["attitude", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_039",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DEHORS",
+    "answer_normalized": "dehors",
+    "letters_pool": ["D","E","H","O","R","S"],
+    "riddle": {
+      "fr": "J'ai quitté mon quartier, je suis sorti du ghetto. Libre et indépendant maintenant."
+    },
+    "explanation": {
+      "fr": "Dehors = libéré, sorti de la galère, qui a grandi au-delà de son quartier. Expression du Nouchi moderne pour dire qu'on a évolué et qu'on n'est plus prisonnière de son origine."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["attitude", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_040",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CAPO",
+    "answer_normalized": "capo",
+    "letters_pool": ["C","A","P","O"],
+    "riddle": {
+      "fr": "Chef du gang, leader respecté. Celui qui commande et qu'on écoute tous."
+    },
+    "explanation": {
+      "fr": "Capo = chef, leader, patron. Terme du Nouchi emprunté à l'argot italo-américain, très utilisé pour désigner le 'boss' d'un groupe ou d'un quartier."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_041",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "JACASSE",
+    "answer_normalized": "jacasse",
+    "letters_pool": ["J","A","C","A","S","S","E"],
+    "riddle": {
+      "fr": "Parler trop, bavarder sans arrêt. Je ne peux pas le faire taire."
+    },
+    "explanation": {
+      "fr": "Jacasse = bavarder excessivement, jacasser. Verbe du Nouchi pour qualifier quelqu'un qui parle beaucoup trop et sans filtre."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_042",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TOUKPE",
+    "answer_normalized": "toukpe",
+    "letters_pool": ["T","O","U","K","P","E"],
+    "riddle": {
+      "fr": "Frapper, cogner, donner des coups. Une bagarre de rue classique."
+    },
+    "explanation": {
+      "fr": "Toukpé = frapper, taper, cogner. Verbe du Nouchi très direct pour désigner la violence physique dans les contextes urbains."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_043",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MEKE",
+    "answer_normalized": "meke",
+    "letters_pool": ["M","E","K","E"],
+    "riddle": {
+      "fr": "Mon vrai ami, mon homie, celui qu'on peut vraiment croire."
+    },
+    "explanation": {
+      "fr": "Meke = vrai ami, compagnon sincère, homie. Terme très récent du Nouchi urbain pour désigner un ami fiable et authentique."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_044",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SOIGNER",
+    "answer_normalized": "soigner",
+    "letters_pool": ["S","O","I","G","N","E","R"],
+    "riddle": {
+      "fr": "Séduire une fille, la charmer, la conquérir avec style. C'est un art."
+    },
+    "explanation": {
+      "fr": "Soigner = séduire, charmer, conquérir une femme. Sens moderne du Nouchi très différent du français standard — très courant chez les jeunes."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_045",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TONTON",
+    "answer_normalized": "tonton",
+    "letters_pool": ["T","O","N","T","O","N"],
+    "riddle": {
+      "fr": "Le frère plus âgé du quartier, celui qu'on respecte sans être de la famille."
+    },
+    "explanation": {
+      "fr": "Tonton = mec respecté du quartier, figure d'autorité bienveillante. Pas forcément un oncle de sang — la fraternité de quartier suffit."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "respect"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_046",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "VOLVOL",
+    "answer_normalized": "volvol",
+    "letters_pool": ["V","O","L","V","O","L"],
+    "riddle": {
+      "fr": "Bouger discrètement, filer en douce. Pas vu pas pris, tu vois."
+    },
+    "explanation": {
+      "fr": "Vol-vol = mouvement furtif, approche discrète. Onomatopée du Nouchi pour qualifier quelque chose de clandestin ou de sournois."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_047",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CHIBA",
+    "answer_normalized": "chiba",
+    "letters_pool": ["C","H","I","B","A"],
+    "riddle": {
+      "fr": "Jolie fille, belle en argot jeune. Elle est canon, vraiment."
+    },
+    "explanation": {
+      "fr": "Chiba = jolie, belle (en argot récent). Terme du Nouchi ultra-moderne (5 ans), très utilisé par la jeunesse abidjanaise pour complimenter l'apparence."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_048",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "POUSSEPO",
+    "answer_normalized": "poussepo",
+    "letters_pool": ["P","O","U","S","S","E","P","O"],
+    "riddle": {
+      "fr": "Chercher une fille, séduire, draguer sans arrêt. C'est mon sport favori."
+    },
+    "explanation": {
+      "fr": "Pousse-pousse = draguer continuellement, chercher femme, faire la chasse. Verbe du Nouchi moderne très expressif pour désigner la séduction urbaine."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_049",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TCHATCHE",
+    "answer_normalized": "tchatche",
+    "letters_pool": ["T","C","H","A","T","C","H","E"],
+    "riddle": {
+      "fr": "Beau parleur, celui qui sait convaincre. Il a un don avec les mots."
+    },
+    "explanation": {
+      "fr": "Tchatche = éloquence, bagout, talent pour convaincre par la parole. Terme du Nouchi pour désigner quelqu'un de persuasif et charismatique."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_050",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MEUDA",
+    "answer_normalized": "meuda",
+    "letters_pool": ["M","E","U","D","A"],
+    "riddle": {
+      "fr": "Jeune fille mignonne, femme attractive. Jolie et charmante."
+    },
+    "explanation": {
+      "fr": "Meuda = jeune fille, femme jolie. Terme tendre et admiratif du Nouchi pour désigner une jeune femme séduisante."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_051",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TOTO",
+    "answer_normalized": "toto",
+    "letters_pool": ["T","O","T","O"],
+    "riddle": {
+      "fr": "Intimité féminine, le bas du ventre. Thème de chanson à Abidjan."
+    },
+    "explanation": {
+      "fr": "Toto = sexe féminin, vulve. Terme du Nouchi léger et courant dans les chansons Coupé Décalé et la musique urbaine abidjanaise (PG-13: suggestif, non cru)."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["objet", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_052",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "AMERIQUE",
+    "answer_normalized": "amerique",
+    "letters_pool": ["A","M","E","R","I","Q","U","E"],
+    "riddle": {
+      "fr": "Extrêmement riche, avoir pété l'Amérique. Les billets coulent comme l'eau."
+    },
+    "explanation": {
+      "fr": "Amérique = être très riche, avoir beaucoup d'argent. Métaphore du Nouchi pour désigner l'opulence et la richesse débordante."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["attitude", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_053",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBOLO",
+    "answer_normalized": "gbolo",
+    "letters_pool": ["G","B","O","L","O"],
+    "riddle": {
+      "fr": "Gros, énorme, qui pèse lourd. Un vrai poids lourd physiquement."
+    },
+    "explanation": {
+      "fr": "Gbôlo = gros, corpulent, costaud. Terme du Nouchi insider pour décrire quelqu'un d'obèse ou de très imposant."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["personne", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_054",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GOFREE",
+    "answer_normalized": "gofree",
+    "letters_pool": ["G","O","F","R","E","E"],
+    "riddle": {
+      "fr": "Au top, impeccable, parfait. Rien à dire, c'est excellent."
+    },
+    "explanation": {
+      "fr": "Gofree = parfait, impeccable, au top. Terme Nouchi insider emprunté au créole haïtien via Abidjan, très prisé des jeunes."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["attitude", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_055",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TARE",
+    "answer_normalized": "tare",
+    "letters_pool": ["T","A","R","E"],
+    "riddle": {
+      "fr": "Mon camarade, mon ami du quartier. Celui avec qui je grandis."
+    },
+    "explanation": {
+      "fr": "Taré = camarade, ami de longue date, compagnon. Terme du Nouchi insider pour désigner un pote du quartier de confiance."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["personne", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_056",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CABROL",
+    "answer_normalized": "cabrol",
+    "letters_pool": ["C","A","B","R","O","L"],
+    "riddle": {
+      "fr": "Vieil ami du quartier, quelqu'un d'ancien avec lequel on traîne."
+    },
+    "explanation": {
+      "fr": "Cabrol = ami de longue date, vieux camarade. Terme Nouchi insider et affectueux pour un ami fidèle avec qui on a grandi."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["personne", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_057",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ATALAKU",
+    "answer_normalized": "atalaku",
+    "letters_pool": ["A","T","A","L","A","K","U"],
+    "riddle": {
+      "fr": "Animateur de fête, celui qui met l'ambiance. Sans lui le maquis est mort."
+    },
+    "explanation": {
+      "fr": "Atalaku = animateur de fête, meneur de danse. Rôle très spécifique du Nouchi insider pour le type qui lance la musique et crée l'énergie."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["personne", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_058",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BAFFER",
+    "answer_normalized": "baffer",
+    "letters_pool": ["B","A","F","F","E","R"],
+    "riddle": {
+      "fr": "Gifler quelqu'un, le frapper au visage. Une humiliation directe."
+    },
+    "explanation": {
+      "fr": "Baffer = gifler, frapper au visage. Verbe du Nouchi insider très cru pour désigner une claque ou un coup direct et humiliant."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["action", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_059",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BIDOUNE",
+    "answer_normalized": "bidoune",
+    "letters_pool": ["B","I","D","O","U","N","E"],
+    "riddle": {
+      "fr": "Poulet local peu cher, nourriture de pauvre. Pas du poulet importé."
+    },
+    "explanation": {
+      "fr": "Bidoune = poulet local, volaille bon marché. Terme Nouchi insider pour qualifier la volaille abidjanaise de qualité inférieure aux importations."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["objet", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_060",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJINGA",
+    "answer_normalized": "djinga",
+    "letters_pool": ["D","J","I","N","G","A"],
+    "riddle": {
+      "fr": "Gros, costaud, musclé. Un type qui impressionne par sa taille."
+    },
+    "explanation": {
+      "fr": "Djinga = gros, costaud, musculeux. Terme du Nouchi insider pour décrire quelqu'un de très imposant ou très fort physiquement."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["personne", "insider"],
+    "format_version": 3
+  }
+]

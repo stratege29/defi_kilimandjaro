@@ -19,7 +19,8 @@
 // pour valider la reproductibilité des hashes v1.
 //
 // Usage :
-//   dart run tool/seed_content_packs.dart
+//   dart run tool/seed_content_packs.dart                   # v1 (initial)
+//   dart run tool/seed_content_packs.dart --version=2       # bump pour OTA
 //
 // Étapes manuelles ensuite :
 //   1. Uploader `build/seed_packs/**/*.json.gz` vers
@@ -42,9 +43,25 @@ const String _starterDir = 'assets/data/devinettes/starter';
 const String _otaDir = 'content/ota_packs';
 const String _outDir = 'build/seed_packs';
 const int _formatVersion = 3;
-const int _initialVersion = 1;
+const int _defaultPackVersion = 1;
 
-void main() async {
+void main(List<String> args) async {
+  // Parse `--version=N` ; défaut = 1. Bumper pour chaque release OTA.
+  var packVersion = _defaultPackVersion;
+  for (final arg in args) {
+    if (arg.startsWith('--version=')) {
+      final raw = arg.substring('--version='.length);
+      final parsed = int.tryParse(raw);
+      if (parsed == null || parsed < 1) {
+        stderr.writeln('--version doit être un entier >= 1 (reçu: "$raw")');
+        exitCode = 64;
+        return;
+      }
+      packVersion = parsed;
+    }
+  }
+  print('Pack version cible : v$packVersion');
+
   final indexFile = File('$_starterDir/_index.json');
   if (!indexFile.existsSync()) {
     stderr.writeln('Index introuvable : $_starterDir/_index.json');
@@ -89,7 +106,7 @@ void main() async {
     final packPayload = <String, dynamic>{
       'format_version': _formatVersion,
       'pack_id': packId,
-      'pack_version': _initialVersion,
+      'pack_version': packVersion,
       'langs': _detectLangs(list),
       'default_lang': 'fr',
       'min_app_version': '0.1.0',
@@ -110,14 +127,14 @@ void main() async {
     final gz = const GZipEncoder().encode(encodedFinal);
 
     final outFile =
-        File('$_outDir/$packId/$packId-v$_initialVersion.json.gz');
+        File('$_outDir/$packId/$packId-v$packVersion.json.gz');
     await outFile.parent.create(recursive: true);
     await outFile.writeAsBytes(gz);
 
-    final storagePath = 'packs/v2/$packId/$packId-v$_initialVersion.json.gz';
+    final storagePath = 'packs/v2/$packId/$packId-v$packVersion.json.gz';
     manifests[packId] = <String, dynamic>{
       'pack': packId,
-      'current_version': _initialVersion,
+      'current_version': packVersion,
       'format_version': _formatVersion,
       'hash_sha256': hashFinal,
       'size_bytes': gz.length,
@@ -133,7 +150,7 @@ void main() async {
 
     activePackIds.add(packId);
     print(
-      '  ✓ $packId : v$_initialVersion (${list.length} entrées, '
+      '  ✓ $packId : v$packVersion (${list.length} entrées, '
       '${gz.length} bytes gzip, hash $hashFinal)',
     );
   }

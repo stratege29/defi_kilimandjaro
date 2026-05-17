@@ -1,0 +1,869 @@
+[
+  {
+    "id": "culture_ci_061",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BAOULE",
+    "answer_normalized": "baoule",
+    "letters_pool": [
+      "B",
+      "A",
+      "O",
+      "U",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Peuple du centre que je suis, venu de Guinée porté par la Reine Pokou. Ma danse Zaouli fait tournoyer les tissus."
+    },
+    "explanation": {
+      "fr": "Les Baoulé sont un peuple akan dominant du centre ivoirien, connus pour leurs masques Goli, leur danse Zaouli et leur fine sculpture."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "peuple",
+      "culture",
+      "akan"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_062",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AGNI",
+    "answer_normalized": "agni",
+    "letters_pool": [
+      "A",
+      "G",
+      "N",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Peuple de l'est royal, je cultive le cacao et porte la couronne Akan depuis la forêt d'Indenie."
+    },
+    "explanation": {
+      "fr": "Les Agni (ou Anyi) sont un peuple akan établi à l'est ivoirien, connus pour la culture du cacao et leur organisation royale hiérarchisée."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "peuple",
+      "culture",
+      "akan"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_063",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DIOULA",
+    "answer_normalized": "dioula",
+    "letters_pool": [
+      "D",
+      "I",
+      "O",
+      "U",
+      "L",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Marchands du Sahel, ma langue mandingue résonne aux marchés du nord. Je suis aussi appelé Dyula."
+    },
+    "explanation": {
+      "fr": "Les Dioula sont un peuple mandingue historiquement commerçant, répandu au nord ivoirien, reconnus pour leur activité marchande et leur Islam traditionnel."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "peuple",
+      "culture",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_064",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SENOUFO",
+    "answer_normalized": "senoufo",
+    "letters_pool": [
+      "S",
+      "E",
+      "N",
+      "O",
+      "U",
+      "F",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Peuple du nord aux masques spiralés, je suis artisan du bois et gardien des secrets initiatiques du Poro."
+    },
+    "explanation": {
+      "fr": "Les Sénoufo sont un peuple du nord ivoirien renommés pour leurs masques Goli, leurs textiles teints et leur société initiatique du Poro."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "peuple",
+      "culture",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_065",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BETE",
+    "answer_normalized": "bete",
+    "letters_pool": [
+      "B",
+      "E",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Peuple de l'ouest montagneux, mon masque Dan protège le village et mon or brille sous la toile."
+    },
+    "explanation": {
+      "fr": "Les Bété sont un peuple du sud-ouest ivoirien, proches des Dan, connus pour leurs masques à traits horizontaux et leur attachement culturel aux montagnes."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "peuple",
+      "culture",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_066",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MALINKE",
+    "answer_normalized": "malinke",
+    "letters_pool": [
+      "M",
+      "A",
+      "L",
+      "I",
+      "N",
+      "K",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Peuple du Mandingue qui s'étend à l'ouest, je cultive l'honneur et porte le souvenir de l'ancien empire Mali."
+    },
+    "explanation": {
+      "fr": "Les Malinké sont un peuple mandingue du Sahel ivoirien, historiquement liés à l'empire Mali, reconnus pour leur culture orale et leur puissance commerciale."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "peuple",
+      "culture",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_067",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "EBRIE",
+    "answer_normalized": "ebrie",
+    "letters_pool": [
+      "E",
+      "B",
+      "R",
+      "I",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Peuple des lagunes qui crée l'attieke famed, je pêche avec sagesse près d'Abidjan sur l'eau sacrée."
+    },
+    "explanation": {
+      "fr": "Les Ébrié sont un peuple lagunaire ivoirien, habitants historiques de la Lagune Ébrié, créateurs et producteurs de l'attieke, experts en pêche côtière."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "peuple",
+      "culture",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_068",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TOGOLE",
+    "answer_normalized": "togole",
+    "letters_pool": [
+      "T",
+      "O",
+      "G",
+      "O",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Sauce amère du pays baoulé, on me prépare avec feuilles piquantes et piment de feu, je régale les palais."
+    },
+    "explanation": {
+      "fr": "Le togolé est une sauce traditionnelle baoulé à base de feuilles amères, aubergines et épices, servie avec foutou ou riz blanc."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "cuisine",
+      "sauce",
+      "baoulé"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_069",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DEMBRO",
+    "answer_normalized": "dembro",
+    "letters_pool": [
+      "D",
+      "E",
+      "M",
+      "B",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Riz gras avec poisson, oignons dorés, mon odeur appelle les convives de près et de loin."
+    },
+    "explanation": {
+      "fr": "Le dembro est un plat ivoirien composé de riz gras relevé de poisson fumé ou frais, servi aux fêtes familiales."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "cuisine",
+      "riz",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_070",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ZAOULI",
+    "answer_normalized": "zaouli",
+    "letters_pool": [
+      "Z",
+      "A",
+      "O",
+      "U",
+      "L",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Danse baoulé de grâce, je fais tourner les hanches sous les tissus qui virevoltent au son du tam-tam."
+    },
+    "explanation": {
+      "fr": "La Zaouli est une danse baoulé féminine spectaculaire, caractérisée par des mouvements de hanches sinueux et le port de pagne volant."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "danse",
+      "tradition",
+      "baoulé"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_071",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ABOURE",
+    "answer_normalized": "aboure",
+    "letters_pool": [
+      "A",
+      "B",
+      "O",
+      "U",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Peuple du littoral sud-est, mes villages dansent au rythme du tam-tam près de la lagune Aby."
+    },
+    "explanation": {
+      "fr": "Les Abouré sont un peuple akan lagunaire du Sud-Est ivoirien, installés autour de Bonoua et la lagune Aby, reconnus pour leur tradition orale et leurs masques."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": [
+      "peuple",
+      "culture",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_072",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ATTIE",
+    "answer_normalized": "attie",
+    "letters_pool": [
+      "A",
+      "T",
+      "T",
+      "I",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Peuple akan de l'est, je suis gardien du cacao et mon accent résonne dans les collines d'Indenie."
+    },
+    "explanation": {
+      "fr": "Les Attié (ou Atié) sont un peuple akan oriental, proches des Agni, cultivateurs de cacao et producteurs de caoutchouc en forêt ivoirienne."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "peuple",
+      "culture",
+      "akan"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_073",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KARITE",
+    "answer_normalized": "karite",
+    "letters_pool": [
+      "K",
+      "A",
+      "R",
+      "I",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Arbre du Sahel dont le beurre nourrit la peau. En pot ou en soins, je suis l'or de la beauté africaine."
+    },
+    "explanation": {
+      "fr": "Le karité est un arbre sahélien dont les noix produisent un beurre utilisé traditionnellement en cosmétique et cuisine ivoirienne."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "plante",
+      "nature",
+      "sante"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_074",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ROCOU",
+    "answer_normalized": "rocou",
+    "letters_pool": [
+      "R",
+      "O",
+      "C",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Graine rouge-orange de la plante tropicale, je colore les tissus et les sauces d'une teinte chaleureuse."
+    },
+    "explanation": {
+      "fr": "Le rocou (ou roucou) est une graine tropicale utilisée pour teindre les tissus et colorer certains plats traditionnels d'une belle teinte rouge-orange."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "plante",
+      "couleur",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_075",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CAIMAN",
+    "answer_normalized": "caiman",
+    "letters_pool": [
+      "C",
+      "A",
+      "I",
+      "M",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Reptile des eaux lagunes, ma gueule se cache sous la surface, respectable et craint."
+    },
+    "explanation": {
+      "fr": "Le caïman est un reptile vivant dans les lagunes et rivières ivoiriennes, animal respecté et parfois craint, présent dans les contes folkloriques."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "faune",
+      "lagune",
+      "reptile"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_076",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GENETTE",
+    "answer_normalized": "genette",
+    "letters_pool": [
+      "G",
+      "E",
+      "N",
+      "E",
+      "T",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Petit carnivore tacheté, je chasse la nuit et je suis vénéré comme esprit par les chasseurs."
+    },
+    "explanation": {
+      "fr": "La genette est un petit carnivore nocturne moucheté, animal mystique du folklore ivoirien associé aux esprits de la forêt."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "faune",
+      "foret",
+      "mystique"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_077",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BONGO",
+    "answer_normalized": "bongo",
+    "letters_pool": [
+      "B",
+      "O",
+      "N",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Antilope rayée des forêts profondes, mes cornes spiralées sont symbole de puissance cachée."
+    },
+    "explanation": {
+      "fr": "Le bongo est une antilope rayée forestière rare, présente dans les zones de savane-forêt ivoiriennes, animal prestigieux du folklore."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "faune",
+      "foret",
+      "rare"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_078",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TOUCAN",
+    "answer_normalized": "toucan",
+    "letters_pool": [
+      "T",
+      "O",
+      "U",
+      "C",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Oiseau au bec gigantesque de couleur vive, je jacasse dans les cimes des forêts profondes."
+    },
+    "explanation": {
+      "fr": "Le toucan est un oiseau tropical coloré habitant les forêts ivoiriennes, caractérisé par son impressionnant bec jaune ou rougeâtre."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "faune",
+      "oiseau",
+      "foret"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_079",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "INDIGO",
+    "answer_normalized": "indigo",
+    "letters_pool": [
+      "I",
+      "N",
+      "D",
+      "I",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Teinture bleue du pays sénoufo, je colore les tissus anciens et je suis symbole de sagesse."
+    },
+    "explanation": {
+      "fr": "L'indigo est une plante traditionnelle utilisée pour teindre les tissus en bleu profond, particulièrement importante dans la teinture sénoufo ivoirienne."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "plante",
+      "artisanat",
+      "couleur"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_080",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CACAOYER",
+    "answer_normalized": "cacaoyer",
+    "letters_pool": [
+      "C",
+      "A",
+      "C",
+      "A",
+      "O",
+      "Y",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Mes cabosses dorées font la fortune du pays. Sans moi, pas de chocolat dans le monde."
+    },
+    "explanation": {
+      "fr": "Le cacaoyer est l'arbre dont les fèves font le chocolat. La Côte d'Ivoire est le premier producteur mondial avec plus de 40% de l'offre."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "agriculture",
+      "economie",
+      "plante"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_081",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DROGBA",
+    "answer_normalized": "drogba",
+    "letters_pool": [
+      "D",
+      "R",
+      "O",
+      "G",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Enfant d'Abidjan devenu géant du football, j'ai porté fièrement le maillot des Éléphants sur les champs de l'Europe."
+    },
+    "explanation": {
+      "fr": "Didier Drogba est un footballeur ivoirien légendaire, capitaine de la sélection nationale, deux fois champion d'Afrique avec la Côte d'Ivoire."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "personnalite",
+      "sport",
+      "moderne"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_082",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ABODAN",
+    "answer_normalized": "abodan",
+    "letters_pool": [
+      "A",
+      "B",
+      "O",
+      "D",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Cérémonie akan d'initiation secrète et sacrée, j'intègre le jeune au monde des hommes et de la sagesse."
+    },
+    "explanation": {
+      "fr": "L'Abodan est une cérémonie initiatique akan très respectée, rite de passage conférant une nouvelle place dans la hiérarchie communautaire."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": [
+      "tradition",
+      "ceremonie",
+      "rite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_083",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOTOKO",
+    "answer_normalized": "kotoko",
+    "letters_pool": [
+      "K",
+      "O",
+      "T",
+      "O",
+      "K",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Cérémonie baoulé de deuil et d'honneur, je dure quarante jours et célèbre la mémoire du défunt."
+    },
+    "explanation": {
+      "fr": "Le Kotoko est un rite funéraire baoulé marquant le deuil, composé de danses, de libations et de rassemblements communautaires pour honorer le décédé."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": [
+      "tradition",
+      "ceremonie",
+      "mort"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_084",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOMIAN",
+    "answer_normalized": "komian",
+    "letters_pool": [
+      "K",
+      "O",
+      "M",
+      "I",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Prêtresse akan gardienne de la source et du secret des eaux, je suis initiée à la connaissance cachée."
+    },
+    "explanation": {
+      "fr": "La Komian est une prêtresse akan vouée à la divinité de l'eau, dépositaire des secrets et des pratiques rituelles traditionnelles."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": [
+      "tradition",
+      "spiritualite",
+      "feminin"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_085",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MANATEE",
+    "answer_normalized": "manatee",
+    "letters_pool": [
+      "M",
+      "A",
+      "N",
+      "A",
+      "T",
+      "E",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Créature marine douce et lente, je suis le lamantin qui navigue dans la Lagune Ébrié sacrée."
+    },
+    "explanation": {
+      "fr": "Le manatee (lamantin) est un mammifère marin endémique aux côtes ivoiriennes, animal vénéré dans la tradition lagunaire."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": [
+      "faune",
+      "lagune",
+      "rare"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_086",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CIVET",
+    "answer_normalized": "civet",
+    "letters_pool": [
+      "C",
+      "I",
+      "V",
+      "E",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Petite bête rayée, je laisse ma trace musquée entre les racines de la forêt sacrée."
+    },
+    "explanation": {
+      "fr": "Le civette est un petit carnivore nocturne forest ivoirien, produisant une sécrétion parfumée utilisée traditionnellement."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": [
+      "faune",
+      "foret",
+      "mystique"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_087",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BAOBAB",
+    "answer_normalized": "baobab",
+    "letters_pool": [
+      "B",
+      "A",
+      "O",
+      "B",
+      "A",
+      "B"
+    ],
+    "riddle": {
+      "fr": "Géant de la savane aux racines profondes, j'ai mille ans et je suis l'arbre de tous les peuples."
+    },
+    "explanation": {
+      "fr": "Le baobab est un arbre sacré et emblématique de la savane ivoirienne, symbole d'ancrage, de sagesse et de vie chez tous les peuples."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": [
+      "plante",
+      "nature",
+      "sacre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_088",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PIROGUE",
+    "answer_normalized": "pirogue",
+    "letters_pool": [
+      "P",
+      "I",
+      "R",
+      "O",
+      "G",
+      "U",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Taillée dans un tronc d'iroko, je glisse silencieuse sur les eaux d'Abidjan depuis des siècles."
+    },
+    "explanation": {
+      "fr": "La pirogue traditionnelle des peuples lagunaires ivoiriens (Ébrié, Avikam, Alladian) est creusée dans un seul tronc d'iroko ou d'acajou, transport quotidien des pêcheurs."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "tradition",
+      "lagune",
+      "artisanat"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_089",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SAMORY",
+    "answer_normalized": "samory",
+    "letters_pool": [
+      "S",
+      "A",
+      "M",
+      "O",
+      "R",
+      "Y"
+    ],
+    "riddle": {
+      "fr": "Guerrier du XIXe siècle venu du Mali, j'ai résisté à la colonisation et j'ai marqué l'âme de l'Ouest."
+    },
+    "explanation": {
+      "fr": "Samory Touré fut un guerrier et résistant ivoirien du XIXe siècle, figure héroïque de la lutte contre la colonisation française."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 40,
+    "tags": [
+      "histoire",
+      "personnalite",
+      "resistance"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_090",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POKOU",
+    "answer_normalized": "pokou",
+    "letters_pool": [
+      "P",
+      "O",
+      "K",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Reine légendaire baoulé, j'ai mené mon peuple en exil jusqu'en Côte d'Ivoire et j'y ai fondé une nation."
+    },
+    "explanation": {
+      "fr": "La Reine Pokou est une figure héroïque baoulé, légendaire fondatrice de la présence baoulé en Côte d'Ivoire vers le XVIIIe siècle."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": [
+      "histoire",
+      "legende",
+      "feminin"
+    ],
+    "format_version": 3
+  }
+]
