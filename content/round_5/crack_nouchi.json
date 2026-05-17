@@ -1,0 +1,542 @@
+[
+  {
+    "id": "crack_nouchi_151",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DOULOU",
+    "answer_normalized": "doulou",
+    "letters_pool": ["D","O","U","L","O","U"],
+    "riddle": {
+      "fr": "Chagrin, peine, souffrance profonde. Ça me fait mal au cœur."
+    },
+    "explanation": {
+      "fr": "Doulou = douleur, chagrin, peine. Terme Nouchi intermédiaire populaire pour exprimer une souffrance morale ou physique."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["emotion", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_152",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SAGNA",
+    "answer_normalized": "sagna",
+    "letters_pool": ["S","A","G","N","A"],
+    "riddle": {
+      "fr": "Jus de mangue sucré qu'on boit frais au marché."
+    },
+    "explanation": {
+      "fr": "Sagna = jus frais, nectar sucré de mangue traditionnelle. Terme Nouchi intermédiaire pour une boisson populaire abidjanaise."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_153",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BOULOU",
+    "answer_normalized": "boulou",
+    "letters_pool": ["B","O","U","L","O","U"],
+    "riddle": {
+      "fr": "Vieux, aged, qui a vu beaucoup de choses."
+    },
+    "explanation": {
+      "fr": "Boulou = ancien, vieux, expérimenté. Terme Nouchi intermédiaire pour quelqu'un d'âgé ou qui a longue expérience du quartier."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_154",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KAKO",
+    "answer_normalized": "kako",
+    "letters_pool": ["K","A","K","O"],
+    "riddle": {
+      "fr": "Sympa, gentil, copain cool. Un bon gars."
+    },
+    "explanation": {
+      "fr": "Kako = gentil, sympa, bienveillant. Terme Nouchi intermédiaire emprunté au baoulé pour un gars de bon caractère."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_155",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TIKO",
+    "answer_normalized": "tiko",
+    "letters_pool": ["T","I","K","O"],
+    "riddle": {
+      "fr": "Dollars, billets verts, monnaie étrangère précieuse."
+    },
+    "explanation": {
+      "fr": "Tiko = dollar, devise étrangère, billet de valeur. Terme Nouchi intermédiaire très utilisé pour décrire l'argent en devises."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_156",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "PETROLE",
+    "answer_normalized": "petrole",
+    "letters_pool": ["P","E","T","R","O","L","E"],
+    "riddle": {
+      "fr": "Alcool fort, gnôle qui brûle. Ça monte sec."
+    },
+    "explanation": {
+      "fr": "Pétrole = alcool clandestin très fort, gnôle de maquis. Terme Nouchi intermédiaire pour un alcool dévastateur."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_157",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBALLA",
+    "answer_normalized": "gballa",
+    "letters_pool": ["G","B","A","L","L","A"],
+    "riddle": {
+      "fr": "Espace large, zone vaste, terrain dégagé. Beaucoup d'espace."
+    },
+    "explanation": {
+      "fr": "Gballa = large, spacieux, dégagé. Terme Nouchi intermédiaire pour décrire un lieu ample ou dépourvu d'obstacles."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["lieu", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_158",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GROHO",
+    "answer_normalized": "groho",
+    "letters_pool": ["G","R","O","H","O"],
+    "riddle": {
+      "fr": "Truc bizarrement drôle, histoire louche et comique."
+    },
+    "explanation": {
+      "fr": "Groho = bizarre amusant, histoire étrange et drôle. Terme Nouchi intermédiaire pour un événement cocasse et inexplicable."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["attitude", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_159",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "LACHE",
+    "answer_normalized": "lache",
+    "letters_pool": ["L","A","C","H","E"],
+    "riddle": {
+      "fr": "Lâcher, relâcher, délivrer. C'est lourd, on lâche."
+    },
+    "explanation": {
+      "fr": "Lâche = relâcher, céder, abandonner une prise. Verbe Nouchi récent pour se débarrasser de quelque chose."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_160",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FALA",
+    "answer_normalized": "fala",
+    "letters_pool": ["F","A","L","A"],
+    "riddle": {
+      "fr": "Parler, causer, discuter. Je vais te causer."
+    },
+    "explanation": {
+      "fr": "Fala = parler, discuter, causer. Terme Nouchi récent emprunté au bambara pour l'action de converser."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_161",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBAYO",
+    "answer_normalized": "gbayo",
+    "letters_pool": ["G","B","A","Y","O"],
+    "riddle": {
+      "fr": "Dur, insensible, qui n'écoute pas. Un roc."
+    },
+    "explanation": {
+      "fr": "Gbayo = dur, inflexible, insensible. Terme Nouchi récent pour quelqu'un de robuste et intraitable."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_162",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MAFFE",
+    "answer_normalized": "maffe",
+    "letters_pool": ["M","A","F","F","E"],
+    "riddle": {
+      "fr": "Sauce riche et savoureuse qu'on mange avec du riz."
+    },
+    "explanation": {
+      "fr": "Maffe = sauce traditionnelle épaisse et riche. Terme Nouchi récent pour un plat cuisiné savoureux abidjanais."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["objet", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_163",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BAYE",
+    "answer_normalized": "baye",
+    "letters_pool": ["B","A","Y","E"],
+    "riddle": {
+      "fr": "Ami, compagnon, copain du quartier. Mon pote."
+    },
+    "explanation": {
+      "fr": "Baye = ami, copain, camarade. Terme Nouchi récent court et direct pour un compagnon."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_164",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DOUBLER",
+    "answer_normalized": "doubler",
+    "letters_pool": ["D","O","U","B","L","E","R"],
+    "riddle": {
+      "fr": "Dépasser quelqu'un, le surpasser. Je suis meilleur que toi."
+    },
+    "explanation": {
+      "fr": "Doubler = dépasser, surpasser, exceller par rapport à. Verbe Nouchi récent pour prouver sa supériorité."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_165",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ETHIC",
+    "answer_normalized": "ethic",
+    "letters_pool": ["E","T","H","I","C"],
+    "riddle": {
+      "fr": "Éthique, principes moraux, code d'honneur personnel."
+    },
+    "explanation": {
+      "fr": "Ethic = éthique, morale, code personnel. Terme Nouchi récent emprunté à l'anglais pour les principes de vie."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["attitude", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_166",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "POSE",
+    "answer_normalized": "pose",
+    "letters_pool": ["P","O","S","E"],
+    "riddle": {
+      "fr": "Attaque, agression, insulte directe. Je te pose."
+    },
+    "explanation": {
+      "fr": "Pose = poser (attaquer verbalement), provoquer. Verbe Nouchi récent pour une agression verbale ou physique."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["action", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_167",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MICRO",
+    "answer_normalized": "micro",
+    "letters_pool": ["M","I","C","R","O"],
+    "riddle": {
+      "fr": "Petite voiture découpée, truc coupé décalé style."
+    },
+    "explanation": {
+      "fr": "Micro = petite voiture sportive coupée, symbole du Coupé Décalé. Terme Nouchi récent pour un véhicule personnalisé."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["objet", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_168",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "HORA",
+    "answer_normalized": "hora",
+    "letters_pool": ["H","O","R","A"],
+    "riddle": {
+      "fr": "L'heure, le moment, quand on se voit."
+    },
+    "explanation": {
+      "fr": "Hora = heure, moment, instant. Terme Nouchi récent emprunté à l'espagnol pour le temps et les rendez-vous."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["objet", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_169",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CASTA",
+    "answer_normalized": "casta",
+    "letters_pool": ["C","A","S","T","A"],
+    "riddle": {
+      "fr": "Jolie fille, beauté classe, femme impressionnante."
+    },
+    "explanation": {
+      "fr": "Casta = jolie, classe, impressionnant. Terme Nouchi récent pour une femme belle et distinguée."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": ["personne", "recent"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_170",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBOMOTA",
+    "answer_normalized": "gbomota",
+    "letters_pool": ["G","B","O","M","O","T","A"],
+    "riddle": {
+      "fr": "Gros costaud, très corpulent, qui prend de la place."
+    },
+    "explanation": {
+      "fr": "Gbomota = très gros, obèse, corpulent. Terme Nouchi insider pour un individu de corpulence extrême."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["personne", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_171",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KAGNON",
+    "answer_normalized": "kagnon",
+    "letters_pool": ["K","A","G","N","O","N"],
+    "riddle": {
+      "fr": "Faux, contrefait, pas authentique du tout."
+    },
+    "explanation": {
+      "fr": "Kagnon = faux, imitation, contrefaçon. Terme Nouchi insider pour un produit inauthentique ou une arnaque."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["objet", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_172",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "JABULA",
+    "answer_normalized": "jabula",
+    "letters_pool": ["J","A","B","U","L","A"],
+    "riddle": {
+      "fr": "Heureux, joyeux, content de la vie. C'est cool."
+    },
+    "explanation": {
+      "fr": "Jabula = heureux, joyeux, content. Terme Nouchi insider emprunté au zoulou via le contexte urbain abidjanais."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["emotion", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_173",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KAKILA",
+    "answer_normalized": "kakila",
+    "letters_pool": ["K","A","K","I","L","A"],
+    "riddle": {
+      "fr": "Endroit sale, malpropre, zone dégoûtante."
+    },
+    "explanation": {
+      "fr": "Kakila = sale, malpropre, immonde. Terme Nouchi insider pour un lieu ou un objet répugnant."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["lieu", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_174",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KOULOU",
+    "answer_normalized": "koulou",
+    "letters_pool": ["K","O","U","L","O","U"],
+    "riddle": {
+      "fr": "Ravin profond, zone escarpée, terrain dangereux."
+    },
+    "explanation": {
+      "fr": "Koulou = ravin, pente escarpée, terrain accidenté. Terme Nouchi insider pour un lieu géographique difficile."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["lieu", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_175",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJEMBO",
+    "answer_normalized": "djembo",
+    "letters_pool": ["D","J","E","M","B","O"],
+    "riddle": {
+      "fr": "Très fort, puissant, costaud au extreme."
+    },
+    "explanation": {
+      "fr": "Djembo = très fort, puissant, costaud. Terme Nouchi insider pour quelqu'un d'extrêmement imposant ou fort."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["personne", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_176",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TCHOUME",
+    "answer_normalized": "tchoume",
+    "letters_pool": ["T","C","H","O","U","M","E"],
+    "riddle": {
+      "fr": "Faire pleurer, faire du mal, blesser profondément."
+    },
+    "explanation": {
+      "fr": "Tchoume = faire souffrir, blesser, affliger. Verbe Nouchi insider pour causer de la peine ou de la douleur."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["action", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_177",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SOUKOUS",
+    "answer_normalized": "soukous",
+    "letters_pool": ["S","O","U","K","O","U","S"],
+    "riddle": {
+      "fr": "Danse zairoise dansée à Abidjan, musique hypnotique."
+    },
+    "explanation": {
+      "fr": "Soukous = danse congolaise populaire en Côte d'Ivoire. Terme Nouchi insider pour un genre musical transatlantique abidjanais."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["objet", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_178",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KASSAKA",
+    "answer_normalized": "kassaka",
+    "letters_pool": ["K","A","S","S","A","K","A"],
+    "riddle": {
+      "fr": "Force brute, puissance écrasante, domination totale."
+    },
+    "explanation": {
+      "fr": "Kassaka = force irrésistible, domination absolue. Terme Nouchi insider pour l'expression de la puissance totale."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 35,
+    "tags": ["attitude", "insider"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_179",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "AKAMA",
+    "answer_normalized": "akama",
+    "letters_pool": ["A","K","A","M","A"],
+    "riddle": {
+      "fr": "Grand chef, digne seigneur, figure de sage puissance."
+    },
+    "explanation": {
+      "fr": "Akama = grand chef, seigneur, figure d'autorité respectée. Terme Nouchi expert emprunté aux traditions Akan/Baoulé."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": ["personne", "expert"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_180",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GADAGA",
+    "answer_normalized": "gadaga",
+    "letters_pool": ["G","A","D","A","G","A"],
+    "riddle": {
+      "fr": "Ancêtre, aïeul, esprit de nos pères. Sagesse ancestrale."
+    },
+    "explanation": {
+      "fr": "Gadaga = ancêtre, aïeul, esprit ancestral. Terme Nouchi expert lié à la spiritualité Akan/Baoulé préservée en milieu urbain."
+    },
+    "difficulty": 5,
+    "estimated_time_s": 40,
+    "tags": ["personne", "expert"],
+    "format_version": 3
+  }
+]
