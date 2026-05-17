@@ -41,6 +41,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Pour scanner le QR code de ton ami et lancer un duel temps réel.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Kilimandjaro n'enregistre pas l'audio. Cette autorisation est référencée par les bibliothèques d'analyse vidéo du scanner QR mais n'est jamais demandée à l'utilisateur.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
