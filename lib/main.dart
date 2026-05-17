@@ -260,20 +260,14 @@ class _BootGateState extends ConsumerState<_BootGate> {
         _onForegroundMessage,
       );
 
-      // UMP consent before AdMob (RGPD UE compliance). Timeout de 8s
-      // pour ne pas bloquer indéfiniment si le serveur Google répond en
-      // HTTP 500 (cas observé en prod) — on init quand même AdMob qui
-      // tournera sans personnalisation jusqu'au prochain consent réussi.
-      try {
-        await ref
-            .read(consentServiceProvider)
-            .requestConsent()
-            .timeout(const Duration(seconds: 8));
-      } on Object {
-        // Silencieusement : ni le user ni la prod ne doivent voir le détail.
-      }
-      if (!mounted) return;
-      unawaited(ref.read(adsServiceProvider).init());
+      // AdMob + UMP désactivés en v0.1 — le formulaire de consent Google
+      // boucle infiniment sur certains iPhone (WebView UMP qui re-exec
+      // du JavaScript toutes les 200ms sans jamais se résoudre, observé
+      // en prod sur iOS 26). Ré-activera en v0.2 après investigation
+      // ou migration vers UMP Lite / une autre solution de consent.
+      //
+      //   await ref.read(consentServiceProvider).requestConsent();
+      //   unawaited(ref.read(adsServiceProvider).init());
 
       // Deep links : ecoute les URL scheme kilimandjaro://duel/*
       unawaited(ref.read(deepLinkServiceProvider).init());
