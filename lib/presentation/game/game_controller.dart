@@ -140,23 +140,45 @@ class GameController extends StateNotifier<GameState> {
   // ---------------------------------------------------------------------------
 
   /// Sélectionne une tuile par son index dans la grille shufflée.
-  /// Gère le slide-back (pointer revient sur l'avant-dernier → supprime le dernier).
+  ///
+  /// Règles (volontairement restrictives pour éviter qu'un tap accidentel
+  /// au milieu du chemin n'explose la sélection) :
+  /// - Tuile **pas encore sélectionnée** → ajoutée en fin.
+  /// - Tuile **avant-dernière** (slide-back classique : le doigt revient
+  ///   en arrière pendant un drag) → retire la dernière. Cascade naturelle
+  ///   lettre par lettre si l'utilisateur continue à reculer.
+  /// - Tuile **dernière sélectionnée** → retirée (re-tap discret = effacer).
+  /// - Tuile **antérieure mais ni avant-dernière ni dernière** → ignorée.
+  ///   La troncature mid-chemin serait trop destructrice sur un toucher
+  ///   imprécis.
   void selectTile(int gridIndex) {
     if (state.phase != GamePhase.playing) return;
 
     final selected = List<int>.from(state.selectedIndices);
 
-    // Slide-back.
+    // Slide-back classique : entrer sur l'avant-dernière retire la dernière.
     if (selected.length >= 2 && selected[selected.length - 2] == gridIndex) {
       selected.removeLast();
       state = state.copyWith(
         selectedIndices: selected,
         validationCorrect: false,
       );
+      unawaited(HapticFeedback.selectionClick());
       return;
     }
 
-    // Ne pas re-sélectionner un index déjà dans la liste.
+    // Re-tap sur la dernière lettre : on la retire.
+    if (selected.isNotEmpty && selected.last == gridIndex) {
+      selected.removeLast();
+      state = state.copyWith(
+        selectedIndices: selected,
+        validationCorrect: false,
+      );
+      unawaited(HapticFeedback.selectionClick());
+      return;
+    }
+
+    // Lettre antérieure (ni avant-dernière ni dernière) : ignorée.
     if (selected.contains(gridIndex)) return;
 
     selected.add(gridIndex);
