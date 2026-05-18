@@ -70,18 +70,18 @@ Future<void> main() async {
 }
 
 Future<void> _bootstrap() async {
-  // [BOOT] timeline : ces prints survivent en release et sortent dans
-  // Console.app / log stream pour debug d'un freeze au splash.
-  // dart:developer.log() utilise os_log nativement sur iOS → visible
-  // dans Console.app et `log stream` même en mode Release. À l'inverse,
-  // Flutter's print() en release est silencieux sur iOS device.
-  developer.log('0 _bootstrap entered', name: 'BOOT');
+  // [BOOT] timeline via print() — visible dans Xcode console (debug + flutter run).
+  // ignore: avoid_print
+  print('[BOOT] 0 _bootstrap entered');
   WidgetsFlutterBinding.ensureInitialized();
-  developer.log('1 WidgetsFlutterBinding OK', name: 'BOOT');
+  // ignore: avoid_print
+  print('[BOOT] 1 WidgetsFlutterBinding OK');
   await EasyLocalization.ensureInitialized();
-  developer.log('2 EasyLocalization OK', name: 'BOOT');
+  // ignore: avoid_print
+  print('[BOOT] 2 EasyLocalization OK');
   await AudioEngine.instance.init();
-  developer.log('3 AudioEngine OK', name: 'BOOT');
+  // ignore: avoid_print
+  print('[BOOT] 3 AudioEngine OK');
 
   // Firebase: initialize then ensure an anonymous session exists so
   // every player has a UID for duels even before signing in with
@@ -102,15 +102,9 @@ Future<void> _bootstrap() async {
       print('🔧 Firebase default app already exists (native auto-init) — OK');
     }
 
-    // App Check: fire-and-forget pour ne PAS bloquer le boot. Si le
-    // serveur Firebase App Check rame ou si l'app n'est pas encore
-    // enregistrée côté console, on ne veut pas un splash forever — les
-    // requêtes Firebase passeront sans token (mode unenforced) jusqu'à
-    // ce que l'activation se termine en arrière-plan.
-    //
-    // Une fois App Check enforced en backend (post-stabilisation prod),
-    // remettre `await` ici + ajouter un timeout de 5s avec fallback.
-    unawaited(activateAppCheck());
+    // App Check: must run right after Firebase.initializeApp and before any
+    // authenticated call (Auth, Firestore, RTDB, Cloud Functions).
+    await activateAppCheck();
 
     // Local emulator wiring — opt-in via --dart-define USE_FIREBASE_EMULATOR=true
     // (cf. README emulator section). Doit être appelé AVANT toute requête
@@ -163,10 +157,8 @@ Future<void> _bootstrap() async {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
-    // Fire-and-forget : Crashlytics est déjà registered via Firebase.initializeApp,
-    // on n'a pas besoin d'attendre l'enable des collections pour booter.
-    unawaited(
-      FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode),
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+      !kDebugMode,
     );
 
     // En mode emulator, on force un fresh sign-in pour invalider tout
@@ -183,24 +175,17 @@ Future<void> _bootstrap() async {
       }
     }
 
-    // signInAnonymously fire-and-forget : pas besoin d'attendre l'UID pour
-    // afficher le splash + onboarding. Le user pourra démarrer une partie
-    // solo immédiatement ; les duels (qui ont besoin d'un UID) ne sont
-    // accessibles qu'après l'onboarding, donc l'auth aura largement eu
-    // le temps de se faire en background.
     if (FirebaseAuth.instance.currentUser == null) {
-      unawaited(
-        FirebaseAuth.instance
-            .signInAnonymously()
-            .then((cred) {
-              // ignore: avoid_print
-              print('🔧 signInAnonymously OK uid=${cred.user?.uid}');
-            })
-            .catchError((Object e) {
-              // ignore: avoid_print
-              print('🔧 signInAnonymously failed: $e');
-            }),
-      );
+      try {
+        final cred = await FirebaseAuth.instance.signInAnonymously().timeout(
+          const Duration(seconds: 8),
+        );
+        // ignore: avoid_print
+        print('🔧 signInAnonymously OK uid=${cred.user?.uid}');
+      } catch (e) {
+        // ignore: avoid_print
+        print('🔧 signInAnonymously failed/timeout: $e');
+      }
     }
 
     // FCM : enregistrer le handler background AVANT toute autre init FCM.
@@ -230,18 +215,22 @@ Future<void> _bootstrap() async {
     } on Object {
       // Timeout ou erreur FCM — l'app boot quand même.
     }
-    developer.log('4 Firebase block OK', name: 'BOOT');
+    // ignore: avoid_print
+    print('[BOOT] 4 Firebase block OK');
   } catch (e) {
     // Fail-soft: solo gameplay continues without backend if Firebase fails.
-    developer.log('4 Firebase bootstrap failed: $e', name: 'BOOT');
+    // ignore: avoid_print
+    print('[BOOT] 4 Firebase bootstrap failed: $e');
   }
 
   final prefs = await SharedPreferences.getInstance();
-  developer.log('5 SharedPreferences OK', name: 'BOOT');
+  // ignore: avoid_print
+  print('[BOOT] 5 SharedPreferences OK');
 
   SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlay);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  developer.log('6 SystemChrome OK — calling runApp', name: 'BOOT');
+  // ignore: avoid_print
+  print('[BOOT] 6 SystemChrome OK — calling runApp');
 
   runApp(
     EasyLocalization(
@@ -278,34 +267,42 @@ class _BootGateState extends ConsumerState<_BootGate> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // ignore: avoid_print
+      print('[BOOT] 7 post-frame entered');
+
       // IAP init is fire-and-forget.
       unawaited(ref.read(iapServiceProvider).init());
+      // ignore: avoid_print
+      print('[BOOT] 8 IAP triggered');
 
       // FCM token storage (permission + persistance Firestore).
       // Fire-and-forget : ne doit pas bloquer le boot.
       unawaited(ref.read(fcmRepositoryProvider).init());
+      // ignore: avoid_print
+      print('[BOOT] 9 FCM triggered');
 
       // FCM foreground : notif in-app quand un duel challenge arrive.
       _fcmForegroundSub = FirebaseMessaging.onMessage.listen(
         _onForegroundMessage,
       );
+      // ignore: avoid_print
+      print('[BOOT] 10 FCM listener attached');
 
-      // AdMob + UMP désactivés en v0.1 — le formulaire de consent Google
-      // boucle infiniment sur certains iPhone (WebView UMP qui re-exec
-      // du JavaScript toutes les 200ms sans jamais se résoudre, observé
-      // en prod sur iOS 26). Ré-activera en v0.2 après investigation
-      // ou migration vers UMP Lite / une autre solution de consent.
-      //
-      //   await ref.read(consentServiceProvider).requestConsent();
-      //   unawaited(ref.read(adsServiceProvider).init());
+      // UMP consent before AdMob (RGPD UE compliance).
+      await ref.read(consentServiceProvider).requestConsent();
+      if (!mounted) return;
+      unawaited(ref.read(adsServiceProvider).init());
 
       // Deep links : ecoute les URL scheme kilimandjaro://duel/*
       unawaited(ref.read(deepLinkServiceProvider).init());
+      // ignore: avoid_print
+      print('[BOOT] 11 deep links triggered');
 
-      // OTA content sync : télécharge les packs distants depuis Firebase
-      // Storage et peuple le cache Drift. Fire-and-forget — les échecs
-      // sont loggés mais l'app continue sur le starter pack bundlé.
-      unawaited(ref.read(manifestSyncServiceProvider).refresh());
+      // OTA content sync DÉSACTIVÉ TEMPORAIREMENT — suspect d'OOM iOS 26.
+      // Réactiver après confirmation que ce n'est pas le coupable.
+      //   unawaited(ref.read(manifestSyncServiceProvider).refresh());
+      // ignore: avoid_print
+      print('[BOOT] 12 OTA sync skipped (debug)');
     });
   }
 
