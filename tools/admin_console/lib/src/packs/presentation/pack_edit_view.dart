@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:kilimandjaro_admin/src/packs/data/packs_repository.dart';
 import 'package:kilimandjaro_admin/src/packs/domain/pack.dart';
+import 'package:kilimandjaro_admin/src/packs/presentation/pack_image_card.dart';
 
 /// Édite les métadonnées d'un pack + déclenche la publication OTA.
 /// Écran d'édition d'un pack.
@@ -250,6 +251,10 @@ class _PackEditViewState extends ConsumerState<PackEditView> {
                   ),
                 ),
               ),
+              const SizedBox(height: 24),
+
+              // ---- Image du pack
+              PackImageCard(pack: pack),
               const SizedBox(height: 24),
 
               // ---- Metadata form

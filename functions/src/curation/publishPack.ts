@@ -187,6 +187,24 @@ export const publishPack = onCall(
       `https://firebasestorage.googleapis.com/v0/b/${bucketName}` +
       `/o/${encodeURIComponent(storagePath)}?alt=media`;
 
+    // Préservation explicite des champs `image_*` (uploadés via backoffice).
+    // On les ré-écrit identiques pour garantir qu'un futur set merge:true
+    // ne les écrase pas par accident, et on n'inclut pas le champ s'il
+    // est absent (évite d'écrire `undefined` dans Firestore).
+    const imagePreserved: Record<string, unknown> = {};
+    if (typeof state.image_url === "string") {
+      imagePreserved.image_url = state.image_url;
+    }
+    if (typeof state.image_path === "string") {
+      imagePreserved.image_path = state.image_path;
+    }
+    if (state.image_updated_at) {
+      imagePreserved.image_updated_at = state.image_updated_at;
+    }
+    if (typeof state.image_hash === "string") {
+      imagePreserved.image_hash = state.image_hash;
+    }
+
     await stateRef.set(
       {
         pack: packId,
@@ -204,6 +222,7 @@ export const publishPack = onCall(
         last_published_at: FieldValue.serverTimestamp(),
         last_published_by: auth.uid,
         updated_at: FieldValue.serverTimestamp(),
+        ...imagePreserved,
       },
       { merge: true }
     );

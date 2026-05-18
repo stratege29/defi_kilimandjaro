@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
@@ -231,8 +232,9 @@ class _PackCardState extends State<_PackCard>
   void _onTapUp(TapUpDetails _) => _scaleCtrl.animateTo(1);
   void _onTapCancel() => _scaleCtrl.animateTo(1);
 
-  /// Chemin de l'asset PNG pour le pack — fallback emoji si pack inconnu.
-  /// Les PNG vivent dans `assets/images/packs/<packId>.png` (512×512).
+  /// Chemin de l'asset PNG bundlé pour le pack — fallback offline si pack
+  /// inconnu ou si l'image distante n'a pas pu être téléchargée. Les PNG
+  /// vivent dans `assets/images/packs/<packId>.png` (512×512).
   String? _assetFor(String packId) {
     switch (packId) {
       case 'culture_ci':
@@ -292,7 +294,10 @@ class _PackCardState extends State<_PackCard>
               children: [
                 Row(
                   children: [
-                    _PackIcon(assetPath: _assetFor(widget.pack.id)),
+                    _PackIcon(
+                      remoteUrl: widget.pack.imageUrl,
+                      assetPath: _assetFor(widget.pack.id),
+                    ),
                     AppSpacing.hGapSm,
                     Expanded(
                       child: Text(
@@ -464,10 +469,21 @@ class _ConfirmDialog extends StatelessWidget {
 }
 
 /// Vignette carrée affichant l'illustration du pack (wood + ornements or).
-/// Fallback sur un placeholder neutre si l'asset n'est pas livré.
+///
+/// Fallback chain (par ordre de priorité) :
+///   1. `remoteUrl` (CDN via `CachedNetworkImage`) — uploadée via backoffice
+///   2. `assetPath` (PNG bundlé) — fallback offline ou si network down
+///   3. Icon placeholder — pack inconnu
 class _PackIcon extends StatelessWidget {
-  const _PackIcon({required this.assetPath});
+  const _PackIcon({
+    required this.assetPath,
+    this.remoteUrl,
+  });
 
+  /// URL distante de l'image WebP 512×512 (incluant cache-buster `?v=…`).
+  final String? remoteUrl;
+
+  /// Chemin d'asset bundlé (PNG 512×512) — utilisé en fallback offline.
   final String? assetPath;
 
   @override
@@ -477,17 +493,39 @@ class _PackIcon extends StatelessWidget {
       child: SizedBox(
         width: 56,
         height: 56,
-        child: assetPath == null
-            ? const ColoredBox(
-                color: AppColors.boisFonce,
-                child: Icon(
-                  Icons.layers_outlined,
-                  color: AppColors.orJour,
-                  size: 28,
-                ),
-              )
-            : Image.asset(assetPath!, fit: BoxFit.cover),
+        child: _buildContent(),
       ),
     );
+  }
+
+  Widget _buildContent() {
+    final url = remoteUrl;
+    if (url != null && url.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: url,
+        fit: BoxFit.cover,
+        // Pendant le chargement : ColoredBox neutre (pas de spinner — la
+        // vignette fait 56×56, un spinner serait disproportionné).
+        placeholder: (_, __) => _buildAssetOrPlaceholder(),
+        // Network down ou 404 : fallback automatique sur l'asset bundlé.
+        errorWidget: (_, __, ___) => _buildAssetOrPlaceholder(),
+      );
+    }
+    return _buildAssetOrPlaceholder();
+  }
+
+  Widget _buildAssetOrPlaceholder() {
+    final asset = assetPath;
+    if (asset == null) {
+      return const ColoredBox(
+        color: AppColors.boisFonce,
+        child: Icon(
+          Icons.layers_outlined,
+          color: AppColors.orJour,
+          size: 28,
+        ),
+      );
+    }
+    return Image.asset(asset, fit: BoxFit.cover);
   }
 }

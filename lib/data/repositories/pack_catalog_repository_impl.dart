@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
 import 'package:defi_kilimandjaro/domain/repositories/pack_catalog_repository.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -86,14 +87,50 @@ final packCatalogRepositoryProvider = Provider<PackCatalogRepository>((ref) {
   return BundledPackCatalogRepository();
 });
 
-/// Liste complète des packs disponibles dans le bundle. AsyncValue pour
-/// que la couche présentation puisse afficher un loader/erreur sans coupler
-/// à `rootBundle`.
-final packCatalogProvider = FutureProvider<List<Pack>>((ref) {
-  return ref.watch(packCatalogRepositoryProvider).loadAll();
+/// Map `packId → image_url` lue depuis Firestore (`content_packs/*`).
+///
+/// Cette map sert à enrichir le catalogue bundlé avec les illustrations
+/// uploadées via le backoffice. Si Firestore est inaccessible (offline,
+/// erreur réseau), on renvoie une map vide — les vignettes utilisent alors
+/// les assets PNG bundlés en fallback dans `_PackIcon`.
+final remotePackImageUrlsProvider =
+    FutureProvider<Map<String, String>>((ref) async {
+  try {
+    final snap = await FirebaseFirestore.instance
+        .collection('content_packs')
+        .get();
+    final result = <String, String>{};
+    for (final doc in snap.docs) {
+      final url = doc.data()['image_url'];
+      if (url is String && url.isNotEmpty) {
+        result[doc.id] = url;
+      }
+    }
+    return result;
+  } on Object {
+    // Tolérant : on dégrade vers fallback assets bundlés sans casser
+    // l'écran (cas offline, App Check refusé, etc.).
+    return const <String, String>{};
+  }
+});
+
+/// Liste complète des packs disponibles dans le bundle, enrichis avec
+/// l'`imageUrl` distante (si disponible). AsyncValue pour que la couche
+/// présentation puisse afficher un loader/erreur sans coupler à `rootBundle`.
+final packCatalogProvider = FutureProvider<List<Pack>>((ref) async {
+  final packs = await ref.watch(packCatalogRepositoryProvider).loadAll();
+  final urls = await ref.watch(remotePackImageUrlsProvider.future);
+  if (urls.isEmpty) return packs;
+  return packs
+      .map((p) {
+        final url = urls[p.id];
+        return url == null ? p : p.copyWith(imageUrl: url);
+      })
+      .toList(growable: false);
 });
 
 /// Packs éligibles au choix gratuit — branché à l'écran d'onboarding.
-final freePackCandidatesProvider = FutureProvider<List<Pack>>((ref) {
-  return ref.watch(packCatalogRepositoryProvider).freeChoiceCandidates();
+final freePackCandidatesProvider = FutureProvider<List<Pack>>((ref) async {
+  final all = await ref.watch(packCatalogProvider.future);
+  return all.where((p) => p.freeChoiceEligible).toList(growable: false);
 });

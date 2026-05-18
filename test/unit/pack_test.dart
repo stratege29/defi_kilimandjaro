@@ -41,5 +41,50 @@ void main() {
       });
       expect(pack.priceEur, 3.0);
     });
+
+    test('imageUrl null par défaut quand absent', () {
+      final pack = Pack.fromIndexEntry('x', const <String, dynamic>{
+        'name_key': 'a',
+        'description_key': 'b',
+      });
+      expect(pack.imageUrl, isNull);
+    });
+
+    test('imageUrl parsé quand présent', () {
+      final pack = Pack.fromIndexEntry('x', const <String, dynamic>{
+        'name_key': 'a',
+        'description_key': 'b',
+        'image_url': 'https://cdn.example/x.webp?v=123',
+      });
+      expect(pack.imageUrl, 'https://cdn.example/x.webp?v=123');
+    });
+  });
+
+  group('Pack.copyWith', () {
+    test('remplace uniquement imageUrl', () {
+      final p = Pack.fromIndexEntry('culture_ci', const <String, dynamic>{
+        'name_key': 'pack.culture_ci.name',
+        'description_key': 'pack.culture_ci.description',
+        'count': 30,
+        'free_choice_eligible': true,
+        'price_eur': 2.99,
+        'price_cauris': 2000,
+      });
+      final enriched = p.copyWith(imageUrl: 'https://x/img.webp?v=1');
+      expect(enriched.imageUrl, 'https://x/img.webp?v=1');
+      expect(enriched.id, p.id);
+      expect(enriched.questionCount, p.questionCount);
+      expect(enriched.freeChoiceEligible, p.freeChoiceEligible);
+    });
+
+    test('préserve imageUrl quand null passé', () {
+      final p = Pack.fromIndexEntry('x', const <String, dynamic>{
+        'name_key': 'a',
+        'description_key': 'b',
+        'image_url': 'https://existing.example/x.webp',
+      });
+      final c = p.copyWith();
+      expect(c.imageUrl, 'https://existing.example/x.webp');
+    });
   });
 }

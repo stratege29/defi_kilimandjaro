@@ -19,6 +19,7 @@ class Pack extends Equatable {
     required this.freeChoiceEligible,
     required this.priceEur,
     required this.priceCauris,
+    this.imageUrl,
   });
 
   /// Parse une entrée du `_index.json` (clé = packId, valeur = body).
@@ -31,6 +32,7 @@ class Pack extends Equatable {
       freeChoiceEligible: (json['free_choice_eligible'] as bool?) ?? false,
       priceEur: (json['price_eur'] as num?)?.toDouble() ?? 0.0,
       priceCauris: (json['price_cauris'] as num?)?.toInt() ?? 0,
+      imageUrl: json['image_url'] as String?,
     );
   }
 
@@ -60,6 +62,29 @@ class Pack extends Equatable {
   /// Prix en cauris (monnaie in-game).
   final int priceCauris;
 
+  /// URL distante de l'illustration carrée 512×512 du pack (WebP),
+  /// uploadée via le backoffice. `null` si aucune image n'a été uploadée —
+  /// l'écran de choix utilise alors l'asset bundlé en fallback.
+  ///
+  /// Inclut un query-param `?v={timestamp}` pour le cache busting.
+  final String? imageUrl;
+
+  /// Construit un Pack en remplaçant uniquement certains champs (utile
+  /// pour hydrater l'`imageUrl` depuis Firestore par-dessus le catalogue
+  /// chargé depuis l'asset bundle).
+  Pack copyWith({String? imageUrl}) {
+    return Pack(
+      id: id,
+      nameKey: nameKey,
+      descriptionKey: descriptionKey,
+      questionCount: questionCount,
+      freeChoiceEligible: freeChoiceEligible,
+      priceEur: priceEur,
+      priceCauris: priceCauris,
+      imageUrl: imageUrl ?? this.imageUrl,
+    );
+  }
+
   @override
   List<Object?> get props => [
     id,
@@ -69,5 +94,6 @@ class Pack extends Equatable {
     freeChoiceEligible,
     priceEur,
     priceCauris,
+    imageUrl,
   ];
 }

@@ -19,6 +19,7 @@ class ContentPackManifest {
     required this.defaultLang,
     required this.enabled,
     required this.isCommunity,
+    this.imageUrl,
   });
 
   factory ContentPackManifest.fromFirestore({
@@ -43,6 +44,7 @@ class ContentPackManifest {
       defaultLang: data['default_lang'] as String? ?? 'fr',
       enabled: data['enabled'] as bool? ?? true,
       isCommunity: docId.endsWith('_community'),
+      imageUrl: data['image_url'] as String?,
     );
   }
 
@@ -68,4 +70,11 @@ class ContentPackManifest {
   /// `true` si le doc concerne le pack communautaire (UGC reconstruit). Sert
   /// à choisir la `DevinetteSource` à l'insertion en cache.
   final bool isCommunity;
+
+  /// URL CDN de l'illustration carrée 512×512 du pack (WebP). `null` si
+  /// aucune image n'a encore été uploadée via le backoffice — l'app
+  /// utilise alors l'asset bundlé `assets/images/packs/{packId}.png` en
+  /// fallback (cf. `_PackIcon` dans `pack_chooser_view.dart`).
+  /// L'URL inclut un query-param `?v={timestamp}` pour le cache busting.
+  final String? imageUrl;
 }

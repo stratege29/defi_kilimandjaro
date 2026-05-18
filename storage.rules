@@ -4,12 +4,35 @@ rules_version = '2';
 // Storage rules — Kilimandjaro
 // -----------------------------------------------------------------------------
 // Stratégie :
-//   - `packs/` : lecture publique (CDN), écriture serveur (Cloud Functions)
-//     uniquement. Le contenu n'est pas sensible — pas de PII.
+//   - `packs/v2/{packId}/image.{ext}` : lecture publique (CDN), écriture par
+//     admin uniquement (claim `role == 'admin'`). Couvre les illustrations
+//     packs uploadées via le backoffice. Note : en Storage rules les
+//     règles spécifiques sont évaluées avant les wildcards plus larges, donc
+//     elles peuvent autoriser un write là où le bloc parent l'interdit.
+//   - `packs/` (gz OTA + reste) : lecture publique, écriture refusée — les
+//     blobs gz sont écrits via Admin SDK (Cloud Function `publishPack`) qui
+//     bypasse les règles.
 //   - Tout le reste : deny par défaut.
 // =============================================================================
 service firebase.storage {
   match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.role == 'admin';
+    }
+
+    // Image d'illustration d'un pack (uploadée depuis le backoffice).
+    // Un seul fichier par pack, overwrite à chaque upload.
+    // Limites : 1 MiB max post-optimisation (la pipeline cible < 80 KiB),
+    // content-type image/webp ou image/png ou image/jpeg.
+    match /packs/v2/{packId}/image.{ext} {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.size < 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if isAdmin();
+    }
 
     match /packs/{allPaths=**} {
       allow read: if true;

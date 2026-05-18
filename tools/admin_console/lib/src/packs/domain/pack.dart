@@ -10,6 +10,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 ///   - id (immuable après création), name, description
 ///   - free_choice_eligible, price_eur, price_cauris
 ///   - enabled (publish flag)
+///   - image_url, image_path, image_hash, image_updated_at (gérés par
+///     `PackImageUploader` — pas via `upsertPack`)
 ///
 /// Champs maintenus par la Cloud Function `publishPack` (read-only UI) :
 ///   - current_version, format_version, hash_sha256, size_bytes, count,
@@ -31,6 +33,10 @@ class Pack {
     required this.storagePath,
     required this.downloadUrl,
     required this.lastPublishedAt,
+    this.imageUrl,
+    this.imagePath,
+    this.imageHash,
+    this.imageUpdatedAt,
   });
 
   factory Pack.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -51,6 +57,10 @@ class Pack {
       storagePath: (d['storage_path'] ?? '') as String,
       downloadUrl: (d['download_url'] ?? '') as String,
       lastPublishedAt: (d['last_published_at'] as Timestamp?)?.toDate(),
+      imageUrl: d['image_url'] as String?,
+      imagePath: d['image_path'] as String?,
+      imageHash: d['image_hash'] as String?,
+      imageUpdatedAt: (d['image_updated_at'] as Timestamp?)?.toDate(),
     );
   }
 
@@ -69,9 +79,13 @@ class Pack {
   final String storagePath;
   final String downloadUrl;
   final DateTime? lastPublishedAt;
+  final String? imageUrl;
+  final String? imagePath;
+  final String? imageHash;
+  final DateTime? imageUpdatedAt;
 
   /// Map des champs éditables UI uniquement (jamais les champs maintenus par
-  /// la Cloud Function `publishPack`).
+  /// la Cloud Function `publishPack` ou par `PackImageUploader`).
   Map<String, dynamic> toEditableMap() => {
         'name': name,
         'description': description,
@@ -107,6 +121,10 @@ class Pack {
       storagePath: storagePath,
       downloadUrl: downloadUrl,
       lastPublishedAt: lastPublishedAt,
+      imageUrl: imageUrl,
+      imagePath: imagePath,
+      imageHash: imageHash,
+      imageUpdatedAt: imageUpdatedAt,
     );
   }
 }
