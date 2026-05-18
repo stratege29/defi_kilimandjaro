@@ -171,17 +171,77 @@ class AudioEngine with WidgetsBindingObserver {
 
   /// Joue un cue de manière fire-and-forget. Aucune attente, aucune exception
   /// remontée — toute erreur est logguée puis avalée.
+  ///
+  /// **Lazy-load** : si le cue n'est pas encore chargé en mémoire SoLoud,
+  /// il est synthétisé et chargé à la volée. La 1ère lecture d'un cue
+  /// donné prend ~50ms supplémentaires, ensuite cache.
   Future<void> play(AudioCue cue) async {
     if (!_initialized || _suspended || _muted) return;
-    final src = _sources[cue];
+    var src = _sources[cue];
     if (src == null) {
-      _log.w('AudioEngine.play: cue $cue not loaded');
-      return;
+      src = await _loadCue(cue);
+      if (src == null) return;
     }
     try {
       await SoLoud.instance.play(src);
     } on Object catch (e) {
       _log.w('AudioEngine.play($cue) failed: $e');
+    }
+  }
+
+  /// Synthétise + charge UN cue dans SoLoud. Retourne null en cas d'échec.
+  /// Idempotent : ne réalloue pas si déjà chargé.
+  Future<AudioSource?> _loadCue(AudioCue cue) async {
+    final existing = _sources[cue];
+    if (existing != null) return existing;
+    try {
+      final pcm = _renderCue(cue);
+      final src = await SoLoud.instance.loadMem(
+        'kilimandjaro_${cue.name}.wav',
+        pcm,
+      );
+      _sources[cue] = src;
+      return src;
+    } on Object catch (e) {
+      _log.w('Lazy load $cue failed: $e');
+      return null;
+    }
+  }
+
+  /// Synthèse PCM à la demande — un seul cue à la fois pour ne pas saturer
+  /// la mémoire (vs _preloadAll qui les rendait tous d'un coup).
+  Uint8List _renderCue(AudioCue cue) {
+    switch (cue) {
+      case AudioCue.letterSelect0:
+        return Balafon.renderLetterNote(0);
+      case AudioCue.letterSelect1:
+        return Balafon.renderLetterNote(1);
+      case AudioCue.letterSelect2:
+        return Balafon.renderLetterNote(2);
+      case AudioCue.letterSelect3:
+        return Balafon.renderLetterNote(3);
+      case AudioCue.letterSelect4:
+        return Balafon.renderLetterNote(4);
+      case AudioCue.wordComplete:
+        return Balafon.renderAscendingChord();
+      case AudioCue.hintUsed:
+        return Kora.renderHint();
+      case AudioCue.victory:
+        return GriotFanfare.render();
+      case AudioCue.failure:
+        return _renderFailure();
+      case AudioCue.wrongAnswer:
+        return Djembe.renderWrongDouble();
+      case AudioCue.timerTick:
+        return TamTam.renderTick();
+      case AudioCue.lobbyLoopDoum:
+        return LobbyDuel.renderLoopDoum();
+      case AudioCue.lobbyLoopTac:
+        return LobbyDuel.renderLoopTac();
+      case AudioCue.lobbyMatchFound:
+        return LobbyDuel.renderMatchFound();
+      case AudioCue.duelStart:
+        return LobbyDuel.renderDuelStart();
     }
   }
 

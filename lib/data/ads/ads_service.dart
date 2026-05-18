@@ -29,10 +29,7 @@ class AdsService {
   RewardedAd? _rewarded;
   InterstitialAd? _interstitial;
 
-  // Forcé à `false` en v0.1 : `init()` est un no-op (cf. plus bas).
-  // À transformer en `bool _initialized = false;` mutable quand AdMob
-  // sera ré-activé en v0.2.
-  final bool _initialized = false;
+  bool _initialized = false;
   bool get initialized => _initialized;
 
   /// Test unit IDs publics Google — utilisés en debug et sur Android tant
@@ -70,12 +67,16 @@ class AdsService {
     return _testInterstitialAndroid; // TODO(admob): prod Android.
   }
 
-  /// **DÉSACTIVÉ en v0.1** — voir `lib/main.dart` (commentaire AdMob/UMP).
-  /// `_initialized` reste à `false` → `showRewardedForCauris` et
-  /// `maybeShowInterstitial` retournent immédiatement sans charger ni
-  /// afficher la moindre pub. Ré-activera en v0.2.
   Future<void> init() async {
-    _log.i('AdMob init skipped (disabled in v0.1)');
+    if (_initialized) return;
+    await MobileAds.instance.initialize();
+    _initialized = true;
+    final mode = kDebugMode
+        ? 'test units'
+        : (Platform.isIOS ? 'prod units' : 'test units (Android pending)');
+    _log.i('AdMob initialized ($mode)');
+    unawaited(_loadRewarded());
+    unawaited(_loadInterstitial());
   }
 
   // -------------------------- Rewarded video --------------------------------
