@@ -1,0 +1,38 @@
+<!-- Maromokotro — Madagascar, 2876m, dome. Plus haut sommet de Madagascar, massif du Tsaratanana, forêt humide de haute altitude, endémisme unique. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#BAE6FD"/><stop offset="55%" stop-color="#FEF3C7"/><stop offset="100%" stop-color="#FBBF24"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_mg)"/>
+  <circle cx="160" cy="50" r="16" fill="#FB923C" opacity="0.8"/>
+
+  <!-- Brumes équatoriales (signature Tsaratanana) -->
+  <ellipse cx="50" cy="115" rx="40" ry="5" fill="#FAFAF9" opacity="0.55"/>
+  <ellipse cx="150" cy="125" rx="35" ry="5" fill="#FAFAF9" opacity="0.5"/>
+  <rect y="145" width="200" height="6" fill="#FEF3C7" opacity="0.5"/>
+
+  <!-- Distant forêt -->
+  <polygon points="0,162 30,150 65,158 105,150 145,158 180,150 200,160 200,180 0,180" fill="#1A2E05" opacity="0.7"/>
+
+  <!-- Dôme forestier -->
+  <polygon points="15,180 30,128 60,95 100,78 145,92 175,125 188,180" fill="#365314"/>
+  <polygon points="15,180 30,128 60,95 80,128 65,180" fill="#1A2E05"/>
+  <polygon points="60,95 100,78 95,125 80,128" fill="#3F6212"/>
+  <polygon points="100,78 145,92 135,125 95,125" fill="#4D7C0F"/>
+  <polygon points="145,92 175,125 188,180 145,180" fill="#65A30D"/>
+  <polygon points="80,128 95,125 135,125 130,180 65,180" fill="#3F6212"/>
+  <polygon points="95,125 135,125 130,180 105,158" fill="#4D7C0F"/>
+
+  <!-- Affleurements rocheux au sommet -->
+  <polygon points="100,78 115,86 105,93" fill="#A1A1AA"/>
+  <polygon points="115,86 130,90 122,98" fill="#71717A"/>
+
+  <!-- Forêt dense sur les versants -->
+  <polygon points="50,165 60,155 70,165 80,160 90,170" fill="#1A2E05"/>
+  <polygon points="125,165 140,155 150,170 165,160 180,170" fill="#1A2E05"/>
+
+  <!-- Foreground -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#052e16"/>
+  <line x1="25" y1="195" x2="25" y2="178" stroke="#052e16" stroke-width="1.5"/>
+  <path d="M 25,178 q -8,-2 -10,2 M 25,178 q 8,-2 10,2 M 25,178 q -4,-5 -2,-9 M 25,178 q 4,-5 2,-9" fill="none" stroke="#052e16" stroke-width="1.2"/>
+  <line x1="175" y1="195" x2="175" y2="178" stroke="#052e16" stroke-width="1.4"/>
+  <path d="M 175,178 q -7,-2 -9,2 M 175,178 q 7,-2 9,2 M 175,178 q -3,-5 -1,-8 M 175,178 q 3,-5 1,-8" fill="none" stroke="#052e16" stroke-width="1"/>
+</svg>

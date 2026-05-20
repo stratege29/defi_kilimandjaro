@@ -7,6 +7,7 @@ import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:vector_graphics/vector_graphics.dart';
 
 /// Overlay « TU AS CONQUIS ce sommet » — affiché juste après la victoire du
 /// dernier niveau d'une montagne, avant la transition vers la suivante.
@@ -159,7 +160,7 @@ class _ConquestCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Halo pulsant derrière le drapeau — signature anim de l'écran.
+          // Halo pulsant derrière la silhouette — signature anim de l'écran.
           SizedBox(
             width: 160,
             height: 160,
@@ -187,14 +188,18 @@ class _ConquestCard extends StatelessWidget {
                       color: AppColors.bois.withValues(alpha: 0.4),
                       border: Border.all(color: AppColors.orJour, width: 1.5),
                     ),
-                    alignment: Alignment.center,
+                    clipBehavior: Clip.antiAlias,
+                    alignment: Alignment.bottomCenter,
                     child: child,
                   ),
                 ],
               ),
-              child: Text(
-                mountain.flagEmoji,
-                style: const TextStyle(fontSize: 76),
+              child: VectorGraphic(
+                loader: AssetBytesLoader(
+                  'assets/svg/mountains/${mountain.id}.svg.vec',
+                ),
+                fit: BoxFit.cover,
+                alignment: Alignment.bottomCenter,
               ),
             ),
           ),

@@ -10,6 +10,7 @@ import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.d
 import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
+import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -120,14 +121,28 @@ class _MountainDetailViewState extends ConsumerState<MountainDetailView>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Fond peint (ciel + montagne + neige + nuages pulsants).
+          // 1. Ciel nocturne + étoiles (gradient bleu nuit → vert forêt).
           AnimatedBuilder(
             animation: _pulseCtrl,
             builder: (_, __) => CustomPaint(
-              painter: _MountainBackgroundPainter(
+              painter: _NightSkyPainter(
                 pulse: _pulseCtrl.value,
                 seedNumber: mountain.altitude,
               ),
+            ),
+          ),
+          // 2. Silhouette réelle de la montagne (le même SVG que l'écran
+          // Sommets). BoxFit.cover pour remplir verticalement l'écran et
+          // donner sa juste place visuelle au sommet, même quand il est bas
+          // (Red Rocks 53 m, Kediet, mesas...).
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            top: 64,
+            child: MountainSilhouetteVector(
+              mountain: mountain,
+              fit: BoxFit.cover,
             ),
           ),
           SafeArea(
@@ -254,8 +269,21 @@ class _LevelsLayer extends StatelessWidget {
   final ValueChanged<int> onLevelTap;
 
   /// Calcule la position (Offset) du centre de la boule du niveau (1-N).
+  ///
+  /// `padTop` est ajusté à l'altitude du sommet pour que le zigzag suive
+  /// approximativement la silhouette : un sommet bas (Red Rocks 53 m,
+  /// mesa) confine les bullets au tiers inférieur ; un sommet haut
+  /// (Kilimandjaro 5895 m) les étale sur toute la hauteur de l'écran.
   Offset _positionOf(int levelNumber, int totalLevels) {
-    final padTop = size.height * 0.08;
+    // Map altitude (50 → 5900 m) en fraction padTop (0.65 → 0.25).
+    // Calibré pour que le bullet du sommet atterrisse juste au-dessus de
+    // la silhouette : sommets bas (Red Rocks 53 m) ont leur top-bullet
+    // à 65 % de la hauteur (juste sur la mesa), sommets hauts
+    // (Kilimandjaro 5895 m) à 25 % (sur l'épaule du pic).
+    final altClamped = mountain.altitude.toDouble().clamp(50.0, 5900.0);
+    final altT = (altClamped - 50) / 5850;
+    final padTopFraction = 0.65 - altT * 0.40;
+    final padTop = size.height * padTopFraction;
     final padBottom = size.height * 0.12;
     final usable = size.height - padTop - padBottom;
     // Niveau 1 en bas, niveau N en haut → metaphor d'ascension.
@@ -516,20 +544,25 @@ class _Footer extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Background painter — sky gradient + stars + mountain + snow + clouds
+// Night sky painter — gradient nuit + étoiles déterministes
 // ---------------------------------------------------------------------------
 
-class _MountainBackgroundPainter extends CustomPainter {
-  _MountainBackgroundPainter({required this.pulse, required this.seedNumber});
+class _NightSkyPainter extends CustomPainter {
+  _NightSkyPainter({required this.pulse, required this.seedNumber});
 
+  /// Animation pulse 0..1 (preserved hook si on veut ré-introduire des
+  /// nuages pulsants ou un twinkle au sommet plus tard).
   final double pulse;
+
+  /// Seed déterministe pour le placement des étoiles (= altitude du sommet
+  /// → même montagne = même ciel, à chaque visite).
   final int seedNumber;
 
   @override
   void paint(Canvas canvas, Size size) {
     final rng = Random(seedNumber);
 
-    // Sky gradient.
+    // Sky gradient nuit → forêt.
     final skyRect = Offset.zero & size;
     canvas.drawRect(
       skyRect,
@@ -537,14 +570,11 @@ class _MountainBackgroundPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF0A1623), // dark night blue
-            AppColors.vertForet,
-          ],
+          colors: [Color(0xFF0A1623), AppColors.vertForet],
         ).createShader(skyRect),
     );
 
-    // Stars (~30 small white dots, deterministic).
+    // 35 étoiles dans le tiers supérieur (déterministes via seed).
     final starPaint = Paint()..color = AppColors.texteSecondaire;
     for (var i = 0; i < 35; i++) {
       final x = rng.nextDouble() * size.width;
@@ -552,73 +582,11 @@ class _MountainBackgroundPainter extends CustomPainter {
       final r = 0.8 + rng.nextDouble() * 1.4;
       canvas.drawCircle(Offset(x, y), r, starPaint);
     }
-
-    // Mountain silhouette (large triangle filling lower 80% width).
-    final centerX = size.width / 2;
-    final mtnTopY = size.height * 0.18;
-    final mtnBaseY = size.height;
-    final mtnPath = Path()
-      ..moveTo(centerX, mtnTopY)
-      ..lineTo(size.width * 1.25, mtnBaseY)
-      ..lineTo(-size.width * 0.25, mtnBaseY)
-      ..close();
-    final mtnRect = Rect.fromLTWH(0, mtnTopY, size.width, mtnBaseY - mtnTopY);
-    canvas.drawPath(
-      mtnPath,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [AppColors.boisFonce, Color(0xFF3B2A14)],
-        ).createShader(mtnRect),
-    );
-
-    // Snow cap (smaller white triangle at top).
-    final snowH = size.height * 0.08;
-    final snowPath = Path()
-      ..moveTo(centerX, mtnTopY)
-      ..lineTo(centerX + size.width * 0.16, mtnTopY + snowH)
-      ..lineTo(centerX - size.width * 0.16, mtnTopY + snowH)
-      ..close();
-    canvas.drawPath(snowPath, Paint()..color = AppColors.ivoire);
-
-    // Soft snow stripes flowing down.
-    final stripePaint = Paint()
-      ..color = AppColors.texteDisabled
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    for (var i = 0; i < 6; i++) {
-      final dx = (rng.nextDouble() - 0.5) * size.width * 0.28;
-      final p = Path()
-        ..moveTo(centerX + dx, mtnTopY + snowH)
-        ..relativeQuadraticBezierTo(
-          dx * 0.1,
-          size.height * 0.04,
-          dx * 0.4,
-          size.height * 0.07,
-        );
-      canvas.drawPath(p, stripePaint);
-    }
-
-    // Pulsing clouds at the peak.
-    final cloudY = mtnTopY - size.height * 0.02;
-    for (var i = 0; i < 4; i++) {
-      final dx = (i - 1.5) * 38;
-      final radius = (16 + i * 4) * (1 + pulse * 0.12);
-      canvas.drawCircle(
-        Offset(centerX + dx, cloudY),
-        radius,
-        Paint()
-          ..color = AppColors.ivoire.withValues(
-            alpha: 0.10 + 0.06 * (1 - pulse),
-          ),
-      );
-    }
   }
 
   @override
-  bool shouldRepaint(_MountainBackgroundPainter oldDelegate) =>
-      oldDelegate.pulse != pulse;
+  bool shouldRepaint(_NightSkyPainter old) =>
+      old.pulse != pulse || old.seedNumber != seedNumber;
 }
 
 // ---------------------------------------------------------------------------

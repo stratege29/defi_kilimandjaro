@@ -1,0 +1,38 @@
+<!-- Mafadi — Afrique du Sud, 3450m, crest. Crête du Drakensberg / uKhahlamba, falaises de basalte vertigineuses, neige hivernale, hautes prairies. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Distant ridges -->
+
+  <!-- Crête massive du Drakensberg : falaises verticales sous plateau -->
+  <!-- Base du plateau -->
+  <polygon points="0,180 5,128 25,108 50,98 80,90 115,88 145,92 170,102 185,118 200,140 200,180" fill="#3F3F46"/>
+
+  <!-- Sommet plateau (presque plat avec ondulations) -->
+  <polygon points="5,128 25,108 50,98 80,90 115,88 145,92 170,102 185,118 175,128 140,118 105,112 70,118 35,128" fill="#71717A"/>
+  <polygon points="5,128 25,108 50,98 80,90 115,88 145,92 170,102 185,118" fill="none" stroke="#52525B" stroke-width="0.5"/>
+
+  <!-- Falaises verticales (signature uKhahlamba) -->
+  <polygon points="5,128 35,128 32,170 8,170" fill="#27272A"/>
+  <polygon points="35,128 70,118 72,165 32,170" fill="#3F3F46"/>
+  <polygon points="70,118 105,112 105,168 72,165" fill="#52525B"/>
+  <polygon points="105,112 140,118 145,170 105,168" fill="#3F3F46"/>
+  <polygon points="140,118 175,128 178,170 145,170" fill="#27272A"/>
+
+  <!-- Lignes de strates (basalte coloré) -->
+  <line x1="5" y1="140" x2="180" y2="140" stroke="#1C0701" stroke-width="0.5" opacity="0.7"/>
+  <line x1="5" y1="152" x2="180" y2="152" stroke="#1C0701" stroke-width="0.4" opacity="0.6"/>
+  <line x1="5" y1="162" x2="180" y2="162" stroke="#1C0701" stroke-width="0.4" opacity="0.6"/>
+
+  <!-- NEIGE HIVERNALE sur le plateau (signature Drakensberg en hiver) -->
+  <polygon points="5,128 25,108 50,98 80,90 115,88 145,92 170,102 185,118 165,110 130,98 95,95 55,103 25,118" fill="#FAFAF9"/>
+  <polygon points="25,108 50,98 80,90 115,88 145,92 170,102 145,100 110,96 75,98 45,108" fill="#E7E5E4"/>
+
+  <!-- Pics enneigés -->
+  <polygon points="80,90 90,82 100,88 95,90" fill="#FAFAF9"/>
+  <polygon points="115,88 122,80 132,86 128,90" fill="#FAFAF9"/>
+
+  <!-- Talus rocheux + prairie -->
+  <polygon points="0,180 5,170 30,175 65,170 105,175 145,170 185,175 200,170 200,180" fill="#365314"/>
+  <polygon points="0,200 0,182 60,186 130,184 200,186 200,200" fill="#1A2E05"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#052e16"/>
+</svg>

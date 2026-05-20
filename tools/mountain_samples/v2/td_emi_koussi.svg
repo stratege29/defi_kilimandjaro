@@ -1,0 +1,40 @@
+<!-- Emi Koussi — Tchad, 3415m, cone. Plus haut sommet du Sahara, volcan-bouclier massif du Tibesti avec immense caldeira de 12 km de large. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_td" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FED7AA"/><stop offset="100%" stop-color="#EA580C"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_td)"/>
+  <circle cx="158" cy="55" r="20" fill="#DC2626" opacity="0.85"/>
+  <rect y="150" width="200" height="8" fill="#FCD34D" opacity="0.4"/>
+
+  <!-- Volcan-bouclier massif et large (profil très étalé) -->
+  <polygon points="0,180 15,160 35,135 60,115 85,108 105,105 125,108 150,118 170,140 190,170 200,180" fill="#7C2D12"/>
+
+  <!-- Caldeira sommitale (12 km — très large et plate) -->
+  <polygon points="60,115 85,108 105,105 125,108 150,118 145,122 105,118 65,120" fill="#92400E"/>
+  <polygon points="65,120 145,122 145,128 65,128" fill="#5C2410"/>
+
+  <!-- Détail dépression interne -->
+  <polygon points="75,123 135,124 130,135 80,134" fill="#451A03"/>
+
+  <!-- Face droite éclairée -->
+  <polygon points="125,108 150,118 170,140 190,170 200,180 160,180" fill="#A16207"/>
+  <polygon points="150,118 170,140 190,170 175,150" fill="#B45309"/>
+
+  <!-- Face gauche ombre -->
+  <polygon points="0,180 15,160 35,135 60,115 65,180" fill="#5C2410"/>
+  <polygon points="35,135 60,115 50,160" fill="#7C2D12"/>
+
+  <!-- Strates volcaniques visibles -->
+  <line x1="20" y1="165" x2="60" y2="140" stroke="#451A03" stroke-width="0.6"/>
+  <line x1="155" y1="135" x2="180" y2="155" stroke="#451A03" stroke-width="0.6"/>
+  <line x1="30" y1="175" x2="58" y2="155" stroke="#451A03" stroke-width="0.5"/>
+
+  <!-- Cônes secondaires distants -->
+  <polygon points="180,180 185,165 195,180" fill="#451A03" opacity="0.7"/>
+  <polygon points="5,180 12,170 22,180" fill="#451A03" opacity="0.7"/>
+
+  <!-- Sable du Sahara -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#FBBF24"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#D97706"/>
+  <path d="M 30,196 q 12,-5 24,0" stroke="#92400E" stroke-width="1" fill="none"/>
+  <path d="M 140,196 q 12,-4 24,0" stroke="#92400E" stroke-width="1" fill="none"/>
+</svg>

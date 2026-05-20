@@ -1,5 +1,5 @@
 [
-  {"id":"gm_red_rocks","name":"Red Rocks","country_code":"GM","country_name":"Gambie","flag_emoji":"🇬🇲","altitude_m":53,"total_levels":4,"shape":"mesa"},
+  {"id":"gm_red_rocks","name":"Red Rocks","country_code":"GM","country_name":"Gambie","flag_emoji":"🇬🇲","altitude_m":53,"total_levels":2,"shape":"mesa"},
   {"id":"sn_sambadougou","name":"Sambadougou","country_code":"SN","country_name":"Sénégal","flag_emoji":"🇸🇳","altitude_m":648,"total_levels":4,"shape":"dome"},
   {"id":"bj_sokbaro","name":"Mont Sokbaro","country_code":"BJ","country_name":"Bénin","flag_emoji":"🇧🇯","altitude_m":658,"total_levels":4,"shape":"dome"},
   {"id":"bf_tena_kourou","name":"Tena Kourou","country_code":"BF","country_name":"Burkina Faso","flag_emoji":"🇧🇫","altitude_m":749,"total_levels":4,"shape":"dome"},

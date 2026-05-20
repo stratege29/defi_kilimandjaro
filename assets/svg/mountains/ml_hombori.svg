@@ -1,0 +1,23 @@
+<!-- Hombori Tondo — Mali, 1153m, dent. Tour de grès à sommet plat surgissant du Sahel, falaises verticales — sommet emblématique du Mali. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="30,175 50,165 150,168 175,175" fill="#7C2D12"/>
+  <polygon points="45,175 50,90 70,75 130,72 150,88 155,175" fill="#9A3412"/>
+  <polygon points="50,90 70,75 130,72 150,88 130,92 70,93" fill="#C2410C"/>
+  <polygon points="50,90 150,88 150,95 50,95" fill="#7C2D12"/>
+  <polygon points="48,105 152,108 152,112 48,109" fill="#7C2D12"/>
+  <polygon points="48,120 153,123 153,126 48,123" fill="#451A03"/>
+  <polygon points="48,140 154,142 154,145 48,142" fill="#7C2D12"/>
+  <polygon points="48,160 154,162 154,165 48,162" fill="#451A03"/>
+  <polygon points="130,72 150,88 155,175 145,175" fill="#B45309"/>
+  <polygon points="45,175 50,90 70,75 65,175" fill="#7C2D12"/>
+  <polygon points="50,90 70,75 70,90" fill="#451A03"/>
+  <line x1="85" y1="93" x2="85" y2="170" stroke="#451A03" stroke-width="0.8"/>
+  <line x1="115" y1="93" x2="115" y2="170" stroke="#451A03" stroke-width="0.8"/>
+  <polygon points="70,75 130,72 100,68" fill="#DC2626"/>
+  <polygon points="30,175 50,165 45,175" fill="#7C2D12"/>
+  <polygon points="155,175 170,165 175,175" fill="#7C2D12"/>
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#FCD34D"/>
+  <polygon points="0,200 30,191 80,193 140,190 200,192 200,200" fill="#D97706"/>
+  <circle cx="35" cy="188" r="2" fill="#1C0701"/>
+  <circle cx="175" cy="188" r="1.8" fill="#1C0701"/>
+</svg>

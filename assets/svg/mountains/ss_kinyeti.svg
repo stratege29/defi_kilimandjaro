@@ -1,0 +1,30 @@
+<!-- Mont Kinyeti — Soudan du Sud, 3187m, crest. Plus haut sommet sud-soudanais dans les monts Imatong, crête forestière à pics multiples. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Distant ridges -->
+
+  <!-- Crête principale (Imatong) -->
+  <polygon points="0,180 10,140 25,118 45,98 60,120 80,80 100,102 118,72 138,92 160,68 180,98 195,135 200,180" fill="#1A2E05"/>
+
+  <!-- Facettes éclairées -->
+  <polygon points="25,118 45,98 60,120 50,132" fill="#3F6212"/>
+  <polygon points="60,120 80,80 100,102 82,120" fill="#4D7C0F"/>
+  <polygon points="100,102 118,72 138,92 122,108" fill="#65A30D"/>
+  <polygon points="118,72 138,92 130,85" fill="#84CC16"/>
+  <polygon points="138,92 160,68 180,98 162,110" fill="#4D7C0F"/>
+  <polygon points="160,68 180,98 172,80" fill="#65A30D"/>
+
+  <!-- Facettes sombres -->
+  <polygon points="10,140 25,118 25,160" fill="#052e16"/>
+  <polygon points="45,98 60,120 60,150" fill="#052e16"/>
+  <polygon points="80,80 100,102 100,135" fill="#052e16"/>
+  <polygon points="118,72 138,92 138,128" fill="#052e16"/>
+  <polygon points="160,68 180,98 180,135" fill="#052e16"/>
+
+  <!-- Forêt sur versants -->
+  <polygon points="0,180 25,150 45,170 65,158 80,180" fill="#052e16"/>
+  <polygon points="115,180 135,158 155,170 175,158 200,180" fill="#052e16"/>
+
+  <!-- Foreground -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#022c1a"/>
+</svg>

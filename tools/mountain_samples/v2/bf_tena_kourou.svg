@@ -1,0 +1,59 @@
+<!-- Tena Kourou — Burkina Faso, 749m, dome
+     Point culminant du Burkina près de la région de Sindou. Dôme principal entouré
+     des Pics de Sindou (aiguilles de grès érodé) — signature visuelle de la zone. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="sky_bf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FED7AA"/>
+      <stop offset="100%" stop-color="#F97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#sky_bf)"/>
+  <circle cx="155" cy="55" r="20" fill="#FB923C" opacity="0.9"/>
+
+  <!-- Sahel haze -->
+  <rect y="155" width="200" height="6" fill="#FBBF24" opacity="0.4"/>
+
+  <!-- Sindou pinnacles (background) - eroded sandstone needles -->
+  <polygon points="8,180 12,140 16,180" fill="#9A3412" opacity="0.85"/>
+  <polygon points="15,180 22,125 28,180" fill="#7C2D12" opacity="0.85"/>
+  <polygon points="27,180 33,150 37,180" fill="#9A3412" opacity="0.85"/>
+  <polygon points="165,180 170,135 176,180" fill="#7C2D12" opacity="0.85"/>
+  <polygon points="175,180 182,150 188,180" fill="#9A3412" opacity="0.85"/>
+
+  <!-- Pinnacle tops detail -->
+  <polygon points="12,140 14,143 16,140 14,138" fill="#C2410C"/>
+  <polygon points="22,125 25,128 28,125 25,123" fill="#C2410C"/>
+  <polygon points="170,135 173,138 176,135" fill="#C2410C"/>
+
+  <!-- Main dome of Tena Kourou: broad, rounded sandstone dome -->
+  <polygon points="35,180 50,150 80,120 120,108 150,118 170,148 180,180" fill="#7C2D12"/>
+  <!-- Dark left face -->
+  <polygon points="35,180 50,150 80,120 90,160 75,180" fill="#5C2410"/>
+  <!-- Mid-left facet -->
+  <polygon points="80,120 120,108 110,140 90,160" fill="#92400E"/>
+  <!-- Lit right facet -->
+  <polygon points="120,108 150,118 145,148 110,140" fill="#B45309"/>
+  <!-- Right slope -->
+  <polygon points="150,118 170,148 180,180 145,180" fill="#A16207"/>
+  <!-- Mid bottom -->
+  <polygon points="90,160 110,140 145,148 130,180 75,180" fill="#92400E"/>
+  <polygon points="110,140 145,148 130,180 90,160" fill="#854D0E"/>
+  <!-- Top -->
+  <polygon points="120,108 130,118 115,124" fill="#C2410C"/>
+  <polygon points="130,118 150,118 138,128" fill="#92400E"/>
+
+  <!-- Stratification line on lit face -->
+  <line x1="115" y1="135" x2="148" y2="140" stroke="#7C2D12" stroke-width="0.8" opacity="0.6"/>
+  <line x1="100" y1="155" x2="143" y2="160" stroke="#7C2D12" stroke-width="0.8" opacity="0.6"/>
+
+  <!-- Foreground sand -->
+  <polygon points="0,200 0,188 50,191 110,189 170,191 200,189 200,200" fill="#FBBF24"/>
+  <polygon points="0,200 30,194 80,196 140,193 200,195 200,200" fill="#D97706"/>
+
+  <!-- Small bushes -->
+  <g fill="#1C0701">
+    <circle cx="45" cy="190" r="2"/>
+    <circle cx="155" cy="190" r="1.8"/>
+  </g>
+</svg>

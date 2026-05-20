@@ -1,0 +1,18 @@
+<!-- Sunzu — Zambie, 2339m, dome. Dôme en zone de forêt Miombo, région de Mbala. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="20,180 35,135 70,100 110,85 150,98 175,130 185,180" fill="#854D0E"/>
+  <polygon points="20,180 35,135 70,100 85,135 70,180" fill="#5C2410"/>
+  <polygon points="70,100 110,85 100,128 85,135" fill="#92400E"/>
+  <polygon points="110,85 150,98 135,130 100,128" fill="#A16207"/>
+  <polygon points="150,98 175,130 185,180 145,180" fill="#B45309"/>
+  <polygon points="85,135 100,128 135,130 130,180 70,180" fill="#92400E"/>
+  <polygon points="100,128 135,130 130,180 100,160" fill="#A16207"/>
+  <polygon points="110,85 125,95 113,100" fill="#C2410C"/>
+  <polygon points="55,160 60,150 65,160" fill="#365314"/>
+  <polygon points="140,160 145,150 150,160" fill="#365314"/>
+  <polygon points="0,200 0,182 60,186 130,184 200,186 200,200" fill="#1A2E05"/>
+  <line x1="30" y1="195" x2="30" y2="184" stroke="#451A03" stroke-width="1.2"/>
+  <ellipse cx="30" cy="182" rx="7" ry="2" fill="#1A2E05"/>
+  <line x1="170" y1="195" x2="170" y2="184" stroke="#451A03" stroke-width="1.2"/>
+  <ellipse cx="170" cy="182" rx="6" ry="2" fill="#1A2E05"/>
+</svg>

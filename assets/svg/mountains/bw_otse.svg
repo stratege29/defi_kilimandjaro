@@ -1,0 +1,20 @@
+<!-- Otse Mountain — Botswana, 1489m, mesa. Mesa de grès au sommet plat près de Gaborone, savane sèche, baobabs. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="20,175 30,120 75,115 165,118 180,125 185,175" fill="#92400E"/>
+  <polygon points="30,120 75,115 165,118 180,125 165,128 75,125 30,127" fill="#B45309"/>
+  <polygon points="30,120 180,125 178,135 30,132" fill="#7C2D12"/>
+  <polygon points="25,142 184,144 184,147 25,145" fill="#7C2D12"/>
+  <polygon points="22,155 184,158 184,161 22,158" fill="#451A03"/>
+  <polygon points="22,165 184,168 184,170 22,167" fill="#7C2D12"/>
+  <polygon points="165,118 180,125 185,175 175,175" fill="#A16207"/>
+  <polygon points="20,175 30,120 35,175" fill="#451A03"/>
+  <polygon points="20,175 30,170 185,170 195,180 5,180" fill="#7C2D12"/>
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#CA8A04"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#A16207"/>
+  <line x1="35" y1="195" x2="35" y2="180" stroke="#451A03" stroke-width="3"/>
+  <ellipse cx="35" cy="177" rx="6" ry="3" fill="#451A03"/>
+  <ellipse cx="32" cy="175" rx="3" ry="1.5" fill="#1C0701"/>
+  <ellipse cx="38" cy="175" rx="3" ry="1.5" fill="#1C0701"/>
+  <line x1="170" y1="195" x2="170" y2="183" stroke="#451A03" stroke-width="1.2"/>
+  <ellipse cx="170" cy="181" rx="7" ry="2" fill="#1C0701"/>
+</svg>

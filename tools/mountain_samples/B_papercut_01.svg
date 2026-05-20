@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Sky -->
+  <rect width="200" height="200" fill="#FDE68A"/>
+
+  <!-- Sun -->
+  <circle cx="150" cy="65" r="26" fill="#FB923C"/>
+
+  <!-- Far hill -->
+  <path d="M 0,165 Q 50,135 100,150 T 200,140 L 200,200 L 0,200 Z" fill="#D97706"/>
+
+  <!-- Mid hill -->
+  <path d="M 0,200 L 0,175 Q 60,145 130,170 T 200,160 L 200,200 Z" fill="#B45309"/>
+
+  <!-- Main hill (rounded peak) -->
+  <path d="M 20,200 Q 110,75 195,200 Z" fill="#92400E"/>
+
+  <!-- Front hill -->
+  <path d="M 0,200 L 0,190 Q 70,170 140,185 T 200,180 L 200,200 Z" fill="#451A03"/>
+</svg>

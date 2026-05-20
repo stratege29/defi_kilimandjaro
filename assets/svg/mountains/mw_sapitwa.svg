@@ -1,0 +1,45 @@
+<!-- Sapitwa (Mulanje) — Malawi, 3002m, crest. Massif granitique du Mulanje, "île dans le ciel", falaises abruptes, théiers à la base. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Brume basse (signature "île dans le ciel") -->
+  <ellipse cx="100" cy="148" rx="100" ry="6" fill="#FAFAF9" opacity="0.7"/>
+
+  <!-- Plaine de théiers en arrière-plan -->
+
+  <!-- Massif granitique du Mulanje: multi-pics dentés, falaises -->
+  <polygon points="0,180 8,135 25,108 45,90 60,115 80,72 100,98 120,68 138,88 158,75 175,92 192,128 200,180" fill="#52525B"/>
+
+  <!-- Facettes éclairées (granite gris-clair) -->
+  <polygon points="25,108 45,90 60,115 48,128" fill="#A1A1AA"/>
+  <polygon points="60,115 80,72 100,98 82,118" fill="#71717A"/>
+  <polygon points="80,72 100,98 92,80" fill="#D6D3D1"/>
+  <polygon points="100,98 120,68 138,88 122,108" fill="#A1A1AA"/>
+  <polygon points="120,68 138,88 130,80" fill="#D6D3D1"/>
+  <polygon points="138,88 158,75 175,92 160,108" fill="#71717A"/>
+  <polygon points="158,75 175,92 168,84" fill="#A1A1AA"/>
+
+  <!-- Facettes sombres -->
+  <polygon points="8,135 25,108 25,160" fill="#27272A"/>
+  <polygon points="45,90 60,115 60,148" fill="#3F3F46"/>
+  <polygon points="80,72 100,98 100,138" fill="#3F3F46"/>
+  <polygon points="120,68 138,88 138,130" fill="#3F3F46"/>
+  <polygon points="158,75 175,92 175,135" fill="#3F3F46"/>
+
+  <!-- Fissures verticales (granite) -->
+  <line x1="60" y1="116" x2="60" y2="160" stroke="#27272A" stroke-width="0.6"/>
+  <line x1="100" y1="100" x2="100" y2="160" stroke="#27272A" stroke-width="0.6"/>
+  <line x1="138" y1="90" x2="138" y2="160" stroke="#27272A" stroke-width="0.6"/>
+
+  <!-- Plaine de théiers (foreground) -->
+  <polygon points="0,200 0,182 60,186 130,184 200,186 200,200" fill="#3F6212"/>
+  <polygon points="0,200 30,194 80,196 140,193 200,195 200,200" fill="#1A2E05"/>
+  <!-- Tea bushes pattern -->
+  <g fill="#1A2E05">
+    <circle cx="30" cy="192" r="2"/>
+    <circle cx="55" cy="194" r="2"/>
+    <circle cx="80" cy="192" r="2"/>
+    <circle cx="120" cy="194" r="2"/>
+    <circle cx="150" cy="192" r="2"/>
+    <circle cx="175" cy="194" r="2"/>
+  </g>
+</svg>

@@ -8,7 +8,7 @@ import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/altimeter_rail.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/atmosphere_layer.dart';
-import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_painter.dart';
+import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -162,10 +162,11 @@ class _MountainListViewState extends ConsumerState<MountainListView>
           return Stack(
             fit: StackFit.expand,
             children: [
-              // 1. Atmosphère animée (fond dégradé).
+              // 1. Atmosphère animée (dégradé biome plein écran).
               Positioned.fill(child: AtmosphereLayer(biome: biome)),
 
-              // 2. Silhouettes BG parallax.
+              // 2. Nuages parallax animés — 3 couches stratifiées qui
+              // dérivent horizontalement + déplacement vertical sur scroll.
               Positioned.fill(
                 child: ParallaxBgLayer(
                   scrollFraction:
@@ -174,13 +175,11 @@ class _MountainListViewState extends ConsumerState<MountainListView>
                 ),
               ),
 
-              // 2.5. Scrim contextuel : dégradé sombre top + bottom pour
-              // garantir le contraste du HUD (nom, altitude, étoiles, CTA)
-              // sur les biomes clairs (savanne, altitude). Le milieu de
-              // l'écran reste pure atmosphère.
+              // 3. Scrim contextuel : dégradé sombre haut + bas pour
+              // garantir la lisibilité du HUD sur les ciels clairs.
               const Positioned.fill(child: _HudScrim()),
 
-              // 3. PageView principal — 1 montagne = 1 viewport.
+              // 4. PageView principal — 1 montagne = 1 viewport.
               PageView.builder(
                 controller: _pageController,
                 scrollDirection: Axis.vertical,
@@ -288,40 +287,28 @@ class _MountainPage extends StatelessWidget {
       mountain.completedLevels >= mountain.totalLevels &&
       mountain.totalLevels > 0;
 
-  Color _silhouetteColor() {
-    final biome = biomeForAltitude(mountain.altitude);
-    if (!mountain.unlocked) return AppColors.silhouetteVerrouillee;
-    return silhouetteColorForBiome(biome);
-  }
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final silhouetteH = size.height * 0.52;
 
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Silhouette FG — occupant la moitié inférieure de l'écran.
+        // Silhouette FG — stripped SVG (transparent au-dessus de la
+        // montagne) qui laisse passer AtmosphereLayer + nuages parallax.
+        // Ancrée au bas de l'écran avec un haut réservé au HUD.
         Positioned(
-          left: 20,
-          right: 60, // Laisse de la place pour l'altimètre.
-          bottom: 96, // Au-dessus de la bottom nav.
-          height: silhouetteH,
+          left: 0,
+          right: 0,
+          bottom: 96,
+          top: size.height * 0.18,
           child: AnimatedBuilder(
             animation: pulseAnim,
             builder: (context, _) {
-              return CustomPaint(
-                painter: MountainSilhouettePainter(
-                  shape: mountain.shape,
-                  seed: mountain.altitude,
-                  locked: !mountain.unlocked,
-                  completed: _isCompleted,
-                  primaryColor: _silhouetteColor(),
-                  snowColor: AppColors.neigeBlanche,
-                  hasPulse: isCurrentTarget && !_isCompleted,
-                  pulseValue: pulseAnim.value,
-                ),
+              return MountainSilhouetteVector(
+                mountain: mountain,
+                hasPulse: isCurrentTarget && !_isCompleted,
+                pulseValue: pulseAnim.value,
               );
             },
           ),
