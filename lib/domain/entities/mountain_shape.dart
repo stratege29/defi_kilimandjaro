@@ -1,8 +1,9 @@
 /// Archétype visuel d'un sommet africain.
 ///
-/// Utilisé par le `MountainSilhouettePainter` pour générer la forme correcte
-/// de chaque montagne. Chaque valeur correspond à un profil géomorphologique
-/// reconnaissable, de loin, par l'œil d'un enfant.
+/// Catégorie géomorphologique parsée depuis `mountains.json`. La silhouette
+/// finale est rendue depuis `assets/svg/mountains/{id}.svg.vec` (dessin
+/// spécifique à chaque sommet), mais cette enum reste disponible pour le
+/// filtrage, le tri ou un éventuel fallback.
 enum MountainShape {
   /// Volcan classique — cône symétrique avec sommet ponctuel.
   /// Ex: Mont Cameroun, Mont Kenya, Karthala, Pico do Fogo.

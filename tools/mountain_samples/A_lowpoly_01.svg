@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="skyA01" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FEF3C7"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#skyA01)"/>
+  <circle cx="158" cy="58" r="22" fill="#F97316" opacity="0.85"/>
+
+  <!-- Back hill -->
+  <polygon points="0,170 50,140 110,165 110,200 0,200" fill="#A16207"/>
+  <polygon points="50,140 80,152 110,165" fill="#854D0E"/>
+
+  <!-- Main hill (peak at 110,90) -->
+  <polygon points="35,200 110,90 110,200" fill="#78350F"/>
+  <polygon points="110,90 200,200 110,200" fill="#A16207"/>
+  <polygon points="110,90 75,150 35,200" fill="#92400E"/>
+  <polygon points="110,90 150,150 200,200" fill="#B45309"/>
+  <polygon points="110,90 95,130 130,130" fill="#854D0E"/>
+
+  <!-- Foreground tuft -->
+  <polygon points="0,200 0,185 30,195 60,200" fill="#451A03"/>
+</svg>

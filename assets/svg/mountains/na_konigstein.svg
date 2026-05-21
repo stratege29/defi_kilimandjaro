@@ -1,0 +1,38 @@
+<!-- Königstein — Namibie, 2606m, plateau. Plus haut sommet du massif du Brandberg, intrusion granitique orange-rouge dans le désert du Namib. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Plateau distant -->
+
+  <!-- Massif du Brandberg : plateau granitique massif avec sommets arrondis -->
+  <polygon points="10,180 20,135 40,115 70,98 105,90 135,95 165,108 180,128 195,180" fill="#9A3412"/>
+
+  <!-- Sommets arrondis multiples (typique du Brandberg) -->
+  <polygon points="40,115 60,105 70,98 65,110" fill="#C2410C"/>
+  <polygon points="70,98 90,92 105,90 100,105" fill="#DC2626"/>
+  <polygon points="105,90 120,90 135,95 130,108" fill="#C2410C"/>
+  <polygon points="135,95 150,100 165,108 158,118" fill="#B45309"/>
+
+  <!-- Face droite (lit fortement par soleil orange-rouge) -->
+  <polygon points="135,95 165,108 180,128 195,180 165,180" fill="#DC2626"/>
+  <polygon points="165,108 180,128 195,180 175,150" fill="#EF4444"/>
+
+  <!-- Face gauche (ombre) -->
+  <polygon points="10,180 20,135 40,115 50,180" fill="#7F1D1D"/>
+  <polygon points="20,135 40,115 35,160" fill="#7C2D12"/>
+
+  <!-- Fissures verticales (granitique) -->
+  <line x1="80" y1="98" x2="80" y2="170" stroke="#7F1D1D" stroke-width="0.6"/>
+  <line x1="115" y1="92" x2="115" y2="170" stroke="#7F1D1D" stroke-width="0.6"/>
+  <line x1="145" y1="100" x2="145" y2="170" stroke="#7F1D1D" stroke-width="0.6"/>
+
+  <!-- Détail sommet -->
+  <polygon points="105,90 120,90 113,95" fill="#FCA5A5"/>
+
+  <!-- Désert du Namib (sable + rochers) -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#F97316"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#C2410C"/>
+  <circle cx="40" cy="195" r="2" fill="#451A03"/>
+  <circle cx="60" cy="196" r="1.5" fill="#451A03"/>
+  <circle cx="155" cy="195" r="2" fill="#451A03"/>
+  <circle cx="175" cy="196" r="1.5" fill="#451A03"/>
+</svg>

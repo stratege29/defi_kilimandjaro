@@ -1,0 +1,45 @@
+<!-- Mont Tahat — Algérie, 3003m, crest. Massif du Hoggar, pitons basaltiques noirs (volcanic plugs), contraste avec le désert doré. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_dz" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FED7AA"/><stop offset="100%" stop-color="#EA580C"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_dz)"/>
+  <circle cx="160" cy="55" r="20" fill="#DC2626" opacity="0.85"/>
+  <rect y="150" width="200" height="8" fill="#FCD34D" opacity="0.4"/>
+
+  <!-- Pitons basaltiques distants -->
+  <polygon points="0,170 8,148 14,170" fill="#0C0A09" opacity="0.7"/>
+  <polygon points="186,170 192,148 198,170" fill="#0C0A09" opacity="0.7"/>
+
+  <!-- Pitons volcaniques du Hoggar : aiguilles basaltiques très verticales -->
+  <!-- Piton principal central -->
+  <polygon points="90,180 95,60 105,55 110,180" fill="#1C1917"/>
+  <polygon points="95,60 105,55 105,180 100,180" fill="#292524"/>
+  <polygon points="95,60 95,180 90,180" fill="#0C0A09"/>
+
+  <!-- Piton gauche -->
+  <polygon points="50,180 55,85 65,80 70,180" fill="#1C1917"/>
+  <polygon points="55,85 65,80 65,180 60,180" fill="#292524"/>
+  <polygon points="55,85 55,180 50,180" fill="#0C0A09"/>
+
+  <!-- Piton droit (un peu plus bas) -->
+  <polygon points="130,180 135,95 145,90 150,180" fill="#1C1917"/>
+  <polygon points="135,95 145,90 145,180 140,180" fill="#292524"/>
+  <polygon points="135,95 135,180 130,180" fill="#0C0A09"/>
+
+  <!-- Petit piton secondaire -->
+  <polygon points="160,180 163,115 169,112 172,180" fill="#1C1917"/>
+  <polygon points="163,115 169,112 169,180 166,180" fill="#292524"/>
+
+  <!-- Base rocheuse -->
+  <polygon points="30,180 40,165 60,170 90,165 115,170 140,165 175,170 195,165" fill="#44403C"/>
+  <polygon points="30,180 50,170 80,175 110,170 140,175 175,170 195,175 195,180" fill="#1C1917"/>
+
+  <!-- Détails de relief -->
+  <line x1="95" y1="90" x2="97" y2="85" stroke="#44403C" stroke-width="1"/>
+  <line x1="55" y1="100" x2="58" y2="95" stroke="#44403C" stroke-width="1"/>
+
+  <!-- Désert doré du Sahara -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#FBBF24"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#D97706"/>
+  <path d="M 30,196 q 12,-5 24,0" stroke="#92400E" stroke-width="1" fill="none"/>
+  <path d="M 140,196 q 12,-4 24,0" stroke="#92400E" stroke-width="1" fill="none"/>
+</svg>

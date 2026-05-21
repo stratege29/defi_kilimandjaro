@@ -1,0 +1,21 @@
+<!-- Morne Seychellois — Seychelles, 905m, dome. Pics granitiques émergeant de la forêt tropicale, océan Indien. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <ellipse cx="50" cy="35" rx="20" ry="3.5" fill="#FAFAF9" opacity="0.75"/>
+  <ellipse cx="125" cy="30" rx="15" ry="3" fill="#FAFAF9" opacity="0.7"/>
+  <rect y="148" width="200" height="20" fill="#0EA5E9"/>
+  <polygon points="0,148 200,148 200,151 0,151" fill="#38BDF8"/>
+  <polygon points="30,168 50,130 85,90 125,80 155,100 175,140 185,168" fill="#3F3F46"/>
+  <polygon points="30,168 50,130 85,90 90,140 75,168" fill="#27272A"/>
+  <polygon points="85,90 125,80 115,120 90,140" fill="#52525B"/>
+  <polygon points="125,80 155,100 145,140 115,120" fill="#71717A"/>
+  <polygon points="155,100 175,140 185,168 150,168" fill="#52525B"/>
+  <polygon points="90,140 115,120 145,140 130,168 75,168" fill="#3F3F46"/>
+  <polygon points="115,120 145,140 130,168 90,140" fill="#52525B"/>
+  <polygon points="125,80 140,95 125,100" fill="#A1A1AA"/>
+  <polygon points="30,168 35,160 45,166 55,158 65,168" fill="#166534"/>
+  <polygon points="120,168 130,160 140,166 155,158 170,168" fill="#15803D"/>
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#14532D"/>
+  <polygon points="0,200 0,193 60,196 130,194 200,195 200,200" fill="#FDE68A"/>
+  <line x1="20" y1="195" x2="20" y2="180" stroke="#052e16" stroke-width="1.5"/>
+  <path d="M 20,180 q -6,-2 -8,2 M 20,180 q 6,-2 8,2 M 20,180 q -3,-4 -1,-7 M 20,180 q 3,-4 1,-7" fill="none" stroke="#052e16" stroke-width="1.2"/>
+</svg>

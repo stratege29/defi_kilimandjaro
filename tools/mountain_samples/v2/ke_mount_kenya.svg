@@ -1,0 +1,46 @@
+<!-- Mont Kenya — Kenya, 5199m, cone. Stratovolcan éteint avec pics rocheux acérés (Batian + Nelion), glaciers permanents, moorland alpin + forêt à la base. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_ke" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#BAE6FD"/><stop offset="55%" stop-color="#FED7AA"/><stop offset="100%" stop-color="#FBBF24"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_ke)"/>
+  <circle cx="160" cy="50" r="15" fill="#FB923C" opacity="0.75"/>
+
+  <!-- Brume basse -->
+  <ellipse cx="100" cy="138" rx="100" ry="6" fill="#FAFAF9" opacity="0.55"/>
+
+  <!-- Crêtes distantes -->
+  <polygon points="0,150 30,140 60,148 90,140 130,148 160,140 200,148 200,160 0,160" fill="#365314" opacity="0.55"/>
+
+  <!-- Profil volcan érodé (large) -->
+  <polygon points="20,180 50,130 80,95 100,65 115,55 125,55 140,75 165,110 185,150 195,180" fill="#3F3F46"/>
+
+  <!-- PICS ROCHEUX DENTÉS sommitaux (Batian + Nelion + Lenana) -->
+  <polygon points="100,65 108,40 115,55" fill="#27272A"/>
+  <polygon points="115,55 120,42 125,55" fill="#3F3F46"/>
+  <polygon points="108,40 115,55 112,55" fill="#1C1917"/>
+
+  <!-- Glaciers entre les pics (Lewis, Tyndall) -->
+  <polygon points="100,65 108,40 115,55 110,68 102,68" fill="#FAFAF9"/>
+  <polygon points="115,55 120,42 125,55 122,68 117,68" fill="#FAFAF9"/>
+  <polygon points="108,40 115,55 112,50" fill="#E7E5E4"/>
+
+  <!-- Plaques de neige sur versants -->
+  <polygon points="102,68 105,90 95,80" fill="#FAFAF9" opacity="0.85"/>
+  <polygon points="117,68 122,90 115,82" fill="#FAFAF9" opacity="0.85"/>
+  <polygon points="125,55 130,90 125,75" fill="#FAFAF9" opacity="0.7"/>
+
+  <!-- Face éclairée -->
+  <polygon points="125,55 140,75 165,110 185,150 195,180 145,180" fill="#52525B"/>
+  <polygon points="140,75 165,110 150,118" fill="#71717A"/>
+
+  <!-- Face sombre -->
+  <polygon points="20,180 50,130 80,95 100,65 100,180 70,180" fill="#27272A"/>
+  <polygon points="50,130 80,95 65,150" fill="#3F3F46"/>
+
+  <!-- Moorland / heath alpin -->
+  <polygon points="25,180 50,160 75,175 50,180" fill="#365314"/>
+  <polygon points="145,180 170,160 195,175 170,180" fill="#365314"/>
+
+  <!-- Forêt base -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#1A2E05"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#052e16"/>
+</svg>

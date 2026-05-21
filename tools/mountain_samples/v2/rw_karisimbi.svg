@@ -1,0 +1,48 @@
+<!-- Karisimbi — Rwanda, 4507m, cone. Plus haut volcan des Virunga, "coquille blanche" (kari = blanc en kinyarwanda), habitat des gorilles, brumes équatoriales. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_rw" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E0F2FE"/><stop offset="55%" stop-color="#FEF3C7"/><stop offset="100%" stop-color="#FBBF24"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_rw)"/>
+  <circle cx="160" cy="50" r="15" fill="#FB923C" opacity="0.75"/>
+
+  <!-- Brumes Virunga -->
+  <ellipse cx="60" cy="95" rx="35" ry="6" fill="#FAFAF9" opacity="0.6"/>
+  <ellipse cx="160" cy="105" rx="35" ry="5" fill="#FAFAF9" opacity="0.55"/>
+
+  <!-- Autres pics Virunga -->
+  <polygon points="0,150 25,130 50,148" fill="#1A2E05" opacity="0.6"/>
+  <polygon points="170,150 185,128 200,148 200,160 170,160" fill="#1A2E05" opacity="0.6"/>
+
+  <!-- Cône principal -->
+  <polygon points="25,180 70,120 100,75 110,60 120,75 150,120 195,180" fill="#1C1917"/>
+
+  <!-- Calotte sommitale ("coquille blanche") -->
+  <polygon points="100,75 110,60 120,75 115,85 105,85" fill="#FAFAF9"/>
+  <polygon points="105,85 115,85 110,92" fill="#E7E5E4"/>
+  <polygon points="110,60 120,75 115,68" fill="#E7E5E4"/>
+
+  <!-- Coulées neigeuses -->
+  <polygon points="105,85 108,100 100,95" fill="#FAFAF9" opacity="0.8"/>
+  <polygon points="115,85 118,98 112,93" fill="#FAFAF9" opacity="0.7"/>
+
+  <!-- Face éclairée -->
+  <polygon points="120,75 150,120 195,180 130,180" fill="#292524"/>
+  <polygon points="150,120 195,180 170,145" fill="#44403C"/>
+
+  <!-- Face sombre -->
+  <polygon points="25,180 70,120 100,75 100,180 70,180" fill="#0C0A09"/>
+  <polygon points="70,120 100,75 85,145" fill="#1C1917"/>
+
+  <!-- Bambous (étage subalpin Virunga) -->
+  <polygon points="25,180 50,150 75,170 50,180" fill="#1A2E05"/>
+  <polygon points="145,180 175,150 195,170 175,180" fill="#1A2E05"/>
+
+  <!-- Forêt à gorilles -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#052e16"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#022c1a"/>
+
+  <!-- Texture canopée -->
+  <circle cx="20" cy="192" r="2" fill="#022c1a"/>
+  <circle cx="45" cy="194" r="1.5" fill="#022c1a"/>
+  <circle cx="170" cy="192" r="2" fill="#022c1a"/>
+  <circle cx="185" cy="194" r="1.5" fill="#022c1a"/>
+</svg>

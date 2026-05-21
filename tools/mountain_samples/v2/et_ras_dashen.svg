@@ -1,0 +1,45 @@
+<!-- Ras Dashen — Éthiopie, 4550m, crest. Plus haut sommet éthiopien, massif du Simien, escarpement dramatique, neige hivernale sur les pics, lande afro-alpine. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_et" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#BAE6FD"/><stop offset="55%" stop-color="#FED7AA"/><stop offset="100%" stop-color="#FB923C"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_et)"/>
+  <circle cx="160" cy="55" r="16" fill="#FB923C" opacity="0.8"/>
+
+  <!-- Escarpement Simien distant -->
+  <polygon points="0,155 30,145 60,152 90,142 130,152 160,142 200,152 200,180 0,180" fill="#52525B" opacity="0.6"/>
+
+  <!-- Crête principale dentelée -->
+  <polygon points="0,180 8,135 25,108 45,82 60,108 80,65 100,90 120,55 135,75 150,60 175,90 195,130 200,180" fill="#52525B"/>
+
+  <!-- Facettes éclairées -->
+  <polygon points="25,108 45,82 60,108 50,115" fill="#A1A1AA"/>
+  <polygon points="60,108 80,65 100,90 82,108" fill="#71717A"/>
+  <polygon points="80,65 100,90 92,75" fill="#A1A1AA"/>
+  <polygon points="100,90 120,55 135,75 122,95" fill="#71717A"/>
+  <polygon points="120,55 135,75 130,68" fill="#A1A1AA"/>
+  <polygon points="135,75 150,60 175,90 158,100" fill="#71717A"/>
+
+  <!-- Neige sur les plus hauts pics -->
+  <polygon points="120,55 125,62 115,62" fill="#FAFAF9"/>
+  <polygon points="150,60 155,67 145,67" fill="#FAFAF9"/>
+  <polygon points="80,65 85,72 75,72" fill="#FAFAF9"/>
+
+  <!-- Coulées neigeuses -->
+  <polygon points="120,55 122,75 117,70" fill="#FAFAF9" opacity="0.8"/>
+  <polygon points="150,60 152,80 147,73" fill="#FAFAF9" opacity="0.8"/>
+  <polygon points="80,65 82,82 77,75" fill="#FAFAF9" opacity="0.7"/>
+
+  <!-- Facettes sombres -->
+  <polygon points="8,135 25,108 25,160" fill="#27272A"/>
+  <polygon points="45,82 60,108 60,140" fill="#27272A"/>
+  <polygon points="80,65 100,90 100,130" fill="#27272A"/>
+  <polygon points="120,55 135,75 135,120" fill="#27272A"/>
+  <polygon points="150,60 175,90 175,130" fill="#27272A"/>
+
+  <!-- Falaises d'escarpement Simien -->
+  <polygon points="0,180 10,165 30,170 50,168 75,170 100,167 130,170 160,167 185,170 200,180" fill="#3F3F46"/>
+  <line x1="0" y1="172" x2="200" y2="172" stroke="#27272A" stroke-width="0.5"/>
+
+  <!-- Lande afro-alpine -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#365314"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#1A2E05"/>
+</svg>

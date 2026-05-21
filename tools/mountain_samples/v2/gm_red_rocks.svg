@@ -1,0 +1,43 @@
+<!-- Red Rocks — Gambie, 53m, mesa
+     Coastal sedimentary cliffs (Tanji area), red layered rock above the sea. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="sky_gm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FEF3C7"/>
+      <stop offset="100%" stop-color="#FCD34D"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#sky_gm)"/>
+  <circle cx="160" cy="50" r="20" fill="#FB923C" opacity="0.85"/>
+
+  <!-- Distant water haze -->
+  <rect y="155" width="200" height="6" fill="#FBBF24" opacity="0.5"/>
+
+  <!-- Mesa main body -->
+  <polygon points="20,170 30,140 80,135 165,138 180,170" fill="#9A3412"/>
+
+  <!-- Top stratum (sun-lit) -->
+  <polygon points="30,140 80,135 165,138 180,170 165,143 80,140 30,145" fill="#DC2626"/>
+  <polygon points="30,140 80,135 165,138 180,170" fill="none"/>
+  <polygon points="32,140 80,136 165,139 178,168 168,140 80,138 38,142" fill="#B91C1C"/>
+
+  <!-- Stratification layers -->
+  <polygon points="22,158 178,162 178,165 22,162" fill="#7C2D12"/>
+  <polygon points="24,148 176,150 176,152 24,150" fill="#C2410C"/>
+  <polygon points="26,153 175,155 175,157 26,155" fill="#7C2D12"/>
+
+  <!-- Right cliff face (light) -->
+  <polygon points="165,138 180,170 180,140" fill="#DC2626"/>
+
+  <!-- Left cliff face (shadow) -->
+  <polygon points="20,170 30,140 30,170" fill="#7C2D12"/>
+
+  <!-- Sea -->
+  <rect y="170" width="200" height="20" fill="#0284C7"/>
+  <polygon points="0,170 200,170 200,173 0,173" fill="#0EA5E9"/>
+  <polygon points="0,175 40,174 100,176 160,174 200,175 200,178 0,178" fill="#38BDF8"/>
+
+  <!-- Beach foreground -->
+  <polygon points="0,200 0,188 50,191 110,189 170,191 200,189 200,200" fill="#FDE68A"/>
+  <polygon points="0,200 25,195 70,196 130,194 180,196 200,194 200,200" fill="#FBBF24"/>
+</svg>

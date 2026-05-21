@@ -1,0 +1,32 @@
+<!-- Mont Nyangani — Zimbabwe, 2592m, dome. Sommet sacré des Eastern Highlands, granite, brumes fréquentes. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Brumes (signature Nyangani) -->
+  <ellipse cx="60" cy="125" rx="40" ry="5" fill="#FAFAF9" opacity="0.55"/>
+  <ellipse cx="150" cy="135" rx="35" ry="4" fill="#FAFAF9" opacity="0.45"/>
+
+  <!-- Distant Eastern Highlands -->
+
+  <!-- Pins de forêt (Pinus patula caractéristique) -->
+  <polygon points="15,170 17,160 19,170" fill="#1A2E05"/>
+  <polygon points="22,172 24,162 26,172" fill="#1A2E05"/>
+  <polygon points="178,170 180,160 182,170" fill="#1A2E05"/>
+  <polygon points="185,172 187,162 189,172" fill="#1A2E05"/>
+
+  <!-- Dôme granitique -->
+  <polygon points="20,180 35,130 70,98 110,82 150,95 175,125 185,180" fill="#52525B"/>
+  <polygon points="20,180 35,130 70,98 85,130 70,180" fill="#27272A"/>
+  <polygon points="70,98 110,82 100,125 85,130" fill="#71717A"/>
+  <polygon points="110,82 150,95 140,128 100,125" fill="#A1A1AA"/>
+  <polygon points="150,95 175,125 185,180 150,180" fill="#71717A"/>
+  <polygon points="85,130 100,125 140,128 135,180 70,180" fill="#52525B"/>
+  <polygon points="100,125 140,128 135,180 105,160" fill="#71717A"/>
+  <polygon points="110,82 125,90 115,98" fill="#D6D3D1"/>
+
+  <!-- Prairies sur les versants -->
+  <polygon points="50,170 65,158 75,170" fill="#65A30D"/>
+  <polygon points="140,170 155,158 170,170" fill="#65A30D"/>
+
+  <!-- Foreground -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#1A2E05"/>
+</svg>

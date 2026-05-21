@@ -1,0 +1,42 @@
+<!-- Thabana Ntlenyana — Lesotho, 3482m, plateau. Plus haut sommet d'Afrique australe, hauts plateaux du Lesotho, neige hivernale, paysage minéral. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Distant chaînes -->
+
+  <!-- Plateau principal (sommet large et ondulé) -->
+  <polygon points="0,180 5,128 20,118 50,108 80,102 105,100 130,103 160,112 180,125 195,148 200,180" fill="#71717A"/>
+
+  <!-- Sommets bombés multiples (typique du roof of southern Africa) -->
+  <polygon points="20,118 35,108 50,108 45,118" fill="#A1A1AA"/>
+  <polygon points="50,108 80,102 75,118 55,118" fill="#A1A1AA"/>
+  <polygon points="80,102 105,100 130,103 120,118 95,118" fill="#A1A1AA"/>
+  <polygon points="130,103 160,112 150,122 130,118" fill="#A1A1AA"/>
+  <polygon points="160,112 180,125 175,135 160,122" fill="#71717A"/>
+
+  <!-- NEIGE PERMANENTE par taches sur le plateau -->
+  <polygon points="20,118 35,108 50,108 45,118 35,116" fill="#FAFAF9"/>
+  <polygon points="50,108 80,102 75,118 60,115 55,113" fill="#FAFAF9"/>
+  <polygon points="80,102 105,100 130,103 120,115 100,113 85,112" fill="#FAFAF9"/>
+  <polygon points="130,103 160,112 150,118 135,110" fill="#FAFAF9"/>
+
+  <!-- Surface du plateau (texture rocheuse mêlée à neige résiduelle) -->
+  <polygon points="5,128 20,118 45,118 75,118 105,118 135,118 165,122 185,128 175,135 145,128 105,128 65,128 30,130" fill="#A1A1AA"/>
+  <polygon points="5,128 30,130 65,128 105,128 145,128 175,135 185,128" fill="none" stroke="#52525B" stroke-width="0.4"/>
+
+  <!-- Traînées de neige résiduelle dans les ravines -->
+
+  <!-- Flancs vers la vallée -->
+  <polygon points="0,180 5,128 5,140 0,180" fill="#52525B"/>
+  <polygon points="200,180 195,148 200,160 200,180" fill="#52525B"/>
+
+  <!-- Strates basaltiques verticales -->
+  <line x1="30" y1="135" x2="32" y2="170" stroke="#52525B" stroke-width="0.4"/>
+  <line x1="70" y1="135" x2="72" y2="170" stroke="#52525B" stroke-width="0.4"/>
+  <line x1="110" y1="135" x2="112" y2="170" stroke="#52525B" stroke-width="0.4"/>
+  <line x1="150" y1="138" x2="152" y2="170" stroke="#52525B" stroke-width="0.4"/>
+
+  <!-- Pâturage afro-alpin -->
+  <polygon points="0,180 5,170 30,175 65,170 105,175 145,170 185,175 200,170 200,180" fill="#65A30D"/>
+  <polygon points="0,200 0,182 60,186 130,184 200,186 200,200" fill="#3F6212"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#1A2E05"/>
+</svg>

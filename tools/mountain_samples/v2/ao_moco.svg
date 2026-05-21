@@ -1,0 +1,31 @@
+<!-- Mont Moco — Angola, 2620m, dome. Plus haut sommet d'Angola dans le plateau du Bié, prairies + miombo. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_ao" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FEF3C7"/><stop offset="100%" stop-color="#FBBF24"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_ao)"/>
+  <circle cx="158" cy="55" r="18" fill="#FB923C" opacity="0.85"/>
+  <rect y="140" width="200" height="5" fill="#FEF3C7" opacity="0.45"/>
+  <polygon points="0,162 30,150 65,158 105,150 145,158 180,150 200,160 200,180 0,180" fill="#365314" opacity="0.65"/>
+
+  <!-- Dôme principal -->
+  <polygon points="15,180 30,130 60,98 100,82 145,95 175,128 188,180" fill="#854D0E"/>
+  <polygon points="15,180 30,130 60,98 80,130 65,180" fill="#5C2410"/>
+  <polygon points="60,98 100,82 95,128 80,130" fill="#92400E"/>
+  <polygon points="100,82 145,95 135,128 95,128" fill="#A16207"/>
+  <polygon points="145,95 175,128 188,180 145,180" fill="#B45309"/>
+  <polygon points="80,130 95,128 135,128 130,180 65,180" fill="#92400E"/>
+  <polygon points="95,128 135,128 130,180 105,158" fill="#A16207"/>
+  <polygon points="100,82 115,90 105,98" fill="#CA8A04"/>
+
+  <!-- Prairies + miombo -->
+  <polygon points="50,168 60,158 70,168" fill="#65A30D"/>
+  <polygon points="140,168 150,158 160,168" fill="#65A30D"/>
+  <polygon points="80,170 90,162 100,170" fill="#3F6212"/>
+  <polygon points="115,170 125,160 135,170" fill="#3F6212"/>
+
+  <!-- Foreground -->
+  <polygon points="0,200 0,182 60,186 130,184 200,186 200,200" fill="#1A2E05"/>
+  <line x1="25" y1="195" x2="25" y2="184" stroke="#451A03" stroke-width="1.1"/>
+  <ellipse cx="25" cy="182" rx="6" ry="1.8" fill="#1A2E05"/>
+  <line x1="175" y1="195" x2="175" y2="184" stroke="#451A03" stroke-width="1.1"/>
+  <ellipse cx="175" cy="182" rx="6" ry="1.8" fill="#1A2E05"/>
+</svg>

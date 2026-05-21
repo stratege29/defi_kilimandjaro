@@ -1,0 +1,48 @@
+<!-- Mont Nimba — Côte d'Ivoire 🇨🇮, 1752m, crest. Sommet emblématique ivoirien.
+     Longue crête partagée avec Guinée/Libéria, plateaux ferrugineux (orange/rouille visibles),
+     forêt tropicale dense à la base. Site UNESCO. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Forest mist layer -->
+
+  <!-- Distant forest ridges -->
+
+  <!-- Main crest: long elongated ridge -->
+  <polygon points="0,180 10,140 25,120 50,108 75,95 110,85 145,92 170,108 185,130 200,160 200,180" fill="#7C2D12"/>
+
+  <!-- Forest covering sides -->
+  <polygon points="0,180 10,140 25,120 35,150 25,180" fill="#1A2E05"/>
+  <polygon points="170,108 185,130 200,160 200,180 175,180" fill="#365314"/>
+
+  <!-- Iron-ore plateaus (signature visuelle Nimba: rouille/orange) -->
+  <polygon points="50,108 75,95 110,85 105,108 80,120 55,118" fill="#B45309"/>
+  <polygon points="110,85 145,92 140,115 125,108 105,108" fill="#9A3412"/>
+
+  <!-- Crest highlights -->
+  <polygon points="75,95 110,85 95,105" fill="#C2410C"/>
+  <polygon points="110,85 145,92 130,105" fill="#A16207"/>
+
+  <!-- Dark facets -->
+  <polygon points="25,120 50,108 55,140 35,150" fill="#451A03"/>
+  <polygon points="50,108 75,95 80,120" fill="#5C2410"/>
+  <polygon points="145,92 170,108 160,130" fill="#5C2410"/>
+
+  <!-- Forest reclaiming lower slopes -->
+  <polygon points="25,160 50,140 70,160 50,170 30,170" fill="#1A2E05"/>
+  <polygon points="80,160 105,142 130,155 145,168 105,170" fill="#365314"/>
+  <polygon points="140,160 165,142 180,160 160,168" fill="#1A2E05"/>
+
+  <!-- Iron-ore stratification texture -->
+  <line x1="60" y1="115" x2="100" y2="105" stroke="#7C2D12" stroke-width="0.6"/>
+  <line x1="75" y1="120" x2="110" y2="110" stroke="#7C2D12" stroke-width="0.5"/>
+  <line x1="115" y1="100" x2="140" y2="100" stroke="#7C2D12" stroke-width="0.6"/>
+
+  <!-- Foreground tropical forest -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#052e16"/>
+
+  <!-- Palm trees foreground -->
+  <line x1="25" y1="195" x2="25" y2="175" stroke="#052e16" stroke-width="1.6"/>
+  <path d="M 25,175 q -8,-2 -10,2 M 25,175 q 8,-2 10,2 M 25,175 q -4,-5 -2,-9 M 25,175 q 4,-5 2,-9" fill="none" stroke="#052e16" stroke-width="1.2"/>
+  <line x1="175" y1="195" x2="175" y2="177" stroke="#052e16" stroke-width="1.4"/>
+  <path d="M 175,177 q -7,-2 -9,2 M 175,177 q 7,-2 9,2 M 175,177 q -3,-4 -1,-7 M 175,177 q 3,-4 1,-7" fill="none" stroke="#052e16" stroke-width="1"/>
+</svg>

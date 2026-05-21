@@ -1,0 +1,20 @@
+<!-- Emlembe — Eswatini, 1862m, dome. Dôme granitique entre Eswatini et Afrique du Sud, prairies. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="20,180 35,140 70,105 110,90 145,100 170,130 185,180" fill="#52525B"/>
+  <polygon points="20,180 35,140 70,105 85,135 70,180" fill="#27272A"/>
+  <polygon points="70,105 110,90 100,128 85,135" fill="#71717A"/>
+  <polygon points="110,90 145,100 135,130 100,128" fill="#A1A1AA"/>
+  <polygon points="145,100 170,130 185,180 150,180" fill="#71717A"/>
+  <polygon points="85,135 100,128 135,130 130,180 70,180" fill="#52525B"/>
+  <polygon points="110,90 125,98 115,105" fill="#D6D3D1"/>
+  <polygon points="50,170 65,160 75,170" fill="#A16207"/>
+  <polygon points="140,170 155,160 170,170" fill="#A16207"/>
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#CA8A04"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#854D0E"/>
+  <g stroke="#451A03" stroke-width="0.7" stroke-linecap="round">
+    <line x1="25" y1="195" x2="27" y2="190"/>
+    <line x1="32" y1="196" x2="34" y2="191"/>
+    <line x1="160" y1="195" x2="162" y2="190"/>
+    <line x1="170" y1="196" x2="172" y2="191"/>
+  </g>
+</svg>
