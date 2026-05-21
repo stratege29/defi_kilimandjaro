@@ -6,6 +6,7 @@ import 'package:defi_kilimandjaro/data/datasources/local_devinette_cache_datasou
 import 'package:defi_kilimandjaro/data/datasources/remote_devinette_pack_datasource.dart';
 import 'package:defi_kilimandjaro/data/local/devinette_database.dart';
 import 'package:defi_kilimandjaro/data/sync/manifest_sync_service.dart';
+import 'package:defi_kilimandjaro/data/sync/sync_state.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/domain/repositories/devinette_repository.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -121,8 +122,17 @@ final remoteDevinettePackDatasourceProvider =
       );
     });
 
+/// Signal de pression mémoire iOS/Android. Singleton attaché au
+/// `WidgetsBinding` — auto-dispose si plus de listener.
+final memoryPressureSignalProvider = Provider<MemoryPressureSignal>((ref) {
+  final signal = WidgetsBindingMemoryPressureSignal();
+  ref.onDispose(signal.dispose);
+  return signal;
+});
+
 /// Service de synchro des manifests Firestore (+ download des packs Storage).
-/// À déclencher en fire-and-forget après le first-frame.
+/// **Ne plus déclencher au boot** (cf. PR #15 — OOM iOS 26). Trigger
+/// manuel uniquement depuis `manifestSyncStateProvider` / `MyPacksView`.
 final manifestSyncServiceProvider = Provider<ManifestSyncService>((ref) {
   FirebaseCrashlytics? crashlytics;
   try {
@@ -133,9 +143,65 @@ final manifestSyncServiceProvider = Provider<ManifestSyncService>((ref) {
   return ManifestSyncService(
     remote: ref.watch(remoteDevinettePackDatasourceProvider),
     cache: ref.watch(localDevinetteCacheDatasourceProvider),
+    memoryPressure: ref.watch(memoryPressureSignalProvider),
     crashlytics: crashlytics,
   );
 });
+
+/// State notifier exposant l'état de sync à l'UI (`MyPacksView`).
+/// Transitions : `Idle → Syncing → (Success | Error)`.
+class ManifestSyncNotifier extends StateNotifier<SyncState> {
+  ManifestSyncNotifier(this._service, [this._ref])
+      : super(const SyncStateIdle());
+
+  final ManifestSyncService _service;
+  final Ref? _ref;
+
+  /// Lance la sync si aucune n'est en cours. Idempotent côté UI : un
+  /// double-tap n'enchaîne pas deux passes.
+  Future<void> startRefresh() async {
+    if (state is SyncStateSyncing) return;
+    state = const SyncStateSyncing(progress: 0, currentPackId: null);
+    try {
+      final report = await _service.refresh(
+        onProgress: (p) {
+          if (!mounted) return;
+          state = SyncStateSyncing(
+            progress: p.overallFraction,
+            currentPackId: p.currentPackId,
+          );
+        },
+      );
+      if (!mounted) return;
+      // Si au moins un pack a changé, invalide les compteurs live pour que
+      // `MyPacksView` réaffiche le nouveau nombre de devinettes (cache + bundle).
+      if (report.hasChanges) {
+        _ref?.invalidate(packLiveQuestionCountProvider);
+      }
+      state = SyncStateSuccess(report);
+    } on Object catch (e) {
+      if (!mounted) return;
+      state = SyncStateError(e.toString());
+    }
+  }
+}
+
+final manifestSyncStateProvider =
+    StateNotifierProvider<ManifestSyncNotifier, SyncState>((ref) {
+      return ManifestSyncNotifier(
+        ref.watch(manifestSyncServiceProvider),
+        ref,
+      );
+    });
+
+/// Compteur "live" du nombre de devinettes disponibles pour un pack —
+/// reflète le merge bundle + cache OTA. Invalidé après chaque sync réussie.
+final packLiveQuestionCountProvider =
+    FutureProvider.family<int, String>((ref, packId) async {
+      final repo = ref.watch(compositeDevinetteRepositoryProvider);
+      final list = await repo.loadPack(packId);
+      return list.length;
+    });
 
 /// Provider du repository composite — c'est l'implémentation par défaut
 /// utilisée à travers l'app via `devinetteRepositoryProvider` (cf.
