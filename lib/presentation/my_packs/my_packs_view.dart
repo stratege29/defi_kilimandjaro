@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/data/repositories/composite_devinette_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/data/sync/sync_state.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -141,6 +143,55 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
       }
     }
 
+    final syncState = ref.watch(manifestSyncStateProvider);
+    final isSyncing = syncState is SyncStateSyncing;
+
+    // Affiche un SnackBar éphémère à la fin de chaque sync.
+    ref.listen<SyncState>(manifestSyncStateProvider, (prev, next) {
+      if (prev is! SyncStateSyncing) return;
+      if (next is SyncStateSuccess) {
+        final String msg;
+        final Color background;
+        if (next.report.abortedByMemoryPressure) {
+          msg = 'my_packs.sync_aborted_memory'.tr();
+          background = AppColors.warningSoft;
+        } else if (next.report.hasChanges) {
+          msg = 'my_packs.sync_success'
+              .tr(namedArgs: {'updated': '${next.report.updated}'});
+          background = AppColors.boisFonce;
+        } else {
+          msg = 'my_packs.sync_up_to_date'.tr();
+          background = AppColors.boisFonce;
+        }
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              backgroundColor: background,
+              content: Text(
+                msg,
+                style: AppTypography.labelSm
+                    .copyWith(color: AppColors.textePrimaire),
+              ),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+      } else if (next is SyncStateError) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              backgroundColor: AppColors.errorSoft,
+              content: Text(
+                'my_packs.sync_error'.tr(),
+                style: AppTypography.labelSm
+                    .copyWith(color: AppColors.textePrimaire),
+              ),
+            ),
+          );
+      }
+    });
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppBar(
@@ -148,32 +199,92 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
         elevation: 0,
         leading: const BackButton(color: AppColors.orJour),
         title: Text('my_packs.title'.tr(), style: AppTypography.headingLg),
+        actions: [
+          IconButton(
+            tooltip: 'my_packs.sync_button'.tr(),
+            icon: const Icon(Icons.refresh, color: AppColors.orJour),
+            onPressed: isSyncing
+                ? null
+                : () => ref
+                    .read(manifestSyncStateProvider.notifier)
+                    .startRefresh(),
+          ),
+        ],
       ),
-      body: asyncCatalog.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.orJour),
-        ),
-        error: (_, __) => Center(
-          child: Text('error.load_failed'.tr(), style: AppTypography.bodyMd),
-        ),
-        data: (catalog) {
-          final owned = catalog.where((p) => ownedPacks.contains(p.id)).toList();
-          final notOwned =
-              catalog.where((p) => !ownedPacks.contains(p.id)).toList();
-          return owned.length >= 2
-              ? _MixView(
-                  owned: owned,
-                  notOwned: notOwned,
-                  localWeights: _localWeights ?? {},
-                  emojiFor: _emojiFor,
-                  onSliderChanged: _onSliderChanged,
-                )
-              : _SinglePackView(
-                  ownedPack: owned.isEmpty ? null : owned.first,
-                  notOwned: notOwned,
-                  emojiFor: _emojiFor,
-                );
-        },
+      body: Column(
+        children: [
+          if (isSyncing) _SyncBanner(state: syncState),
+          Expanded(
+            child: asyncCatalog.when(
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: AppColors.orJour),
+              ),
+              error: (_, __) => Center(
+                child:
+                    Text('error.load_failed'.tr(), style: AppTypography.bodyMd),
+              ),
+              data: (catalog) {
+                final owned =
+                    catalog.where((p) => ownedPacks.contains(p.id)).toList();
+                final notOwned =
+                    catalog.where((p) => !ownedPacks.contains(p.id)).toList();
+                return owned.length >= 2
+                    ? _MixView(
+                        owned: owned,
+                        notOwned: notOwned,
+                        localWeights: _localWeights ?? {},
+                        emojiFor: _emojiFor,
+                        onSliderChanged: _onSliderChanged,
+                      )
+                    : _SinglePackView(
+                        ownedPack: owned.isEmpty ? null : owned.first,
+                        notOwned: notOwned,
+                        emojiFor: _emojiFor,
+                      );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Bandeau de progression au-dessus du body pendant une sync OTA.
+class _SyncBanner extends StatelessWidget {
+  const _SyncBanner({required this.state});
+
+  final SyncStateSyncing state;
+
+  @override
+  Widget build(BuildContext context) {
+    final packLabel = state.currentPackId ?? '…';
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      color: AppColors.surfaceVariant,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'my_packs.syncing'.tr(namedArgs: {'pack': packLabel}),
+            style: AppTypography.labelSm,
+          ),
+          AppSpacing.gapXs,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: state.progress == 0 ? null : state.progress,
+              minHeight: 4,
+              backgroundColor: AppColors.boisFonce,
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.orJour,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -393,14 +504,20 @@ class _TotalIndicator extends StatelessWidget {
   }
 }
 
-class _CurrentPackTile extends StatelessWidget {
+class _CurrentPackTile extends ConsumerWidget {
   const _CurrentPackTile({required this.pack, required this.emoji});
 
   final Pack pack;
   final String emoji;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Compteur "live" : bundle + cache OTA fusionnés. Fallback sur le
+    // compteur bundlé du `_index.json` tant que le merge n'a pas chargé.
+    final liveCount = ref
+        .watch(packLiveQuestionCountProvider(pack.id))
+        .maybeWhen(data: (n) => n, orElse: () => pack.questionCount);
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -419,7 +536,7 @@ class _CurrentPackTile extends StatelessWidget {
                 Text(pack.nameKey.tr(), style: AppTypography.headingMd),
                 Text(
                   'my_packs.current_pack_label'
-                      .tr(namedArgs: {'count': '${pack.questionCount}'}),
+                      .tr(namedArgs: {'count': '$liveCount'}),
                   style: AppTypography.bodySm,
                 ),
               ],

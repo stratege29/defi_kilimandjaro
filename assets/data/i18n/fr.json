@@ -283,6 +283,12 @@
     "owned_section": "Packs possédés",
     "available_section": "Packs disponibles",
     "coming_soon": "Bientôt disponible",
-    "coming_soon_sub": "Achat avec cauris ou IAP — Phase 4"
+    "coming_soon_sub": "Achat avec cauris ou IAP — Phase 4",
+    "sync_button": "Vérifier les mises à jour",
+    "syncing": "Téléchargement de {pack}…",
+    "sync_success": "{updated} pack(s) mis à jour",
+    "sync_up_to_date": "Tout est à jour",
+    "sync_error": "Échec de la synchronisation",
+    "sync_aborted_memory": "Sync interrompue (mémoire faible) — réessayer plus tard"
   }
 }
