@@ -30,6 +30,7 @@ class CircularGrid extends StatefulWidget {
     required this.onTileEntered,
     required this.onDragEnd,
     this.seed,
+    this.hiddenIndices = const <int>{},
     super.key,
   });
 
@@ -43,6 +44,11 @@ class CircularGrid extends StatefulWidget {
   /// par `GameState.hintTileIndices` pour pointer la prochaine lettre
   /// de la réponse (et non une tuile aléatoire de la grille).
   final List<int> hintTileIndices;
+
+  /// Indices des tuiles masquées par le modifier `fog`. Rendues avec
+  /// opacité 0 et ignorées par le hit-test. Tournent toutes les 5 s
+  /// côté `GameController`.
+  final Set<int> hiddenIndices;
 
   /// Phase du jeu.
   final Object phase;
@@ -143,6 +149,9 @@ class _CircularGridState extends State<CircularGrid> {
     const fullRadius = _tileSize / 2;
     const smallRadius = _tileSize * 0.40;
     for (var i = 0; i < _tileCenters.length; i++) {
+      // Une tuile masquée par le fog ne capte pas le touch — le doigt
+      // passe « à travers » comme si la case n'existait pas.
+      if (widget.hiddenIndices.contains(i)) continue;
       final dist = (_tileCenters[i] - localPos).distance;
       final r = _smallHitIndices.contains(i) ? smallRadius : fullRadius;
       if (dist <= r) return i;
@@ -246,18 +255,25 @@ class _CircularGridState extends State<CircularGrid> {
                   final center = layout.centers[i];
                   final isSelected = widget.selectedIndices.contains(i);
                   final isHint = widget.hintTileIndices.contains(i);
+                  final isHidden = widget.hiddenIndices.contains(i);
                   return Positioned(
                     left: center.dx - _tileSize / 2,
                     top: center.dy - _tileSize / 2,
                     width: _tileSize,
                     height: _tileSize,
-                    child: _Tile(
-                      letter: widget.letters[i],
-                      isSelected: isSelected,
-                      isHint: isHint,
-                      selectionOrder: isSelected
-                          ? widget.selectedIndices.indexOf(i) + 1
-                          : null,
+                    child: AnimatedOpacity(
+                      // Fog : fade-out à 0 quand la tuile est masquée,
+                      // re-fade-in quand elle ré-apparaît.
+                      duration: const Duration(milliseconds: 400),
+                      opacity: isHidden ? 0.0 : 1.0,
+                      child: _Tile(
+                        letter: widget.letters[i],
+                        isSelected: isSelected,
+                        isHint: isHint,
+                        selectionOrder: isSelected
+                            ? widget.selectedIndices.indexOf(i) + 1
+                            : null,
+                      ),
                     ),
                   );
                 }),

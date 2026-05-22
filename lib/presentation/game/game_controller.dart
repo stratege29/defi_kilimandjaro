@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_star_rating.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
@@ -26,6 +27,7 @@ class GameState {
     this.validationCorrect = false,
     this.reverseAnswer = false,
     this.starsEarned = 0,
+    this.fogHiddenIndices = const <int>{},
   });
 
   final Devinette devinette;
@@ -61,6 +63,12 @@ class GameState {
   /// (0 sinon). Calculé une seule fois lors de la validation (cf.
   /// `LevelStarRating.computeStars`).
   final int starsEarned;
+
+  /// Indices grille (positions dans [shuffledIndices]) actuellement
+  /// masqués par le modifier `fog`. Le widget `CircularGrid` rend ces
+  /// tuiles avec opacité 0 et ignore les taps dessus. Rotation 5 s côté
+  /// controller. Vide quand le modifier n'est pas actif.
+  final Set<int> fogHiddenIndices;
 
   /// Séquence de lettres attendue compte tenu du modifier `reverse`.
   /// Stockée comme String pour permettre l'égalité directe avec
@@ -125,6 +133,7 @@ class GameState {
     bool? validationCorrect,
     bool? reverseAnswer,
     int? starsEarned,
+    Set<int>? fogHiddenIndices,
   }) {
     return GameState(
       devinette: devinette ?? this.devinette,
@@ -138,6 +147,7 @@ class GameState {
       validationCorrect: validationCorrect ?? this.validationCorrect,
       reverseAnswer: reverseAnswer ?? this.reverseAnswer,
       starsEarned: starsEarned ?? this.starsEarned,
+      fogHiddenIndices: fogHiddenIndices ?? this.fogHiddenIndices,
     );
   }
 }
@@ -158,6 +168,7 @@ class GameController extends StateNotifier<GameState> {
         _initialState(_args, _progress.state.cauris),
       ) {
     _startTimer();
+    _startModifierTimer();
   }
 
   /// Construit l'état initial : génère les distracteurs selon la config,
@@ -210,10 +221,18 @@ class GameController extends StateNotifier<GameState> {
   static const int _hintCost = 20;
   static const int _caurisBase = 30;
 
+  static const int _windPeriodSeconds = 8;
+  static const int _earthquakePeriodSeconds = 6;
+  static const int _fogPeriodSeconds = 5;
+  static const int _shufflePeriodSeconds = 15;
+
   final GameArgs _args;
   final AudioController _audio;
   final PlayerProgressNotifier _progress;
   Timer? _timer;
+  Timer? _modifierTimer;
+  int _modifierTick = 0;
+  final Random _modifierRng = Random();
 
   // ---------------------------------------------------------------------------
   // Public API
@@ -233,6 +252,10 @@ class GameController extends StateNotifier<GameState> {
   ///   imprécis.
   void selectTile(int gridIndex) {
     if (state.phase != GamePhase.playing) return;
+    // Une tuile masquée par le fog est intaptable. Le widget devrait
+    // déjà bloquer le tap (pointer ignored), filet de sécurité côté
+    // controller pour les call-sites synthétiques (tests, debug overlay).
+    if (state.fogHiddenIndices.contains(gridIndex)) return;
 
     final selected = List<int>.from(state.selectedIndices);
 
@@ -363,6 +386,8 @@ class GameController extends StateNotifier<GameState> {
     if (state.phase != GamePhase.playing) return;
     _timer?.cancel();
     _timer = null;
+    _modifierTimer?.cancel();
+    _modifierTimer = null;
   }
 
   /// Reprend le décompte depuis le `timeLeft` actuel. No-op si la partie n'est
@@ -371,6 +396,7 @@ class GameController extends StateNotifier<GameState> {
     if (state.phase != GamePhase.playing) return;
     if (_timer != null && _timer!.isActive) return;
     _startTimer();
+    _startModifierTimer();
   }
 
   /// Re-démarre la même devinette : re-shuffle, timer adaptatif depuis
@@ -378,13 +404,16 @@ class GameController extends StateNotifier<GameState> {
   /// pour éviter la mémorisation d'une grille spécifique entre runs.
   void restart() {
     _timer?.cancel();
+    _modifierTimer?.cancel();
     state = _initialState(_args, _progress.state.cauris);
     _startTimer();
+    _startModifierTimer();
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _modifierTimer?.cancel();
     super.dispose();
   }
 
@@ -408,6 +437,124 @@ class GameController extends StateNotifier<GameState> {
         state = state.copyWith(timeLeft: state.timeLeft - 1);
       }
     });
+  }
+
+  /// Timer séparé pour les effets des modifiers (wind / earthquake / fog /
+  /// shuffle). Tick chaque seconde et déclenche chaque effet selon sa
+  /// période propre. Indépendant du timer principal pour pouvoir être
+  /// suspendu sans toucher au compte à rebours.
+  void _startModifierTimer() {
+    final mods = _args.config.modifiers;
+    final hasAny = mods.contains(LevelModifier.wind) ||
+        mods.contains(LevelModifier.earthquake) ||
+        mods.contains(LevelModifier.fog) ||
+        mods.contains(LevelModifier.shuffle);
+    if (!hasAny) return; // Pas de tic-tac inutile si aucun modifier visuel.
+    _modifierTimer?.cancel();
+    _modifierTick = 0;
+    _modifierTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (state.phase != GamePhase.playing) {
+        _modifierTimer?.cancel();
+        return;
+      }
+      _modifierTick++;
+      if (mods.contains(LevelModifier.wind) &&
+          _modifierTick % _windPeriodSeconds == 0) {
+        _applyWind();
+      }
+      if (mods.contains(LevelModifier.earthquake) &&
+          _modifierTick % _earthquakePeriodSeconds == 0) {
+        _applyEarthquake();
+      }
+      if (mods.contains(LevelModifier.fog) &&
+          _modifierTick % _fogPeriodSeconds == 0) {
+        _applyFog();
+      }
+      if (mods.contains(LevelModifier.shuffle) &&
+          _modifierTick % _shufflePeriodSeconds == 0) {
+        _applyShuffle();
+      }
+    });
+  }
+
+  /// Wind : choisit une case au hasard et swap avec sa voisine logique
+  /// dans le cercle (gridIdx + 1 mod len). Léger drift d'une lettre.
+  void _applyWind() {
+    final len = state.shuffledIndices.length;
+    if (len < 2) return;
+    final a = _modifierRng.nextInt(len);
+    final b = (a + 1) % len;
+    _swapTiles(a, b);
+  }
+
+  /// Earthquake : choisit 2 cases distinctes au hasard et les échange.
+  /// Mouvement plus brutal que wind (positions arbitraires, pas forcément
+  /// voisines).
+  void _applyEarthquake() {
+    final len = state.shuffledIndices.length;
+    if (len < 2) return;
+    final a = _modifierRng.nextInt(len);
+    var b = _modifierRng.nextInt(len);
+    while (b == a) {
+      b = _modifierRng.nextInt(len);
+    }
+    _swapTiles(a, b);
+  }
+
+  /// Fog : masque 1 tuile aléatoire (différente de la précédente quand
+  /// possible). Le widget `CircularGrid` rend opacity 0 et ignore les
+  /// taps sur cet index.
+  void _applyFog() {
+    final len = state.shuffledIndices.length;
+    if (len < 2) return;
+    final previous = state.fogHiddenIndices;
+    var next = _modifierRng.nextInt(len);
+    // Tente d'éviter de re-masquer la même tuile (rotation visible).
+    var attempts = 0;
+    while (previous.contains(next) && attempts < 5) {
+      next = _modifierRng.nextInt(len);
+      attempts++;
+    }
+    state = state.copyWith(fogHiddenIndices: <int>{next});
+  }
+
+  /// Shuffle : re-Fisher-Yates complet de `shuffledIndices`. Casse la
+  /// mémoire spatiale du joueur. La sélection en cours est préservée :
+  /// chaque indice sélectionné est remplacé par sa nouvelle position.
+  void _applyShuffle() {
+    final len = state.shuffledIndices.length;
+    if (len < 2) return;
+    final newShuffled = _shuffleIndices(len, _modifierRng);
+    // Translate selectedIndices via la permutation. Pour chaque case
+    // sélectionnée (gridIdx), on trouve où la lettre originale a atterri
+    // après le re-shuffle.
+    final newSelected = state.selectedIndices.map((oldGridIdx) {
+      final letterPoolIdx = state.shuffledIndices[oldGridIdx];
+      return newShuffled.indexOf(letterPoolIdx);
+    }).toList(growable: false);
+    state = state.copyWith(
+      shuffledIndices: newShuffled,
+      selectedIndices: newSelected,
+    );
+  }
+
+  /// Swap atomique entre 2 cases de la grille. La sélection « suit » les
+  /// lettres : si une case sélectionnée bouge, son indice est remplacé
+  /// par le nouvel emplacement de la même lettre.
+  void _swapTiles(int a, int b) {
+    final newShuffled = List<int>.from(state.shuffledIndices);
+    final tmp = newShuffled[a];
+    newShuffled[a] = newShuffled[b];
+    newShuffled[b] = tmp;
+    final newSelected = state.selectedIndices.map((i) {
+      if (i == a) return b;
+      if (i == b) return a;
+      return i;
+    }).toList(growable: false);
+    state = state.copyWith(
+      shuffledIndices: newShuffled,
+      selectedIndices: newSelected,
+    );
   }
 
   /// Fisher-Yates shuffle sur [0..count-1]. `rng` injectable pour que la

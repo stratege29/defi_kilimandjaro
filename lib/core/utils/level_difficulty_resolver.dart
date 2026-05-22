@@ -153,8 +153,29 @@ abstract final class LevelDifficultyResolver {
     final modifiers = <LevelModifier>{};
 
     // thinAir : timer accéléré au-dessus de 4000 m (effet hypoxie).
+    // Passif (pas de modifier visuel) — cohabite avec tout.
     if (mountain.altitude >= 4000) {
       modifiers.add(LevelModifier.thinAir);
+    }
+
+    // Règles **exclusives** pour les modifiers de mouvement/masquage :
+    // un niveau ne reçoit qu'un seul d'entre eux pour éviter la surcharge
+    // visuelle (4 modifiers simultanés = grille illisible).
+    //
+    // Priorité :
+    // 1. earthquake — montagnes en pays tectonique (Rift, volcans actifs).
+    //    Match thématique fort, on l'attribue dès qu'éligible.
+    // 2. wind — altitude ≥ 3000 m sur sommets non-tectoniques.
+    //    Les vents catabatiques dominent à cette altitude.
+    // 3. fog — zone des nuages (2000–3000 m) sur sommets non-tectoniques.
+    //    Calme atmosphérique, brouillard plus que tremblement.
+    final isTectonic = _isTectonic(mountain.countryCode);
+    if (isTectonic && tier >= 3) {
+      modifiers.add(LevelModifier.earthquake);
+    } else if (mountain.altitude >= 3000) {
+      modifiers.add(LevelModifier.wind);
+    } else if (mountain.altitude >= 2000) {
+      modifiers.add(LevelModifier.fog);
     }
 
     // reverse : à partir du tier 3, attribué de façon déterministe à
@@ -169,6 +190,12 @@ abstract final class LevelDifficultyResolver {
       }
     }
 
+    // shuffle : signature des boss tier ≥ 3. Re-mélange complet de la
+    // grille toutes les 15 s pour casser la mémoire spatiale du joueur.
+    if (isBoss && tier >= 3) {
+      modifiers.add(LevelModifier.shuffle);
+    }
+
     // Boss tier ≥ 3 : on garantit qu'au moins UN modifier sortant est
     // présent pour donner du sel à la finale (au minimum reverse si rien
     // d'autre attribué par les règles ci-dessus). En S3+ on enrichira
@@ -178,11 +205,35 @@ abstract final class LevelDifficultyResolver {
     // implicite (apprentissage du gameplay de base). Le 2e niveau du
     // jeu — boss Red Rocks — doit rester un boss "soft" sans inversion
     // cognitive pour ne pas effrayer le joueur dès la sortie du splash.
-    if (isBoss && tier >= 3 && modifiers.isEmpty) {
+    if (isBoss && tier >= 3 && modifiers.length <= 1) {
+      // Si on n'a que `shuffle` (ajouté juste au-dessus), on ajoute reverse
+      // pour le double-pic boss. La condition `length <= 1` couvre les
+      // boss tier 3 avec uniquement shuffle (zones non-tectoniques,
+      // < 2000 m donc pas fog/wind/earthquake/thinAir).
       modifiers.add(LevelModifier.reverse);
     }
 
     return modifiers;
+  }
+
+  /// Codes pays à géologie tectonique active (Rift Valley est-africain,
+  /// volcanisme, chaînes en formation). Liste non exhaustive mais couvre
+  /// les sommets signature du jeu : Mt Cameroun, Karthala, Nyiragongo,
+  /// Kilimandjaro, Mt Kenya, etc.
+  static bool _isTectonic(String countryCode) {
+    const tectonicCountries = <String>{
+      'CM', // Mont Cameroun (volcan actif)
+      'KM', // Karthala (volcan actif)
+      'CD', // Nyiragongo / Rwenzori (Rift + volcans)
+      'RW', // Karisimbi (Rift)
+      'UG', // Rwenzori (Rift)
+      'KE', // Mt Kenya (Rift)
+      'TZ', // Kilimandjaro, Ol Doinyo Lengai (Rift)
+      'ET', // Ras Dashen (Rift)
+      'ER', // Dahlak / Rift
+      'DJ', // Mousa Ali (Rift)
+    };
+    return tectonicCountries.contains(countryCode);
   }
 
   /// Hash stable indépendant de l'implémentation Object.hashCode (qui

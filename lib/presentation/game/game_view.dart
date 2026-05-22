@@ -7,6 +7,7 @@ import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
+import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
@@ -163,9 +164,9 @@ class _GameViewState extends ConsumerState<GameView>
               const SizedBox(height: 8),
               // Riddle card.
               _RiddleCard(riddle: widget.args.devinette.riddle),
-              if (gameState.reverseAnswer) ...<Widget>[
+              if (widget.args.config.modifiers.isNotEmpty) ...<Widget>[
                 const SizedBox(height: 8),
-                const _ReverseBadge(),
+                _ModifierBadges(modifiers: widget.args.config.modifiers),
               ],
               const SizedBox(height: 10),
               // Timer bar — totalTime calibré sur la config du niveau.
@@ -190,6 +191,7 @@ class _GameViewState extends ConsumerState<GameView>
                     letters: gameState.displayLetters,
                     selectedIndices: gameState.selectedIndices,
                     hintTileIndices: gameState.hintTileIndices,
+                    hiddenIndices: gameState.fogHiddenIndices,
                     phase: gameState.phase,
                     onTileEntered: controller.selectTile,
                     onDragEnd: () {
@@ -720,47 +722,112 @@ class _RiddleCard extends StatelessWidget {
   }
 }
 
-/// Badge "Mot à l'envers" — affiché sous l'énoncé quand le niveau active
-/// le modifier `reverse`. Indication explicite pour que la mécanique reste
-/// un défi cognitif (et non un piège déloyal).
-class _ReverseBadge extends StatelessWidget {
-  const _ReverseBadge();
+/// Row de badges pour les modifiers actifs (un pill par modifier).
+/// Indication explicite des défis présents pour éviter les pièges
+/// déloyaux : le joueur sait que le mot est à l'envers, que des lettres
+/// vont bouger, que la grille va se brumer, etc.
+class _ModifierBadges extends StatelessWidget {
+  const _ModifierBadges({required this.modifiers});
+
+  final Set<LevelModifier> modifiers;
 
   @override
   Widget build(BuildContext context) {
+    // Filtre aux modifiers qui ont un effet visible côté joueur — on
+    // n'affiche pas un badge pour `thinAir` (déjà perceptible via le timer
+    // plus court).
+    final visible = modifiers
+        .where((m) => _badgeForModifier(m) != null)
+        .toList(growable: false);
+    if (visible.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Align(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: AppColors.rouge.withValues(alpha: 0.18),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: AppColors.rouge.withValues(alpha: 0.7),
-              width: 1.2,
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 6,
+        runSpacing: 6,
+        children: <Widget>[
+          for (final m in visible) _badgeForModifier(m)!,
+        ],
+      ),
+    );
+  }
+
+  static Widget? _badgeForModifier(LevelModifier m) {
+    switch (m) {
+      case LevelModifier.reverse:
+        return const _ModifierPill(
+          icon: Icons.swap_horiz_rounded,
+          label: "Mot à l'envers",
+          color: AppColors.rouge,
+        );
+      case LevelModifier.wind:
+        return const _ModifierPill(
+          icon: Icons.air_rounded,
+          label: 'Vent',
+          color: AppColors.cielHauteur,
+        );
+      case LevelModifier.earthquake:
+        return const _ModifierPill(
+          icon: Icons.terrain_rounded,
+          label: 'Tremblement',
+          color: AppColors.laterite,
+        );
+      case LevelModifier.fog:
+        return const _ModifierPill(
+          icon: Icons.cloud_rounded,
+          label: 'Brouillard',
+          color: AppColors.cielHauteur,
+        );
+      case LevelModifier.shuffle:
+        return const _ModifierPill(
+          icon: Icons.shuffle_rounded,
+          label: 'Remélange',
+          color: AppColors.rouge,
+        );
+      // ignore: no_default_cases
+      default:
+        // thinAir + autres modifiers non-implémentés visuellement → pas
+        // de badge pour l'instant. La couverture S3 se limite aux 4 cités.
+        return null;
+    }
+  }
+}
+
+class _ModifierPill extends StatelessWidget {
+  const _ModifierPill({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.7), width: 1.2),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: AppTypography.bebas().copyWith(
+              fontSize: 12,
+              letterSpacing: 1.1,
+              color: color,
             ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const Icon(
-                Icons.swap_horiz_rounded,
-                size: 16,
-                color: AppColors.rouge,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                "Mot à l'envers",
-                style: AppTypography.bebas().copyWith(
-                  fontSize: 13,
-                  letterSpacing: 1.2,
-                  color: AppColors.rouge,
-                ),
-              ),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }

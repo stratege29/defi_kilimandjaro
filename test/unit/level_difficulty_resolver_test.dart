@@ -7,11 +7,12 @@ Mountain _make({
   required String id,
   required int altitude,
   int totalLevels = 4,
+  String countryCode = 'ci',
 }) {
   return Mountain(
     id: id,
     name: 'Mt $id',
-    countryCode: 'ci',
+    countryCode: countryCode,
     countryName: "Côte d'Ivoire",
     flagEmoji: '🇨🇮',
     altitude: altitude,
@@ -173,16 +174,74 @@ void main() {
       );
     });
 
-    test('boss tier 3+ sans autres modifiers ⇒ reverse attribué (signature)',
-        () {
-      // Cherche une montagne tier 3 dont le boss n'aurait pas reçu reverse
-      // par le hash random ; on doit alors le voir attribué par la garantie.
-      // L'ID 'zw_nyangani' (rank 28, alt 2592) tier 3 boss n'a pas de
-      // reverse aléatoire → la garantie doit le rajouter.
+    test('boss tier ≥ 3 reçoit toujours au moins un modifier signature', () {
+      // Couvert par les règles S3 : shuffle est attribué à tout boss
+      // tier ≥ 3. Le filet reverse (garantie originale) reste en place
+      // pour les cas pathologiques mais en pratique shuffle suffit.
       final m = _make(id: 'zw_nyangani', altitude: 2592);
       final boss = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 4);
       expect(boss.isBoss, isTrue);
-      expect(boss.modifiers, contains(LevelModifier.reverse));
+      expect(
+        boss.modifiers.any((m) => <LevelModifier>{
+              LevelModifier.shuffle,
+              LevelModifier.reverse,
+              LevelModifier.earthquake,
+              LevelModifier.wind,
+              LevelModifier.fog,
+            }.contains(m)),
+        isTrue,
+        reason: 'un boss tier ≥ 3 doit avoir au moins un modifier visible',
+      );
+    });
+  });
+
+  group('LevelDifficultyResolver — modifiers exclusifs mouvement/masque', () {
+    test('tectonique tier ≥ 3 ⇒ earthquake (pas wind, pas fog)', () {
+      // Mt Cameroun simulé : code CM, 4040 m, tier 4.
+      final m = _make(id: 'cm', altitude: 4040, countryCode: 'CM');
+      final c = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 1);
+      expect(c.modifiers, contains(LevelModifier.earthquake));
+      expect(c.modifiers, isNot(contains(LevelModifier.wind)));
+      expect(c.modifiers, isNot(contains(LevelModifier.fog)));
+    });
+
+    test('non-tectonique altitude ≥ 3000 m ⇒ wind (pas earthquake)', () {
+      // Toubkal Maroc simulé : code MA, 4167 m.
+      final m = _make(id: 'ma', altitude: 4167, countryCode: 'MA');
+      final c = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 1);
+      expect(c.modifiers, contains(LevelModifier.wind));
+      expect(c.modifiers, isNot(contains(LevelModifier.earthquake)));
+      expect(c.modifiers, isNot(contains(LevelModifier.fog)));
+    });
+
+    test('non-tectonique altitude 2000–3000 m ⇒ fog', () {
+      // Mt Sunzu Zambie simulé : code ZM, 2339 m.
+      final m = _make(id: 'zm', altitude: 2339, countryCode: 'ZM');
+      final c = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 1);
+      expect(c.modifiers, contains(LevelModifier.fog));
+      expect(c.modifiers, isNot(contains(LevelModifier.wind)));
+      expect(c.modifiers, isNot(contains(LevelModifier.earthquake)));
+    });
+
+    test('shuffle attribué aux boss tier ≥ 3', () {
+      final m = _make(id: 'ci_nimba', altitude: 1752, totalLevels: 6);
+      final boss = LevelDifficultyResolver.resolve(
+        mountain: m,
+        levelIndex: 6,
+      );
+      expect(boss.isBoss, isTrue);
+      expect(boss.modifiers, contains(LevelModifier.shuffle));
+    });
+
+    test('shuffle PAS attribué aux niveaux normaux ni aux boss tier 1-2', () {
+      // Boss tier 2.
+      final m = _make(id: 'sn', altitude: 648);
+      final boss = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 4);
+      expect(boss.modifiers, isNot(contains(LevelModifier.shuffle)));
+      // Niveau normal tier 3.
+      final mid = _make(id: 'ci_nimba', altitude: 1752, totalLevels: 6);
+      final n3 = LevelDifficultyResolver.resolve(mountain: mid, levelIndex: 3);
+      expect(n3.modifiers, isNot(contains(LevelModifier.shuffle)));
     });
   });
 
