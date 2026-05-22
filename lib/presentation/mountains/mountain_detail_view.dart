@@ -4,7 +4,7 @@ import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
-import 'package:defi_kilimandjaro/core/utils/difficulty_curve.dart';
+import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
@@ -77,10 +77,14 @@ class _MountainDetailViewState extends ConsumerState<MountainDetailView>
     try {
       final selectionService = ref.read(devinetteSelectionServiceProvider);
       final progress = ref.read(playerProgressProvider);
-      final targetDifficulty = difficultyForAltitude(liveMountain.altitude);
+      final config = LevelDifficultyResolver.resolve(
+        mountain: liveMountain,
+        levelIndex: levelNumber,
+      );
       final devinette = await selectionService.nextDevinette(
         mix: progress.activePackMix,
-        targetDifficulty: targetDifficulty,
+        targetDifficulty: config.difficultyTier,
+        wordLengthBucket: config.wordLengthBucket,
         excludeIds: progress.recentDevinetteIds.toSet(),
       );
       await ref
@@ -89,7 +93,11 @@ class _MountainDetailViewState extends ConsumerState<MountainDetailView>
       if (!mounted) return;
       await context.push<void>(
         AppRoutes.game,
-        extra: GameArgs(devinette: devinette, mountainId: widget.mountain.id),
+        extra: GameArgs(
+          devinette: devinette,
+          mountainId: widget.mountain.id,
+          config: config,
+        ),
       );
     } on Exception catch (_) {
       if (!mounted) return;

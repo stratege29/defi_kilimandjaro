@@ -22,6 +22,7 @@ class GameState {
     required this.shuffledIndices,
     this.hintRevealedCount = 0,
     this.validationCorrect = false,
+    this.reverseAnswer = false,
   });
 
   final Devinette devinette;
@@ -41,6 +42,18 @@ class GameState {
 
   /// Vrai juste après une validation correcte (pour déclencher le flash).
   final bool validationCorrect;
+
+  /// Modifier `reverse` actif : le joueur doit former le mot inversé.
+  /// La validation et la révélation par indice itèrent sur
+  /// `devinette.answer` lu de droite à gauche.
+  final bool reverseAnswer;
+
+  /// Séquence de lettres attendue compte tenu du modifier `reverse`.
+  /// Stockée comme String pour permettre l'égalité directe avec
+  /// [formedWord] et l'itération par indice dans [hintTileIndices].
+  String get expectedAnswer => reverseAnswer
+      ? String.fromCharCodes(devinette.answer.runes.toList().reversed)
+      : devinette.answer;
 
   /// Lettres dans l'ordre shufflé.
   List<String> get displayLetters => shuffledIndices
@@ -64,12 +77,13 @@ class GameState {
   /// ce qui révélait une tuile aléatoire au lieu de pointer la prochaine
   /// lettre de la réponse.
   List<int> get hintTileIndices {
-    final n = hintRevealedCount.clamp(0, devinette.answer.length);
+    final answer = expectedAnswer;
+    final n = hintRevealedCount.clamp(0, answer.length);
     if (n == 0) return const <int>[];
     final used = <int>{};
     final result = <int>[];
     for (var k = 0; k < n; k++) {
-      final target = devinette.answer[k];
+      final target = answer[k];
       for (var gridIdx = 0; gridIdx < shuffledIndices.length; gridIdx++) {
         if (used.contains(gridIdx)) continue;
         final letter = devinette.lettersPool[shuffledIndices[gridIdx]];
@@ -92,6 +106,7 @@ class GameState {
     List<int>? shuffledIndices,
     int? hintRevealedCount,
     bool? validationCorrect,
+    bool? reverseAnswer,
   }) {
     return GameState(
       devinette: devinette ?? this.devinette,
@@ -102,32 +117,38 @@ class GameState {
       shuffledIndices: shuffledIndices ?? this.shuffledIndices,
       hintRevealedCount: hintRevealedCount ?? this.hintRevealedCount,
       validationCorrect: validationCorrect ?? this.validationCorrect,
+      reverseAnswer: reverseAnswer ?? this.reverseAnswer,
     );
   }
 }
 
 /// Contrôleur principal de l'écran de jeu (cf. plan.md §2 Phase 1.2).
 ///
-/// - Timer 30 s géré ici via [Timer.periodic].
+/// - Timer adaptatif provenant de `args.config.timerSeconds`
+///   (cf. `LevelDifficultyResolver`).
 /// - Sélection par index (pas par lettre) pour gérer les doublons.
 /// - Auto-validation quand [selectedIndices.length == answer.length].
+/// - Modifier `reverse` : la validation compare au mot inversé et
+///   l'ordre des lettres révélées par l'indice suit le mot inversé.
+/// - Récompense finale multipliée par `args.config.caurisMultiplier`
+///   pour valoriser les niveaux difficiles.
 class GameController extends StateNotifier<GameState> {
   GameController(this._args, this._audio, this._progress)
     : super(
         GameState(
           devinette: _args.devinette,
           selectedIndices: const <int>[],
-          timeLeft: _gameDuration,
+          timeLeft: _args.config.timerSeconds,
           phase: GamePhase.playing,
           cauris: _progress.state.cauris,
           shuffledIndices: _shuffleIndices(_args.devinette.lettersPool.length),
+          reverseAnswer: _args.config.hasReverse,
         ),
       ) {
     _startTimer();
   }
 
   static const int _hintCost = 20;
-  static const int _gameDuration = 30;
   static const int _caurisBase = 30;
 
   final GameArgs _args;
@@ -228,10 +249,12 @@ class GameController extends StateNotifier<GameState> {
     if (state.selectedIndices.isEmpty) return;
 
     final formed = state.formedWord;
-    if (formed == state.devinette.answer) {
+    if (formed == state.expectedAnswer) {
       _timer?.cancel();
-      // Récompense : base 30 + bonus vitesse (timeLeft × 2).
-      final caurisAwarded = _caurisBase + state.timeLeft * 2;
+      // Récompense : (base 30 + bonus vitesse 2×timeLeft) × multiplier
+      // de difficulté (1.0 → 2.5 selon le tier).
+      final raw = _caurisBase + state.timeLeft * 2;
+      final caurisAwarded = (raw * _args.config.caurisMultiplier).round();
       state = state.copyWith(
         phase: GamePhase.won,
         validationCorrect: true,
@@ -280,16 +303,18 @@ class GameController extends StateNotifier<GameState> {
     _startTimer();
   }
 
-  /// Re-démarre la même devinette : re-shuffle, timer 30 s, sélection vide.
+  /// Re-démarre la même devinette : re-shuffle, timer adaptatif depuis
+  /// la config, sélection vide.
   void restart() {
     _timer?.cancel();
     state = GameState(
       devinette: state.devinette,
       selectedIndices: const <int>[],
-      timeLeft: _gameDuration,
+      timeLeft: _args.config.timerSeconds,
       phase: GamePhase.playing,
       cauris: _progress.state.cauris,
       shuffledIndices: _shuffleIndices(state.devinette.lettersPool.length),
+      reverseAnswer: _args.config.hasReverse,
     );
     _startTimer();
   }

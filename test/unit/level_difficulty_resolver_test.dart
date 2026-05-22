@@ -1,0 +1,206 @@
+import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
+import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
+import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+Mountain _make({
+  required String id,
+  required int altitude,
+  int totalLevels = 4,
+}) {
+  return Mountain(
+    id: id,
+    name: 'Mt $id',
+    countryCode: 'ci',
+    countryName: "Côte d'Ivoire",
+    flagEmoji: '🇨🇮',
+    altitude: altitude,
+    totalLevels: totalLevels,
+  );
+}
+
+void main() {
+  group('LevelDifficultyResolver — palier de difficulté par altitude', () {
+    test('palier 1 pour moins de 500 m (Red Rocks Gambie ~53 m)', () {
+      final config = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 'gm', altitude: 53),
+        levelIndex: 1,
+      );
+      expect(config.difficultyTier, 1);
+      expect(config.wordLengthBucket, 1);
+      expect(config.caurisMultiplier, 1.0);
+    });
+
+    test('palier 3 pour 1500–2999 m (Mt Nimba 1752 m)', () {
+      final config = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 'ci', altitude: 1752),
+        levelIndex: 1,
+      );
+      expect(config.difficultyTier, 3);
+      expect(config.caurisMultiplier, 1.6);
+    });
+
+    test('palier 5 pour ≥ 4500 m (Kilimandjaro 5895 m)', () {
+      final config = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 'kili', altitude: 5895),
+        levelIndex: 1,
+      );
+      expect(config.difficultyTier, 5);
+      expect(config.caurisMultiplier, 2.5);
+    });
+  });
+
+  group('LevelDifficultyResolver — timer adaptatif', () {
+    test("timer plus long au palier 5 qu'au palier 1 (toutes choses égales)",
+        () {
+      final easy = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 'easy', altitude: 100),
+        levelIndex: 1,
+      );
+      // Pour comparer "toutes choses égales" on prend une montagne sous
+      // 4000 m pour éviter le modifier `thinAir`.
+      final hard = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 'hard', altitude: 2800),
+        levelIndex: 1,
+      );
+      expect(hard.timerSeconds, greaterThan(easy.timerSeconds));
+    });
+
+    test('thinAir réduit le timer au-dessus de 4000 m', () {
+      final atFourThousand = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 'a', altitude: 3999),
+        levelIndex: 1,
+      );
+      final aboveFourThousand = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 'b', altitude: 4000),
+        levelIndex: 1,
+      );
+      // Même bucket de longueur, tier supérieur d'un cran, mais le
+      // multiplicateur 0.8 doit faire baisser le timer absolu.
+      expect(aboveFourThousand.modifiers, contains(LevelModifier.thinAir));
+      expect(
+        aboveFourThousand.timerSeconds,
+        lessThan(atFourThousand.timerSeconds),
+        reason: 'thinAir doit réduire le timer net malgré le tier supérieur',
+      );
+    });
+  });
+
+  group('LevelDifficultyResolver — modifier reverse', () {
+    test('jamais attribué en tier 1–2 (zone tutoriel, même au boss)', () {
+      // Aucun niveau (boss inclus) en tier 1-2 ne doit recevoir reverse.
+      final easy = _make(id: 'plain', altitude: 200);
+      var anyReverse = false;
+      for (var i = 1; i <= easy.totalLevels; i++) {
+        final config = LevelDifficultyResolver.resolve(
+          mountain: easy,
+          levelIndex: i,
+        );
+        if (config.modifiers.contains(LevelModifier.reverse)) {
+          anyReverse = true;
+        }
+      }
+      expect(anyReverse, isFalse);
+    });
+
+    test('peut être attribué à partir du tier 3', () {
+      // Cherche au moins un niveau avec reverse parmi plusieurs montagnes
+      // de tier 3 — l'attribution est déterministe via hash, donc on en
+      // teste plusieurs pour ne pas dépendre d'un cas particulier.
+      final candidates = <Mountain>[
+        _make(id: 'a', altitude: 1800),
+        _make(id: 'b', altitude: 2000),
+        _make(id: 'c', altitude: 2500),
+        _make(id: 'd', altitude: 2800),
+      ];
+      var foundReverse = false;
+      for (final m in candidates) {
+        for (var lvl = 1; lvl < m.totalLevels; lvl++) {
+          final config = LevelDifficultyResolver.resolve(
+            mountain: m,
+            levelIndex: lvl,
+          );
+          if (config.modifiers.contains(LevelModifier.reverse)) {
+            foundReverse = true;
+            break;
+          }
+        }
+        if (foundReverse) break;
+      }
+      expect(
+        foundReverse,
+        isTrue,
+        reason: 'au moins une montagne tier 3+ doit avoir un niveau reverse',
+      );
+    });
+
+    test('attribution déterministe : 2 résolutions du même niveau identiques',
+        () {
+      final m = _make(id: 'stable', altitude: 3500);
+      final a = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 2);
+      final b = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 2);
+      expect(a, b);
+    });
+  });
+
+  group('LevelDifficultyResolver — flag boss', () {
+    test("dernier niveau d'une montagne ⇒ isBoss = true", () {
+      final m = _make(id: 'boss', altitude: 500);
+      final last = LevelDifficultyResolver.resolve(
+        mountain: m,
+        levelIndex: 4,
+      );
+      final earlier = LevelDifficultyResolver.resolve(
+        mountain: m,
+        levelIndex: 3,
+      );
+      expect(last.isBoss, isTrue);
+      expect(earlier.isBoss, isFalse);
+    });
+
+    test('boss tier 1-2 reste "soft" : pas de reverse garanti (zone tutoriel)',
+        () {
+      // Red Rocks niveau 2 (tier 1, boss) ne doit PAS recevoir reverse —
+      // le joueur sort à peine du splash et n'a pas appris le gameplay.
+      final m = _make(id: 'boss-easy', altitude: 200);
+      final boss = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 4);
+      expect(boss.isBoss, isTrue);
+      expect(boss.modifiers, isNot(contains(LevelModifier.reverse)));
+      expect(
+        boss.modifiers,
+        isEmpty,
+        reason: 'tier 1 + boss = aucun modifier (zone tutoriel)',
+      );
+    });
+
+    test('boss tier 3+ sans autres modifiers ⇒ reverse attribué (signature)',
+        () {
+      // Cherche une montagne tier 3 dont le boss n'aurait pas reçu reverse
+      // par le hash random ; on doit alors le voir attribué par la garantie.
+      // L'ID 'zw_nyangani' (rank 28, alt 2592) tier 3 boss n'a pas de
+      // reverse aléatoire → la garantie doit le rajouter.
+      final m = _make(id: 'zw_nyangani', altitude: 2592);
+      final boss = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 4);
+      expect(boss.isBoss, isTrue);
+      expect(boss.modifiers, contains(LevelModifier.reverse));
+    });
+  });
+
+  group('LevelDifficultyResolver — clamping levelIndex', () {
+    test('levelIndex < 1 clampé à 1 (UX > strictness)', () {
+      final m = _make(id: 'clamp', altitude: 500);
+      final at0 = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 0);
+      final at1 = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 1);
+      expect(at0, at1);
+    });
+
+    test('levelIndex > totalLevels clampé au boss', () {
+      final m = _make(id: 'clamp2', altitude: 500);
+      final beyond = LevelDifficultyResolver.resolve(
+        mountain: m,
+        levelIndex: 99,
+      );
+      expect(beyond.isBoss, isTrue);
+    });
+  });
+}

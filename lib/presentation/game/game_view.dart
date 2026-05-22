@@ -2,7 +2,7 @@ import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
-import 'package:defi_kilimandjaro/core/utils/difficulty_curve.dart';
+import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
@@ -163,13 +163,22 @@ class _GameViewState extends ConsumerState<GameView>
               const SizedBox(height: 8),
               // Riddle card.
               _RiddleCard(riddle: widget.args.devinette.riddle),
+              if (gameState.reverseAnswer) ...<Widget>[
+                const SizedBox(height: 8),
+                const _ReverseBadge(),
+              ],
               const SizedBox(height: 10),
-              // Timer bar.
-              TimerBar(timeLeft: gameState.timeLeft, totalTime: 30),
+              // Timer bar — totalTime calibré sur la config du niveau.
+              TimerBar(
+                timeLeft: gameState.timeLeft,
+                totalTime: widget.args.config.timerSeconds,
+              ),
               const SizedBox(height: 12),
-              // Answer cells.
+              // Answer cells — quand `reverse` est actif on affiche les
+              // cases dans l'ordre de saisie (mot inversé) pour que le
+              // remplissage gauche→droite reste intuitif.
               AnswerCells(
-                answer: widget.args.devinette.answer,
+                answer: gameState.expectedAnswer,
                 formedLetters: gameState.formedWord,
                 isValidated: gameState.validationCorrect,
               ),
@@ -417,13 +426,20 @@ class _GameViewState extends ConsumerState<GameView>
         ),
         orElse: () => null,
       );
-      final targetDifficulty = mountain != null
-          ? difficultyForAltitude(mountain.altitude)
-          : 1;
+      // Pour la devinette suivante en chaîne, on se base sur le niveau
+      // que le joueur s'apprête à atteindre (completedLevels + 1).
+      // Si pas de montagne (mode Hub) → config fallback.
+      final config = mountain != null
+          ? LevelDifficultyResolver.resolve(
+              mountain: mountain,
+              levelIndex: mountain.completedLevels + 1,
+            )
+          : LevelDifficultyResolver.fallback();
 
       final next = await selectionService.nextDevinette(
         mix: progress.activePackMix,
-        targetDifficulty: targetDifficulty,
+        targetDifficulty: config.difficultyTier,
+        wordLengthBucket: config.wordLengthBucket,
         excludeIds: progress.recentDevinetteIds.toSet(),
       );
       await ref
@@ -432,7 +448,11 @@ class _GameViewState extends ConsumerState<GameView>
       if (!mounted) return;
       context.pushReplacement(
         AppRoutes.game,
-        extra: GameArgs(devinette: next, mountainId: mountainId),
+        extra: GameArgs(
+          devinette: next,
+          mountainId: mountainId,
+          config: config,
+        ),
       );
     } on Exception catch (_) {
       if (!mounted) return;
@@ -691,6 +711,52 @@ class _RiddleCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Badge "Mot à l'envers" — affiché sous l'énoncé quand le niveau active
+/// le modifier `reverse`. Indication explicite pour que la mécanique reste
+/// un défi cognitif (et non un piège déloyal).
+class _ReverseBadge extends StatelessWidget {
+  const _ReverseBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Align(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.rouge.withValues(alpha: 0.18),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppColors.rouge.withValues(alpha: 0.7),
+              width: 1.2,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Icon(
+                Icons.swap_horiz_rounded,
+                size: 16,
+                color: AppColors.rouge,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                "Mot à l'envers",
+                style: AppTypography.bebas().copyWith(
+                  fontSize: 13,
+                  letterSpacing: 1.2,
+                  color: AppColors.rouge,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

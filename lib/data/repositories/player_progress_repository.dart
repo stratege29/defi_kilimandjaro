@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -124,6 +125,28 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
   Future<void> reset() async {
     await _repo.reset();
     state = PlayerProgress.initial();
+  }
+
+  /// **Outil de debug uniquement** — marque toutes les montagnes données
+  /// comme intégralement terminées pour permettre de tester rapidement
+  /// les niveaux haute altitude (reverse, thinAir, boss tier 5).
+  ///
+  /// Doit être gardé derrière `kDebugMode` côté UI ; le repository accepte
+  /// inconditionnellement pour rester sans dépendance Flutter.
+  /// Idempotent : ré-appel = no-op.
+  Future<void> unlockAllForDebug(Iterable<Mountain> mountains) async {
+    final levels = Map<String, int>.from(state.completedLevelsByMountain);
+    var changed = false;
+    for (final m in mountains) {
+      if ((levels[m.id] ?? 0) < m.totalLevels) {
+        levels[m.id] = m.totalLevels;
+        changed = true;
+      }
+    }
+    if (!changed) return;
+    final newState = state.copyWith(completedLevelsByMountain: levels);
+    state = newState;
+    await _repo.save(newState);
   }
 
   /// Mémorise l'id d'une devinette qui vient d'être servie au joueur, en

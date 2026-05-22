@@ -21,15 +21,26 @@ import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 /// 2. Filtre les devinettes du pack par `targetDifficulty`, avec fallback
 ///    progressif ±1, ±2, ... jusqu'à trouver un pool non vide (hors
 ///    `excludeIds`).
-/// 3. Si le pack tiré est totalement vide après exclusions, on tire un
+/// 3. Si `wordLengthBucket` est fourni, raffinement secondaire dans
+///    chaque palier de difficulté par distance croissante au bucket
+///    de longueur cible (0, 1, 2, …).
+/// 4. Si le pack tiré est totalement vide après exclusions, on tire un
 ///    autre pack du mix (sans répéter les packs déjà tentés).
-/// 4. Si tous les packs du mix sont vides : [StateError] explicite.
+/// 5. Si tous les packs du mix sont vides : [StateError] explicite.
 // ignore: one_member_abstracts
 abstract interface class DevinetteSelectionService {
+  /// Tire la prochaine devinette compatible.
+  ///
+  /// - [targetDifficulty] : palier 1–5 visé (matching primaire).
+  /// - [wordLengthBucket] : optionnel, bucket de longueur de mot 1–5
+  ///   préféré (matching secondaire avec fallback ±1, ±2…). Cf.
+  ///   `LevelDifficultyConfig.wordLengthBucket`. Quand `null`, comportement
+  ///   historique : aucun filtrage par longueur.
   Future<Devinette> nextDevinette({
     required PackMix mix,
     required int targetDifficulty,
     required Set<String> excludeIds,
+    int? wordLengthBucket,
     int? seed,
   });
 }
