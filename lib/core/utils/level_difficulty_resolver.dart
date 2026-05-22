@@ -57,6 +57,7 @@ abstract final class LevelDifficultyResolver {
       wordLengthBucket: bucket,
       timerSeconds: timer,
       caurisMultiplier: _caurisMultiplierForTier(tier),
+      distractorCount: _distractorCountForTier(tier),
       modifiers: modifiers,
       isBoss: isBoss,
     );
@@ -100,6 +101,25 @@ abstract final class LevelDifficultyResolver {
         return 9;
       default:
         return 5;
+    }
+  }
+
+  /// Nombre de lettres parasites ajoutées à la grille selon le tier.
+  /// Courbe douce : 0 en zone tutoriel (tier 1-2), puis +1 par palier.
+  /// Au tier 5, un mot de 6 lettres affiche 9 cases (6 + 3 distracteurs).
+  static int _distractorCountForTier(int tier) {
+    switch (tier) {
+      case 1:
+      case 2:
+        return 0;
+      case 3:
+        return 1;
+      case 4:
+        return 2;
+      case 5:
+        return 3;
+      default:
+        return 0;
     }
   }
 

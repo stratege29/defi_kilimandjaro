@@ -27,13 +27,19 @@ GameState _state({
   required bool reverseAnswer,
   required List<int> shuffledIndices,
   int hintRevealedCount = 0,
+  List<String>? effectivePool,
 }) {
+  final dev = _foutou();
   return GameState(
-    devinette: _foutou(),
+    devinette: dev,
     selectedIndices: const <int>[],
     timeLeft: 30,
     phase: GamePhase.playing,
     cauris: 0,
+    // Pool effectif = lettres originales par défaut (pas de distracteurs
+    // dans ces tests reverse). Possibilité d'override pour des cas
+    // spécifiques (distracteurs ajoutés en fin).
+    effectivePool: effectivePool ?? dev.lettersPool,
     shuffledIndices: shuffledIndices,
     hintRevealedCount: hintRevealedCount,
     reverseAnswer: reverseAnswer,

@@ -96,6 +96,7 @@ class _MountainDetailViewState extends ConsumerState<MountainDetailView>
         extra: GameArgs(
           devinette: devinette,
           mountainId: widget.mountain.id,
+          levelIndex: levelNumber,
           config: config,
         ),
       );
@@ -160,11 +161,27 @@ class _MountainDetailViewState extends ConsumerState<MountainDetailView>
                 Expanded(
                   child: LayoutBuilder(
                     builder: (_, constraints) {
+                      // Map levelIndex (1-based) → étoiles gagnées pour
+                      // cette montagne. Le provider est déjà watché plus
+                      // haut via `progress`, pas de double-subscribe.
+                      final stars = <int, int>{
+                        for (var i = 1; i <= mountain.totalLevels; i++)
+                          if (progress.starsOnLevel(
+                                mountainId: mountain.id,
+                                levelIndex: i,
+                              ) >
+                              0)
+                            i: progress.starsOnLevel(
+                              mountainId: mountain.id,
+                              levelIndex: i,
+                            ),
+                      };
                       return _LevelsLayer(
                         mountain: mountain,
                         size: constraints.biggest,
                         pulse: _pulseCtrl,
                         onLevelTap: _onLevelTap,
+                        starsByLevel: stars,
                       );
                     },
                   ),
@@ -269,12 +286,17 @@ class _LevelsLayer extends StatelessWidget {
     required this.size,
     required this.pulse,
     required this.onLevelTap,
+    this.starsByLevel = const <int, int>{},
   });
 
   final Mountain mountain;
   final Size size;
   final AnimationController pulse;
   final ValueChanged<int> onLevelTap;
+
+  /// Étoiles gagnées par niveau (levelIndex 1-based → 0..3). Niveaux non
+  /// joués absents de la map. Affichés en mini-row sous chaque bullet.
+  final Map<int, int> starsByLevel;
 
   /// Calcule la position (Offset) du centre de la boule du niveau (1-N).
   ///
@@ -331,6 +353,7 @@ class _LevelsLayer extends StatelessWidget {
                   ? _BulletStatus.current
                   : _BulletStatus.locked,
               pulse: pulse,
+              starsEarned: starsByLevel[i + 1] ?? 0,
               onTap: () => onLevelTap(i + 1),
             ),
           ),
@@ -397,12 +420,17 @@ class _LevelBullet extends StatelessWidget {
     required this.status,
     required this.pulse,
     required this.onTap,
+    this.starsEarned = 0,
   });
 
   final int levelNumber;
   final _BulletStatus status;
   final AnimationController pulse;
   final VoidCallback onTap;
+
+  /// Étoiles obtenues sur ce niveau (0-3). Quand > 0, affiche une mini-row
+  /// d'étoiles dorées sous le bullet pour signaler la performance.
+  final int starsEarned;
 
   Color get _bg {
     switch (status) {
@@ -460,9 +488,40 @@ class _LevelBullet extends StatelessWidget {
       ),
     );
 
-    if (status != _BulletStatus.current) return bullet;
+    // Mini-row d'étoiles affichée sous le bullet pour les niveaux où le
+    // joueur a déjà obtenu au moins 1 étoile (toujours vrai post-victoire).
+    Widget bulletWithStars = bullet;
+    if (starsEarned > 0) {
+      bulletWithStars = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          bullet,
+          const SizedBox(height: 2),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              for (var i = 1; i <= 3; i++) ...<Widget>[
+                if (i > 1) const SizedBox(width: 1),
+                Icon(
+                  i <= starsEarned
+                      ? Icons.star_rounded
+                      : Icons.star_outline_rounded,
+                  size: 12,
+                  color: i <= starsEarned
+                      ? AppColors.orJour
+                      : Colors.white.withValues(alpha: 0.3),
+                ),
+              ],
+            ],
+          ),
+        ],
+      );
+    }
 
-    // Halo pulsant pour le niveau courant.
+    if (status != _BulletStatus.current) return bulletWithStars;
+
+    // Halo pulsant pour le niveau courant — entoure uniquement le bullet,
+    // pas la row d'étoiles.
     return AnimatedBuilder(
       animation: pulse,
       builder: (_, __) {
@@ -483,7 +542,7 @@ class _LevelBullet extends StatelessWidget {
                 ),
               ),
             ),
-            bullet,
+            bulletWithStars,
           ],
         );
       },

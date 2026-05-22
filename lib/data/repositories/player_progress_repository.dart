@@ -63,23 +63,54 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
 
   /// Récompense après une victoire sur une montagne donnée.
   ///
-  /// `caurisAwarded` = base 30 + bonus vitesse (timeLeft × 2).
+  /// `caurisAwarded` = base 30 + bonus vitesse (timeLeft × 2), multiplié
+  /// par `caurisMultiplier` du tier.
+  ///
+  /// Quand `levelIndex` et `starsEarned` sont fournis, persiste aussi le
+  /// score étoile du niveau en gardant **le meilleur** entre la valeur
+  /// existante et la nouvelle (un re-run avec un meilleur perf up le
+  /// score ; un re-run moins bon n'écrase pas).
+  ///
   /// Reset le compteur d'échecs consécutifs.
   Future<void> recordWin({
     required String? mountainId,
     required int caurisAwarded,
+    int? levelIndex,
+    int? starsEarned,
   }) async {
     final levels = Map<String, int>.from(state.completedLevelsByMountain);
     if (mountainId != null) {
-      levels[mountainId] = (levels[mountainId] ?? 0) + 1;
+      // On n'incrémente le compteur de niveaux complétés que si le joueur
+      // pousse le front d'avancement (1er run d'un niveau). Les re-runs
+      // de niveaux déjà complétés mettent à jour les étoiles uniquement.
+      final currentCompleted = levels[mountainId] ?? 0;
+      if (levelIndex == null || levelIndex > currentCompleted) {
+        levels[mountainId] = currentCompleted + 1;
+      }
     }
+
+    // Merge max sur le score étoile du niveau (rejouabilité).
+    final stars = Map<String, int>.from(state.starsByLevel);
+    if (mountainId != null && levelIndex != null && starsEarned != null) {
+      final key = '$mountainId#$levelIndex';
+      final previous = stars[key] ?? 0;
+      if (starsEarned > previous) {
+        stars[key] = starsEarned;
+      }
+    }
+
+    final isFirstRun = mountainId == null ||
+        levelIndex == null ||
+        levelIndex > (state.completedLevelsByMountain[mountainId] ?? 0);
 
     final newState = state.copyWith(
       cauris: state.cauris + caurisAwarded,
       completedLevelsByMountain: levels,
-      totalLevelsCompleted: state.totalLevelsCompleted + 1,
+      totalLevelsCompleted:
+          state.totalLevelsCompleted + (isFirstRun ? 1 : 0),
       lastPlayDate: DateTime.now(),
       consecutiveFailures: 0,
+      starsByLevel: stars,
     );
     state = newState;
     await _repo.save(newState);

@@ -135,7 +135,7 @@ class _GameViewState extends ConsumerState<GameView>
         _overlayShown = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          _showVictoryOverlay(context, next.timeLeft);
+          _showVictoryOverlay(context, next.timeLeft, next.starsEarned);
         });
       } else if (next.phase == GamePhase.lost &&
           (previous == null || previous.phase != GamePhase.lost)) {
@@ -314,7 +314,7 @@ class _GameViewState extends ConsumerState<GameView>
     }
   }
 
-  void _showVictoryOverlay(BuildContext ctx, int timeLeft) {
+  void _showVictoryOverlay(BuildContext ctx, int timeLeft, int starsEarned) {
     showDialog<void>(
       context: ctx,
       barrierDismissible: false,
@@ -322,6 +322,7 @@ class _GameViewState extends ConsumerState<GameView>
       builder: (_) => VictoryView(
         devinette: widget.args.devinette,
         timeLeft: timeLeft,
+        starsEarned: starsEarned,
         onNext: () {
           // Ferme l'overlay puis enchaîne automatiquement sur la prochaine
           // étape : devinette suivante de la même montagne, ou montagne
@@ -429,10 +430,12 @@ class _GameViewState extends ConsumerState<GameView>
       // Pour la devinette suivante en chaîne, on se base sur le niveau
       // que le joueur s'apprête à atteindre (completedLevels + 1).
       // Si pas de montagne (mode Hub) → config fallback.
+      final nextLevelIndex =
+          mountain != null ? mountain.completedLevels + 1 : null;
       final config = mountain != null
           ? LevelDifficultyResolver.resolve(
               mountain: mountain,
-              levelIndex: mountain.completedLevels + 1,
+              levelIndex: nextLevelIndex!,
             )
           : LevelDifficultyResolver.fallback();
 
@@ -451,6 +454,7 @@ class _GameViewState extends ConsumerState<GameView>
         extra: GameArgs(
           devinette: next,
           mountainId: mountainId,
+          levelIndex: nextLevelIndex,
           config: config,
         ),
       );

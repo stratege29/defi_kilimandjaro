@@ -186,6 +186,39 @@ void main() {
     });
   });
 
+  group('LevelDifficultyResolver — distractorCount par tier', () {
+    test('tier 1-2 → 0 distracteur (zone tutoriel)', () {
+      final tier1 = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 't1', altitude: 200),
+        levelIndex: 1,
+      );
+      final tier2 = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 't2', altitude: 800),
+        levelIndex: 1,
+      );
+      expect(tier1.distractorCount, 0);
+      expect(tier2.distractorCount, 0);
+    });
+
+    test('progression 1 → 2 → 3 distracteurs aux tiers 3/4/5', () {
+      final tier3 = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 't3', altitude: 2000),
+        levelIndex: 1,
+      );
+      final tier4 = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 't4', altitude: 3500),
+        levelIndex: 1,
+      );
+      final tier5 = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 't5', altitude: 5000),
+        levelIndex: 1,
+      );
+      expect(tier3.distractorCount, 1);
+      expect(tier4.distractorCount, 2);
+      expect(tier5.distractorCount, 3);
+    });
+  });
+
   group('LevelDifficultyResolver — clamping levelIndex', () {
     test('levelIndex < 1 clampé à 1 (UX > strictness)', () {
       final m = _make(id: 'clamp', altitude: 500);

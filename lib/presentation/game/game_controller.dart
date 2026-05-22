@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:defi_kilimandjaro/domain/entities/level_star_rating.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,9 +21,11 @@ class GameState {
     required this.phase,
     required this.cauris,
     required this.shuffledIndices,
+    required this.effectivePool,
     this.hintRevealedCount = 0,
     this.validationCorrect = false,
     this.reverseAnswer = false,
+    this.starsEarned = 0,
   });
 
   final Devinette devinette;
@@ -34,7 +37,13 @@ class GameState {
   final GamePhase phase;
   final int cauris;
 
-  /// Permutation des indices de lettersPool (Fisher-Yates au départ).
+  /// Pool effectif affiché dans la grille : lettres de `devinette.answer`
+  /// + N lettres parasites (cf. `LevelDifficultyConfig.distractorCount`).
+  /// Reste fixé au début de la partie, identique à `devinette.lettersPool`
+  /// quand `distractorCount == 0`.
+  final List<String> effectivePool;
+
+  /// Permutation des indices de [effectivePool] (Fisher-Yates au départ).
   final List<int> shuffledIndices;
 
   /// Nombre de lettres révélées par l'indice.
@@ -48,6 +57,11 @@ class GameState {
   /// `devinette.answer` lu de droite à gauche.
   final bool reverseAnswer;
 
+  /// Nombre d'étoiles obtenues une fois la partie en phase `won`
+  /// (0 sinon). Calculé une seule fois lors de la validation (cf.
+  /// `LevelStarRating.computeStars`).
+  final int starsEarned;
+
   /// Séquence de lettres attendue compte tenu du modifier `reverse`.
   /// Stockée comme String pour permettre l'égalité directe avec
   /// [formedWord] et l'itération par indice dans [hintTileIndices].
@@ -55,14 +69,16 @@ class GameState {
       ? String.fromCharCodes(devinette.answer.runes.toList().reversed)
       : devinette.answer;
 
-  /// Lettres dans l'ordre shufflé.
+  /// Lettres dans l'ordre shufflé (inclut les distracteurs si présents).
   List<String> get displayLetters => shuffledIndices
-      .map((i) => devinette.lettersPool[i])
+      .map((i) => effectivePool[i])
       .toList(growable: false);
 
   /// Mot formé par les indices sélectionnés (lettres dans l'ordre de sélection).
+  /// Inclut les distracteurs si le joueur en tape un — la validation
+  /// le rejettera puisque le mot formé ne matchera plus `expectedAnswer`.
   String get formedWord => selectedIndices
-      .map((si) => devinette.lettersPool[shuffledIndices[si]])
+      .map((si) => effectivePool[shuffledIndices[si]])
       .join();
 
   bool get isComplete => selectedIndices.length == devinette.answer.length;
@@ -86,7 +102,7 @@ class GameState {
       final target = answer[k];
       for (var gridIdx = 0; gridIdx < shuffledIndices.length; gridIdx++) {
         if (used.contains(gridIdx)) continue;
-        final letter = devinette.lettersPool[shuffledIndices[gridIdx]];
+        final letter = effectivePool[shuffledIndices[gridIdx]];
         if (letter == target) {
           result.add(gridIdx);
           used.add(gridIdx);
@@ -104,9 +120,11 @@ class GameState {
     GamePhase? phase,
     int? cauris,
     List<int>? shuffledIndices,
+    List<String>? effectivePool,
     int? hintRevealedCount,
     bool? validationCorrect,
     bool? reverseAnswer,
+    int? starsEarned,
   }) {
     return GameState(
       devinette: devinette ?? this.devinette,
@@ -115,9 +133,11 @@ class GameState {
       phase: phase ?? this.phase,
       cauris: cauris ?? this.cauris,
       shuffledIndices: shuffledIndices ?? this.shuffledIndices,
+      effectivePool: effectivePool ?? this.effectivePool,
       hintRevealedCount: hintRevealedCount ?? this.hintRevealedCount,
       validationCorrect: validationCorrect ?? this.validationCorrect,
       reverseAnswer: reverseAnswer ?? this.reverseAnswer,
+      starsEarned: starsEarned ?? this.starsEarned,
     );
   }
 }
@@ -135,17 +155,56 @@ class GameState {
 class GameController extends StateNotifier<GameState> {
   GameController(this._args, this._audio, this._progress)
     : super(
-        GameState(
-          devinette: _args.devinette,
-          selectedIndices: const <int>[],
-          timeLeft: _args.config.timerSeconds,
-          phase: GamePhase.playing,
-          cauris: _progress.state.cauris,
-          shuffledIndices: _shuffleIndices(_args.devinette.lettersPool.length),
-          reverseAnswer: _args.config.hasReverse,
-        ),
+        _initialState(_args, _progress.state.cauris),
       ) {
     _startTimer();
+  }
+
+  /// Construit l'état initial : génère les distracteurs selon la config,
+  /// shuffle le pool effectif, applique le flag reverse. Extrait pour
+  /// être réutilisable par [restart].
+  static GameState _initialState(GameArgs args, int cauris) {
+    final rng = Random();
+    final effectivePool = _buildEffectivePool(
+      original: args.devinette.lettersPool,
+      answer: args.devinette.answer,
+      distractorCount: args.config.distractorCount,
+      rng: rng,
+    );
+    return GameState(
+      devinette: args.devinette,
+      selectedIndices: const <int>[],
+      timeLeft: args.config.timerSeconds,
+      phase: GamePhase.playing,
+      cauris: cauris,
+      effectivePool: effectivePool,
+      shuffledIndices: _shuffleIndices(effectivePool.length, rng),
+      reverseAnswer: args.config.hasReverse,
+    );
+  }
+
+  /// Génère le pool effectif = pool original + N distracteurs aléatoires
+  /// pris dans l'alphabet français hors lettres de `answer` (pour ne pas
+  /// créer d'ambiguïté avec les lettres légitimes du mot — un distracteur
+  /// 'O' alors que le mot contient déjà 'O' pourrait piéger le `hint`).
+  static List<String> _buildEffectivePool({
+    required List<String> original,
+    required String answer,
+    required int distractorCount,
+    required Random rng,
+  }) {
+    if (distractorCount <= 0) return List<String>.from(original);
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    final excluded = answer.toUpperCase().split('').toSet();
+    final available = alphabet
+        .split('')
+        .where((l) => !excluded.contains(l))
+        .toList(growable: false);
+    final picks = List<String>.from(available)..shuffle(rng);
+    return <String>[
+      ...original,
+      ...picks.take(distractorCount),
+    ];
   }
 
   static const int _hintCost = 20;
@@ -255,16 +314,27 @@ class GameController extends StateNotifier<GameState> {
       // de difficulté (1.0 → 2.5 selon le tier).
       final raw = _caurisBase + state.timeLeft * 2;
       final caurisAwarded = (raw * _args.config.caurisMultiplier).round();
+      // Étoiles : (1) victoire (2) sans indice (3) ≥ 50 % timer restant.
+      final stars = LevelStarRating.computeStars(
+        won: true,
+        hintUsed: state.hintRevealedCount > 0,
+        timerSeconds: _args.config.timerSeconds,
+        timeLeftAtVictory: state.timeLeft,
+      );
       state = state.copyWith(
         phase: GamePhase.won,
         validationCorrect: true,
         cauris: state.cauris + caurisAwarded,
+        starsEarned: stars,
       );
-      // Persiste la victoire (cauris + level mountain + total + lastPlay).
+      // Persiste la victoire (cauris + level mountain + total + lastPlay
+      // + meilleur score étoile pour ce niveau).
       unawaited(
         _progress.recordWin(
           mountainId: _args.mountainId,
           caurisAwarded: caurisAwarded,
+          levelIndex: _args.levelIndex,
+          starsEarned: stars,
         ),
       );
       // Audio: balafon accord 5 notes puis fanfare griot.
@@ -304,18 +374,11 @@ class GameController extends StateNotifier<GameState> {
   }
 
   /// Re-démarre la même devinette : re-shuffle, timer adaptatif depuis
-  /// la config, sélection vide.
+  /// la config, sélection vide. Génère de nouveaux distracteurs aléatoires
+  /// pour éviter la mémorisation d'une grille spécifique entre runs.
   void restart() {
     _timer?.cancel();
-    state = GameState(
-      devinette: state.devinette,
-      selectedIndices: const <int>[],
-      timeLeft: _args.config.timerSeconds,
-      phase: GamePhase.playing,
-      cauris: _progress.state.cauris,
-      shuffledIndices: _shuffleIndices(state.devinette.lettersPool.length),
-      reverseAnswer: _args.config.hasReverse,
-    );
+    state = _initialState(_args, _progress.state.cauris);
     _startTimer();
   }
 
@@ -347,12 +410,14 @@ class GameController extends StateNotifier<GameState> {
     });
   }
 
-  /// Fisher-Yates shuffle sur [0..count-1].
-  static List<int> _shuffleIndices(int count) {
-    final rng = Random();
+  /// Fisher-Yates shuffle sur [0..count-1]. `rng` injectable pour que la
+  /// même instance Random soit partagée avec [_buildEffectivePool] (tirage
+  /// distracteurs + shuffle cohérents sur un même run).
+  static List<int> _shuffleIndices(int count, [Random? rng]) {
+    final r = rng ?? Random();
     final list = List<int>.generate(count, (i) => i);
     for (var i = list.length - 1; i > 0; i--) {
-      final j = rng.nextInt(i + 1);
+      final j = r.nextInt(i + 1);
       final tmp = list[i];
       list[i] = list[j];
       list[j] = tmp;

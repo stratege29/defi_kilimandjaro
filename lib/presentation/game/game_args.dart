@@ -16,17 +16,25 @@ class GameArgs {
     required this.devinette,
     required this.config,
     this.mountainId,
+    this.levelIndex,
   });
 
   /// Constructeur de commodité pour les call-sites qui n'ont pas encore
   /// migré : applique la config fallback. À supprimer une fois toute la
-  /// codebase migrée (S2+).
+  /// codebase migrée.
   GameArgs.legacy({
     required this.devinette,
     this.mountainId,
+    this.levelIndex,
   }) : config = LevelDifficultyConfig.fallback;
 
   final Devinette devinette;
   final String? mountainId;
+
+  /// Index 1-based du niveau dans la montagne. Utilisé pour persister
+  /// le score étoile par niveau (`PlayerProgress.starsByLevel`). Null en
+  /// mode Hub (jeu sans contexte géographique).
+  final int? levelIndex;
+
   final LevelDifficultyConfig config;
 }
