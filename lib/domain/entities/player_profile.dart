@@ -19,6 +19,7 @@ class PlayerProfile extends Equatable {
     required this.losses,
     this.displayName,
     this.displayNameUpdatedAt,
+    this.avatarId,
   });
 
   factory PlayerProfile.initial(String uid) => PlayerProfile(
@@ -44,6 +45,7 @@ class PlayerProfile extends Equatable {
             : DateTime.fromMillisecondsSinceEpoch(
                 (json['display_name_updated_at'] as num).toInt(),
               ),
+        avatarId: json['avatar_id'] as String?,
       );
 
   /// ELO initial : 1000 m (altitude de départ symbolique).
@@ -70,6 +72,10 @@ class PlayerProfile extends Equatable {
   /// Date de la dernière modification du displayName (anti-spam).
   final DateTime? displayNameUpdatedAt;
 
+  /// Id de l'avatar choisi (cf. `AvatarCatalog`). Null = pas encore choisi
+  /// → fallback initiale du pseudo dans l'UI.
+  final String? avatarId;
+
   /// Taux de victoire [0.0 – 1.0]. Null si pas de duel joué.
   double? get winRate => totalDuels == 0 ? null : wins / totalDuels;
 
@@ -90,6 +96,7 @@ class PlayerProfile extends Equatable {
         'wins': wins,
         'losses': losses,
         if (displayName != null) 'display_name': displayName,
+        if (avatarId != null) 'avatar_id': avatarId,
       };
 
   PlayerProfile copyWith({
@@ -101,6 +108,7 @@ class PlayerProfile extends Equatable {
     int? losses,
     String? displayName,
     DateTime? displayNameUpdatedAt,
+    String? avatarId,
   }) {
     return PlayerProfile(
       uid: uid ?? this.uid,
@@ -111,6 +119,7 @@ class PlayerProfile extends Equatable {
       losses: losses ?? this.losses,
       displayName: displayName ?? this.displayName,
       displayNameUpdatedAt: displayNameUpdatedAt ?? this.displayNameUpdatedAt,
+      avatarId: avatarId ?? this.avatarId,
     );
   }
 
@@ -124,5 +133,6 @@ class PlayerProfile extends Equatable {
         losses,
         displayName,
         displayNameUpdatedAt,
+        avatarId,
       ];
 }

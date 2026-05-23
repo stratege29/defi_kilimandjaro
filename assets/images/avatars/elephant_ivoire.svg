@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- elephant_ivoire : baby elephant with kente-patterned ears -->
+  <defs>
+    <radialGradient id="bgEle" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#E9F4D9"/>
+      <stop offset="100%" stop-color="#4A8B3E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="230" fill="url(#bgEle)"/>
+
+  <!-- Legs (4 stubby) -->
+  <rect x="160" y="400" width="50" height="70" rx="14" fill="#9DA3A8" stroke="#1F1A17" stroke-width="5"/>
+  <rect x="220" y="410" width="48" height="60" rx="14" fill="#9DA3A8" stroke="#1F1A17" stroke-width="5"/>
+  <rect x="278" y="410" width="48" height="60" rx="14" fill="#9DA3A8" stroke="#1F1A17" stroke-width="5"/>
+  <rect x="335" y="400" width="50" height="70" rx="14" fill="#9DA3A8" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Toenails -->
+  <ellipse cx="175" cy="465" rx="4" ry="3" fill="#FAF3E0" stroke="#1F1A17" stroke-width="2"/>
+  <ellipse cx="195" cy="465" rx="4" ry="3" fill="#FAF3E0" stroke="#1F1A17" stroke-width="2"/>
+  <ellipse cx="350" cy="465" rx="4" ry="3" fill="#FAF3E0" stroke="#1F1A17" stroke-width="2"/>
+  <ellipse cx="370" cy="465" rx="4" ry="3" fill="#FAF3E0" stroke="#1F1A17" stroke-width="2"/>
+
+  <!-- Body (round chubby) -->
+  <ellipse cx="272" cy="350" rx="130" ry="90" fill="#9DA3A8" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Belly shading -->
+  <ellipse cx="272" cy="380" rx="90" ry="40" fill="#B8BCC0" opacity="0.5"/>
+
+  <!-- Tiny tail with tuft -->
+  <path d="M 400 350 Q 430 360 425 390" fill="none" stroke="#9DA3A8" stroke-width="10" stroke-linecap="round"/>
+  <path d="M 400 350 Q 430 360 425 390" fill="none" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="425" cy="395" r="9" fill="#6E767D" stroke="#1F1A17" stroke-width="3"/>
+
+  <!-- Head -->
+  <ellipse cx="200" cy="240" rx="105" ry="100" fill="#9DA3A8" stroke="#1F1A17" stroke-width="5"/>
+
+  <!-- Ear left (with kente pattern) -->
+  <ellipse cx="115" cy="220" rx="50" ry="60" fill="#9DA3A8" stroke="#1F1A17" stroke-width="5"/>
+  <ellipse cx="118" cy="225" rx="32" ry="42" fill="#E89BB0" stroke="#1F1A17" stroke-width="3"/>
+  <!-- Kente stripes inner -->
+  <rect x="98" y="200" width="40" height="6" fill="#F4B942"/>
+  <rect x="98" y="210" width="40" height="6" fill="#4A8B3E"/>
+  <rect x="98" y="220" width="40" height="6" fill="#E54F3B"/>
+  <rect x="98" y="230" width="40" height="6" fill="#3B4B8C"/>
+  <rect x="98" y="240" width="40" height="6" fill="#F4B942"/>
+
+  <!-- Ear right (with kente pattern) -->
+  <ellipse cx="285" cy="220" rx="50" ry="60" fill="#9DA3A8" stroke="#1F1A17" stroke-width="5"/>
+  <ellipse cx="282" cy="225" rx="32" ry="42" fill="#E89BB0" stroke="#1F1A17" stroke-width="3"/>
+  <rect x="262" y="200" width="40" height="6" fill="#F4B942"/>
+  <rect x="262" y="210" width="40" height="6" fill="#4A8B3E"/>
+  <rect x="262" y="220" width="40" height="6" fill="#E54F3B"/>
+  <rect x="262" y="230" width="40" height="6" fill="#3B4B8C"/>
+  <rect x="262" y="240" width="40" height="6" fill="#F4B942"/>
+
+  <!-- Trunk raised triumphantly -->
+  <path d="M 200 290 Q 220 340 270 320 Q 320 295 330 230 Q 335 175 310 155 Q 290 145 290 165 Q 295 195 300 220 Q 305 270 270 285 Q 230 295 215 280" fill="#9DA3A8" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Trunk wrinkles -->
+  <path d="M 232 285 Q 240 282 248 286" fill="none" stroke="#6E767D" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 260 280 Q 268 275 276 280" fill="none" stroke="#6E767D" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 285 265 Q 295 260 305 265" fill="none" stroke="#6E767D" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 300 230 Q 310 225 320 230" fill="none" stroke="#6E767D" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Tusks -->
+  <path d="M 170 290 Q 168 305 175 312 Z" fill="#FAF3E0" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M 215 295 Q 217 310 210 315 Z" fill="#FAF3E0" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Eyes (big kawai with sparkle) -->
+  <circle cx="170" cy="230" r="14" fill="#FFFFFF" stroke="#1F1A17" stroke-width="4"/>
+  <circle cx="172" cy="232" r="7" fill="#1F1A17"/>
+  <circle cx="174" cy="229" r="2.5" fill="#FFFFFF"/>
+  <circle cx="225" cy="230" r="14" fill="#FFFFFF" stroke="#1F1A17" stroke-width="4"/>
+  <circle cx="227" cy="232" r="7" fill="#1F1A17"/>
+  <circle cx="229" cy="229" r="2.5" fill="#FFFFFF"/>
+
+  <!-- Sparkle stars near eyes -->
+  <text x="148" y="208" font-family="Arial" font-size="18" fill="#F4B942" stroke="#1F1A17" stroke-width="1">✦</text>
+  <text x="240" y="210" font-family="Arial" font-size="16" fill="#F4B942" stroke="#1F1A17" stroke-width="1">✦</text>
+
+  <!-- Blush -->
+  <ellipse cx="148" cy="270" rx="12" ry="7" fill="#E58A8A" opacity="0.55"/>
+  <ellipse cx="245" cy="270" rx="12" ry="7" fill="#E58A8A" opacity="0.55"/>
+</svg>

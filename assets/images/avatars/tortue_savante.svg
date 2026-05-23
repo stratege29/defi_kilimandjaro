@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- tortue_savante : tortue ancienne, lunettes rondes, carapace adinkra, parchemin -->
+  <defs>
+    <radialGradient id="bg4" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#E9F4D9"/>
+      <stop offset="100%" stop-color="#4A8B3E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="230" fill="url(#bg4)"/>
+
+  <!-- Pattes arrière -->
+  <ellipse cx="160" cy="430" rx="35" ry="22" fill="#5B7A3E" stroke="#1F1A17" stroke-width="5"/>
+  <ellipse cx="352" cy="430" rx="35" ry="22" fill="#5B7A3E" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Griffes -->
+  <line x1="140" y1="448" x2="135" y2="455" stroke="#1F1A17" stroke-width="3"/>
+  <line x1="155" y1="450" x2="153" y2="458" stroke="#1F1A17" stroke-width="3"/>
+  <line x1="370" y1="448" x2="375" y2="455" stroke="#1F1A17" stroke-width="3"/>
+  <line x1="355" y1="450" x2="357" y2="458" stroke="#1F1A17" stroke-width="3"/>
+
+  <!-- Carapace -->
+  <ellipse cx="256" cy="340" rx="180" ry="100" fill="#D97742" stroke="#1F1A17" stroke-width="6"/>
+  <!-- Plaques hexagonales avec adinkra -->
+  <path d="M 200 290 L 230 280 L 245 305 L 230 330 L 200 330 L 185 305 Z" fill="#A85820" stroke="#1F1A17" stroke-width="3"/>
+  <path d="M 270 280 L 300 270 L 315 295 L 300 320 L 270 320 L 255 295 Z" fill="#A85820" stroke="#1F1A17" stroke-width="3"/>
+  <path d="M 340 290 L 370 280 L 385 305 L 370 330 L 340 330 L 325 305 Z" fill="#A85820" stroke="#1F1A17" stroke-width="3"/>
+  <path d="M 175 360 L 205 350 L 220 375 L 205 400 L 175 400 L 160 375 Z" fill="#A85820" stroke="#1F1A17" stroke-width="3"/>
+  <path d="M 295 360 L 325 350 L 340 375 L 325 400 L 295 400 L 280 375 Z" fill="#A85820" stroke="#1F1A17" stroke-width="3"/>
+  <!-- Symboles adinkra stylisés (Gye Nyame, Sankofa) -->
+  <text x="215" y="313" font-family="Arial" font-size="22" fill="#F4B942" text-anchor="middle">✦</text>
+  <text x="285" y="303" font-family="Arial" font-size="22" fill="#F4B942" text-anchor="middle">❋</text>
+  <text x="355" y="313" font-family="Arial" font-size="22" fill="#F4B942" text-anchor="middle">⊛</text>
+  <text x="190" y="383" font-family="Arial" font-size="22" fill="#F4B942" text-anchor="middle">◈</text>
+  <text x="310" y="383" font-family="Arial" font-size="22" fill="#F4B942" text-anchor="middle">✺</text>
+
+  <!-- Cou + tête sortant -->
+  <path d="M 220 280 Q 200 220 220 170 Q 240 150 280 155 Q 320 160 330 200 Q 330 250 300 280 Z" fill="#7A9E5B" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Tête (bec proéminent) -->
+  <ellipse cx="265" cy="175" rx="55" ry="48" fill="#7A9E5B" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Bec -->
+  <path d="M 215 180 Q 195 188 215 200 Z" fill="#F4B942" stroke="#1F1A17" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Lunettes rondes sur le bec -->
+  <circle cx="240" cy="165" r="22" fill="#FFFFFF" stroke="#1F1A17" stroke-width="4"/>
+  <circle cx="285" cy="165" r="22" fill="#FFFFFF" stroke="#1F1A17" stroke-width="4"/>
+  <line x1="262" y1="165" x2="263" y2="165" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Pupilles + sourcil levé sur l'œil droit -->
+  <circle cx="240" cy="168" r="6" fill="#1F1A17"/>
+  <circle cx="285" cy="168" r="6" fill="#1F1A17"/>
+  <circle cx="242" cy="166" r="2" fill="#FFFFFF"/>
+  <circle cx="287" cy="166" r="2" fill="#FFFFFF"/>
+  <!-- Sourcil levé -->
+  <path d="M 270 138 Q 285 130 305 140" fill="none" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 220 145 Q 235 142 255 145" fill="none" stroke="#1F1A17" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Joues -->
+  <ellipse cx="225" cy="200" rx="9" ry="6" fill="#E58A8A" opacity="0.5"/>
+  <ellipse cx="305" cy="200" rx="9" ry="6" fill="#E58A8A" opacity="0.5"/>
+
+  <!-- Patte avant gauche tenant le parchemin -->
+  <ellipse cx="110" cy="350" rx="30" ry="22" fill="#5B7A3E" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Parchemin ouvert -->
+  <g transform="translate(60 290)">
+    <rect x="0" y="0" width="120" height="80" rx="6" fill="#FAF3E0" stroke="#1F1A17" stroke-width="4"/>
+    <line x1="15" y1="20" x2="105" y2="20" stroke="#7A4E2B" stroke-width="2"/>
+    <line x1="15" y1="35" x2="95" y2="35" stroke="#7A4E2B" stroke-width="2"/>
+    <line x1="15" y1="50" x2="100" y2="50" stroke="#7A4E2B" stroke-width="2"/>
+    <line x1="15" y1="65" x2="85" y2="65" stroke="#7A4E2B" stroke-width="2"/>
+    <!-- Coin enroulé -->
+    <path d="M 120 0 Q 130 10 120 20 L 120 0 Z" fill="#E0D8B8" stroke="#1F1A17" stroke-width="3"/>
+  </g>
+
+  <!-- Patte avant droite -->
+  <ellipse cx="410" cy="360" rx="30" ry="22" fill="#5B7A3E" stroke="#1F1A17" stroke-width="5"/>
+
+  <!-- Queue -->
+  <path d="M 430 340 Q 460 345 470 360" fill="none" stroke="#5B7A3E" stroke-width="14" stroke-linecap="round"/>
+  <path d="M 430 340 Q 460 345 470 360" fill="none" stroke="#1F1A17" stroke-width="5"/>
+</svg>

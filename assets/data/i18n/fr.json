@@ -92,7 +92,50 @@
       "message": "Tous les cauris, niveaux et titres seront perdus. Action irréversible.",
       "confirm": "Réinitialiser"
     },
-    "title_progress": "Termine {threshold} niveaux pour débloquer ({current}/{threshold})"
+    "title_progress": "Termine {threshold} niveaux pour débloquer ({current}/{threshold})",
+    "avatar_badge": {
+      "semantics": "Modifier mon avatar"
+    },
+    "avatar_picker": {
+      "title": "CHOISIR UN AVATAR",
+      "validate": "VALIDER",
+      "locked_snackbar": "Atteins l'altitude {elo} m pour débloquer cet avatar",
+      "category": {
+        "griot": "Griots & sages",
+        "masque": "Masques traditionnels",
+        "vie_quotidienne": "Vie quotidienne",
+        "aliment": "Saveurs d'ici",
+        "instrument": "Instruments",
+        "faune": "Faune d'Afrique",
+        "wildcard": "Bonus"
+      }
+    }
+  },
+  "avatar": {
+    "griot_classique": "Le Griot",
+    "griot_moderne": "Griot 2.0",
+    "vieux_sage": "Le Vieux Sage",
+    "tortue_savante": "Tortue Savante",
+    "masque_baoule_lune": "Masque Lune",
+    "masque_dan": "Masque Dan",
+    "masque_senoufo_kpelie": "Kpélié",
+    "gbaka_conducteur": "Chauffeur Gbaka",
+    "vendeuse_attieke": "Maman Attiéké",
+    "maman_bebe": "Maman & Bébé",
+    "case_kawai": "Petite Case",
+    "grand_marche": "Au Grand Marché",
+    "cabosse_cacao": "Cabosse Cacao",
+    "mangue_souriante": "Mangue Mûre",
+    "igname_dansante": "Igname Dansante",
+    "piment_furieux": "Piment Furieux",
+    "tamtam_tete": "Tam-Tam",
+    "balafon_baby": "Bébé Balafon",
+    "calebasse_tete": "Tête-Calebasse",
+    "elephant_ivoire": "Éléphant d'Ivoire",
+    "hippo_jovial": "Hippo Jovial",
+    "toucan_bavard": "Toucan Bavard",
+    "panthere_royale": "Panthère Royale",
+    "squelette_ancetre": "Ancêtre Mystique"
   },
   "shop": {
     "title": "BOUTIQUE",

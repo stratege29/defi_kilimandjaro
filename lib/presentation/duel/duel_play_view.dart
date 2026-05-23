@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
@@ -5,6 +7,7 @@ import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_controller.dart';
+import 'package:defi_kilimandjaro/presentation/duel/widgets/duel_intro_overlay.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/answer_cells.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/circular_grid.dart';
@@ -30,6 +33,11 @@ class DuelPlayView extends ConsumerStatefulWidget {
 }
 
 class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
+  static const Duration _introDuration = Duration(milliseconds: 2500);
+
+  bool _showIntro = true;
+  Timer? _introTimer;
+
   @override
   void initState() {
     super.initState();
@@ -39,6 +47,16 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
         ref.read(audioControllerProvider.notifier).playDuelStart().ignore();
       });
     }
+    _introTimer = Timer(_introDuration, () {
+      if (!mounted) return;
+      setState(() => _showIntro = false);
+    });
+  }
+
+  @override
+  void dispose() {
+    _introTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -83,56 +101,71 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
 
     return Scaffold(
       backgroundColor: AppColors.vertForet,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _DuelHeader(
-              selfProgress: selfPlayer?.progress ?? 0,
-              opponentProgress: opponent?.progress ?? 0,
-              opponentLabel: opponent != null ? 'Adversaire' : 'En attente...',
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+              children: [
+                _DuelHeader(
+                  selfProgress: selfPlayer?.progress ?? 0,
+                  opponentProgress: opponent?.progress ?? 0,
+                  opponentLabel:
+                      opponent != null ? 'Adversaire' : 'En attente...',
+                ),
+                const SizedBox(height: 12),
+                _RiddleCard(riddle: liveSession.riddle),
+                const SizedBox(height: 10),
+                TimerBar(timeLeft: localState.timeLeft, totalTime: 30),
+                const SizedBox(height: 14),
+                AnswerCells(
+                  answer: liveSession.answer,
+                  formedLetters: formedLetters,
+                  isValidated: localState.submitted,
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: Center(
+                    child: CircularGrid(
+                      letters: liveSession.lettersPool,
+                      selectedIndices: localState.selectedIndices,
+                      hintTileIndices: const <int>[],
+                      phase: localState.submitted
+                          ? GamePhase.won
+                          : (localState.timeLeft == 0
+                                ? GamePhase.lost
+                                : GamePhase.playing),
+                      seed: liveSession.answer,
+                      onTileEntered: controller.selectTile,
+                      onDragEnd: () {},
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _BottomControls(
+                  onClear: controller.clearSelection,
+                  onForfeit: () async {
+                    await ref
+                        .read(duelRepositoryProvider)
+                        .forfeit(liveSession.matchId);
+                    if (!context.mounted) return;
+                    context.pop();
+                  },
+                ),
+                const SizedBox(height: 12),
+              ],
             ),
-            const SizedBox(height: 12),
-            _RiddleCard(riddle: liveSession.riddle),
-            const SizedBox(height: 10),
-            TimerBar(timeLeft: localState.timeLeft, totalTime: 30),
-            const SizedBox(height: 14),
-            AnswerCells(
-              answer: liveSession.answer,
-              formedLetters: formedLetters,
-              isValidated: localState.submitted,
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: Center(
-                child: CircularGrid(
-                  letters: liveSession.lettersPool,
-                  selectedIndices: localState.selectedIndices,
-                  hintTileIndices: const <int>[],
-                  phase: localState.submitted
-                      ? GamePhase.won
-                      : (localState.timeLeft == 0
-                            ? GamePhase.lost
-                            : GamePhase.playing),
-                  seed: liveSession.answer,
-                  onTileEntered: controller.selectTile,
-                  onDragEnd: () {},
+          ),
+          if (_showIntro)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: DuelIntroOverlay(
+                  selfUid: selfUid,
+                  opponentUid: opponent?.uid,
+                  isRanked: liveSession.isRanked,
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            _BottomControls(
-              onClear: controller.clearSelection,
-              onForfeit: () async {
-                await ref
-                    .read(duelRepositoryProvider)
-                    .forfeit(liveSession.matchId);
-                if (!context.mounted) return;
-                context.pop();
-              },
-            ),
-            const SizedBox(height: 12),
-          ],
-        ),
+        ],
       ),
     );
   }

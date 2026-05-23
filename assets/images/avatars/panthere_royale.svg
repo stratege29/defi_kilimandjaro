@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- panthere_royale : elegant black panther with red collar -->
+  <defs>
+    <radialGradient id="bgPan" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#F4B942" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#3B4B8C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="230" fill="url(#bgPan)"/>
+
+  <!-- Tail curled around -->
+  <path d="M 130 440 Q 90 420 95 370 Q 100 340 130 350" fill="none" stroke="#1F1A17" stroke-width="14" stroke-linecap="round"/>
+  <path d="M 130 440 Q 90 420 95 370 Q 100 340 130 350" fill="none" stroke="#2A2A40" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+  <!-- Tail tip -->
+  <circle cx="130" cy="350" r="10" fill="#1F1A17" stroke="#1F1A17" stroke-width="3"/>
+
+  <!-- Hind legs sitting -->
+  <ellipse cx="180" cy="450" rx="40" ry="28" fill="#1F1A17" stroke="#1F1A17" stroke-width="5"/>
+  <ellipse cx="332" cy="450" rx="40" ry="28" fill="#1F1A17" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Paw toe lines -->
+  <line x1="170" y1="465" x2="170" y2="475" stroke="#3A3A55" stroke-width="2"/>
+  <line x1="185" y1="468" x2="185" y2="478" stroke="#3A3A55" stroke-width="2"/>
+  <line x1="200" y1="465" x2="200" y2="475" stroke="#3A3A55" stroke-width="2"/>
+  <line x1="320" y1="465" x2="320" y2="475" stroke="#3A3A55" stroke-width="2"/>
+  <line x1="335" y1="468" x2="335" y2="478" stroke="#3A3A55" stroke-width="2"/>
+  <line x1="350" y1="465" x2="350" y2="475" stroke="#3A3A55" stroke-width="2"/>
+
+  <!-- Body sitting upright -->
+  <path d="M 175 430 Q 165 320 200 260 Q 256 230 312 260 Q 347 320 337 430 Z" fill="#1F1A17" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Highlights -->
+  <path d="M 205 280 Q 215 340 220 410" fill="none" stroke="#2A2A50" stroke-width="3" opacity="0.7"/>
+  <path d="M 307 280 Q 297 340 292 410" fill="none" stroke="#2A2A50" stroke-width="3" opacity="0.7"/>
+
+  <!-- Right front leg (down) -->
+  <ellipse cx="300" cy="400" rx="22" ry="38" fill="#1F1A17" stroke="#1F1A17" stroke-width="4"/>
+
+  <!-- Left front paw raised in a wave -->
+  <path d="M 195 290 Q 165 250 150 200" fill="none" stroke="#1F1A17" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="150" cy="200" r="20" fill="#1F1A17" stroke="#1F1A17" stroke-width="4"/>
+  <!-- Paw pads -->
+  <circle cx="144" cy="195" r="3" fill="#7A4E2B"/>
+  <circle cx="154" cy="190" r="3" fill="#7A4E2B"/>
+  <circle cx="160" cy="200" r="3" fill="#7A4E2B"/>
+
+  <!-- Red royal collar -->
+  <path d="M 200 260 Q 256 285 312 260 Q 310 275 256 290 Q 202 275 200 260 Z" fill="#E54F3B" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Collar stitching -->
+  <path d="M 210 268 Q 256 285 302 268" fill="none" stroke="#A8351F" stroke-width="2" stroke-dasharray="4 3"/>
+  <!-- Gold medallion pendant -->
+  <circle cx="256" cy="295" r="18" fill="#F4B942" stroke="#1F1A17" stroke-width="4"/>
+  <circle cx="256" cy="295" r="9" fill="none" stroke="#A87A1F" stroke-width="2"/>
+  <path d="M 256 287 L 259 294 L 266 295 L 261 300 L 263 307 L 256 304 L 249 307 L 251 300 L 246 295 L 253 294 Z" fill="#A87A1F"/>
+
+  <!-- Head -->
+  <ellipse cx="256" cy="200" rx="90" ry="80" fill="#1F1A17" stroke="#1F1A17" stroke-width="5"/>
+
+  <!-- Pointed ears -->
+  <path d="M 180 160 L 175 100 L 220 145 Z" fill="#1F1A17" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M 332 160 L 337 100 L 292 145 Z" fill="#1F1A17" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Pink inner ears -->
+  <path d="M 188 150 L 189 118 L 208 142 Z" fill="#E58A8A" stroke="#1F1A17" stroke-width="2" stroke-linejoin="round" opacity="0.85"/>
+  <path d="M 324 150 L 323 118 L 304 142 Z" fill="#E58A8A" stroke="#1F1A17" stroke-width="2" stroke-linejoin="round" opacity="0.85"/>
+
+  <!-- Golden glowing eyes with slit pupils -->
+  <ellipse cx="222" cy="200" rx="16" ry="18" fill="#F4B942" stroke="#1F1A17" stroke-width="4"/>
+  <ellipse cx="290" cy="200" rx="16" ry="18" fill="#F4B942" stroke="#1F1A17" stroke-width="4"/>
+  <!-- Slit pupils -->
+  <ellipse cx="222" cy="200" rx="3" ry="14" fill="#1F1A17"/>
+  <ellipse cx="290" cy="200" rx="3" ry="14" fill="#1F1A17"/>
+  <!-- Reflection -->
+  <circle cx="226" cy="193" r="2" fill="#FFFFFF"/>
+  <circle cx="294" cy="193" r="2" fill="#FFFFFF"/>
+
+  <!-- Nose -->
+  <path d="M 246 230 Q 256 240 266 230 Q 264 238 256 240 Q 248 238 246 230 Z" fill="#E58A8A" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Mouth -->
+  <path d="M 256 240 L 256 250" stroke="#1F1A17" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 256 250 Q 244 258 240 250" fill="none" stroke="#1F1A17" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 256 250 Q 268 258 272 250" fill="none" stroke="#1F1A17" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Whiskers -->
+  <line x1="230" y1="240" x2="180" y2="235" stroke="#FAF3E0" stroke-width="2"/>
+  <line x1="230" y1="245" x2="180" y2="248" stroke="#FAF3E0" stroke-width="2"/>
+  <line x1="282" y1="240" x2="332" y2="235" stroke="#FAF3E0" stroke-width="2"/>
+  <line x1="282" y1="245" x2="332" y2="248" stroke="#FAF3E0" stroke-width="2"/>
+</svg>

@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- case_kawai : case ronde traditionnelle façon personnage kawai -->
+  <defs>
+    <radialGradient id="bgCase" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#FFE9C9"/>
+      <stop offset="100%" stop-color="#4A8B3E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="230" fill="url(#bgCase)"/>
+
+  <!-- Petit sol vert -->
+  <ellipse cx="256" cy="475" rx="200" ry="20" fill="#5B7A3E" stroke="#1F1A17" stroke-width="4"/>
+
+  <!-- Corps de la case : cylindre / mur en terre -->
+  <path d="M 130 280 Q 130 470 256 478 Q 382 470 382 280 L 382 280 Q 350 295 256 295 Q 162 295 130 280 Z" fill="#D97742" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Trait de base du mur -->
+  <path d="M 145 300 Q 256 310 367 300" fill="none" stroke="#A85420" stroke-width="3"/>
+
+  <!-- Toit conique chaume -->
+  <path d="M 100 285 Q 256 80 412 285 Q 380 300 256 305 Q 132 300 100 285 Z" fill="#F4B942" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Stries de paille (lignes brunes) -->
+  <path d="M 256 90 L 130 280" stroke="#7A4E2B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 256 90 L 175 285" stroke="#7A4E2B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 256 90 L 220 290" stroke="#7A4E2B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 256 90 L 256 295" stroke="#7A4E2B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 256 90 L 292 290" stroke="#7A4E2B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 256 90 L 337 285" stroke="#7A4E2B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 256 90 L 382 280" stroke="#7A4E2B" stroke-width="3" stroke-linecap="round"/>
+  <!-- Bandes circulaires de paille -->
+  <path d="M 175 200 Q 256 215 337 200" fill="none" stroke="#7A4E2B" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 145 250 Q 256 268 367 250" fill="none" stroke="#7A4E2B" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Pointe du toit -->
+  <circle cx="256" cy="85" r="10" fill="#7A4E2B" stroke="#1F1A17" stroke-width="3"/>
+
+  <!-- Fumée en forme de coeur rose -->
+  <g transform="translate(256 50)">
+    <path d="M 0 10 Q -18 -8 -10 -20 Q 0 -28 0 -15 Q 0 -28 10 -20 Q 18 -8 0 10 Z" fill="#E58A8A" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+  <!-- Petits puffs sous le coeur -->
+  <circle cx="244" cy="78" r="5" fill="#E58A8A" opacity="0.7" stroke="#1F1A17" stroke-width="2"/>
+  <circle cx="264" cy="73" r="4" fill="#E58A8A" opacity="0.6" stroke="#1F1A17" stroke-width="2"/>
+
+  <!-- Fenêtres (yeux kawai) -->
+  <rect x="170" y="345" width="50" height="50" rx="4" fill="#FAF3E0" stroke="#1F1A17" stroke-width="5"/>
+  <rect x="292" y="345" width="50" height="50" rx="4" fill="#FAF3E0" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Croisillons en bois -->
+  <line x1="195" y1="345" x2="195" y2="395" stroke="#7A4E2B" stroke-width="4"/>
+  <line x1="170" y1="370" x2="220" y2="370" stroke="#7A4E2B" stroke-width="4"/>
+  <line x1="317" y1="345" x2="317" y2="395" stroke="#7A4E2B" stroke-width="4"/>
+  <line x1="292" y1="370" x2="342" y2="370" stroke="#7A4E2B" stroke-width="4"/>
+  <!-- Pupilles kawai -->
+  <circle cx="200" cy="378" r="6" fill="#1F1A17"/>
+  <circle cx="202" cy="376" r="2" fill="#FFFFFF"/>
+  <circle cx="312" cy="378" r="6" fill="#1F1A17"/>
+  <circle cx="314" cy="376" r="2" fill="#FFFFFF"/>
+
+  <!-- Joues kawai -->
+  <ellipse cx="155" cy="410" rx="12" ry="7" fill="#E58A8A" opacity="0.55"/>
+  <ellipse cx="357" cy="410" rx="12" ry="7" fill="#E58A8A" opacity="0.55"/>
+
+  <!-- Porte en bois (bouche souriante) -->
+  <path d="M 218 460 Q 218 420 256 420 Q 294 420 294 460 Z" fill="#3A1F0F" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Cadre de porte en bois -->
+  <path d="M 218 460 Q 218 420 256 420 Q 294 420 294 460" fill="none" stroke="#7A4E2B" stroke-width="4"/>
+  <!-- Petite dent au milieu (effet sourire) -->
+  <rect x="251" y="420" width="10" height="14" rx="2" fill="#FAF3E0" stroke="#1F1A17" stroke-width="2"/>
+
+  <!-- Petites herbes décoratives -->
+  <path d="M 100 470 Q 105 455 110 470" fill="none" stroke="#4A8B3E" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 115 472 Q 120 460 125 472" fill="none" stroke="#4A8B3E" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 400 470 Q 405 455 410 470" fill="none" stroke="#4A8B3E" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 385 472 Q 390 460 395 472" fill="none" stroke="#4A8B3E" stroke-width="3" stroke-linecap="round"/>
+</svg>

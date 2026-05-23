@@ -15,6 +15,10 @@ abstract final class AppAssets {
   static const _shop = 'assets/images/shop';
   static const _duel = 'assets/images/duel';
 
+  /// Dossier contenant les PNG du catalogue d'avatars (cf. `AvatarCatalog`).
+  /// Référencé via `'${AppAssets.avatarsDir}/<id>.png'` dans chaque `Avatar`.
+  static const String avatarsDir = 'assets/images/avatars';
+
   // --- Mascotte griot (turban bleu, halo jaune) ---
   /// Pose neutre / approbation (clin d'œil + pouce levé). Carte devinette, HUD.
   static const String griotIdle = '$_mascot/griot_idle.png';
