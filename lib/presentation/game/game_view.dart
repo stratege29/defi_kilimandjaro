@@ -192,6 +192,7 @@ class _GameViewState extends ConsumerState<GameView>
                     selectedIndices: gameState.selectedIndices,
                     hintTileIndices: gameState.hintTileIndices,
                     hiddenIndices: gameState.fogHiddenIndices,
+                    shuffledIndices: gameState.shuffledIndices,
                     phase: gameState.phase,
                     onTileEntered: controller.selectTile,
                     onDragEnd: () {
