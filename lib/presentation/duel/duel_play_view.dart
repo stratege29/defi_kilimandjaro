@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
@@ -37,6 +39,13 @@ class DuelPlayView extends ConsumerStatefulWidget {
 }
 
 class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
+  /// Timer qui declenche advancePhase apres l'animation locale (3s) sur
+  /// roundEnd et countdown. Re-armé à chaque changement de phase.
+  Timer? _phaseAdvanceTimer;
+
+  /// Phase observée au dernier tick pour détecter les transitions.
+  DuelPhase? _lastObservedPhase;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +55,32 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
         ref.read(audioControllerProvider.notifier).playDuelStart().ignore();
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _phaseAdvanceTimer?.cancel();
+    super.dispose();
+  }
+
+  /// Programme un appel a `advancePhase` 3.2s apres l'entree en `roundEnd`
+  /// ou `countdown` (3s d'animation + 0.2s tolerance latence reseau).
+  ///
+  /// Les 2 clients vont appeler en parallele. Grace a l'idempotence cote
+  /// serveur (MIN_ELAPSED_MS + check phase courante), un seul gagne et
+  /// l'autre voit la phase deja avancee.
+  void _scheduleAdvancePhase(String matchId, DuelPhase newPhase) {
+    _phaseAdvanceTimer?.cancel();
+    if (newPhase != DuelPhase.roundEnd && newPhase != DuelPhase.countdown) {
+      return;
+    }
+    _phaseAdvanceTimer = Timer(const Duration(milliseconds: 3200), () {
+      if (!mounted) return;
+      // Best-effort : on ignore l'erreur, le serveur est idempotent.
+      ref.read(duelRepositoryProvider).advancePhase(matchId).catchError((
+        Object _,
+      ) {});
+    });
   }
 
   @override
@@ -73,6 +108,12 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
         final s = next.value;
         if (s == null) return;
         controller.onSessionUpdated(s);
+        // Détection de transition de phase : si on entre dans roundEnd ou
+        // countdown, on schedule l'appel à advancePhase après 3s d'animation.
+        if (s.phase != _lastObservedPhase) {
+          _lastObservedPhase = s.phase;
+          _scheduleAdvancePhase(s.matchId, s.phase);
+        }
         // Navigation automatique vers résultat.
         if (s.phase == DuelPhase.finished) {
           WidgetsBinding.instance.addPostFrameCallback((_) {

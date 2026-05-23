@@ -19,7 +19,7 @@ export { requestMatch } from "./matchmaking/requestMatch";
 export { cancelMatch } from "./matchmaking/cancelMatch";
 export { endMatch } from "./matchmaking/endMatch";
 export { submitRoundWin } from "./matchmaking/submitRoundWin";
-export { advanceRound } from "./matchmaking/advanceRound";
+export { advancePhase } from "./matchmaking/advancePhase";
 export { createLocalDuel } from "./matchmaking/createLocalDuel";
 
 // --- Social & Viral (Phase 7) ---
