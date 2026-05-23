@@ -193,8 +193,21 @@ class _Header extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Text('KILIMANDJARO', style: AppTypography.bebas(size: 18)),
-          const Spacer(),
+          // Le titre rétrécit sur écrans étroits (iPhone normal ~393pt)
+          // pour laisser la place aux 3 chips à droite. FittedBox
+          // garantit qu'on ne dépasse jamais en largeur, tout en
+          // préservant la taille naturelle sur écrans larges.
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'KILIMANDJARO',
+                style: AppTypography.bebas(size: 18),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
           _Chip(
             iconWidget: const CaurisIcon(size: 16),
             value: '${progress.cauris}',
