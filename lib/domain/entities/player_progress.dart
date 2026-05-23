@@ -18,6 +18,7 @@ class PlayerProgress extends Equatable {
     this.noAdsPurchased = false,
     this.recentDevinetteIds = const <String>[],
     this.freePackChosen,
+    this.starsByLevel = const <String, int>{},
   }) : activePackMix =
            activePackMix ?? _defaultPackMix(ownedPacks, freePackChosen);
 
@@ -65,6 +66,9 @@ class PlayerProgress extends Equatable {
       freePackChosen: freePack,
       activePackMix:
           parsedMix ?? _defaultPackMix(ownedPacks, freePack),
+      starsByLevel: ((json['stars_by_level'] as Map<String, dynamic>?) ??
+              <String, dynamic>{})
+          .map((k, v) => MapEntry(k, v as int)),
     );
   }
 
@@ -140,6 +144,12 @@ class PlayerProgress extends Equatable {
   /// sinon mix sentinelle (`_pending_`).
   final PackMix activePackMix;
 
+  /// Étoiles obtenues par niveau (clé = `"$mountainId#$levelIndex"`, 1-3).
+  /// Garde toujours le meilleur score d'un re-run (cf. `mergeStars` dans
+  /// `PlayerProgressNotifier.recordWin`). Niveaux non joués absents de la
+  /// map.
+  final Map<String, int> starsByLevel;
+
   /// True quand l'utilisateur a déjà choisi son pack gratuit (gating
   /// d'onboarding).
   bool get hasChosenFreePack => freePackChosen != null;
@@ -156,10 +166,16 @@ class PlayerProgress extends Equatable {
     'owned_packs': ownedPacks.toList(growable: false),
     if (freePackChosen != null) 'free_pack_chosen': freePackChosen,
     'pack_mix': activePackMix.toJson(),
+    if (starsByLevel.isNotEmpty) 'stars_by_level': starsByLevel,
   };
 
   /// Combien de niveaux complétés sur cette montagne.
   int levelsOn(String mountainId) => completedLevelsByMountain[mountainId] ?? 0;
+
+  /// Nombre d'étoiles obtenues sur un niveau précis (0 si jamais joué).
+  int starsOnLevel({required String mountainId, required int levelIndex}) {
+    return starsByLevel['$mountainId#$levelIndex'] ?? 0;
+  }
 
   PlayerProgress copyWith({
     int? cauris,
@@ -173,6 +189,7 @@ class PlayerProgress extends Equatable {
     Set<String>? ownedPacks,
     String? freePackChosen,
     PackMix? activePackMix,
+    Map<String, int>? starsByLevel,
   }) {
     return PlayerProgress(
       cauris: cauris ?? this.cauris,
@@ -187,6 +204,7 @@ class PlayerProgress extends Equatable {
       ownedPacks: ownedPacks ?? this.ownedPacks,
       freePackChosen: freePackChosen ?? this.freePackChosen,
       activePackMix: activePackMix ?? this.activePackMix,
+      starsByLevel: starsByLevel ?? this.starsByLevel,
     );
   }
 
@@ -203,5 +221,6 @@ class PlayerProgress extends Equatable {
     ownedPacks,
     freePackChosen,
     activePackMix,
+    starsByLevel,
   ];
 }

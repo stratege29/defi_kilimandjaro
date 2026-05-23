@@ -151,9 +151,17 @@ class _GoldenPathPainter extends CustomPainter {
   @override
   bool shouldRepaint(_GoldenPathPainter oldDelegate) {
     if (oldDelegate.fingerPosition != fingerPosition) return true;
-    // On compare les longueurs **capturées à la construction** (pas
-    // `points.length` qui lit la liste mutée et donnerait la même valeur
-    // des deux côtés).
+    // Cas drag normal : `points` est la **même liste mutée en place**
+    // (append à chaque pointer move). On détecte le changement via la
+    // longueur capturée à la construction.
+    //
+    // Cas animation (swap wind/earthquake/shuffle) : `points` est une
+    // **nouvelle liste générée** par lerp à chaque frame, avec une
+    // longueur identique mais des valeurs différentes. La comparaison
+    // de longueur seule renverrait false alors qu'il faut repaint à
+    // chaque frame. `identical` détecte ce cas (nouvelle référence) et
+    // force le repaint.
+    if (!identical(oldDelegate.points, points)) return true;
     return oldDelegate._pointsLength != _pointsLength;
   }
 }

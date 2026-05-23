@@ -50,5 +50,42 @@ void main() {
       final p = PlayerProgress.fromJson(const <String, dynamic>{'coins': 333});
       expect(p.cauris, 333);
     });
+
+    test('starsByLevel persistance round-trip', () {
+      final p = PlayerProgress.initial().copyWith(
+        starsByLevel: const <String, int>{
+          'ci_nimba#1': 3,
+          'ci_nimba#2': 2,
+          'tz_kilimanjaro#8': 1,
+        },
+      );
+      final back = PlayerProgress.fromJson(p.toJson());
+      expect(back.starsByLevel['ci_nimba#1'], 3);
+      expect(back.starsByLevel['ci_nimba#2'], 2);
+      expect(back.starsByLevel['tz_kilimanjaro#8'], 1);
+    });
+
+    test('starsByLevel absent du JSON quand vide (économie de bytes)', () {
+      final json = PlayerProgress.initial().toJson();
+      expect(json.containsKey('stars_by_level'), isFalse);
+    });
+
+    test('starsOnLevel retourne 0 quand niveau jamais joué', () {
+      final p = PlayerProgress.initial();
+      expect(
+        p.starsOnLevel(mountainId: 'ci_nimba', levelIndex: 1),
+        0,
+      );
+    });
+
+    test('starsOnLevel lit la valeur persistée', () {
+      final p = PlayerProgress.initial().copyWith(
+        starsByLevel: const <String, int>{'ci_nimba#3': 2},
+      );
+      expect(
+        p.starsOnLevel(mountainId: 'ci_nimba', levelIndex: 3),
+        2,
+      );
+    });
   });
 }

@@ -164,7 +164,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         final extra = state.extra;
         final args = extra is GameArgs
             ? extra
-            : GameArgs(devinette: extra! as Devinette);
+            : GameArgs.legacy(devinette: extra! as Devinette);
         return GameView(args: args);
       },
     ),

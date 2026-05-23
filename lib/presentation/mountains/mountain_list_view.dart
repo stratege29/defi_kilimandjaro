@@ -4,12 +4,14 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/altimeter_rail.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/atmosphere_layer.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -215,31 +217,39 @@ class _MountainListViewState extends ConsumerState<MountainListView>
                 ),
               ),
 
-              // 5. Bouton "Mes packs" — coin supérieur droit (icon-only).
+              // 5. Boutons coin supérieur droit : [dev unlock]? + "Mes packs".
               // Libère l'espace pour le nom de la montagne en haut-gauche.
               Positioned(
                 top: 0,
                 right: 0,
                 child: SafeArea(
-                  child: Semantics(
-                    button: true,
-                    label: 'my_packs.title'.tr(),
-                    child: Material(
-                      color: AppColors.surfaceContainer.withValues(alpha: 0.85),
-                      shape: const CircleBorder(),
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: () => context.push(AppRoutes.myPacks),
-                        child: const Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Icon(
-                            Icons.layers_outlined,
-                            color: AppColors.orJour,
-                            size: 22,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (kDebugMode)
+                        _DevUnlockButton(mountains: mountains),
+                      Semantics(
+                        button: true,
+                        label: 'my_packs.title'.tr(),
+                        child: Material(
+                          color: AppColors.surfaceContainer
+                              .withValues(alpha: 0.85),
+                          shape: const CircleBorder(),
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            onTap: () => context.push(AppRoutes.myPacks),
+                            child: const Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Icon(
+                                Icons.layers_outlined,
+                                color: AppColors.orJour,
+                                size: 22,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -610,6 +620,54 @@ class _ErrorView extends StatelessWidget {
         child: Text(
           'Impossible de charger les sommets',
           style: AppTypography.crimson(color: AppColors.rouge),
+        ),
+      ),
+    );
+  }
+}
+
+/// Bouton debug-only (kDebugMode) : tape pour marquer toutes les montagnes
+/// comme intégralement complétées. Permet de tester rapidement les
+/// niveaux haute altitude (reverse, thinAir, boss tier 5) sans grinder
+/// 15+ montagnes. À retirer après validation du S1.
+class _DevUnlockButton extends ConsumerWidget {
+  const _DevUnlockButton({required this.mountains});
+
+  final List<Mountain> mountains;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: Semantics(
+        button: true,
+        label: 'Dev: déverrouiller tout',
+        child: Material(
+          color: AppColors.rouge.withValues(alpha: 0.85),
+          shape: const CircleBorder(),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () async {
+              await ref
+                  .read(playerProgressProvider.notifier)
+                  .unlockAllForDebug(mountains);
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('DEV : toutes les montagnes débloquées'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(10),
+              child: Icon(
+                Icons.lock_open,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
+          ),
         ),
       ),
     );
