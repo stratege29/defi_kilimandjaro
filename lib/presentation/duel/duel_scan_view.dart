@@ -51,7 +51,13 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
                     s.phase == DuelPhase.active),
           );
       if (!mounted) return;
-      context.go(AppRoutes.duelPlay, extra: session);
+      // Defer la navigation au prochain frame pour éviter le conflit
+      // "There is nothing to pop" de go_router quand le `firstWhere` se
+      // résout pendant un build/dispose de MobileScanner.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        context.go(AppRoutes.duelPlay, extra: session);
+      });
     } on Exception catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -252,7 +258,11 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
                     s.phase == DuelPhase.active),
           );
       if (!mounted) return;
-      context.go(AppRoutes.duelPlay, extra: session);
+      // Defer la navigation au prochain frame (cf. _onDetect plus haut).
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        context.go(AppRoutes.duelPlay, extra: session);
+      });
     } on Exception catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

@@ -105,7 +105,13 @@ class _WaitingBody extends ConsumerWidget {
               session.phase == DuelPhase.countdown ||
               session.phase == DuelPhase.active);
       if (gameStarted) {
-        context.go(AppRoutes.duelPlay, extra: session);
+        // Defer la navigation au prochain frame pour éviter le conflit
+        // "There is nothing to pop" de go_router quand ref.listen se
+        // déclenche pendant un build.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
+          context.go(AppRoutes.duelPlay, extra: session);
+        });
       }
     });
 
