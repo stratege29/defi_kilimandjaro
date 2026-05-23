@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:audio_session/audio_session.dart';
 import 'package:defi_kilimandjaro/audio/instruments/balafon.dart';
 import 'package:defi_kilimandjaro/audio/instruments/djembe.dart';
+import 'package:defi_kilimandjaro/audio/instruments/duel_round_end.dart';
 import 'package:defi_kilimandjaro/audio/instruments/griot_fanfare.dart';
 import 'package:defi_kilimandjaro/audio/instruments/kora.dart';
 import 'package:defi_kilimandjaro/audio/instruments/lobby_duel.dart';
@@ -54,6 +55,17 @@ enum AudioCue {
 
   /// Gong kora C3 + frappe tam-tam très grave — démarrage du duel ranked (~820 ms).
   duelStart,
+
+  // ─── Duel — fin de manche (3-manches) ───────────────────────────────────
+
+  /// Arpège kora ascendant C major + roulement djembé — manche gagnée (~950 ms).
+  roundWon,
+
+  /// Note balafon grave descendante + ride courte — manche perdue (~800 ms).
+  roundLost,
+
+  /// Accord kora suspendu sans tierce — manche nulle (~750 ms).
+  roundDraw,
 }
 
 /// Singleton du moteur audio. Gère :
@@ -242,6 +254,12 @@ class AudioEngine with WidgetsBindingObserver {
         return LobbyDuel.renderMatchFound();
       case AudioCue.duelStart:
         return LobbyDuel.renderDuelStart();
+      case AudioCue.roundWon:
+        return DuelRoundEnd.renderRoundWon();
+      case AudioCue.roundLost:
+        return DuelRoundEnd.renderRoundLost();
+      case AudioCue.roundDraw:
+        return DuelRoundEnd.renderRoundDraw();
     }
   }
 
@@ -279,6 +297,10 @@ class AudioEngine with WidgetsBindingObserver {
       AudioCue.lobbyLoopTac: LobbyDuel.renderLoopTac(),
       AudioCue.lobbyMatchFound: LobbyDuel.renderMatchFound(),
       AudioCue.duelStart: LobbyDuel.renderDuelStart(),
+      // Duel round-end cues (3-manches)
+      AudioCue.roundWon: DuelRoundEnd.renderRoundWon(),
+      AudioCue.roundLost: DuelRoundEnd.renderRoundLost(),
+      AudioCue.roundDraw: DuelRoundEnd.renderRoundDraw(),
     };
     for (final entry in cues.entries) {
       try {

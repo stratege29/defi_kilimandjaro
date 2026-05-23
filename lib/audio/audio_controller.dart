@@ -200,6 +200,30 @@ class AudioController extends StateNotifier<AudioState> {
     await _engine.play(AudioCue.duelStart);
   }
 
+  // ─── Duel — fin de manche (3-manches) ──────────────────────────────────
+
+  /// Cue "manche gagnée" — arpège kora ascendant + roulement djembé (~950 ms).
+  /// À appeler depuis l'overlay de fin de manche quand le joueur l'emporte.
+  /// Fire-and-forget, respecte le mute global.
+  Future<void> playRoundWon() async {
+    if (state.muted) return;
+    await _engine.play(AudioCue.roundWon);
+  }
+
+  /// Cue "manche perdue" — balafon grave descendant + ride courte (~800 ms).
+  /// Fire-and-forget, respecte le mute global.
+  Future<void> playRoundLost() async {
+    if (state.muted) return;
+    await _engine.play(AudioCue.roundLost);
+  }
+
+  /// Cue "manche nulle" — accord kora suspendu sans tierce (~750 ms).
+  /// Fire-and-forget, respecte le mute global.
+  Future<void> playRoundDraw() async {
+    if (state.muted) return;
+    await _engine.play(AudioCue.roundDraw);
+  }
+
   // ─── Privé ──────────────────────────────────────────────────────────────
 
   Future<void> _loadPrefs() async {
