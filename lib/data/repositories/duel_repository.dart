@@ -144,6 +144,18 @@ class DuelRepository {
     return result.data['next_phase'] as String? ?? 'finished';
   }
 
+  /// Demande au serveur d'avancer la phase (roundEnd -> countdown ou
+  /// countdown -> active). Appele par le client apres son animation de 3s.
+  ///
+  /// Idempotent : les 2 clients peuvent appeler simultanement, le serveur
+  /// gere via verification du delai minimal et de la phase courante.
+  Future<void> advancePhase(String matchId) async {
+    final callable = functions.httpsCallable('advancePhase');
+    await callable.call<Map<String, dynamic>>(<String, dynamic>{
+      'match_id': matchId,
+    });
+  }
+
   /// Forfait — declare l'autre joueur gagnant si present.
   Future<void> forfeit(String matchId) async {
     final uid = currentUid;
