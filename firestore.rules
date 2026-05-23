@@ -94,6 +94,17 @@ service cloud.firestore {
     }
 
     // -------------------------------------------------------------------------
+    // Devinettes (seed Firestore pour duel 1v1) — serveur uniquement
+    // -------------------------------------------------------------------------
+    // Anti-cheat: les devinettes sont seedées en Firestore par Cloud Functions
+    // et consultées UNIQUEMENT par les CF (admin SDK). Les clients ne doivent
+    // JAMAIS accéder directement — les devinettes du duel leur arrivent via
+    // Realtime DB dans /matches/{matchId}, qui est source de vérité côté CF.
+    match /devinettes/{devinetteId} {
+      allow read, write: if false;  // serveur uniquement (admin SDK bypass)
+    }
+
+    // -------------------------------------------------------------------------
     // UGC — soumissions
     // -------------------------------------------------------------------------
     match /submissions/{submissionId} {

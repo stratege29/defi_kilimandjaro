@@ -43,7 +43,13 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
       final session = await ref
           .read(duelRepositoryProvider)
           .watch(parsed.matchId)
-          .firstWhere((s) => s != null && s.phase == DuelPhase.active);
+          .firstWhere(
+            (s) =>
+                s != null &&
+                (s.phase == DuelPhase.intro ||
+                    s.phase == DuelPhase.countdown ||
+                    s.phase == DuelPhase.active),
+          );
       if (!mounted) return;
       context.go(AppRoutes.duelPlay, extra: session);
     } on Exception catch (e) {
@@ -238,7 +244,13 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
       final session = await ref
           .read(duelRepositoryProvider)
           .watch(matchId)
-          .firstWhere((s) => s != null && s.phase == DuelPhase.active);
+          .firstWhere(
+            (s) =>
+                s != null &&
+                (s.phase == DuelPhase.intro ||
+                    s.phase == DuelPhase.countdown ||
+                    s.phase == DuelPhase.active),
+          );
       if (!mounted) return;
       context.go(AppRoutes.duelPlay, extra: session);
     } on Exception catch (e) {

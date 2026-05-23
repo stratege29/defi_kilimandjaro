@@ -3,7 +3,7 @@
   "packs": {
     "culture_ci": {
       "file": "culture_ci.json",
-      "count": 60,
+      "count": 70,
       "name_key": "pack.culture_ci.name",
       "description_key": "pack.culture_ci.description",
       "free_choice_eligible": true,
@@ -12,7 +12,7 @@
     },
     "crack_nouchi": {
       "file": "crack_nouchi.json",
-      "count": 30,
+      "count": 38,
       "name_key": "pack.crack_nouchi.name",
       "description_key": "pack.crack_nouchi.description",
       "free_choice_eligible": true,
@@ -20,5 +20,5 @@
       "price_cauris": 2000
     }
   },
-  "total": 90
+  "total": 108
 }

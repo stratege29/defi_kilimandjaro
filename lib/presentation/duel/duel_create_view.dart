@@ -98,7 +98,13 @@ class _WaitingBody extends ConsumerWidget {
     ) {
       final session = next.value;
       if (session == null) return;
-      if (session.players.length >= 2 && session.phase == DuelPhase.active) {
+      // Phase 3 : la jointure passe par intro→countdown avant active.
+      // On navigue dès que la partie est dans une phase de jeu active.
+      final gameStarted = session.players.length >= 2 &&
+          (session.phase == DuelPhase.intro ||
+              session.phase == DuelPhase.countdown ||
+              session.phase == DuelPhase.active);
+      if (gameStarted) {
         context.go(AppRoutes.duelPlay, extra: session);
       }
     });
@@ -109,12 +115,6 @@ class _WaitingBody extends ConsumerWidget {
       createdBy: '',
       createdAt: 0,
       phase: DuelPhase.waiting,
-      answer: '',
-      lettersPool: const [],
-      riddle: '',
-      explanation: '',
-      proverb: '',
-      players: const {},
     ).toQrPayload();
 
     return Padding(
