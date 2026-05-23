@@ -171,7 +171,9 @@ class _CircularGridState extends State<CircularGrid>
         _shakeCtrl
           ..reset()
           ..forward();
-        _rebuildTrailFromSelection();
+        // La re-synchro effective des snap points se fait dans build()
+        // une fois _tileCenters mis à jour par le layout. Tenter de
+        // rebuild ici lit des centres potentiellement obsolètes.
       }
     }
   }
@@ -194,26 +196,25 @@ class _CircularGridState extends State<CircularGrid>
     });
   }
 
-  /// Reconstruit `_trail` comme polyline lettre-à-lettre depuis les
-  /// positions actuelles des tuiles sélectionnées. Appelé après un
-  /// swap (wind / earthquake / shuffle) pour que le golden path
-  /// reste collé aux lettres qui ont bougé. La queue free-form du
-  /// drag est perdue — acceptable, le joueur a relâché son doigt à
-  /// ce moment-là dans la quasi-totalité des cas (les swaps modifier
-  /// se déclenchent au tick timer, pas pendant un drag actif).
-  void _rebuildTrailFromSelection() {
-    if (widget.selectedIndices.isEmpty || _tileCenters.isEmpty) {
-      _trail.clear();
-      _letterTrailIndices.clear();
-      return;
-    }
-    _trail.clear();
-    _letterTrailIndices.clear();
-    for (final gridIdx in widget.selectedIndices) {
-      if (gridIdx < _tileCenters.length) {
-        _trail.add(_tileCenters[gridIdx]);
-        _letterTrailIndices.add(_trail.length - 1);
+  /// Synchronise IN-PLACE les snap points de `_trail` avec les centres
+  /// actuels des tuiles sélectionnées. Appelé à chaque `build()` après
+  /// la mise à jour de `_tileCenters` pour garantir que le golden path
+  /// reste collé aux lettres, même si :
+  /// - un swap (wind / earthquake / shuffle) vient de bouger les lettres
+  /// - le layout change (resize, rotation)
+  /// - une lettre sélectionnée bouge entre 2 frames
+  ///
+  /// Préserve les éventuels points free-form (queue du drag) entre les
+  /// snaps — seul les snap points sont écrasés.
+  void _syncTrailSnapPointsToTileCenters() {
+    if (widget.selectedIndices.length != _letterTrailIndices.length) return;
+    for (var k = 0; k < widget.selectedIndices.length; k++) {
+      final gridIdx = widget.selectedIndices[k];
+      final snapTrailIdx = _letterTrailIndices[k];
+      if (snapTrailIdx >= _trail.length || gridIdx >= _tileCenters.length) {
+        continue;
       }
+      _trail[snapTrailIdx] = _tileCenters[gridIdx];
     }
   }
 
@@ -335,6 +336,11 @@ class _CircularGridState extends State<CircularGrid>
           ..clear()
           ..addAll(layout.centers);
         _smallHitIndices = layout.smallHitIndices;
+        // Garantit que les snap points du golden path sont collés aux
+        // tuiles sélectionnées à chaque build, indépendamment du timing
+        // de `didUpdateWidget` (qui voit potentiellement un `_tileCenters`
+        // périmé entre 2 frames).
+        _syncTrailSnapPointsToTileCenters();
 
         return SizedBox(
           width: layout.size.width,
@@ -359,12 +365,21 @@ class _CircularGridState extends State<CircularGrid>
               child: Stack(
                 children: <Widget>[
                   Positioned.fill(
-                    child: GoldenPath(
-                      // `_animatedTrail` interpole les positions snap
-                      // pendant un swap pour suivre les lettres qui
-                      // glissent. Hors swap, équivaut à `_trail`.
-                      points: _animatedTrail,
-                      fingerPosition: _fingerPosition,
+                    // AnimatedBuilder INTERNE écoutant `_shakeCtrl` :
+                    // garantit que `_animatedTrail` est ré-évalué à
+                    // chaque frame de l'animation. Sans ça, le getter
+                    // est lu une seule fois dans le `child:` du
+                    // AnimatedBuilder externe (qui n'est construit
+                    // qu'une fois — c'est précisément l'optim du
+                    // `child:` Flutter) et le trail reste figé.
+                    child: AnimatedBuilder(
+                      animation: _shakeCtrl,
+                      builder: (context, _) {
+                        return GoldenPath(
+                          points: _animatedTrail,
+                          fingerPosition: _fingerPosition,
+                        );
+                      },
                     ),
                   ),
                   ...List<Widget>.generate(count, (i) {
