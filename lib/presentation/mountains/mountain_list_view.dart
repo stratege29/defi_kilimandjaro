@@ -13,6 +13,7 @@ import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhou
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -45,6 +46,21 @@ class _MountainListViewState extends ConsumerState<MountainListView>
   // le PageView attache le controller, `page` vaut 0.0, jamais null.
   bool _initialJumpDone = false;
 
+  // Cache local des montagnes : `mountainsProvider` dépend de
+  // `playerProgressProvider`, donc chaque fin de niveau invalide l'async et
+  // repasse par `AsyncLoading`. Sans cache, le `.when(loading: ...)` démonte
+  // le PageView et un nouveau s'attache au `PageController` neuf → retour
+  // brutal à la page 0. Garder la dernière `data` connue évite le démontage.
+  List<Mountain>? _cachedMountains;
+
+  // Dernière page snappée — utilisé pour ne déclencher l'haptic qu'au
+  // franchissement d'une frontière de page (pas pendant le glissement).
+  int _lastSnappedPage = 0;
+
+  // Vrai pendant qu'un drag sur l'altimètre pilote le scroll : on coupe
+  // l'haptic snap pour éviter une rafale de clics pendant le scrub.
+  bool _altimeterScrubbing = false;
+
   @override
   void initState() {
     super.initState();
@@ -72,11 +88,39 @@ class _MountainListViewState extends ConsumerState<MountainListView>
   }
 
   void _onPageScroll() {
-    if (_pageController.hasClients) {
-      setState(() {
-        _pagePosition = _pageController.page ?? 0;
-      });
+    if (!_pageController.hasClients) return;
+    final page = _pageController.page ?? 0;
+    final snapped = page.round();
+    if (snapped != _lastSnappedPage && !_altimeterScrubbing) {
+      _lastSnappedPage = snapped;
+      HapticFeedback.selectionClick();
     }
+    setState(() {
+      _pagePosition = page;
+    });
+  }
+
+  /// Saute (sans animation) à un index — pilote du drag altimètre.
+  void _jumpToIndex(int idx) {
+    if (!_pageController.hasClients) return;
+    _altimeterScrubbing = true;
+    _pageController.jumpToPage(idx);
+    // Reset asynchrone : le scroll callback va encore tirer une fois après
+    // ce jump, on évite de bruiter l'haptic.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _altimeterScrubbing = false;
+      _lastSnappedPage = idx;
+    });
+  }
+
+  /// Anime vers un index — utilisé pour le retap onglet "Sommets".
+  Future<void> _animateToIndex(int idx) async {
+    if (!_pageController.hasClients) return;
+    await _pageController.animateToPage(
+      idx,
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOutCubic,
+    );
   }
 
   /// Initialise le PageController sur le sommet courant (premier non-completed).
@@ -139,13 +183,24 @@ class _MountainListViewState extends ConsumerState<MountainListView>
   @override
   Widget build(BuildContext context) {
     final asyncMountains = ref.watch(mountainsProvider);
+    // Cache local : on garde la dernière liste connue pour éviter de
+    // démonter le PageView pendant un re-fetch (voir doc de _cachedMountains).
+    if (asyncMountains.hasValue) {
+      _cachedMountains = asyncMountains.value;
+    }
+    final mountains = _cachedMountains;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: asyncMountains.when(
-        loading: () => const _LoadingView(),
-        error: (_, __) => const _ErrorView(),
-        data: (mountains) {
+      body: Builder(
+        builder: (context) {
+          if (asyncMountains.hasError && mountains == null) {
+            return const _ErrorView();
+          }
+          if (mountains == null) {
+            return const _LoadingView();
+          }
+
           // Positionnement initial sur le sommet courant.
           WidgetsBinding.instance.addPostFrameCallback(
             (_) => _jumpToCurrentMountain(mountains),
@@ -201,7 +256,7 @@ class _MountainListViewState extends ConsumerState<MountainListView>
                 },
               ),
 
-              // 4. Altimètre rail droit.
+              // 4. Altimètre rail droit — scrubber interactif.
               Positioned(
                 right: 0,
                 top: 60,
@@ -212,6 +267,8 @@ class _MountainListViewState extends ConsumerState<MountainListView>
                     child: AltimeterRail(
                       currentAltitude: interpolatedAlt,
                       bestAltitude: bestAlt,
+                      mountains: mountains,
+                      onSeekToIndex: _jumpToIndex,
                     ),
                   ),
                 ),
@@ -264,7 +321,14 @@ class _MountainListViewState extends ConsumerState<MountainListView>
             case NavTab.defi:
               context.go(AppRoutes.hub);
             case NavTab.sommets:
-              break;
+              // Retap sur l'onglet courant → recentrer sur le sommet
+              // à conquérir (pattern iOS). Silencieux si la liste n'est
+              // pas encore chargée.
+              final ms = _cachedMountains;
+              if (ms != null) {
+                final idx = _currentMountainIndex(ms) ?? 0;
+                _animateToIndex(idx);
+              }
             case NavTab.profil:
               context.go(AppRoutes.profile);
           }
