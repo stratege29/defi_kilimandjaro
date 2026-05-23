@@ -164,9 +164,13 @@ class _GameViewState extends ConsumerState<GameView>
               const SizedBox(height: 8),
               // Riddle card.
               _RiddleCard(riddle: widget.args.devinette.riddle),
-              if (widget.args.config.modifiers.isNotEmpty) ...<Widget>[
+              if (widget.args.config.isBoss ||
+                  widget.args.config.modifiers.isNotEmpty) ...<Widget>[
                 const SizedBox(height: 8),
-                _ModifierBadges(modifiers: widget.args.config.modifiers),
+                _ModifierBadges(
+                  modifiers: widget.args.config.modifiers,
+                  isBoss: widget.args.config.isBoss,
+                ),
               ],
               const SizedBox(height: 10),
               // Timer bar — totalTime calibré sur la config du niveau.
@@ -326,6 +330,7 @@ class _GameViewState extends ConsumerState<GameView>
         devinette: widget.args.devinette,
         timeLeft: timeLeft,
         starsEarned: starsEarned,
+        isBoss: widget.args.config.isBoss,
         onNext: () {
           // Ferme l'overlay puis enchaîne automatiquement sur la prochaine
           // étape : devinette suivante de la même montagne, ou montagne
@@ -728,9 +733,10 @@ class _RiddleCard extends StatelessWidget {
 /// déloyaux : le joueur sait que le mot est à l'envers, que des lettres
 /// vont bouger, que la grille va se brumer, etc.
 class _ModifierBadges extends StatelessWidget {
-  const _ModifierBadges({required this.modifiers});
+  const _ModifierBadges({required this.modifiers, this.isBoss = false});
 
   final Set<LevelModifier> modifiers;
+  final bool isBoss;
 
   @override
   Widget build(BuildContext context) {
@@ -740,7 +746,7 @@ class _ModifierBadges extends StatelessWidget {
     final visible = modifiers
         .where((m) => _badgeForModifier(m) != null)
         .toList(growable: false);
-    if (visible.isEmpty) return const SizedBox.shrink();
+    if (visible.isEmpty && !isBoss) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Wrap(
@@ -748,6 +754,12 @@ class _ModifierBadges extends StatelessWidget {
         spacing: 6,
         runSpacing: 6,
         children: <Widget>[
+          if (isBoss)
+            const _ModifierPill(
+              icon: Icons.workspace_premium_rounded,
+              label: 'BOSS',
+              color: AppColors.orJour,
+            ),
           for (final m in visible) _badgeForModifier(m)!,
         ],
       ),

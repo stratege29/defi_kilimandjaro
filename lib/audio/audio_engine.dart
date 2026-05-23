@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:defi_kilimandjaro/audio/instruments/balafon.dart';
+import 'package:defi_kilimandjaro/audio/instruments/boss_fanfare.dart';
 import 'package:defi_kilimandjaro/audio/instruments/djembe.dart';
 import 'package:defi_kilimandjaro/audio/instruments/griot_fanfare.dart';
 import 'package:defi_kilimandjaro/audio/instruments/kora.dart';
@@ -31,6 +32,10 @@ enum AudioCue {
 
   /// Victoire — fanfare griot.
   victory,
+
+  /// Victoire BOSS — fanfare griot enrichie (intro djembé grave + queue
+  /// tam-tam, ~2.8 s vs 2 s pour victoire standard).
+  bossVictory,
 
   /// Échec — balafon descendant + tam-tam lent.
   failure,
@@ -228,6 +233,8 @@ class AudioEngine with WidgetsBindingObserver {
         return Kora.renderHint();
       case AudioCue.victory:
         return GriotFanfare.render();
+      case AudioCue.bossVictory:
+        return BossFanfare.render();
       case AudioCue.failure:
         return _renderFailure();
       case AudioCue.wrongAnswer:
@@ -271,6 +278,7 @@ class AudioEngine with WidgetsBindingObserver {
       AudioCue.wordComplete: Balafon.renderAscendingChord(),
       AudioCue.hintUsed: Kora.renderHint(),
       AudioCue.victory: GriotFanfare.render(),
+      AudioCue.bossVictory: BossFanfare.render(),
       AudioCue.failure: _renderFailure(),
       AudioCue.wrongAnswer: Djembe.renderWrongDouble(),
       AudioCue.timerTick: TamTam.renderTick(),

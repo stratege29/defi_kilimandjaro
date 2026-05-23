@@ -354,6 +354,7 @@ class _LevelsLayer extends StatelessWidget {
                   : _BulletStatus.locked,
               pulse: pulse,
               starsEarned: starsByLevel[i + 1] ?? 0,
+              isBoss: i + 1 == mountain.totalLevels,
               onTap: () => onLevelTap(i + 1),
             ),
           ),
@@ -421,6 +422,7 @@ class _LevelBullet extends StatelessWidget {
     required this.pulse,
     required this.onTap,
     this.starsEarned = 0,
+    this.isBoss = false,
   });
 
   final int levelNumber;
@@ -431,6 +433,10 @@ class _LevelBullet extends StatelessWidget {
   /// Étoiles obtenues sur ce niveau (0-3). Quand > 0, affiche une mini-row
   /// d'étoiles dorées sous le bullet pour signaler la performance.
   final int starsEarned;
+
+  /// Niveau boss (dernier de la montagne). Décoré d'une couronne dorée
+  /// au-dessus du bullet pour signaler la signature visuelle.
+  final bool isBoss;
 
   Color get _bg {
     switch (status) {
@@ -488,14 +494,43 @@ class _LevelBullet extends StatelessWidget {
       ),
     );
 
+    // Couronne dorée flottante au-dessus du bullet pour les boss
+    // (dernier niveau de la montagne). Signature visuelle distincte
+    // pour anticiper le combat clé.
+    Widget bulletDecorated = bullet;
+    if (isBoss) {
+      bulletDecorated = Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
+        children: <Widget>[
+          bullet,
+          Positioned(
+            top: -16,
+            child: Icon(
+              Icons.workspace_premium_rounded,
+              size: 22,
+              color: AppColors.orJour,
+              shadows: <Shadow>[
+                Shadow(
+                  color: Colors.black.withValues(alpha: 0.6),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
     // Mini-row d'étoiles affichée sous le bullet pour les niveaux où le
     // joueur a déjà obtenu au moins 1 étoile (toujours vrai post-victoire).
-    Widget bulletWithStars = bullet;
+    var bulletWithStars = bulletDecorated;
     if (starsEarned > 0) {
       bulletWithStars = Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          bullet,
+          bulletDecorated,
           const SizedBox(height: 2),
           Row(
             mainAxisSize: MainAxisSize.min,

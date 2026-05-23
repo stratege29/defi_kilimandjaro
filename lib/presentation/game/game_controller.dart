@@ -360,12 +360,19 @@ class GameController extends StateNotifier<GameState> {
           starsEarned: stars,
         ),
       );
-      // Audio: balafon accord 5 notes puis fanfare griot.
+      // Audio: balafon accord 5 notes puis fanfare griot (boss ou
+      // standard). La fanfare boss est plus longue et débute par 2
+      // frappes djembé graves — l'attaque haptique heavy est aussi
+      // décalée pour s'aligner avec l'impact percussif.
       unawaited(_audio.playWordComplete());
-      // Haptique victoire: medium puis heavy à 350ms (sync avec la fanfare).
       unawaited(HapticFeedback.mediumImpact());
+      final isBoss = _args.config.isBoss;
       Future<void>.delayed(const Duration(milliseconds: 350), () {
-        unawaited(_audio.playVictory());
+        if (isBoss) {
+          unawaited(_audio.playBossVictory());
+        } else {
+          unawaited(_audio.playVictory());
+        }
         unawaited(HapticFeedback.heavyImpact());
       });
     } else {
