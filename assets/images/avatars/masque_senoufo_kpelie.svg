@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- masque_senoufo_kpelie : masque Kpélié, cornes courbes, scarifications -->
+  <defs>
+    <radialGradient id="bg4" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#FCE0C2"/>
+      <stop offset="100%" stop-color="#D97742" stop-opacity="0.0"/>
+    </radialGradient>
+  </defs>
+  <!-- Halo de fond doux -->
+  <circle cx="256" cy="256" r="230" fill="url(#bg4)"/>
+
+  <!-- Cornes/antennes courbes -->
+  <path d="M 200 130 Q 160 80 130 90 Q 145 95 165 125 Q 185 145 200 150 Z" fill="#7A4E2B" stroke="#1F1A17" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M 312 130 Q 352 80 382 90 Q 367 95 347 125 Q 327 145 312 150 Z" fill="#7A4E2B" stroke="#1F1A17" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Visage ovale (terracotta) -->
+  <ellipse cx="256" cy="260" rx="115" ry="140" fill="#D97742" stroke="#1F1A17" stroke-width="5"/>
+
+  <!-- Bordure bois plus sombre sur le pourtour (highlights) -->
+  <path d="M 256 130 Q 200 135 165 200" fill="none" stroke="#7A4E2B" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 256 130 Q 312 135 347 200" fill="none" stroke="#7A4E2B" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Oreilles décoratives latérales -->
+  <ellipse cx="138" cy="270" rx="12" ry="20" fill="#7A4E2B" stroke="#1F1A17" stroke-width="4"/>
+  <ellipse cx="374" cy="270" rx="12" ry="20" fill="#7A4E2B" stroke="#1F1A17" stroke-width="4"/>
+
+  <!-- Petites perles dans les oreilles -->
+  <circle cx="120" cy="295" r="4" fill="#F4B942" stroke="#1F1A17" stroke-width="2"/>
+  <circle cx="392" cy="295" r="4" fill="#F4B942" stroke="#1F1A17" stroke-width="2"/>
+
+  <!-- Ligne médiane front -->
+  <line x1="256" y1="155" x2="256" y2="200" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Scarifications verticales joues (gauche) -->
+  <line x1="175" y1="285" x2="175" y2="310" stroke="#1F1A17" stroke-width="3" stroke-linecap="round"/>
+  <line x1="188" y1="290" x2="188" y2="315" stroke="#1F1A17" stroke-width="3" stroke-linecap="round"/>
+  <line x1="201" y1="285" x2="201" y2="310" stroke="#1F1A17" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Scarifications verticales joues (droite) -->
+  <line x1="311" y1="285" x2="311" y2="310" stroke="#1F1A17" stroke-width="3" stroke-linecap="round"/>
+  <line x1="324" y1="290" x2="324" y2="315" stroke="#1F1A17" stroke-width="3" stroke-linecap="round"/>
+  <line x1="337" y1="285" x2="337" y2="310" stroke="#1F1A17" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Sourcils -->
+  <path d="M 192 222 Q 215 215 235 222" fill="none" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 277 222 Q 297 215 320 222" fill="none" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Yeux grands expressifs -->
+  <circle cx="213" cy="252" r="14" fill="#FAF3E0" stroke="#1F1A17" stroke-width="4"/>
+  <circle cx="299" cy="252" r="14" fill="#FAF3E0" stroke="#1F1A17" stroke-width="4"/>
+  <circle cx="215" cy="254" r="7" fill="#1F1A17"/>
+  <circle cx="301" cy="254" r="7" fill="#1F1A17"/>
+  <circle cx="218" cy="251" r="2.5" fill="#FFFFFF"/>
+  <circle cx="304" cy="251" r="2.5" fill="#FFFFFF"/>
+
+  <!-- Nez fin géométrique -->
+  <path d="M 256 270 L 248 320 L 264 320 Z" fill="#7A4E2B" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Bouche ouverte avec dents blanches -->
+  <path d="M 222 345 Q 256 375 290 345 Q 256 360 222 345 Z" fill="#1F1A17" stroke="#1F1A17" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="234" y="350" width="10" height="10" fill="#FAF3E0"/>
+  <rect x="246" y="352" width="10" height="11" fill="#FAF3E0"/>
+  <rect x="258" y="352" width="10" height="11" fill="#FAF3E0"/>
+  <rect x="270" y="350" width="10" height="10" fill="#FAF3E0"/>
+
+  <!-- Joues kawai -->
+  <ellipse cx="170" cy="335" rx="12" ry="8" fill="#E58A8A" opacity="0.55"/>
+  <ellipse cx="342" cy="335" rx="12" ry="8" fill="#E58A8A" opacity="0.55"/>
+</svg>

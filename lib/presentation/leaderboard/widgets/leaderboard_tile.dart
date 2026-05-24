@@ -1,9 +1,11 @@
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/domain/avatars/avatar_catalog.dart';
 import 'package:defi_kilimandjaro/domain/entities/leaderboard_entry.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// Tuile d'un joueur dans le classement.
 ///
@@ -66,7 +68,10 @@ class LeaderboardTile extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               // Avatar circulaire.
-              _Avatar(displayName: entry.displayName),
+              _Avatar(
+                displayName: entry.displayName,
+                avatarId: entry.avatarId,
+              ),
               const SizedBox(width: 12),
               // Nom + badge MAÎTRE.
               Expanded(
@@ -138,13 +143,16 @@ class LeaderboardTile extends StatelessWidget {
 }
 
 class _Avatar extends StatelessWidget {
-  const _Avatar({required this.displayName});
+  const _Avatar({required this.displayName, this.avatarId});
   final String displayName;
+  final String? avatarId;
 
   @override
   Widget build(BuildContext context) {
+    final avatar = AvatarCatalog.byId(avatarId);
     final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : '?';
-    return Container(
+
+    final initialFallback = Container(
       width: 36,
       height: 36,
       decoration: BoxDecoration(
@@ -158,6 +166,25 @@ class _Avatar extends StatelessWidget {
       child: Text(
         initial,
         style: AppTypography.bebas(size: 18),
+      ),
+    );
+
+    if (avatar == null) return initialFallback;
+
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: AppColors.orSoleil.withValues(alpha: 0.5),
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: SvgPicture.asset(
+        avatar.assetPath,
+        fit: BoxFit.cover,
+        placeholderBuilder: (_) => initialFallback,
       ),
     );
   }

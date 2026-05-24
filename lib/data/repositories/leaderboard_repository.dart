@@ -68,6 +68,7 @@ class LeaderboardRepository {
       final rawDisplayName = data['display_name'] as String?;
       final myDisplayName =
           (rawDisplayName?.isNotEmpty ?? false) ? rawDisplayName! : 'Grimpeur anonyme';
+      final myAvatarId = data['avatar_id'] as String?;
 
       // Vérifier si dans top-100.
       final top100Snap = await _profiles
@@ -83,6 +84,7 @@ class LeaderboardRepository {
           displayName: myDisplayName,
           elo: myElo,
           rank: posInTop100 + 1,
+          avatarId: myAvatarId,
         );
       }
 
@@ -98,6 +100,7 @@ class LeaderboardRepository {
         displayName: myDisplayName,
         elo: myElo,
         rank: rank,
+        avatarId: myAvatarId,
       );
     } on Exception catch (e) {
       _log.e('fetchMyRank($uid) error', error: e);
@@ -135,6 +138,7 @@ class LeaderboardRepository {
               displayName: e.value.displayLabel,
               elo: e.value.elo,
               rank: e.key + 1,
+              avatarId: e.value.avatarId,
             ),
           )
           .toList();
@@ -158,6 +162,7 @@ class LeaderboardRepository {
       displayName: displayName,
       elo: (data['elo'] as num?)?.toInt() ?? PlayerProfile.eloInitial,
       rank: rank,
+      avatarId: data['avatar_id'] as String?,
     );
   }
 }

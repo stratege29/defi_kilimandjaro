@@ -100,6 +100,7 @@ flutter:
     - assets/images/badges/
     - assets/images/shop/
     - assets/images/duel/
+    - assets/images/avatars/
 
 # ----------------------------------------------------------------------------
 # App icon (run: dart run flutter_launcher_icons)

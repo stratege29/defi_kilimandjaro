@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- hippo_jovial : jolly laughing hippo with lily pad -->
+  <defs>
+    <radialGradient id="bgHip" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#D9E5F2"/>
+      <stop offset="100%" stop-color="#7A6E80" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="230" fill="url(#bgHip)"/>
+
+  <!-- Mud splatter dots -->
+  <circle cx="90" cy="380" r="6" fill="#7A4E2B" opacity="0.7"/>
+  <circle cx="105" cy="400" r="4" fill="#7A4E2B" opacity="0.7"/>
+  <circle cx="75" cy="350" r="5" fill="#7A4E2B" opacity="0.7"/>
+  <circle cx="420" cy="380" r="6" fill="#7A4E2B" opacity="0.7"/>
+  <circle cx="405" cy="400" r="4" fill="#7A4E2B" opacity="0.7"/>
+  <circle cx="435" cy="350" r="5" fill="#7A4E2B" opacity="0.7"/>
+  <circle cx="60" cy="420" r="4" fill="#7A4E2B" opacity="0.7"/>
+  <circle cx="450" cy="420" r="4" fill="#7A4E2B" opacity="0.7"/>
+
+  <!-- Legs -->
+  <rect x="155" y="410" width="55" height="65" rx="14" fill="#7A6E80" stroke="#1F1A17" stroke-width="5"/>
+  <rect x="305" y="410" width="55" height="65" rx="14" fill="#7A6E80" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Toes -->
+  <ellipse cx="170" cy="470" rx="5" ry="4" fill="#5C5267" stroke="#1F1A17" stroke-width="2"/>
+  <ellipse cx="185" cy="472" rx="5" ry="4" fill="#5C5267" stroke="#1F1A17" stroke-width="2"/>
+  <ellipse cx="200" cy="470" rx="5" ry="4" fill="#5C5267" stroke="#1F1A17" stroke-width="2"/>
+  <ellipse cx="320" cy="470" rx="5" ry="4" fill="#5C5267" stroke="#1F1A17" stroke-width="2"/>
+  <ellipse cx="335" cy="472" rx="5" ry="4" fill="#5C5267" stroke="#1F1A17" stroke-width="2"/>
+  <ellipse cx="350" cy="470" rx="5" ry="4" fill="#5C5267" stroke="#1F1A17" stroke-width="2"/>
+
+  <!-- Body (big round) -->
+  <ellipse cx="256" cy="330" rx="155" ry="120" fill="#7A6E80" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Belly shading -->
+  <ellipse cx="256" cy="370" rx="100" ry="55" fill="#94889B" opacity="0.6"/>
+
+  <!-- Head (snout area) -->
+  <ellipse cx="256" cy="240" rx="135" ry="105" fill="#7A6E80" stroke="#1F1A17" stroke-width="5"/>
+
+  <!-- Small ears on top -->
+  <ellipse cx="170" cy="155" rx="20" ry="16" fill="#7A6E80" stroke="#1F1A17" stroke-width="4"/>
+  <ellipse cx="170" cy="158" rx="10" ry="8" fill="#E58A8A" opacity="0.7"/>
+  <ellipse cx="342" cy="155" rx="20" ry="16" fill="#7A6E80" stroke="#1F1A17" stroke-width="4"/>
+  <ellipse cx="342" cy="158" rx="10" ry="8" fill="#E58A8A" opacity="0.7"/>
+
+  <!-- Closed eyes in joy (above mouth) -->
+  <path d="M 195 195 Q 215 178 235 195" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 277 195 Q 297 178 317 195" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Nostrils on snout -->
+  <ellipse cx="222" cy="225" rx="6" ry="4" fill="#1F1A17"/>
+  <ellipse cx="290" cy="225" rx="6" ry="4" fill="#1F1A17"/>
+
+  <!-- Big open laughing mouth -->
+  <path d="M 165 260 Q 256 260 347 260 Q 350 330 320 360 Q 256 380 192 360 Q 162 330 165 260 Z" fill="#E58A8A" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Inside mouth darker -->
+  <path d="M 185 280 Q 256 285 327 280 Q 325 340 295 355 Q 256 365 217 355 Q 187 340 185 280 Z" fill="#C25E6E" opacity="0.6"/>
+
+  <!-- Two square ivory teeth on bottom -->
+  <rect x="225" y="340" width="22" height="28" rx="4" fill="#FAF3E0" stroke="#1F1A17" stroke-width="4"/>
+  <rect x="265" y="340" width="22" height="28" rx="4" fill="#FAF3E0" stroke="#1F1A17" stroke-width="4"/>
+
+  <!-- Tongue hint -->
+  <ellipse cx="256" cy="320" rx="30" ry="12" fill="#E54F3B" opacity="0.7"/>
+
+  <!-- Blush -->
+  <ellipse cx="160" cy="270" rx="14" ry="9" fill="#E58A8A" opacity="0.55"/>
+  <ellipse cx="352" cy="270" rx="14" ry="9" fill="#E58A8A" opacity="0.55"/>
+
+  <!-- Lily pad on head -->
+  <ellipse cx="256" cy="135" rx="55" ry="20" fill="#4A8B3E" stroke="#1F1A17" stroke-width="4"/>
+  <path d="M 256 135 L 220 130" stroke="#3A6B30" stroke-width="2"/>
+  <path d="M 256 135 L 290 132" stroke="#3A6B30" stroke-width="2"/>
+  <path d="M 256 135 L 235 145" stroke="#3A6B30" stroke-width="2"/>
+  <path d="M 256 135 L 277 145" stroke="#3A6B30" stroke-width="2"/>
+
+  <!-- Lily flower on lily pad -->
+  <path d="M 246 122 Q 248 110 256 110 Q 264 110 266 122 Q 270 118 270 125 Q 264 130 256 130 Q 248 130 242 125 Q 242 118 246 122 Z" fill="#E58A8A" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="256" cy="122" r="3" fill="#F4B942"/>
+</svg>

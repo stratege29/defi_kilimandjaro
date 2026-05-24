@@ -4,9 +4,13 @@ import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
+import 'package:defi_kilimandjaro/domain/avatars/avatar_catalog.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
+import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// Superposition animée affichée pendant la phase [DuelPhase.intro].
 ///
@@ -151,6 +155,7 @@ class _DuelIntroOverlayState extends ConsumerState<DuelIntroOverlay>
                         uid: selfUid,
                         roundsWon: self?.roundsWon ?? 0,
                         alignment: Alignment.centerRight,
+                        showElo: widget.session.isRanked,
                       ),
                     ),
                   ),
@@ -168,6 +173,7 @@ class _DuelIntroOverlayState extends ConsumerState<DuelIntroOverlay>
                         uid: opponent?.uid ?? '',
                         roundsWon: opponent?.roundsWon ?? 0,
                         alignment: Alignment.centerLeft,
+                        showElo: widget.session.isRanked,
                       ),
                     ),
                   ),
@@ -237,26 +243,57 @@ class _SavannahBackground extends StatelessWidget {
   }
 }
 
-class _PlayerPortrait extends StatelessWidget {
+/// Portrait d'un joueur — branché sur [playerProfileProvider] pour afficher :
+/// - Pseudo réel (fallback "Joueur" si profil null / displayName vide)
+/// - Avatar SVG si [PlayerProfile.avatarId] défini (fallback initiale du
+///   pseudo, sinon initiale UID)
+/// - Score ELO en mètres si [showElo] (i.e. duel ranked)
+///
+/// [label] reste affiché en petite étiquette ("Moi" / "Adversaire") au-dessus
+/// du pseudo pour identifier rapidement chaque côté.
+class _PlayerPortrait extends ConsumerWidget {
   const _PlayerPortrait({
     required this.label,
     required this.uid,
     required this.roundsWon,
     required this.alignment,
+    required this.showElo,
   });
 
   final String label;
   final String uid;
   final int roundsWon;
   final Alignment alignment;
+  final bool showElo;
+
+  static const String _fallbackPseudo = 'Joueur';
+
+  static String _fallbackInitial(String uid) =>
+      uid.isEmpty ? '?' : uid.substring(0, 1).toUpperCase();
+
+  static String _initialOf(String name) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return '?';
+    return trimmed.substring(0, 1).toUpperCase();
+  }
 
   @override
-  Widget build(BuildContext context) {
-    final initials =
-        uid.isNotEmpty ? uid.substring(0, 1).toUpperCase() : '?';
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Si pas d'uid (adversaire pas encore connecté), rendu placeholder.
+    final asyncProfile = uid.isEmpty
+        ? const AsyncValue<PlayerProfile?>.data(null)
+        : ref.watch(playerProfileProvider(uid));
+
+    final profile = asyncProfile.asData?.value;
+    final hasDisplayName = profile?.displayName?.isNotEmpty ?? false;
+    final pseudo = hasDisplayName ? profile!.displayName! : _fallbackPseudo;
+    final initial =
+        hasDisplayName ? _initialOf(profile!.displayName!) : _fallbackInitial(uid);
+    final avatar = AvatarCatalog.byId(profile?.avatarId);
+    final eloLabel = (showElo && profile != null) ? '${profile.elo} m' : null;
 
     return Semantics(
-      label: '$label, $roundsWon manche(s) gagnée(s)',
+      label: '$label $pseudo, $roundsWon manche(s) gagnée(s)',
       child: Align(
         alignment: alignment,
         child: Padding(
@@ -264,7 +301,16 @@ class _PlayerPortrait extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Avatar circulaire avec initiales.
+              // Étiquette "Moi" / "Adversaire" en petit au-dessus.
+              Text(
+                label,
+                style: AppTypography.labelSm.copyWith(
+                  color: AppColors.orJour,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 6),
+              // Avatar circulaire (SVG ou initiale).
               Container(
                 width: 80,
                 height: 80,
@@ -283,23 +329,54 @@ class _PlayerPortrait extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Center(
-                  child: Text(
-                    initials,
-                    style: AppTypography.displaySm,
-                  ),
-                ),
+                clipBehavior: avatar != null ? Clip.antiAlias : Clip.none,
+                child: avatar != null
+                    ? SvgPicture.asset(
+                        avatar.assetPath,
+                        fit: BoxFit.cover,
+                        placeholderBuilder: (_) =>
+                            _InitialBadge(initial: initial),
+                      )
+                    : _InitialBadge(initial: initial),
               ),
               const SizedBox(height: 10),
+              // Pseudo.
               Text(
-                label,
+                pseudo,
                 style: AppTypography.headingMd,
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
+              if (eloLabel != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  eloLabel,
+                  style: AppTypography.bebas(
+                    size: 12,
+                    color: AppColors.texteSecondaire,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _InitialBadge extends StatelessWidget {
+  const _InitialBadge({required this.initial});
+
+  final String initial;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        initial,
+        style: AppTypography.displaySm,
       ),
     );
   }

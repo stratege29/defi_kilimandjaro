@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- griot_classique : conteur ancien, turban indigo, kora -->
+  <defs>
+    <radialGradient id="bg1" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#FFE9C9"/>
+      <stop offset="100%" stop-color="#F4B942" stop-opacity="0.0"/>
+    </radialGradient>
+  </defs>
+  <!-- Halo de fond doux -->
+  <circle cx="256" cy="256" r="230" fill="url(#bg1)"/>
+
+  <!-- Corps / boubou -->
+  <path d="M 120 470 Q 256 360 392 470 L 392 512 L 120 512 Z" fill="#3B4B8C" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Motifs boubou -->
+  <circle cx="200" cy="450" r="6" fill="#F4B942"/>
+  <circle cx="256" cy="430" r="6" fill="#F4B942"/>
+  <circle cx="312" cy="450" r="6" fill="#F4B942"/>
+
+  <!-- Cou -->
+  <rect x="226" y="320" width="60" height="40" rx="8" fill="#8B5A2B" stroke="#1F1A17" stroke-width="4"/>
+
+  <!-- Tête -->
+  <ellipse cx="256" cy="240" rx="120" ry="130" fill="#A06A3E" stroke="#1F1A17" stroke-width="5"/>
+
+  <!-- Oreilles -->
+  <ellipse cx="138" cy="245" rx="14" ry="22" fill="#8B5A2B" stroke="#1F1A17" stroke-width="4"/>
+  <ellipse cx="374" cy="245" rx="14" ry="22" fill="#8B5A2B" stroke="#1F1A17" stroke-width="4"/>
+
+  <!-- Turban indigo enroulé -->
+  <path d="M 140 180 Q 160 120 256 110 Q 352 120 372 180 Q 380 200 360 210 Q 320 175 256 175 Q 192 175 152 210 Q 132 200 140 180 Z" fill="#3B4B8C" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M 152 200 Q 200 165 256 165 Q 312 165 360 200" fill="none" stroke="#2A3970" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 162 215 Q 210 185 256 185 Q 302 185 350 215" fill="none" stroke="#2A3970" stroke-width="4" stroke-linecap="round"/>
+  <!-- Épingle dorée -->
+  <circle cx="200" cy="155" r="14" fill="#F4B942" stroke="#1F1A17" stroke-width="4"/>
+  <circle cx="200" cy="155" r="5" fill="#FFFFFF"/>
+
+  <!-- Yeux fermés en arc (chantant) -->
+  <path d="M 200 245 Q 215 235 230 245" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 282 245 Q 297 235 312 245" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Rides expressives -->
+  <path d="M 185 252 Q 178 258 175 268" fill="none" stroke="#7A4E2B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 327 252 Q 334 258 337 268" fill="none" stroke="#7A4E2B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 183 265 Q 178 270 178 278" fill="none" stroke="#7A4E2B" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 329 265 Q 334 270 334 278" fill="none" stroke="#7A4E2B" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Joues kawai -->
+  <ellipse cx="180" cy="285" rx="14" ry="9" fill="#E58A8A" opacity="0.55"/>
+  <ellipse cx="332" cy="285" rx="14" ry="9" fill="#E58A8A" opacity="0.55"/>
+
+  <!-- Nez -->
+  <path d="M 256 260 Q 248 285 252 295 Q 256 300 264 297" fill="none" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Sourire doux -->
+  <path d="M 226 318 Q 256 335 286 318" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Barbe blanche -->
+  <path d="M 200 330 Q 180 380 200 410 Q 230 420 256 415 Q 282 420 312 410 Q 332 380 312 330 Q 290 350 256 350 Q 222 350 200 330 Z" fill="#FAF3E0" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M 220 360 Q 220 380 232 395" fill="none" stroke="#D4CFB8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 256 365 L 256 408" stroke="#D4CFB8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 292 360 Q 292 380 280 395" fill="none" stroke="#D4CFB8" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Kora (mini, à côté de la tête à droite) -->
+  <g transform="translate(385 320)">
+    <ellipse cx="0" cy="40" rx="36" ry="40" fill="#D97742" stroke="#1F1A17" stroke-width="4"/>
+    <path d="M -28 25 L -28 -55" stroke="#7A4E2B" stroke-width="5" stroke-linecap="round"/>
+    <path d="M -20 8 L -20 -55" stroke="#FAF3E0" stroke-width="1.5"/>
+    <path d="M -14 8 L -14 -55" stroke="#FAF3E0" stroke-width="1.5"/>
+    <path d="M -8 8 L -8 -55" stroke="#FAF3E0" stroke-width="1.5"/>
+    <path d="M -2 8 L -2 -55" stroke="#FAF3E0" stroke-width="1.5"/>
+    <circle cx="0" cy="40" r="10" fill="#1F1A17"/>
+  </g>
+
+  <!-- Notes musicales -->
+  <text x="80" y="200" font-family="Arial" font-size="32" fill="#F4B942" stroke="#1F1A17" stroke-width="1.5">♪</text>
+  <text x="60" y="280" font-family="Arial" font-size="26" fill="#3B4B8C" stroke="#1F1A17" stroke-width="1">♫</text>
+</svg>

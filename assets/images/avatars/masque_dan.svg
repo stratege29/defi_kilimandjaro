@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- masque_dan : masque Dan en bois sombre, yeux fendus dorés, raphia -->
+  <defs>
+    <radialGradient id="bg3" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#F2D8B0"/>
+      <stop offset="100%" stop-color="#7A4E2B" stop-opacity="0.0"/>
+    </radialGradient>
+  </defs>
+  <!-- Halo de fond doux -->
+  <circle cx="256" cy="256" r="230" fill="url(#bg3)"/>
+
+  <!-- Visage en cœur, bois sombre -->
+  <path d="M 256 100 Q 360 110 370 220 Q 370 320 256 400 Q 142 320 142 220 Q 152 110 256 100 Z" fill="#3A1F0F" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Reflets bois plus chauds sur les côtés -->
+  <path d="M 256 110 Q 200 115 175 180 Q 168 240 200 300 Q 220 270 220 220 Q 220 160 256 130 Z" fill="#7A4E2B" opacity="0.5"/>
+  <path d="M 256 110 Q 312 115 337 180 Q 344 240 312 300 Q 292 270 292 220 Q 292 160 256 130 Z" fill="#7A4E2B" opacity="0.4"/>
+
+  <!-- Front : crête centrale verticale -->
+  <line x1="256" y1="115" x2="256" y2="195" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Sourcils légèrement obliques (mystérieux mais cute) -->
+  <path d="M 192 215 Q 210 205 228 213" fill="none" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 284 213 Q 302 205 320 215" fill="none" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Yeux fendus (slits) avec lueur dorée -->
+  <path d="M 188 248 Q 210 242 232 248 Q 210 254 188 248 Z" fill="#1F1A17" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round"/>
+  <ellipse cx="210" cy="248" rx="10" ry="2.5" fill="#F4B942"/>
+  <path d="M 280 248 Q 302 242 324 248 Q 302 254 280 248 Z" fill="#1F1A17" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round"/>
+  <ellipse cx="302" cy="248" rx="10" ry="2.5" fill="#F4B942"/>
+
+  <!-- Nez fin, long, géométrique -->
+  <path d="M 256 260 L 248 320 L 264 320 Z" fill="#1F1A17" opacity="0.6" stroke="#1F1A17" stroke-width="3"/>
+
+  <!-- Petite bouche -->
+  <ellipse cx="256" cy="350" rx="14" ry="6" fill="#1F1A17" stroke="#1F1A17" stroke-width="3"/>
+
+  <!-- Joues kawai discrètes -->
+  <ellipse cx="190" cy="295" rx="10" ry="6" fill="#E58A8A" opacity="0.35"/>
+  <ellipse cx="322" cy="295" rx="10" ry="6" fill="#E58A8A" opacity="0.35"/>
+
+  <!-- Frange de raphia : nombreux brins -->
+  <g stroke="#1F1A17" stroke-width="2" stroke-linecap="round">
+    <line x1="160" y1="395" x2="150" y2="475" stroke="#FAF3E0" stroke-width="4"/>
+    <line x1="175" y1="400" x2="170" y2="485" stroke="#D4B889" stroke-width="4"/>
+    <line x1="190" y1="405" x2="188" y2="490" stroke="#FAF3E0" stroke-width="4"/>
+    <line x1="205" y1="408" x2="204" y2="495" stroke="#D4B889" stroke-width="4"/>
+    <line x1="220" y1="410" x2="220" y2="498" stroke="#FAF3E0" stroke-width="4"/>
+    <line x1="235" y1="412" x2="236" y2="500" stroke="#D4B889" stroke-width="4"/>
+    <line x1="250" y1="412" x2="252" y2="502" stroke="#FAF3E0" stroke-width="4"/>
+    <line x1="265" y1="412" x2="268" y2="502" stroke="#D4B889" stroke-width="4"/>
+    <line x1="280" y1="412" x2="284" y2="500" stroke="#FAF3E0" stroke-width="4"/>
+    <line x1="295" y1="410" x2="300" y2="498" stroke="#D4B889" stroke-width="4"/>
+    <line x1="310" y1="408" x2="316" y2="495" stroke="#FAF3E0" stroke-width="4"/>
+    <line x1="325" y1="405" x2="332" y2="490" stroke="#D4B889" stroke-width="4"/>
+    <line x1="340" y1="400" x2="348" y2="485" stroke="#FAF3E0" stroke-width="4"/>
+    <line x1="355" y1="395" x2="365" y2="475" stroke="#D4B889" stroke-width="4"/>
+  </g>
+
+  <!-- Bandeau d'attache du raphia -->
+  <path d="M 150 388 Q 256 410 365 388 L 365 405 Q 256 425 150 405 Z" fill="#7A4E2B" stroke="#1F1A17" stroke-width="4" stroke-linejoin="round"/>
+</svg>

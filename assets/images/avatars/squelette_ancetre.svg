@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- squelette_ancetre : tête de mort kawai façon Día de los Muertos × ancêtre ouest-africain -->
+  <defs>
+    <radialGradient id="bgSquel" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#FFD9E6"/>
+      <stop offset="100%" stop-color="#3B4B8C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="230" fill="url(#bgSquel)"/>
+
+  <!-- Petit col de boubou indigo en bas, sous le crâne -->
+  <path d="M 150 510 Q 170 430 256 420 Q 342 430 362 510 Z" fill="#3B4B8C" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Trim doré -->
+  <path d="M 175 460 Q 256 445 337 460" fill="none" stroke="#F4B942" stroke-width="5"/>
+  <circle cx="200" cy="478" r="5" fill="#F4B942"/>
+  <circle cx="256" cy="470" r="5" fill="#F4B942"/>
+  <circle cx="312" cy="478" r="5" fill="#F4B942"/>
+  <!-- Encolure -->
+  <path d="M 220 425 Q 256 445 292 425" fill="none" stroke="#F4B942" stroke-width="4"/>
+
+  <!-- Crâne rond ivoire -->
+  <ellipse cx="256" cy="260" rx="130" ry="135" fill="#FAF3E0" stroke="#1F1A17" stroke-width="5"/>
+
+  <!-- Mâchoire arrondie -->
+  <path d="M 165 320 Q 180 410 256 420 Q 332 410 347 320" fill="#FAF3E0" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Orbites (sockets) -->
+  <ellipse cx="205" cy="265" rx="32" ry="36" fill="#1F1A17"/>
+  <ellipse cx="307" cy="265" rx="32" ry="36" fill="#1F1A17"/>
+
+  <!-- Yeux fermés paisibles dans les orbites (arcs souriants en doré-ivoire) -->
+  <path d="M 180 268 Q 205 252 230 268" fill="none" stroke="#FAF3E0" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 282 268 Q 307 252 332 268" fill="none" stroke="#FAF3E0" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Petits coeurs dorés sous les orbites (motifs tribaux) -->
+  <path d="M 205 318 Q 200 312 205 308 Q 210 312 205 318 Z" fill="#F4B942" stroke="#1F1A17" stroke-width="2"/>
+  <path d="M 307 318 Q 302 312 307 308 Q 312 312 307 318 Z" fill="#F4B942" stroke="#1F1A17" stroke-width="2"/>
+
+  <!-- Points décoratifs autour des orbites -->
+  <circle cx="170" cy="240" r="4" fill="#3B4B8C"/>
+  <circle cx="160" cy="265" r="4" fill="#F4B942"/>
+  <circle cx="170" cy="295" r="4" fill="#3B4B8C"/>
+  <circle cx="240" cy="240" r="3" fill="#F4B942"/>
+  <circle cx="240" cy="295" r="3" fill="#F4B942"/>
+  <circle cx="272" cy="240" r="3" fill="#F4B942"/>
+  <circle cx="272" cy="295" r="3" fill="#F4B942"/>
+  <circle cx="342" cy="240" r="4" fill="#3B4B8C"/>
+  <circle cx="352" cy="265" r="4" fill="#F4B942"/>
+  <circle cx="342" cy="295" r="4" fill="#3B4B8C"/>
+
+  <!-- Triangles bleus sous les orbites (larmes tribales) -->
+  <path d="M 195 305 L 205 325 L 215 305 Z" fill="#3B4B8C" stroke="#1F1A17" stroke-width="2"/>
+  <path d="M 297 305 L 307 325 L 317 305 Z" fill="#3B4B8C" stroke="#1F1A17" stroke-width="2"/>
+
+  <!-- Motifs swirl sur le front -->
+  <path d="M 230 200 Q 240 188 256 195 Q 272 188 282 200" fill="none" stroke="#3B4B8C" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="256" cy="215" r="5" fill="#F4B942" stroke="#1F1A17" stroke-width="2"/>
+  <path d="M 220 230 Q 235 220 235 230" fill="none" stroke="#F4B942" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 292 230 Q 277 220 277 230" fill="none" stroke="#F4B942" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Nez (petit coeur inversé) -->
+  <path d="M 256 335 Q 246 320 251 315 Q 256 320 256 320 Q 256 320 261 315 Q 266 320 256 335 Z" fill="#1F1A17"/>
+
+  <!-- Sourire doux avec deux petites dents -->
+  <path d="M 215 365 Q 256 388 297 365" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+  <!-- Lignes verticales mâchoire (style sugar skull) -->
+  <line x1="230" y1="365" x2="230" y2="378" stroke="#1F1A17" stroke-width="3"/>
+  <line x1="245" y1="365" x2="245" y2="380" stroke="#1F1A17" stroke-width="3"/>
+  <line x1="267" y1="365" x2="267" y2="380" stroke="#1F1A17" stroke-width="3"/>
+  <line x1="282" y1="365" x2="282" y2="378" stroke="#1F1A17" stroke-width="3"/>
+  <!-- Deux petites dents visibles -->
+  <rect x="249" y="365" width="7" height="13" rx="1.5" fill="#FAF3E0" stroke="#1F1A17" stroke-width="2"/>
+  <rect x="256" y="365" width="7" height="13" rx="1.5" fill="#FAF3E0" stroke="#1F1A17" stroke-width="2"/>
+
+  <!-- Joues kawai (petites) -->
+  <ellipse cx="170" cy="345" rx="10" ry="6" fill="#E58A8A" opacity="0.55"/>
+  <ellipse cx="342" cy="345" rx="10" ry="6" fill="#E58A8A" opacity="0.55"/>
+
+  <!-- Couronne de fleurs hibiscus autour du haut du crâne -->
+  <!-- Fleur 1 (gauche) -->
+  <g transform="translate(140 155)">
+    <circle cx="0" cy="0" r="18" fill="#E54F3B" stroke="#1F1A17" stroke-width="4"/>
+    <circle cx="-12" cy="-8" r="10" fill="#E54F3B" stroke="#1F1A17" stroke-width="3"/>
+    <circle cx="12" cy="-8" r="10" fill="#E54F3B" stroke="#1F1A17" stroke-width="3"/>
+    <circle cx="-10" cy="10" r="10" fill="#E54F3B" stroke="#1F1A17" stroke-width="3"/>
+    <circle cx="10" cy="10" r="10" fill="#E54F3B" stroke="#1F1A17" stroke-width="3"/>
+    <circle cx="0" cy="0" r="7" fill="#F4B942" stroke="#1F1A17" stroke-width="2"/>
+  </g>
+  <!-- Fleur 2 (centre haut) -->
+  <g transform="translate(256 120)">
+    <circle cx="0" cy="0" r="20" fill="#E58A8A" stroke="#1F1A17" stroke-width="4"/>
+    <circle cx="-14" cy="-9" r="11" fill="#E58A8A" stroke="#1F1A17" stroke-width="3"/>
+    <circle cx="14" cy="-9" r="11" fill="#E58A8A" stroke="#1F1A17" stroke-width="3"/>
+    <circle cx="-12" cy="11" r="11" fill="#E58A8A" stroke="#1F1A17" stroke-width="3"/>
+    <circle cx="12" cy="11" r="11" fill="#E58A8A" stroke="#1F1A17" stroke-width="3"/>
+    <circle cx="0" cy="0" r="8" fill="#F4B942" stroke="#1F1A17" stroke-width="2"/>
+  </g>
+  <!-- Fleur 3 (droite) -->
+  <g transform="translate(372 155)">
+    <circle cx="0" cy="0" r="18" fill="#E54F3B" stroke="#1F1A17" stroke-width="4"/>
+    <circle cx="-12" cy="-8" r="10" fill="#E54F3B" stroke="#1F1A17" stroke-width="3"/>
+    <circle cx="12" cy="-8" r="10" fill="#E54F3B" stroke="#1F1A17" stroke-width="3"/>
+    <circle cx="-10" cy="10" r="10" fill="#E54F3B" stroke="#1F1A17" stroke-width="3"/>
+    <circle cx="10" cy="10" r="10" fill="#E54F3B" stroke="#1F1A17" stroke-width="3"/>
+    <circle cx="0" cy="0" r="7" fill="#F4B942" stroke="#1F1A17" stroke-width="2"/>
+  </g>
+  <!-- Petites feuilles vertes entre les fleurs -->
+  <path d="M 190 145 Q 195 130 210 138 Q 200 150 190 145 Z" fill="#4A8B3E" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M 322 145 Q 317 130 302 138 Q 312 150 322 145 Z" fill="#4A8B3E" stroke="#1F1A17" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Pétales flottants autour -->
+  <ellipse cx="80" cy="240" rx="8" ry="5" fill="#E58A8A" stroke="#1F1A17" stroke-width="2" transform="rotate(-30 80 240)"/>
+  <ellipse cx="440" cy="280" rx="8" ry="5" fill="#E54F3B" stroke="#1F1A17" stroke-width="2" transform="rotate(40 440 280)"/>
+  <ellipse cx="100" cy="380" rx="7" ry="4" fill="#E54F3B" stroke="#1F1A17" stroke-width="2" transform="rotate(20 100 380)"/>
+</svg>

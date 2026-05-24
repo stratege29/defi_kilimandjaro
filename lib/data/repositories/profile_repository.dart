@@ -55,6 +55,16 @@ class ProfileRepository {
     return PlayerProfile.fromJson(uid, snap.data()!);
   }
 
+  /// Stream live du profil d'un autre joueur (pour l'overlay de duel).
+  /// Émet `null` si le document n'existe pas — le widget appelant gère
+  /// le fallback (label "Joueur" + initiale UID).
+  Stream<PlayerProfile?> watchProfile(String uid) {
+    return _profiles.doc(uid).snapshots().map((snap) {
+      if (!snap.exists || snap.data() == null) return null;
+      return PlayerProfile.fromJson(uid, snap.data()!);
+    });
+  }
+
   /// Lecture du profil d'un autre joueur (pour affichage dans l'écran de
   /// résultat ou le lobby).
   Future<PlayerProfile?> fetchProfile(String uid) async {
@@ -65,6 +75,31 @@ class ProfileRepository {
     } on Exception catch (e) {
       _log.e('fetchProfile($uid) failed', error: e);
       return null;
+    }
+  }
+
+  /// Met à jour l'avatar du joueur courant.
+  ///
+  /// Autorisé par les règles Firestore (écriture du seul champ `avatar_id`).
+  /// Utilise `SetOptions(merge: true)` pour ne pas écraser les champs ELO.
+  ///
+  /// L'`avatarId` doit correspondre à un id existant dans `AvatarCatalog` —
+  /// la validation est faite côté UI (impossible de sélectionner un id
+  /// inexistant via le picker).
+  Future<void> updateAvatar(String uid, String avatarId) async {
+    if (avatarId.isEmpty) return;
+    try {
+      await _profiles.doc(uid).set(
+        <String, dynamic>{
+          'avatar_id': avatarId,
+          'avatar_updated_at': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+      _log.i('avatar updated for $uid → "$avatarId"');
+    } on Exception catch (e) {
+      _log.e('updateAvatar error', error: e);
+      rethrow;
     }
   }
 
@@ -106,6 +141,14 @@ final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
 /// Utilisé dans le lobby, le profil, l'en-tête hub.
 final playerProfileStreamProvider = StreamProvider<PlayerProfile>((ref) {
   return ref.watch(profileRepositoryProvider).watchMyProfile();
+});
+
+/// Stream du profil d'un joueur arbitraire (par uid).
+/// Émet `null` si le document n'existe pas. Utilisé par l'overlay de duel
+/// pour afficher pseudo + ELO de chaque participant.
+final playerProfileProvider =
+    StreamProvider.family<PlayerProfile?, String>((ref, uid) {
+  return ref.watch(profileRepositoryProvider).watchProfile(uid);
 });
 
 /// Provider Firestore pour la couche leaderboard.
