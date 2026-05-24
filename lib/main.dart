@@ -16,6 +16,7 @@ import 'package:defi_kilimandjaro/data/repositories/fcm_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/firebase_options.dart';
+import 'package:defi_kilimandjaro/presentation/duel/incoming_challenge_listener.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -335,7 +336,8 @@ class _BootGateState extends ConsumerState<_BootGate> {
   }
 
   @override
-  Widget build(BuildContext context) => widget.child;
+  Widget build(BuildContext context) =>
+      IncomingChallengeListener(child: widget.child);
 }
 
 class KilimandjaroApp extends ConsumerWidget {

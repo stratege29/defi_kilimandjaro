@@ -113,6 +113,8 @@ class _LobbyViewState extends ConsumerState<LobbyView>
                           key: const ValueKey('noOpponent'),
                           slideCtrl: _slideCtrl,
                           isRematch: lobbyState.isRematch,
+                          wasDeclined:
+                              lobbyState.errorMessage == 'declined',
                         ),
                       },
                     ),
@@ -232,9 +234,11 @@ class _SearchingBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final remaining = (_kLobbyTimeoutSeconds - state.secondsElapsed).clamp(
+    // En mode rematch, l'attente est plus courte (l'adversaire est connu).
+    final totalTimeout = state.isRematch ? 15 : _kLobbyTimeoutSeconds;
+    final remaining = (totalTimeout - state.secondsElapsed).clamp(
       0,
-      _kLobbyTimeoutSeconds,
+      totalTimeout,
     );
 
     return Padding(
@@ -245,7 +249,7 @@ class _SearchingBody extends ConsumerWidget {
           // Tam-tam animé avec anneau countdown.
           _CountdownRing(
             secondsRemaining: remaining,
-            totalSeconds: _kLobbyTimeoutSeconds,
+            totalSeconds: totalTimeout,
             child: const _TamTamMascot(),
           ),
           const SizedBox(height: 32),
@@ -253,28 +257,27 @@ class _SearchingBody extends ConsumerWidget {
             'Altitude actuelle : $myElo m',
             style: AppTypography.bebas(color: AppColors.orSoleil),
           ),
-          if (state.isRematch) ...[
-            const SizedBox(height: 4),
+          const SizedBox(height: 4),
+          if (state.isRematch)
             Text(
-              'Recherche de ton dernier adversaire…',
+              "Défi envoyé — en attente de\nréponse de l'adversaire…",
               textAlign: TextAlign.center,
               style: AppTypography.crimson(
-                size: 13,
-                color: AppColors.orSoleil.withValues(alpha: 0.75),
+                size: 15,
+                color: AppColors.textePrimaire,
+                style: FontStyle.italic,
+              ),
+            )
+          else
+            Text(
+              "Recherche d'un grimpeur de niveau similaire…",
+              textAlign: TextAlign.center,
+              style: AppTypography.crimson(
+                size: 15,
+                color: AppColors.textePrimaire,
                 style: FontStyle.italic,
               ),
             ),
-          ] else
-            const SizedBox(height: 4),
-          Text(
-            "Recherche d'un grimpeur de niveau similaire…",
-            textAlign: TextAlign.center,
-            style: AppTypography.crimson(
-              size: 15,
-              color: AppColors.textePrimaire,
-              style: FontStyle.italic,
-            ),
-          ),
           const SizedBox(height: 28),
           // Bande ELO visuelle.
           _BandExpansionBar(state: state),
@@ -586,11 +589,25 @@ class _NoOpponentBody extends ConsumerWidget {
   const _NoOpponentBody({
     required this.slideCtrl,
     required this.isRematch,
+    this.wasDeclined = false,
     super.key,
   });
 
   final AnimationController slideCtrl;
   final bool isRematch;
+
+  /// True quand l'adversaire a explicitement refuse le rematch (vs timeout).
+  final bool wasDeclined;
+
+  String _bodyText() {
+    if (wasDeclined) {
+      return "Ton adversaire n'a pas accepté ce duel.\nPropose-en un autre !";
+    }
+    if (isRematch) {
+      return "Ton adversaire n'a pas répondu à temps.\nRetente ta chance !";
+    }
+    return 'Personne dans ton altitude pour le moment.\nReviens dans quelques instants !';
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -608,7 +625,7 @@ class _NoOpponentBody extends ConsumerWidget {
           FadeTransition(
             opacity: slideCtrl,
             child: Text(
-              'PERSONNE DISPONIBLE',
+              wasDeclined ? 'DÉFI REFUSÉ' : 'PERSONNE DISPONIBLE',
               style: AppTypography.bebas(size: 22, color: AppColors.orSoleil),
             ),
           ),
@@ -616,9 +633,7 @@ class _NoOpponentBody extends ConsumerWidget {
           FadeTransition(
             opacity: slideCtrl,
             child: Text(
-              isRematch
-                  ? "Ton adversaire n'est plus en ligne.\nRetente ta chance !"
-                  : 'Personne dans ton altitude pour le moment.\nReviens dans quelques instants !',
+              _bodyText(),
               textAlign: TextAlign.center,
               style: AppTypography.crimson(
                 size: 14,

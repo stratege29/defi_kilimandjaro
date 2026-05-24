@@ -57,7 +57,10 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
     const rtdb = getDatabase();
     const now = Date.now();
 
-    // --- Rate limit : 1 appel / 3 s ---
+    // --- Check match deja appaire (joueur passif notifie via lobby) ---
+    // Pattern Lichess/Firebase : quand un poll trouve `matched_to`, on lit
+    // le match et on retourne `matched` au client. Le listener RTDB cote
+    // client devrait avoir push avant, mais ce polling est un fallback fiable.
     const lobbyRef = rtdb.ref(`lobby/${uid}`);
     const existingSnap = await lobbyRef.get();
     if (existingSnap.exists()) {
@@ -66,19 +69,31 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
         request_id: string;
         matched_to?: string;
       };
-      const elapsedMs = now - (existing.ts ?? 0);
-      // Meme request_id = expansion — pas de rate limit.
-      if (existing.request_id !== request_id && elapsedMs < 3000) {
-        throw new HttpsError(
-          "resource-exhausted",
-          "Trop de requetes. Attends 3 secondes entre chaque tentative."
-        );
-      }
+
+      // Match deja cree pour ce joueur passif → retourner matched.
       if (existing.matched_to) {
-        return {
-          status: "waiting",
-          lobbyEntry: { matched_to: existing.matched_to },
-        };
+        const matchedTo = existing.matched_to;
+        const matchSnap = await rtdb.ref(`matches/${matchedTo}`).get();
+        if (matchSnap.exists()) {
+          await lobbyRef.remove();
+          return {
+            status: "matched",
+            matchId: matchedTo,
+            matchData: matchSnap.val() as Record<string, unknown>,
+          };
+        }
+        // Match supprime (rare : adversaire forfait apres creation) :
+        // on nettoie et on continue a chercher normalement.
+        await lobbyRef.remove();
+      } else {
+        // Rate limit : 1 appel / 3 s sauf meme request_id (expansion).
+        const elapsedMs = now - (existing.ts ?? 0);
+        if (existing.request_id !== request_id && elapsedMs < 3000) {
+          throw new HttpsError(
+            "resource-exhausted",
+            "Trop de requetes. Attends 3 secondes entre chaque tentative."
+          );
+        }
       }
     }
 
@@ -136,11 +151,16 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
       const rounds = _pickThreeRounds(cache);
       const now2 = Date.now();
 
+      // Phase = countdown direct (pas waiting) pour declencher l'overlay
+      // 3,2,1 du DuelPlayView des reception cote client. La duree de
+      // l'animation (3s) est calculee via phase_started_at, donc les 2
+      // clients restent synchronises meme si B arrive avec ~500ms de retard.
       const matchData: Record<string, unknown> = {
         match_id: matchId,
         created_by: uid,
         created_at: now2,
-        phase: "waiting",
+        phase: "countdown",
+        phase_started_at: now2,
         is_ranked: true,
         current_round: 0,
         total_rounds: 3,
@@ -167,11 +187,14 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
         },
       };
 
-      // Ecriture atomique dans Realtime DB.
+      // Ecriture atomique : creation du match + notification du joueur passif
+      // via `matched_to` sur son entree lobby (sera detecte par son listener
+      // RTDB ou par son prochain poll). L'appelant `uid` est notifie via la
+      // valeur de retour, donc son entree lobby peut etre supprimee.
       const updates: Record<string, unknown> = {
         [`matches/${matchId}`]: matchData,
         [`lobby/${uid}`]: null,
-        [`lobby/${opponentUid}`]: null,
+        [`lobby/${opponentUid}/matched_to`]: matchId,
       };
       await rtdb.ref().update(updates);
 

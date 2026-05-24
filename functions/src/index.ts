@@ -34,6 +34,7 @@ export { createLocalDuel } from "./matchmaking/createLocalDuel";
 // --- Social & Viral (Phase 7) ---
 export { sendChallengeNotif } from "./matchmaking/sendChallengeNotif";
 export { requestRematch } from "./matchmaking/requestRematch";
+export { respondToChallenge } from "./matchmaking/respondToChallenge";
 
 // --- UGC (user-generated devinettes) ---
 export { submitDevinette } from "./devinettes/submitDevinette";

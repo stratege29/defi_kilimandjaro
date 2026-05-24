@@ -6,6 +6,8 @@ import 'package:defi_kilimandjaro/data/repositories/matchmaking_repository.dart'
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
@@ -122,6 +124,8 @@ class LobbyController extends StateNotifier<LobbyState> {
     required this.duelRepository,
     required this.audioController,
     required this.profile,
+    required this.database,
+    required this.auth,
     String? rematchOpponentUid,
     String? previousMatchId,
   }) : super(
@@ -140,22 +144,33 @@ class LobbyController extends StateNotifier<LobbyState> {
   final DuelRepository duelRepository;
   final AudioController audioController;
   final PlayerProfile profile;
+  final FirebaseDatabase database;
+  final FirebaseAuth auth;
   final Logger _log = Logger();
 
   static const int _timeoutSeconds = 30;
+  // Rematch : adversaire connu, on attend juste sa reponse au dialog modal.
+  // 15s est suffisant — au-dela on considere qu'il a ferme l'app ou ne
+  // repond pas.
+  static const int _rematchTimeoutSeconds = 15;
   static const int _pollIntervalSeconds = 5;
+
+  int get _effectiveTimeoutSeconds =>
+      state.isRematch ? _rematchTimeoutSeconds : _timeoutSeconds;
 
   late String _requestId;
   Timer? _pollTimer;
   Timer? _tickTimer;
   StreamSubscription<DuelSession?>? _rematchWatchSub;
+  StreamSubscription<DatabaseEvent>? _matchedToSub;
   bool _cancelled = false;
+  bool _matchHandled = false;
 
   void _startSearch() {
     _tickTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_cancelled || state.phase != LobbyPhase.searching) return;
       state = state.copyWith(secondsElapsed: state.secondsElapsed + 1);
-      if (state.secondsElapsed >= _timeoutSeconds) {
+      if (state.secondsElapsed >= _effectiveTimeoutSeconds) {
         _onTimeout();
       }
     });
@@ -166,12 +181,75 @@ class LobbyController extends StateNotifier<LobbyState> {
       // Mode rematch ciblé — appel unique à la CF requestRematch.
       _startRematchFlow();
     } else {
-      // Mode matchmaking ELO standard — polling toutes les 5 s.
+      // Mode matchmaking ELO standard.
+      // Listener RTDB push (pattern Lichess) : detecte un match cree pour
+      // ce joueur en < 1s (au lieu d'attendre le prochain poll a +5s).
+      _listenForMatched();
+      // Polling de secours toutes les 5 s (fallback si le listener loupe
+      // ou si on est l'appelant qui trouve un adversaire dans le lobby).
       _poll();
       _pollTimer = Timer.periodic(
         const Duration(seconds: _pollIntervalSeconds),
         (_) => _poll(),
       );
+    }
+  }
+
+  /// Listener RTDB push sur `lobby/{uid}/matched_to`.
+  ///
+  /// Quand le serveur (`requestMatch`) appaire ce joueur avec un autre,
+  /// il ecrit `matched_to: matchId` sur l'entree lobby. Ce listener detecte
+  /// l'ecriture en < 1s et bascule directement en phase matched, sans
+  /// attendre le prochain poll.
+  void _listenForMatched() {
+    final uid = auth.currentUser?.uid;
+    if (uid == null) return;
+    _matchedToSub = database
+        .ref('lobby/$uid/matched_to')
+        .onValue
+        .listen((event) {
+      final value = event.snapshot.value;
+      if (value is! String) return;
+      _log.i('[Lobby] Match push detecte via RTDB: $value');
+      unawaited(_handleMatched(value));
+    });
+  }
+
+  /// Bascule l'etat en `matched` apres avoir recupere la session.
+  /// Idempotent : appele soit par le listener push, soit par le poll fallback.
+  Future<void> _handleMatched(String matchId) async {
+    if (_matchHandled || _cancelled) return;
+    _matchHandled = true;
+
+    try {
+      // Fetch la session live (timeout 5s : si RTDB met trop de temps,
+      // on retombe en mode polling normal).
+      final session = await duelRepository
+          .watch(matchId)
+          .firstWhere((s) => s != null)
+          .timeout(const Duration(seconds: 5));
+
+      if (_cancelled) return;
+
+      _pollTimer?.cancel();
+      _tickTimer?.cancel();
+      unawaited(_matchedToSub?.cancel());
+
+      // Nettoyer notre entree lobby (best-effort — le serveur nettoiera
+      // de toute facon au prochain poll d'expiration).
+      unawaited(matchmakingRepo.cancelMatch());
+
+      unawaited(audioController.stopLobbySearchLoop());
+      unawaited(audioController.playLobbyMatchFound());
+
+      state = state.copyWith(
+        phase: LobbyPhase.matched,
+        matchedSession: session,
+      );
+    } on Exception catch (e) {
+      _log.e('[Lobby] Fetch matched session failed', error: e);
+      // Reset le flag pour permettre une nouvelle tentative via poll.
+      _matchHandled = false;
     }
   }
 
@@ -215,11 +293,26 @@ class LobbyController extends StateNotifier<LobbyState> {
     if (_cancelled || state.phase != LobbyPhase.searching) return;
     if (session == null) return;
 
-    // Le match est prêt dès que l'adversaire a rejoint (2 joueurs présents)
-    // ou que la phase est active.
     final hasOpponent = session.players.length >= 2;
     final isActive = session.phase == DuelPhase.active;
+    // Refus : la CF respondToChallenge a ecrit phase=finished sans que
+    // l'opponent ait rejoint (players.length < 2).
+    final wasDeclined = session.phase == DuelPhase.finished && !hasOpponent;
 
+    if (wasDeclined) {
+      unawaited(_rematchWatchSub?.cancel());
+      _pollTimer?.cancel();
+      _tickTimer?.cancel();
+      unawaited(audioController.stopLobbySearchLoop());
+      state = state.copyWith(
+        phase: LobbyPhase.noOpponent,
+        errorMessage: 'declined',
+      );
+      return;
+    }
+
+    // Le match est prêt dès que l'adversaire a rejoint (2 joueurs présents)
+    // ou que la phase est active.
     if (hasOpponent || isActive) {
       unawaited(_rematchWatchSub?.cancel());
       _pollTimer?.cancel();
@@ -234,7 +327,9 @@ class LobbyController extends StateNotifier<LobbyState> {
   }
 
   Future<void> _poll() async {
-    if (_cancelled || state.phase != LobbyPhase.searching) return;
+    if (_cancelled || _matchHandled || state.phase != LobbyPhase.searching) {
+      return;
+    }
 
     final expansionStep = state.secondsElapsed ~/ _pollIntervalSeconds;
     _log.d(
@@ -253,8 +348,15 @@ class LobbyController extends StateNotifier<LobbyState> {
       if (_cancelled) return;
 
       if (result is MatchmakingMatched) {
+        // Cas 1 (appelant) : on a trouve un adversaire dans le lobby.
+        // Cas 2 (passif fallback) : le listener RTDB a loupe et le poll
+        // attrape le matched_to.
+        // Le _matchHandled guard rend le passage idempotent.
+        if (_matchHandled) return;
+        _matchHandled = true;
         _pollTimer?.cancel();
         _tickTimer?.cancel();
+        unawaited(_matchedToSub?.cancel());
         unawaited(audioController.stopLobbySearchLoop());
         unawaited(audioController.playLobbyMatchFound());
         state = state.copyWith(
@@ -289,6 +391,7 @@ class LobbyController extends StateNotifier<LobbyState> {
     _pollTimer?.cancel();
     _tickTimer?.cancel();
     unawaited(_rematchWatchSub?.cancel());
+    unawaited(_matchedToSub?.cancel());
     unawaited(audioController.stopLobbySearchLoop());
     if (!state.isRematch) {
       await matchmakingRepo.cancelMatch();
@@ -300,7 +403,9 @@ class LobbyController extends StateNotifier<LobbyState> {
     _pollTimer?.cancel();
     _tickTimer?.cancel();
     unawaited(_rematchWatchSub?.cancel());
+    unawaited(_matchedToSub?.cancel());
     _cancelled = false;
+    _matchHandled = false;
     _requestId = const Uuid().v4();
     state = LobbyState.initial(
       rematchOpponentUid: state.rematchOpponentUid,
@@ -316,6 +421,7 @@ class LobbyController extends StateNotifier<LobbyState> {
     _pollTimer?.cancel();
     _tickTimer?.cancel();
     unawaited(_rematchWatchSub?.cancel());
+    unawaited(_matchedToSub?.cancel());
     unawaited(audioController.stopLobbySearchLoop());
     super.dispose();
   }
@@ -334,6 +440,8 @@ final lobbyControllerProvider =
       duelRepository: ref.watch(duelRepositoryProvider),
       audioController: ref.read(audioControllerProvider.notifier),
       profile: profile ?? PlayerProfile.initial('anonymous'),
+      database: ref.watch(firebaseDatabaseProvider),
+      auth: ref.watch(firebaseAuthProvider),
       rematchOpponentUid: rematchUid,
       previousMatchId: previousMatchId,
     );
