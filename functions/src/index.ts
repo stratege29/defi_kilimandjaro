@@ -12,14 +12,20 @@
  */
 import { initializeApp } from "firebase-admin/app";
 
-// databaseURL explicite : la RTDB du projet est en us-central1 (URL historique
-// firebaseio.com). Sans cette config, les CF en europe-west1 ne resolvent pas
-// correctement l'URL via auto-discovery, et les writes RTDB partent "dans le
-// vide" silencieusement (CF return OK mais rien n'est ecrit). Cf. debug
-// duel 3-manches : submitRoundWin retournait next_phase=countdown mais
-// l'update phase=roundEnd n'arrivait jamais aux clients.
+// databaseURL explicite (auto-discovery non fiable depuis europe-west1 vers
+// une RTDB us-central1). Construction dynamique depuis le projet actif :
+//   dev  → https://kilimandjaro-dev-default-rtdb.firebaseio.com
+//   prod → https://kilimandjaro-prod-default-rtdb.firebaseio.com
+//
+// Hypothese : RTDB en us-central1 (URL historique firebaseio.com) avec
+// instance par defaut `{projectId}-default-rtdb`. Si la RTDB prod est
+// creee dans une autre region, ajuster ici (ex: .europe-west1.firebase
+// database.app). Cf. debug duel 3-manches : sans cette config explicite,
+// les writes RTDB partent dans le vide silencieusement.
+const projectId =
+  process.env["GCLOUD_PROJECT"] ?? "kilimandjaro-dev";
 initializeApp({
-  databaseURL: "https://kilimandjaro-dev-default-rtdb.firebaseio.com",
+  databaseURL: `https://${projectId}-default-rtdb.firebaseio.com`,
 });
 
 // --- Matchmaking ELO (Phase 6) ---
