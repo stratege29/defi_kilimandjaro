@@ -26,12 +26,16 @@ service firebase.storage {
     // Un seul fichier par pack, overwrite à chaque upload.
     // Limites : 1 MiB max post-optimisation (la pipeline cible < 80 KiB),
     // content-type image/webp ou image/png ou image/jpeg.
-    match /packs/v2/{packId}/image.{ext} {
+    // Le filename est matché par regex (image.{webp,png,jpg,jpeg}) plutôt
+    // qu'avec {ext} qui n'est pas supporté par les Storage rules.
+    match /packs/v2/{packId}/{filename} {
       allow read: if true;
       allow write: if isAdmin()
+        && filename.matches('image\\.(webp|png|jpg|jpeg)')
         && request.resource.size < 1024 * 1024
         && request.resource.contentType.matches('image/.*');
-      allow delete: if isAdmin();
+      allow delete: if isAdmin()
+        && filename.matches('image\\.(webp|png|jpg|jpeg)');
     }
 
     match /packs/{allPaths=**} {
