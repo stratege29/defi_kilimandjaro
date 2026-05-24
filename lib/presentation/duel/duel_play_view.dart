@@ -77,9 +77,12 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
     _phaseAdvanceTimer = Timer(const Duration(milliseconds: 3200), () {
       if (!mounted) return;
       // Best-effort : on ignore l'erreur, le serveur est idempotent.
-      ref.read(duelRepositoryProvider).advancePhase(matchId).catchError((
-        Object _,
-      ) {});
+      // Les 2 clients appellent simultanément, le 2e voit la phase déjà
+      // avancée et reçoit OK silencieux.
+      ref
+          .read(duelRepositoryProvider)
+          .advancePhase(matchId)
+          .catchError((Object _) {});
     });
   }
 
@@ -252,6 +255,11 @@ class _GameplayContent extends StatelessWidget {
           TimerBar(timeLeft: localState.timeLeft, totalTime: 30),
           const SizedBox(height: 14),
           AnswerCells(
+            // ValueKey sur currentRound : force le re-mount du widget
+            // à chaque changement de round (les longueurs answer/lettersPool
+            // changent — sans key, les animations gardent l'état du round
+            // précédent et causent RangeError sur des tuiles inexistantes).
+            key: ValueKey<String>('answer-cells-${session.currentRound}'),
             answer: session.answer,
             formedLetters: formedLetters,
             isValidated: localState.submitted,
@@ -260,6 +268,7 @@ class _GameplayContent extends StatelessWidget {
           Expanded(
             child: Center(
               child: CircularGrid(
+                key: ValueKey<String>('circular-grid-${session.currentRound}'),
                 letters: session.lettersPool,
                 selectedIndices: localState.selectedIndices,
                 hintTileIndices: const <int>[],

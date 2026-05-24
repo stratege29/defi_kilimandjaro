@@ -138,14 +138,29 @@ class DuelPlayer extends Equatable {
   });
 
   factory DuelPlayer.fromJson(String uid, Map<String, dynamic> json) {
-    final roundsRaw =
-        (json['rounds'] as Map<dynamic, dynamic>?) ?? <dynamic, dynamic>{};
-    final rounds = <int, RoundResult>{
-      for (final e in roundsRaw.entries)
-        int.parse(e.key.toString()): RoundResult.fromJson(
+    // Firebase RTDB convertit automatiquement les Maps avec cles numeriques
+    // consecutives (0, 1, 2...) en Arrays JSON cote serveur. Apres un write
+    // CF du genre `players/UID/rounds/0/found`, la structure parent `rounds`
+    // arrive cote client soit comme Map (clés "0","1","2") soit comme List
+    // selon l'historique des writes. On gere les 2 cas.
+    final roundsRaw = json['rounds'];
+    final rounds = <int, RoundResult>{};
+    if (roundsRaw is Map) {
+      for (final e in roundsRaw.entries) {
+        if (e.value == null) continue;
+        rounds[int.parse(e.key.toString())] = RoundResult.fromJson(
           (e.value as Map).cast<String, dynamic>(),
-        ),
-    };
+        );
+      }
+    } else if (roundsRaw is List) {
+      for (var i = 0; i < roundsRaw.length; i++) {
+        final item = roundsRaw[i];
+        if (item == null) continue;
+        rounds[i] = RoundResult.fromJson(
+          (item as Map).cast<String, dynamic>(),
+        );
+      }
+    }
     return DuelPlayer(
       uid: uid,
       roundsWon: (json['rounds_won'] as num?)?.toInt() ?? 0,

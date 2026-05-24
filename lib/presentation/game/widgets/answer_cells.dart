@@ -78,24 +78,41 @@ class _AnswerCellsState extends State<AnswerCells>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _flipCtrl,
-      builder: (_, __) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List<Widget>.generate(widget.answer.length, (i) {
-            final hasLetter = i < widget.formedLetters.length;
-            final letter = hasLetter ? widget.formedLetters[i] : '';
-            // Une fois validé, on affiche la lettre cible (la bonne réponse).
-            final displayLetter = widget.isValidated
-                ? widget.answer[i].toUpperCase()
-                : letter;
-            return _FlipCell(
-              letter: displayLetter,
-              filled: hasLetter || widget.isValidated,
-              flipProgress: _cellProgress(i, _flipCtrl.value),
+    // Calcul d'une taille adaptative pour ne pas overflow sur mots longs
+    // (DJEMBEFOLA = 10 lettres en mode duel hard). Le defaut 42×42 + 6px
+    // margin fait 480px pour 10 cellules, dépasse la largeur iPhone (~393px).
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const defaultCell = 42.0;
+        const horizontalMargin = 6.0;
+        final maxWidth = constraints.maxWidth;
+        final wantedWidth =
+            widget.answer.length * (defaultCell + horizontalMargin);
+        final cellSize = wantedWidth <= maxWidth
+            ? defaultCell
+            : (maxWidth / widget.answer.length - horizontalMargin)
+                  .clamp(24.0, defaultCell);
+
+        return AnimatedBuilder(
+          animation: _flipCtrl,
+          builder: (_, __) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List<Widget>.generate(widget.answer.length, (i) {
+                final hasLetter = i < widget.formedLetters.length;
+                final letter = hasLetter ? widget.formedLetters[i] : '';
+                final displayLetter = widget.isValidated
+                    ? widget.answer[i].toUpperCase()
+                    : letter;
+                return _FlipCell(
+                  letter: displayLetter,
+                  filled: hasLetter || widget.isValidated,
+                  flipProgress: _cellProgress(i, _flipCtrl.value),
+                  size: cellSize,
+                );
+              }),
             );
-          }),
+          },
         );
       },
     );
@@ -112,11 +129,13 @@ class _FlipCell extends StatelessWidget {
     required this.letter,
     required this.filled,
     required this.flipProgress,
+    this.size = 42,
   });
 
   final String letter;
   final bool filled;
   final double flipProgress;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +152,7 @@ class _FlipCell extends StatelessWidget {
               borderColor: AppColors.success,
               textColor: AppColors.textePrimaire,
               shadowColor: AppColors.success,
+              size: size,
             ),
           )
         : _CellFace(
@@ -141,6 +161,7 @@ class _FlipCell extends StatelessWidget {
             borderColor: AppColors.orSoleil,
             textColor: AppColors.vertForet,
             shadowColor: filled ? AppColors.orSoleil : null,
+            size: size,
           );
 
     return Transform(
@@ -160,6 +181,7 @@ class _CellFace extends StatelessWidget {
     required this.borderColor,
     required this.textColor,
     this.shadowColor,
+    this.size = 42,
   });
 
   final String letter;
@@ -167,12 +189,15 @@ class _CellFace extends StatelessWidget {
   final Color borderColor;
   final Color textColor;
   final Color? shadowColor;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
+    // Font size proportionnelle a la taille de cellule (22 pour 42 = ~52%).
+    final fontSize = (size * 0.52).clamp(14.0, 22.0);
     return Container(
-      width: 42,
-      height: 42,
+      width: size,
+      height: size,
       margin: const EdgeInsets.symmetric(horizontal: 3),
       decoration: BoxDecoration(
         color: bg,
@@ -190,7 +215,7 @@ class _CellFace extends StatelessWidget {
       child: Center(
         child: Text(
           letter,
-          style: AppTypography.bebas(size: 22, color: textColor),
+          style: AppTypography.bebas(size: fontSize, color: textColor),
         ),
       ),
     );
