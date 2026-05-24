@@ -73,21 +73,31 @@ DuelSession _makeSession({
 }
 
 /// Wrap minimal pour tester des widgets Riverpod sans Firebase live.
+///
+/// [audioController] : permet d'injecter un mock externe pour le `verify(...)`
+/// dans les tests d'intégration audio. Si null, un mock interne est créé.
 Widget _wrap(
   Widget child, {
   String selfUid = 'uid-a',
+  MockAudioController? audioController,
 }) {
   final mockAuth = MockFirebaseAuth();
   final mockUser = MockUser();
   when(mockUser.uid).thenReturn(selfUid);
   when(mockAuth.currentUser).thenReturn(mockUser);
 
-  final mockAudioCtrl = MockAudioController();
+  final mockAudioCtrl = audioController ?? MockAudioController();
   when(mockAudioCtrl.playDuelStart())
       .thenAnswer((_) async {});
   when(mockAudioCtrl.playTimerTick(any))
       .thenAnswer((_) async {});
   when(mockAudioCtrl.playWordComplete())
+      .thenAnswer((_) async {});
+  when(mockAudioCtrl.playRoundWon())
+      .thenAnswer((_) async {});
+  when(mockAudioCtrl.playRoundLost())
+      .thenAnswer((_) async {});
+  when(mockAudioCtrl.playRoundDraw())
       .thenAnswer((_) async {});
   when(mockAudioCtrl.state).thenReturn(AudioState.defaults());
 
@@ -393,6 +403,157 @@ void main() {
 
         // Doit afficher la prochaine manche (round 1 = medium).
         expect(find.textContaining('Moyen'), findsWidgets);
+      },
+    );
+
+    // ─── Audio cues (PR ce commit) ──────────────────────────────────────
+
+    testWidgets(
+      'audio: joue playRoundWon une seule fois quand le joueur a gagné',
+      (tester) async {
+        const selfUid = 'uid-a';
+        const opponentUid = 'uid-b';
+        final mockCtrl = MockAudioController();
+
+        final session = _makeSession(
+          phase: DuelPhase.roundEnd,
+          players: {
+            selfUid: const DuelPlayer(
+              uid: selfUid,
+              roundsWon: 1,
+              totalTimeMs: 8000,
+              rounds: {
+                0: RoundResult(
+                  progress: 1,
+                  found: true,
+                  finishedAtMs: 8000,
+                  timeTakenMs: 8000,
+                ),
+              },
+            ),
+            opponentUid: const DuelPlayer(
+              uid: opponentUid,
+              roundsWon: 0,
+              totalTimeMs: 0,
+              rounds: {
+                0: RoundResult(progress: 0.5, found: false),
+              },
+            ),
+          },
+        );
+
+        await tester.pumpWidget(
+          _wrap(
+            DuelRoundEndOverlay(
+              session: session,
+              gameBackground: const SizedBox.shrink(),
+            ),
+            audioController: mockCtrl,
+          ),
+        );
+        // Laisse le postFrameCallback se déclencher.
+        await tester.pump();
+
+        verify(mockCtrl.playRoundWon()).called(1);
+        verifyNever(mockCtrl.playRoundLost());
+        verifyNever(mockCtrl.playRoundDraw());
+      },
+    );
+
+    testWidgets(
+      "audio: joue playRoundLost quand l'adversaire a gagné",
+      (tester) async {
+        const selfUid = 'uid-a';
+        const opponentUid = 'uid-b';
+        final mockCtrl = MockAudioController();
+
+        final session = _makeSession(
+          phase: DuelPhase.roundEnd,
+          players: {
+            selfUid: const DuelPlayer(
+              uid: selfUid,
+              roundsWon: 0,
+              totalTimeMs: 0,
+              rounds: {
+                0: RoundResult(progress: 0.4, found: false),
+              },
+            ),
+            opponentUid: const DuelPlayer(
+              uid: opponentUid,
+              roundsWon: 1,
+              totalTimeMs: 6000,
+              rounds: {
+                0: RoundResult(
+                  progress: 1,
+                  found: true,
+                  finishedAtMs: 6000,
+                  timeTakenMs: 6000,
+                ),
+              },
+            ),
+          },
+        );
+
+        await tester.pumpWidget(
+          _wrap(
+            DuelRoundEndOverlay(
+              session: session,
+              gameBackground: const SizedBox.shrink(),
+            ),
+            audioController: mockCtrl,
+          ),
+        );
+        await tester.pump();
+
+        verify(mockCtrl.playRoundLost()).called(1);
+        verifyNever(mockCtrl.playRoundWon());
+        verifyNever(mockCtrl.playRoundDraw());
+      },
+    );
+
+    testWidgets(
+      "audio: joue playRoundDraw quand personne n'a trouvé",
+      (tester) async {
+        const selfUid = 'uid-a';
+        const opponentUid = 'uid-b';
+        final mockCtrl = MockAudioController();
+
+        final session = _makeSession(
+          phase: DuelPhase.roundEnd,
+          players: {
+            selfUid: const DuelPlayer(
+              uid: selfUid,
+              roundsWon: 0,
+              totalTimeMs: 0,
+              rounds: {
+                0: RoundResult(progress: 0.3, found: false),
+              },
+            ),
+            opponentUid: const DuelPlayer(
+              uid: opponentUid,
+              roundsWon: 0,
+              totalTimeMs: 0,
+              rounds: {
+                0: RoundResult(progress: 0.2, found: false),
+              },
+            ),
+          },
+        );
+
+        await tester.pumpWidget(
+          _wrap(
+            DuelRoundEndOverlay(
+              session: session,
+              gameBackground: const SizedBox.shrink(),
+            ),
+            audioController: mockCtrl,
+          ),
+        );
+        await tester.pump();
+
+        verify(mockCtrl.playRoundDraw()).called(1);
+        verifyNever(mockCtrl.playRoundWon());
+        verifyNever(mockCtrl.playRoundLost());
       },
     );
   });

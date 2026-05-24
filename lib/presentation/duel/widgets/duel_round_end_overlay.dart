@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
@@ -12,7 +13,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Affiche le score de la manche qui vient de se terminer, avec animation
 /// de compteur sur le score du gagnant. Durée ~3 s (accord serveur).
 /// La transition vers le [DuelPhase.countdown] suivant est serveur-driven.
-class DuelRoundEndOverlay extends ConsumerWidget {
+///
+/// **Audio** : à l'apparition de l'overlay, joue le cue procédural
+/// correspondant au résultat de la manche (kora ascendant si gagnée,
+/// balafon grave si perdue, accord suspendu si nulle). Une seule fois
+/// par instance, fire-and-forget.
+class DuelRoundEndOverlay extends ConsumerStatefulWidget {
   const DuelRoundEndOverlay({
     required this.session,
     required this.gameBackground,
@@ -25,7 +31,55 @@ class DuelRoundEndOverlay extends ConsumerWidget {
   final Widget gameBackground;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DuelRoundEndOverlay> createState() =>
+      _DuelRoundEndOverlayState();
+}
+
+class _DuelRoundEndOverlayState extends ConsumerState<DuelRoundEndOverlay> {
+  @override
+  void initState() {
+    super.initState();
+    // Cue audio joué une seule fois à l'apparition de l'overlay.
+    // Décalé d'une frame pour ne pas bloquer le premier paint sur la
+    // lecture (même si fire-and-forget — par prudence).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _playRoundEndCue();
+    });
+  }
+
+  /// Détermine le résultat de la manche courante et déclenche le cue
+  /// audio correspondant via [AudioController]. Fire-and-forget.
+  void _playRoundEndCue() {
+    final selfUid = ref.read(firebaseAuthProvider).currentUser?.uid ?? '';
+    final self = widget.session.players[selfUid];
+    final opponent = widget.session.opponentOf(selfUid);
+    final roundIdx = widget.session.currentRound;
+    final selfRound = self?.rounds[roundIdx];
+    final opponentRound = opponent?.rounds[roundIdx];
+
+    final winnerUid = _roundWinnerUid(
+      selfUid: selfUid,
+      opponentUid: opponent?.uid,
+      selfRound: selfRound,
+      opponentRound: opponentRound,
+    );
+
+    final audio = ref.read(audioControllerProvider.notifier);
+    if (winnerUid == null) {
+      audio.playRoundDraw().ignore();
+    } else if (winnerUid == selfUid) {
+      audio.playRoundWon().ignore();
+    } else {
+      audio.playRoundLost().ignore();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final session = widget.session;
+    final gameBackground = widget.gameBackground;
+
     final selfUid =
         ref.watch(firebaseAuthProvider).currentUser?.uid ?? '';
     final self = session.players[selfUid];
