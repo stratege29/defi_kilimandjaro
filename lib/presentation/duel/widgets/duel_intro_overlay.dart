@@ -4,7 +4,9 @@ import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
+import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -237,7 +239,7 @@ class _SavannahBackground extends StatelessWidget {
   }
 }
 
-class _PlayerPortrait extends StatelessWidget {
+class _PlayerPortrait extends ConsumerWidget {
   const _PlayerPortrait({
     required this.label,
     required this.uid,
@@ -245,18 +247,37 @@ class _PlayerPortrait extends StatelessWidget {
     required this.alignment,
   });
 
+  /// Label fallback affiché si le profil n'est pas (encore) disponible.
   final String label;
+
+  /// UID du joueur à observer.
   final String uid;
   final int roundsWon;
   final Alignment alignment;
 
   @override
-  Widget build(BuildContext context) {
-    final initials =
-        uid.isNotEmpty ? uid.substring(0, 1).toUpperCase() : '?';
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Observe le profil live : displayName + ELO.
+    final profileAsync = uid.isEmpty
+        ? const AsyncValue<PlayerProfile?>.data(null)
+        : ref.watch(playerProfileProvider(uid));
+
+    final profile = profileAsync.value;
+    final displayName = (profile?.displayName != null &&
+            profile!.displayName!.trim().isNotEmpty)
+        ? profile.displayName!.trim()
+        : label;
+    final elo = profile?.elo;
+
+    // Initiale calculée à partir du displayName si dispo, sinon UID.
+    final initialsSource = (profile?.displayName != null &&
+            profile!.displayName!.trim().isNotEmpty)
+        ? profile.displayName!.trim()
+        : (uid.isNotEmpty ? uid : '?');
+    final initials = initialsSource.substring(0, 1).toUpperCase();
 
     return Semantics(
-      label: '$label, $roundsWon manche(s) gagnée(s)',
+      label: '$displayName, $roundsWon manche(s) gagnée(s)',
       child: Align(
         alignment: alignment,
         child: Padding(
@@ -292,14 +313,44 @@ class _PlayerPortrait extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                label,
+                displayName,
                 style: AppTypography.headingMd,
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
+              if (elo != null) ...[
+                const SizedBox(height: 4),
+                _EloChip(elo: elo),
+              ],
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Petite pastille altitude (ELO en mètres). Style cohérent avec
+/// l'AltitudeChip du lobby et du profil.
+class _EloChip extends StatelessWidget {
+  const _EloChip({required this.elo});
+  final int elo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColors.orJour.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: AppColors.orJour.withValues(alpha: 0.5),
+        ),
+      ),
+      child: Text(
+        '$elo m',
+        style: AppTypography.bebas(size: 12, color: AppColors.orJour),
       ),
     );
   }

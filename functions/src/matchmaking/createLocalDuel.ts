@@ -21,24 +21,24 @@ import { _loadDevinettesCache, _pickThreeRounds } from "./devinettesCache";
 const REGION = "europe-west1";
 
 function _generateMatchId(): string {
-  // 8 caracteres alphanumeriques, lisibles (sans 0/O/1/I).
+  // 6 caracteres alphanumeriques, lisibles (sans 0/O/1/I).
+  // Garde la coherence avec l'UI client (DuelScanView accepte maxLength: 6).
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let id = "";
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 6; i++) {
     id += chars[Math.floor(Math.random() * chars.length)];
   }
   return id;
 }
 
 function _generateSecret(): string {
-  // 16 caracteres aleatoires (validation cote serveur quand joinDuel).
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let s = "";
-  for (let i = 0; i < 16; i++) {
-    s += chars[Math.floor(Math.random() * chars.length)];
+  // 24 hex caracteres (12 bytes random). Coherent avec l'UI client
+  // (DuelScanView accepte maxLength: 24 dans le champ Secret).
+  const bytes: number[] = [];
+  for (let i = 0; i < 12; i++) {
+    bytes.push(Math.floor(Math.random() * 256));
   }
-  return s;
+  return bytes.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 export const createLocalDuel = onCall(

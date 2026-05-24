@@ -305,10 +305,10 @@ class _GoLabelState extends State<_GoLabel>
             'GO !',
             style: AppTypography.displayLg.copyWith(
               fontSize: 80,
-              color: AppColors.success,
+              color: AppColors.orJour,
               shadows: [
                 Shadow(
-                  color: AppColors.success.withValues(alpha: 0.6),
+                  color: AppColors.orJour.withValues(alpha: 0.6),
                   blurRadius: 32,
                 ),
               ],

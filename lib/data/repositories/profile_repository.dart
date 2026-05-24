@@ -68,6 +68,16 @@ class ProfileRepository {
     }
   }
 
+  /// Stream live du profil d'un autre joueur (pour overlay duel).
+  /// Émet `null` si le document n'existe pas — le widget appelant gère
+  /// le fallback (label "Joueur" + initiale UID).
+  Stream<PlayerProfile?> watchProfile(String uid) {
+    return _profiles.doc(uid).snapshots().map((snap) {
+      if (!snap.exists || snap.data() == null) return null;
+      return PlayerProfile.fromJson(uid, snap.data()!);
+    });
+  }
+
   /// Met à jour le displayName du joueur courant.
   ///
   /// Autorisé par les règles Firestore (écriture de `display_name` uniquement).
@@ -106,6 +116,14 @@ final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
 /// Utilisé dans le lobby, le profil, l'en-tête hub.
 final playerProfileStreamProvider = StreamProvider<PlayerProfile>((ref) {
   return ref.watch(profileRepositoryProvider).watchMyProfile();
+});
+
+/// Stream du profil d'un joueur arbitraire (par uid). Émet `null` si le
+/// document n'existe pas. Utilisé par l'overlay de duel pour afficher
+/// pseudo + ELO de chaque participant.
+final playerProfileProvider =
+    StreamProvider.family<PlayerProfile?, String>((ref, uid) {
+  return ref.watch(profileRepositoryProvider).watchProfile(uid);
 });
 
 /// Provider Firestore pour la couche leaderboard.
