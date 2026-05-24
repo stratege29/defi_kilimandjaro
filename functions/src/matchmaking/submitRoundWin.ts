@@ -143,7 +143,7 @@ export const submitRoundWin = onCall<SubmitRoundWinData, Promise<SubmitRoundWinR
     const newTotalTime = winnerCurrentTotalTime + timeTakenMs;
 
     if (!isLastRound) {
-      // --- Round intermediaire : roundEnd, le trigger advanceRound prendra le relai ---
+      // --- Round intermediaire : roundEnd, le client appellera advancePhase ---
       await matchRef.update({
         phase: "roundEnd",
         phase_started_at: now,

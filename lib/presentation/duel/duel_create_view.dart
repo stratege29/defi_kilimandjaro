@@ -165,8 +165,16 @@ class _WaitingBody extends ConsumerWidget {
             'Code : $matchId',
             style: AppTypography.bebas(size: 22, color: AppColors.orSoleil),
           ),
-          const SizedBox(height: 6),
-          _ManualEntryBlock(matchId: matchId, secret: secret),
+          const SizedBox(height: 4),
+          Text(
+            'Ton ami tape ce code à 6 caractères dans «Rejoindre un défi».',
+            style: AppTypography.crimson(
+              size: 12,
+              color: AppColors.texteSecondaire,
+              style: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: 16),
           asyncSession.when(
             loading: () => _statusBox('Connexion...'),

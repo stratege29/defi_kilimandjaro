@@ -58,7 +58,10 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
         if (!mounted) return;
         context.go(AppRoutes.duelPlay, extra: session);
       });
-    } on Exception catch (e) {
+      // Catch all (Exception + Error) : joinDuel throw StateError sur secret
+      // invalide ou duel introuvable, qui n'est pas un Exception.
+      // ignore: avoid_catches_without_on_clauses
+    } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -155,7 +158,6 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
 
   Future<void> _showManualCodeSheet() async {
     final controller = TextEditingController();
-    final secretCtrl = TextEditingController();
     final saved = await showModalBottomSheet<bool>(
       context: context,
       backgroundColor: AppColors.boisFonce,
@@ -177,8 +179,8 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
             Text('Code du défi', style: AppTypography.bebas(size: 18)),
             const SizedBox(height: 4),
             Text(
-              'Demande à ton ami son code (6 caractères) et son secret '
-              '(visible dans son URL de QR).',
+              'Demande à ton ami son code à 6 caractères '
+              "(visible sur son écran d'attente).",
               style: AppTypography.crimson(
                 size: 12,
                 color: AppColors.texteSecondaire,
@@ -191,29 +193,20 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
               autofocus: true,
               textCapitalization: TextCapitalization.characters,
               maxLength: 6,
-              style: AppTypography.bebas(size: 18),
+              style: AppTypography.bebas(size: 24),
+              textAlign: TextAlign.center,
               decoration: InputDecoration(
-                labelText: 'Match ID',
+                labelText: 'Code du défi',
                 labelStyle: AppTypography.crimson(size: 13),
                 hintText: 'ABCD23',
                 hintStyle: AppTypography.crimson(
-                  size: 13,
+                  size: 24,
                   color: AppColors.texteDisabled,
                 ),
                 border: const OutlineInputBorder(),
               ),
             ),
-            TextField(
-              controller: secretCtrl,
-              maxLength: 24,
-              style: AppTypography.crimson(size: 13),
-              decoration: InputDecoration(
-                labelText: 'Secret (24 hex)',
-                labelStyle: AppTypography.crimson(size: 13),
-                border: const OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -235,9 +228,8 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
 
     if (saved != true) return;
     final matchId = controller.text.trim().toUpperCase();
-    final secret = secretCtrl.text.trim();
-    if (matchId.isEmpty || secret.isEmpty) return;
-    await _joinByCode(matchId, secret);
+    if (matchId.isEmpty) return;
+    await _joinByCode(matchId, '');
   }
 
   Future<void> _joinByCode(String matchId, String secret) async {
@@ -263,7 +255,10 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
         if (!mounted) return;
         context.go(AppRoutes.duelPlay, extra: session);
       });
-    } on Exception catch (e) {
+      // Catch all (Exception + Error) : joinDuel throw StateError sur secret
+      // invalide ou duel introuvable, qui n'est pas un Exception.
+      // ignore: avoid_catches_without_on_clauses
+    } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

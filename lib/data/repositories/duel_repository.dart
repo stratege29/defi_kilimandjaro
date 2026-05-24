@@ -56,11 +56,15 @@ class DuelRepository {
     return (matchId: matchId, secret: secret);
   }
 
-  /// Rejoint un duel existant. Verifie le secret.
+  /// Rejoint un duel existant.
   /// Demarre la phase `countdown` quand le 2e joueur arrive.
+  ///
+  /// Le `secret` est optionnel : il est verifie uniquement si fourni (cas
+  /// scan QR). Pour la saisie manuelle, on accepte un secret vide — le
+  /// matchId a 6 chars (32^6 ≈ 1Md combinaisons) suffit comme protection.
   Future<void> joinDuel({
     required String matchId,
-    required String secret,
+    String secret = '',
   }) async {
     final uid = currentUid;
     final ref = _matchRef(matchId);
@@ -69,7 +73,7 @@ class DuelRepository {
       throw StateError('Duel introuvable');
     }
     final data = (snapshot.value! as Map).cast<String, dynamic>();
-    if (data['secret'] != secret) {
+    if (secret.isNotEmpty && data['secret'] != secret) {
       throw StateError('Secret invalide');
     }
     if (data['created_by'] == uid) {
@@ -153,6 +157,20 @@ class DuelRepository {
     final callable = functions.httpsCallable('advancePhase');
     await callable.call<Map<String, dynamic>>(<String, dynamic>{
       'match_id': matchId,
+    });
+  }
+
+  /// Declare au serveur que le timer du round courant a atteint 0 sans
+  /// trouvaille. Si l'autre joueur est aussi en timeout :
+  ///   - rounds intermediaires : phase passe a roundEnd (personne ne gagne)
+  ///   - dernier round : match termine avec calcul du gagnant final
+  ///
+  /// Idempotent : les 2 clients appellent en parallele, le serveur gere.
+  Future<void> submitRoundTimeout(String matchId, int round) async {
+    final callable = functions.httpsCallable('submitRoundTimeout');
+    await callable.call<Map<String, dynamic>>(<String, dynamic>{
+      'match_id': matchId,
+      'round': round,
     });
   }
 

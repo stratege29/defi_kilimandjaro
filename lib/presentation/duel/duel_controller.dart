@@ -80,6 +80,15 @@ class DuelController extends StateNotifier<DuelLocalState> {
     final roundChanged = updated.currentRound != state.currentRound;
     final isNowActive = updated.phase == DuelPhase.active;
 
+    // Si la phase n'est plus active (roundEnd, countdown, finished),
+    // arreter immediatement le timer local : on n'a plus rien a faire
+    // pendant les animations inter-rounds. Evite que le perdant continue
+    // a decrementer son timer pendant que le round est deja termine.
+    if (!isNowActive && _timer != null) {
+      _timer?.cancel();
+      _timer = null;
+    }
+
     if (roundChanged && isNowActive) {
       _timer?.cancel();
       state = DuelLocalState(
@@ -129,13 +138,12 @@ class DuelController extends StateNotifier<DuelLocalState> {
         state.selectedIndices.map((i) => roundData.lettersPool[i]).join();
     if (formed == roundData.answer) {
       state = state.copyWith(submitted: true);
-      unawaited(
-        repository.submitRoundWin(
-          session.matchId,
-          state.currentRound,
-          selfUid,
-        ),
-      );
+      // Fire-and-forget : on swallow l'erreur (le serveur est idempotent,
+      // si l'autre joueur a gagné en parallèle, ça retourne failed-precondition
+      // et c'est normal).
+      repository
+          .submitRoundWin(session.matchId, state.currentRound, selfUid)
+          .catchError((Object _) => '');
     } else {
       state = state.copyWith(selectedIndices: const <int>[]);
       _pushProgress();
@@ -163,9 +171,15 @@ class DuelController extends StateNotifier<DuelLocalState> {
       }
       state = state.copyWith(timeLeft: state.timeLeft - 1);
       if (state.timeLeft == 0) {
-        // Timeout sur ce round : forfait global.
-        unawaited(repository.forfeit(session.matchId));
+        // Timeout du round : signaler au serveur via submitRoundTimeout.
+        // Si les 2 joueurs sont en timeout, le serveur :
+        //   - rounds 0,1 : passe a roundEnd (personne ne gagne)
+        //   - round 2 (dernier) : termine le match avec calcul du gagnant
         _timer?.cancel();
+        // Idempotent : si l'autre client a deja appele, no-op cote serveur.
+        repository
+            .submitRoundTimeout(session.matchId, state.currentRound)
+            .catchError((Object _) {});
       }
     });
   }
