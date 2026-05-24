@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>Atmosphère — proposition par biome</title>
+<style>
+  :root { --bg:#0f0f10; --panel:#1a1a1c; --text:#f5f5f4; --muted:#a8a29e; --accent:#fbbf24; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--bg); color:var(--text); padding:32px 24px 80px; }
+  h1 { margin:0 0 6px; font-size:22px; }
+  .sub { color:var(--muted); margin-bottom:24px; font-size:14px; max-width:1100px; }
+
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; max-width:1300px; }
+  .phone { background:var(--panel); border-radius:22px; padding:10px; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .screen { width:100%; aspect-ratio:9/19; border-radius:16px; overflow:hidden; position:relative; background:#000; }
+  .screen svg { width:100%; height:100%; display:block; }
+  .label { font-size:14px; font-weight:600; margin-top:6px; }
+  .desc { font-size:11px; color:var(--muted); text-align:center; line-height:1.4; }
+  .alt-range { font-size:10px; color:var(--accent); font-family:ui-monospace,monospace; }
+
+  .legend { margin-top:40px; padding:20px; background:var(--panel); border-radius:12px; font-size:13px; line-height:1.7; color:var(--muted); max-width:1300px; border-left:3px solid var(--accent); }
+  .legend b { color:var(--text); }
+  .legend code { background:#0c0c0d; padding:2px 6px; border-radius:4px; color:var(--accent); }
+  .legend h3 { color:var(--text); margin-top:16px; margin-bottom:6px; font-size:14px; }
+</style>
+</head>
+<body>
+  <h1>Atmosphère & parallax — proposition par biome</h1>
+  <div class="sub">
+    Brainstorm visuel pour remplacer les "nuages bulles". Mix d'<b>astre dominant</b>
+    (soleil/lune) + <b>cirrus filiformes</b> + <b>étoiles</b> (altitude uniquement).
+    Tout est statique pour le moment — aucune animation, aucun blur (causes du crash
+    iOS 26). Animations micro-safe ajoutables après validation.
+  </div>
+
+  <div class="grid">
+
+    <!-- ============ SAVANE ============ -->
+    <div class="phone">
+      <div class="screen">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 422" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="sky_sav" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#E8B86A"/>
+              <stop offset="100%" stop-color="#D4A857"/>
+            </linearGradient>
+            <radialGradient id="sun_sav" cx="0.5" cy="0.5">
+              <stop offset="0%" stop-color="#F0C040" stop-opacity="1"/>
+              <stop offset="50%" stop-color="#F0C040" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#F0C040" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="scrimTop_sav" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#000" stop-opacity="0.45"/>
+              <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="scrimBot_sav" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#000" stop-opacity="0.55"/>
+            </linearGradient>
+          </defs>
+          <!-- sky -->
+          <rect width="200" height="422" fill="url(#sky_sav)"/>
+          <!-- soleil bas-droite avec halo -->
+          <circle cx="160" cy="110" r="46" fill="url(#sun_sav)"/>
+          <circle cx="160" cy="110" r="22" fill="#FCD34D"/>
+          <!-- cirrus filiformes (2 strands sahéliens) -->
+          <ellipse cx="55" cy="155" rx="42" ry="2" fill="#FEF3C7" opacity="0.40"/>
+          <ellipse cx="130" cy="200" rx="32" ry="1.8" fill="#FEF3C7" opacity="0.32"/>
+          <ellipse cx="40" cy="225" rx="22" ry="1.2" fill="#FEF3C7" opacity="0.25"/>
+          <!-- scrim top (HUD readability) -->
+          <rect width="200" height="100" fill="url(#scrimTop_sav)"/>
+          <!-- mountain silhouette (Red Rocks mesa rouge) -->
+          <polygon points="0,422 0,360 25,330 55,325 145,328 175,332 200,358 200,422" fill="#9A3412"/>
+          <polygon points="25,330 55,325 145,328 175,332 168,338 145,335 55,335 32,338" fill="#B91C1C"/>
+          <!-- foreground sand -->
+          <polygon points="0,422 0,395 50,398 130,396 200,398 200,422" fill="#D4A857"/>
+          <!-- scrim bottom (HUD bottom area) -->
+          <rect x="0" y="330" width="200" height="92" fill="url(#scrimBot_sav)"/>
+          <!-- HUD mockup -->
+          <text x="14" y="38" fill="#F5EAD0" font-family="sans-serif" font-size="11" font-weight="700" letter-spacing="2">🇬🇲 RED ROCKS</text>
+          <text x="14" y="76" fill="#F0C040" font-family="sans-serif" font-size="26" font-weight="800">53 m</text>
+          <text x="60" y="412" fill="#F5EAD0" font-family="sans-serif" font-size="9" letter-spacing="1.5">GRAVIR</text>
+        </svg>
+      </div>
+      <div class="label">🌅 Savane</div>
+      <div class="alt-range">0 – 500 m</div>
+      <div class="desc">Soleil chaud (avec halo radial) bas-droite + 2-3 cirrus sahéliens jaune-pâle</div>
+    </div>
+
+    <!-- ============ FORÊT ============ -->
+    <div class="phone">
+      <div class="screen">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 422" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="sky_for" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1A3A20"/>
+              <stop offset="100%" stop-color="#0D2510"/>
+            </linearGradient>
+            <radialGradient id="sun_for" cx="0.5" cy="0.5">
+              <stop offset="0%" stop-color="#F0C040" stop-opacity="0.6"/>
+              <stop offset="60%" stop-color="#F0C040" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#F0C040" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="scrimTop_for" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#000" stop-opacity="0.45"/>
+              <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="scrimBot_for" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#000" stop-opacity="0.55"/>
+            </linearGradient>
+          </defs>
+          <rect width="200" height="422" fill="url(#sky_for)"/>
+          <!-- soleil voilé (plus haut, plus faible) -->
+          <circle cx="150" cy="95" r="55" fill="url(#sun_for)"/>
+          <circle cx="150" cy="95" r="16" fill="#F0C040" opacity="0.7"/>
+          <!-- cirrus brumeux verts pâles -->
+          <ellipse cx="70" cy="135" rx="38" ry="2" fill="#E8E8F5" opacity="0.20"/>
+          <ellipse cx="135" cy="170" rx="30" ry="1.5" fill="#E8E8F5" opacity="0.18"/>
+          <!-- horizontal mist band -->
+          <rect x="0" y="240" width="200" height="3" fill="#E8E8F5" opacity="0.12"/>
+          <!-- scrim top -->
+          <rect width="200" height="100" fill="url(#scrimTop_for)"/>
+          <!-- mountain (Mont Nimba — crête ferrugineuse) -->
+          <polygon points="0,422 0,310 15,290 35,270 75,250 110,245 150,255 180,275 200,310 200,422" fill="#1A2E05"/>
+          <!-- iron-ore plateau (signature orange) -->
+          <polygon points="35,270 75,250 110,245 130,255 105,270 75,275" fill="#B45309" opacity="0.85"/>
+          <polygon points="110,245 130,255 150,255 140,265 130,260" fill="#9A3412" opacity="0.85"/>
+          <!-- canopy texture -->
+          <polygon points="0,360 25,340 50,355 75,340 100,358 130,345 160,357 200,345 200,395 0,395" fill="#052e16"/>
+          <!-- scrim bot -->
+          <rect x="0" y="330" width="200" height="92" fill="url(#scrimBot_for)"/>
+          <!-- HUD -->
+          <text x="14" y="38" fill="#F5EAD0" font-family="sans-serif" font-size="11" font-weight="700" letter-spacing="2">🇨🇮 MONT NIMBA</text>
+          <text x="14" y="76" fill="#F0C040" font-family="sans-serif" font-size="26" font-weight="800">1 752 m</text>
+          <text x="60" y="412" fill="#F5EAD0" font-family="sans-serif" font-size="9" letter-spacing="1.5">GRAVIR</text>
+        </svg>
+      </div>
+      <div class="label">🌳 Forêt</div>
+      <div class="alt-range">500 – 2000 m</div>
+      <div class="desc">Soleil voilé (halo flou) plus haut + 1-2 cirrus brumeux + bande de brume horizontale</div>
+    </div>
+
+    <!-- ============ ROCHE ============ -->
+    <div class="phone">
+      <div class="screen">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 422" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="sky_roc" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7E8B98"/>
+              <stop offset="100%" stop-color="#5C6770"/>
+            </linearGradient>
+            <radialGradient id="sun_roc" cx="0.5" cy="0.5">
+              <stop offset="0%" stop-color="#F5EAD0" stop-opacity="0.95"/>
+              <stop offset="50%" stop-color="#F5EAD0" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#F5EAD0" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="scrimTop_roc" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#000" stop-opacity="0.45"/>
+              <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="scrimBot_roc" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#000" stop-opacity="0.55"/>
+            </linearGradient>
+          </defs>
+          <rect width="200" height="422" fill="url(#sky_roc)"/>
+          <!-- soleil pâle haut-droite, plus petit -->
+          <circle cx="155" cy="75" r="38" fill="url(#sun_roc)"/>
+          <circle cx="155" cy="75" r="14" fill="#F5EAD0" opacity="0.85"/>
+          <!-- cirrus blancs froids -->
+          <ellipse cx="50" cy="125" rx="40" ry="2.2" fill="#E8E8F5" opacity="0.35"/>
+          <ellipse cx="125" cy="160" rx="34" ry="1.6" fill="#E8E8F5" opacity="0.30"/>
+          <ellipse cx="35" cy="195" rx="22" ry="1.3" fill="#E8E8F5" opacity="0.22"/>
+          <!-- scrim top -->
+          <rect width="200" height="100" fill="url(#scrimTop_roc)"/>
+          <!-- mountain (Pico do Fogo — volcan basalte noir) -->
+          <polygon points="0,422 5,330 30,290 100,225 170,290 195,325 200,422" fill="#1C1917"/>
+          <polygon points="100,225 130,255 100,260" fill="#3F3F46"/>
+          <ellipse cx="100" cy="230" rx="6" ry="2" fill="#7F1D1D"/>
+          <!-- coulée de lave -->
+          <polygon points="80,290 100,360 70,365" fill="#7F1D1D" opacity="0.7"/>
+          <polygon points="120,290 145,365 110,365" fill="#451A03" opacity="0.7"/>
+          <!-- cendres -->
+          <polygon points="0,422 0,400 200,400 200,422" fill="#0C0A09"/>
+          <!-- scrim bot -->
+          <rect x="0" y="330" width="200" height="92" fill="url(#scrimBot_roc)"/>
+          <!-- HUD -->
+          <text x="14" y="38" fill="#F5EAD0" font-family="sans-serif" font-size="11" font-weight="700" letter-spacing="2">🇨🇻 PICO DO FOGO</text>
+          <text x="14" y="76" fill="#F0C040" font-family="sans-serif" font-size="26" font-weight="800">2 829 m</text>
+          <text x="60" y="412" fill="#F5EAD0" font-family="sans-serif" font-size="9" letter-spacing="1.5">GRAVIR</text>
+        </svg>
+      </div>
+      <div class="label">⛰ Roche</div>
+      <div class="alt-range">2000 – 4000 m</div>
+      <div class="desc">Soleil pâle haut-droite (plus petit) + 2-3 cirrus blancs froids + ciel gris bleuté</div>
+    </div>
+
+    <!-- ============ ALTITUDE ============ -->
+    <div class="phone">
+      <div class="screen">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 422" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="sky_alt" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1E1B4B"/>
+              <stop offset="55%" stop-color="#4C1D95"/>
+              <stop offset="100%" stop-color="#7A8AC4"/>
+            </linearGradient>
+            <radialGradient id="moon_alt" cx="0.5" cy="0.5">
+              <stop offset="0%" stop-color="#F5EAD0" stop-opacity="0.45"/>
+              <stop offset="100%" stop-color="#F5EAD0" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="scrimTop_alt" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#000" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="scrimBot_alt" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#000" stop-opacity="0.55"/>
+            </linearGradient>
+          </defs>
+          <rect width="200" height="422" fill="url(#sky_alt)"/>
+          <!-- étoiles (12 dispersées dans le tiers supérieur) -->
+          <g fill="#FAFAF9">
+            <circle cx="22" cy="48" r="1.3"/>
+            <circle cx="45" cy="22" r="0.9"/>
+            <circle cx="68" cy="55" r="1.1"/>
+            <circle cx="90" cy="30" r="0.8"/>
+            <circle cx="115" cy="58" r="1"/>
+            <circle cx="135" cy="38" r="1.3"/>
+            <circle cx="180" cy="25" r="1.1"/>
+            <circle cx="195" cy="60" r="0.9"/>
+            <circle cx="30" cy="85" r="0.8"/>
+            <circle cx="78" cy="95" r="0.7"/>
+            <circle cx="148" cy="100" r="1"/>
+            <circle cx="172" cy="115" r="0.8"/>
+            <circle cx="55" cy="120" r="0.6"/>
+            <circle cx="118" cy="135" r="0.7"/>
+            <circle cx="105" cy="155" r="0.5"/>
+          </g>
+          <!-- lune haut-droite avec halo -->
+          <circle cx="150" cy="75" r="34" fill="url(#moon_alt)"/>
+          <circle cx="150" cy="75" r="13" fill="#F5EAD0" opacity="0.92"/>
+          <circle cx="146" cy="71" r="3" fill="#D4D4D8" opacity="0.4"/>
+          <!-- cirrus très haut (1 strand) -->
+          <ellipse cx="60" cy="180" rx="40" ry="1.4" fill="#E8E8F5" opacity="0.25"/>
+          <!-- scrim top -->
+          <rect width="200" height="100" fill="url(#scrimTop_alt)"/>
+          <!-- mountain (Kilimandjaro — flat-top + glaciers) -->
+          <polygon points="0,422 5,330 40,285 90,235 150,235 180,275 195,310 200,422" fill="#0C0A09"/>
+          <!-- snow cap -->
+          <polygon points="40,285 90,235 150,235 180,275 165,278 130,260 95,258 60,275" fill="#FAFAF9"/>
+          <polygon points="90,235 150,235 130,243 100,243" fill="#E7E5E4"/>
+          <!-- glaciers descendants -->
+          <polygon points="65,275 70,310 75,290" fill="#FAFAF9"/>
+          <polygon points="100,258 105,330 110,290" fill="#FAFAF9" opacity="0.9"/>
+          <polygon points="130,260 135,325 140,295" fill="#FAFAF9" opacity="0.9"/>
+          <polygon points="160,275 162,310 166,295" fill="#FAFAF9" opacity="0.7"/>
+          <!-- savane / acacias -->
+          <polygon points="0,422 0,392 200,395 200,422" fill="#0C0A09"/>
+          <ellipse cx="30" cy="385" rx="9" ry="2" fill="#000"/>
+          <line x1="30" y1="392" x2="30" y2="385" stroke="#000" stroke-width="1.2"/>
+          <ellipse cx="170" cy="385" rx="9" ry="2" fill="#000"/>
+          <line x1="170" y1="392" x2="170" y2="385" stroke="#000" stroke-width="1.2"/>
+          <!-- scrim bot -->
+          <rect x="0" y="330" width="200" height="92" fill="url(#scrimBot_alt)"/>
+          <!-- HUD -->
+          <text x="14" y="38" fill="#F5EAD0" font-family="sans-serif" font-size="11" font-weight="700" letter-spacing="2">🇹🇿 KILIMANDJARO</text>
+          <text x="14" y="76" fill="#F0C040" font-family="sans-serif" font-size="26" font-weight="800">5 895 m</text>
+          <text x="60" y="412" fill="#F5EAD0" font-family="sans-serif" font-size="9" letter-spacing="1.5">GRAVIR</text>
+        </svg>
+      </div>
+      <div class="label">⭐ Altitude</div>
+      <div class="alt-range">4000 m +</div>
+      <div class="desc">Lune froide haut-droite + 12-15 étoiles + 1 cirrus haut — ciel nuit indigo→violet</div>
+    </div>
+
+  </div>
+
+  <div class="legend">
+    <h3>Principes</h3>
+    <ul style="margin:0 0 8px 0; padding-left:20px;">
+      <li><b>Astre dominant</b> (soleil ou lune) : un seul, position haute-droite ou bas-droite selon biome. Halo radial via <code>RadialGradient</code> Flutter.</li>
+      <li><b>Cirrus filiformes</b> : 1-3 ellipses très plates (ry ≈ 1.5-2 px), horizontales. Polygones simples si on veut éviter les ellipses.</li>
+      <li><b>Étoiles</b> : altitude uniquement. 12-15 cercles de 0.5-1.3 px, dispersés dans le tiers supérieur.</li>
+      <li><b>Aucun <code>MaskFilter.blur</code></b> — c'était une des causes du crash iOS 26. Les halos viennent des <code>RadialGradient</code>, qui sont safe.</li>
+      <li><b>Statique</b> pour livraison initiale. Drift vertical sur scroll PageView conservé (offset Y léger).</li>
+    </ul>
+
+    <h3>Animations safe à ajouter plus tard (étape 2)</h3>
+    <ul style="margin:0 0 8px 0; padding-left:20px;">
+      <li><b>Twinkle</b> des étoiles : 3-4 étoiles oscillent leur opacité entre 0.4 et 1.0 sur un cycle de 2-3 s (déphasés). Simple <code>TweenAnimationBuilder</code> par étoile, pas de blur.</li>
+      <li><b>Pulse</b> subtil du halo de l'astre : scale 0.95 ↔ 1.05 sur 4 s. Le halo est déjà un radial gradient, on anime juste le rayon du cercle qui le contient.</li>
+      <li><b>Drift</b> très lent des cirrus : translation horizontale linéaire (1-2 px/s). Avec <code>RepaintBoundary</code> + shapes simples (pas de blur), devrait passer.</li>
+    </ul>
+
+    <h3>Changements vs version actuelle</h3>
+    <ul style="margin:0; padding-left:20px;">
+      <li>❌ Suppression des "nuages bulles" (10 amas de 5-6 cercles chacun)</li>
+      <li>✅ Astre par biome (soleil chaud / soleil voilé / soleil froid / lune)</li>
+      <li>✅ Cirrus filiformes 1-3 strands au lieu de 10 amas</li>
+      <li>✅ Étoiles uniquement pour altitude (cohérent avec ciel nuit)</li>
+      <li>✅ Tout statique = pas de crash iOS 26 attendu</li>
+    </ul>
+  </div>
+</body>
+</html>

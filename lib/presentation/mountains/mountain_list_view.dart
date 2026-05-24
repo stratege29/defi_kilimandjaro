@@ -4,13 +4,16 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/altimeter_rail.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/atmosphere_layer.dart';
-import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_painter.dart';
+import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -43,6 +46,21 @@ class _MountainListViewState extends ConsumerState<MountainListView>
   // le PageView attache le controller, `page` vaut 0.0, jamais null.
   bool _initialJumpDone = false;
 
+  // Cache local des montagnes : `mountainsProvider` dépend de
+  // `playerProgressProvider`, donc chaque fin de niveau invalide l'async et
+  // repasse par `AsyncLoading`. Sans cache, le `.when(loading: ...)` démonte
+  // le PageView et un nouveau s'attache au `PageController` neuf → retour
+  // brutal à la page 0. Garder la dernière `data` connue évite le démontage.
+  List<Mountain>? _cachedMountains;
+
+  // Dernière page snappée — utilisé pour ne déclencher l'haptic qu'au
+  // franchissement d'une frontière de page (pas pendant le glissement).
+  int _lastSnappedPage = 0;
+
+  // Vrai pendant qu'un drag sur l'altimètre pilote le scroll : on coupe
+  // l'haptic snap pour éviter une rafale de clics pendant le scrub.
+  bool _altimeterScrubbing = false;
+
   @override
   void initState() {
     super.initState();
@@ -70,11 +88,39 @@ class _MountainListViewState extends ConsumerState<MountainListView>
   }
 
   void _onPageScroll() {
-    if (_pageController.hasClients) {
-      setState(() {
-        _pagePosition = _pageController.page ?? 0;
-      });
+    if (!_pageController.hasClients) return;
+    final page = _pageController.page ?? 0;
+    final snapped = page.round();
+    if (snapped != _lastSnappedPage && !_altimeterScrubbing) {
+      _lastSnappedPage = snapped;
+      HapticFeedback.selectionClick();
     }
+    setState(() {
+      _pagePosition = page;
+    });
+  }
+
+  /// Saute (sans animation) à un index — pilote du drag altimètre.
+  void _jumpToIndex(int idx) {
+    if (!_pageController.hasClients) return;
+    _altimeterScrubbing = true;
+    _pageController.jumpToPage(idx);
+    // Reset asynchrone : le scroll callback va encore tirer une fois après
+    // ce jump, on évite de bruiter l'haptic.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _altimeterScrubbing = false;
+      _lastSnappedPage = idx;
+    });
+  }
+
+  /// Anime vers un index — utilisé pour le retap onglet "Sommets".
+  Future<void> _animateToIndex(int idx) async {
+    if (!_pageController.hasClients) return;
+    await _pageController.animateToPage(
+      idx,
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOutCubic,
+    );
   }
 
   /// Initialise le PageController sur le sommet courant (premier non-completed).
@@ -137,13 +183,24 @@ class _MountainListViewState extends ConsumerState<MountainListView>
   @override
   Widget build(BuildContext context) {
     final asyncMountains = ref.watch(mountainsProvider);
+    // Cache local : on garde la dernière liste connue pour éviter de
+    // démonter le PageView pendant un re-fetch (voir doc de _cachedMountains).
+    if (asyncMountains.hasValue) {
+      _cachedMountains = asyncMountains.value;
+    }
+    final mountains = _cachedMountains;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: asyncMountains.when(
-        loading: () => const _LoadingView(),
-        error: (_, __) => const _ErrorView(),
-        data: (mountains) {
+      body: Builder(
+        builder: (context) {
+          if (asyncMountains.hasError && mountains == null) {
+            return const _ErrorView();
+          }
+          if (mountains == null) {
+            return const _LoadingView();
+          }
+
           // Positionnement initial sur le sommet courant.
           WidgetsBinding.instance.addPostFrameCallback(
             (_) => _jumpToCurrentMountain(mountains),
@@ -162,10 +219,11 @@ class _MountainListViewState extends ConsumerState<MountainListView>
           return Stack(
             fit: StackFit.expand,
             children: [
-              // 1. Atmosphère animée (fond dégradé).
+              // 1. Atmosphère animée (dégradé biome plein écran).
               Positioned.fill(child: AtmosphereLayer(biome: biome)),
 
-              // 2. Silhouettes BG parallax.
+              // 2. Nuages parallax animés — 3 couches stratifiées qui
+              // dérivent horizontalement + déplacement vertical sur scroll.
               Positioned.fill(
                 child: ParallaxBgLayer(
                   scrollFraction:
@@ -174,13 +232,11 @@ class _MountainListViewState extends ConsumerState<MountainListView>
                 ),
               ),
 
-              // 2.5. Scrim contextuel : dégradé sombre top + bottom pour
-              // garantir le contraste du HUD (nom, altitude, étoiles, CTA)
-              // sur les biomes clairs (savanne, altitude). Le milieu de
-              // l'écran reste pure atmosphère.
+              // 3. Scrim contextuel : dégradé sombre haut + bas pour
+              // garantir la lisibilité du HUD sur les ciels clairs.
               const Positioned.fill(child: _HudScrim()),
 
-              // 3. PageView principal — 1 montagne = 1 viewport.
+              // 4. PageView principal — 1 montagne = 1 viewport.
               PageView.builder(
                 controller: _pageController,
                 scrollDirection: Axis.vertical,
@@ -200,7 +256,7 @@ class _MountainListViewState extends ConsumerState<MountainListView>
                 },
               ),
 
-              // 4. Altimètre rail droit.
+              // 4. Altimètre rail droit — scrubber interactif.
               Positioned(
                 right: 0,
                 top: 60,
@@ -211,36 +267,46 @@ class _MountainListViewState extends ConsumerState<MountainListView>
                     child: AltimeterRail(
                       currentAltitude: interpolatedAlt,
                       bestAltitude: bestAlt,
+                      mountains: mountains,
+                      onSeekToIndex: _jumpToIndex,
                     ),
                   ),
                 ),
               ),
 
-              // 5. Bouton "Mes packs" — coin supérieur droit (icon-only).
+              // 5. Boutons coin supérieur droit : [dev unlock]? + "Mes packs".
               // Libère l'espace pour le nom de la montagne en haut-gauche.
               Positioned(
                 top: 0,
                 right: 0,
                 child: SafeArea(
-                  child: Semantics(
-                    button: true,
-                    label: 'my_packs.title'.tr(),
-                    child: Material(
-                      color: AppColors.surfaceContainer.withValues(alpha: 0.85),
-                      shape: const CircleBorder(),
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: () => context.push(AppRoutes.myPacks),
-                        child: const Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Icon(
-                            Icons.layers_outlined,
-                            color: AppColors.orJour,
-                            size: 22,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (kDebugMode)
+                        _DevUnlockButton(mountains: mountains),
+                      Semantics(
+                        button: true,
+                        label: 'my_packs.title'.tr(),
+                        child: Material(
+                          color: AppColors.surfaceContainer
+                              .withValues(alpha: 0.85),
+                          shape: const CircleBorder(),
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            onTap: () => context.push(AppRoutes.myPacks),
+                            child: const Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Icon(
+                                Icons.layers_outlined,
+                                color: AppColors.orJour,
+                                size: 22,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -255,7 +321,14 @@ class _MountainListViewState extends ConsumerState<MountainListView>
             case NavTab.defi:
               context.go(AppRoutes.hub);
             case NavTab.sommets:
-              break;
+              // Retap sur l'onglet courant → recentrer sur le sommet
+              // à conquérir (pattern iOS). Silencieux si la liste n'est
+              // pas encore chargée.
+              final ms = _cachedMountains;
+              if (ms != null) {
+                final idx = _currentMountainIndex(ms) ?? 0;
+                _animateToIndex(idx);
+              }
             case NavTab.profil:
               context.go(AppRoutes.profile);
           }
@@ -288,40 +361,28 @@ class _MountainPage extends StatelessWidget {
       mountain.completedLevels >= mountain.totalLevels &&
       mountain.totalLevels > 0;
 
-  Color _silhouetteColor() {
-    final biome = biomeForAltitude(mountain.altitude);
-    if (!mountain.unlocked) return AppColors.silhouetteVerrouillee;
-    return silhouetteColorForBiome(biome);
-  }
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final silhouetteH = size.height * 0.52;
 
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Silhouette FG — occupant la moitié inférieure de l'écran.
+        // Silhouette FG — stripped SVG (transparent au-dessus de la
+        // montagne) qui laisse passer AtmosphereLayer + nuages parallax.
+        // Ancrée au bas de l'écran avec un haut réservé au HUD.
         Positioned(
-          left: 20,
-          right: 60, // Laisse de la place pour l'altimètre.
-          bottom: 96, // Au-dessus de la bottom nav.
-          height: silhouetteH,
+          left: 0,
+          right: 0,
+          bottom: 96,
+          top: size.height * 0.18,
           child: AnimatedBuilder(
             animation: pulseAnim,
             builder: (context, _) {
-              return CustomPaint(
-                painter: MountainSilhouettePainter(
-                  shape: mountain.shape,
-                  seed: mountain.altitude,
-                  locked: !mountain.unlocked,
-                  completed: _isCompleted,
-                  primaryColor: _silhouetteColor(),
-                  snowColor: AppColors.neigeBlanche,
-                  hasPulse: isCurrentTarget && !_isCompleted,
-                  pulseValue: pulseAnim.value,
-                ),
+              return MountainSilhouetteVector(
+                mountain: mountain,
+                hasPulse: isCurrentTarget && !_isCompleted,
+                pulseValue: pulseAnim.value,
               );
             },
           ),
@@ -623,6 +684,54 @@ class _ErrorView extends StatelessWidget {
         child: Text(
           'Impossible de charger les sommets',
           style: AppTypography.crimson(color: AppColors.rouge),
+        ),
+      ),
+    );
+  }
+}
+
+/// Bouton debug-only (kDebugMode) : tape pour marquer toutes les montagnes
+/// comme intégralement complétées. Permet de tester rapidement les
+/// niveaux haute altitude (reverse, thinAir, boss tier 5) sans grinder
+/// 15+ montagnes. À retirer après validation du S1.
+class _DevUnlockButton extends ConsumerWidget {
+  const _DevUnlockButton({required this.mountains});
+
+  final List<Mountain> mountains;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: Semantics(
+        button: true,
+        label: 'Dev: déverrouiller tout',
+        child: Material(
+          color: AppColors.rouge.withValues(alpha: 0.85),
+          shape: const CircleBorder(),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () async {
+              await ref
+                  .read(playerProgressProvider.notifier)
+                  .unlockAllForDebug(mountains);
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('DEV : toutes les montagnes débloquées'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(10),
+              child: Icon(
+                Icons.lock_open,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
+          ),
         ),
       ),
     );

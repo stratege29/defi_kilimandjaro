@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="skyB51" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#312E81"/>
+      <stop offset="55%" stop-color="#DB2777"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#skyB51)"/>
+
+  <!-- Stars -->
+  <circle cx="25" cy="22" r="1.2" fill="#FAFAF9"/>
+  <circle cx="45" cy="14" r="0.8" fill="#FAFAF9"/>
+  <circle cx="170" cy="20" r="1" fill="#FAFAF9"/>
+
+  <!-- Sun disk -->
+  <circle cx="100" cy="118" r="22" fill="#FCD34D" opacity="0.85"/>
+
+  <!-- Layer 1: distant range -->
+  <path d="M 0,200 L 0,150 L 25,138 L 55,148 L 80,135 L 115,145 L 145,132 L 175,148 L 200,140 L 200,200 Z" fill="#581C87" opacity="0.7"/>
+
+  <!-- Layer 2: mid range -->
+  <path d="M 0,200 L 0,170 L 35,155 L 70,165 L 105,150 L 145,160 L 180,150 L 200,165 L 200,200 Z" fill="#4C1D95" opacity="0.85"/>
+
+  <!-- Layer 3: Kilimanjaro signature silhouette (flat top + slopes) -->
+  <path d="M 0,200 L 0,180 L 30,170 L 60,150 L 78,105 L 95,92 L 135,90 L 155,105 L 170,135 L 195,170 L 200,180 L 200,200 Z" fill="#1C0701"/>
+
+  <!-- Snow cap (wide, signature) -->
+  <path d="M 78,105 L 95,92 L 135,90 L 155,105 L 148,112 L 132,103 L 115,108 L 98,102 L 88,110 Z" fill="#FAFAF9"/>
+
+  <!-- Snow runoff streaks -->
+  <path d="M 88,110 L 92,135 L 96,118 Z" fill="#FAFAF9" opacity="0.7"/>
+  <path d="M 132,103 L 140,128 L 144,115 Z" fill="#FAFAF9" opacity="0.7"/>
+  <path d="M 115,108 L 118,140 L 122,118 Z" fill="#FAFAF9" opacity="0.55"/>
+
+  <!-- Foreground -->
+  <path d="M 0,200 L 0,193 Q 60,184 120,191 T 200,189 L 200,200 Z" fill="#000"/>
+</svg>

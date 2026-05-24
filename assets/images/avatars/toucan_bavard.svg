@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- toucan_bavard : colorful toucan teacher on a branch -->
+  <defs>
+    <radialGradient id="bgTou" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#E9F4D9"/>
+      <stop offset="100%" stop-color="#4A8B3E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="230" fill="url(#bgTou)"/>
+
+  <!-- Branch -->
+  <path d="M 80 430 Q 256 415 432 435" fill="none" stroke="#7A4E2B" stroke-width="22" stroke-linecap="round"/>
+  <path d="M 80 430 Q 256 415 432 435" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+  <!-- Branch texture -->
+  <path d="M 130 425 L 140 432" stroke="#5A3A1B" stroke-width="2"/>
+  <path d="M 200 422 L 210 430" stroke="#5A3A1B" stroke-width="2"/>
+  <path d="M 300 425 L 312 432" stroke="#5A3A1B" stroke-width="2"/>
+  <path d="M 380 430 L 392 437" stroke="#5A3A1B" stroke-width="2"/>
+  <!-- Small leaves -->
+  <ellipse cx="100" cy="410" rx="14" ry="7" fill="#4A8B3E" stroke="#1F1A17" stroke-width="3" transform="rotate(-30 100 410)"/>
+  <ellipse cx="410" cy="410" rx="14" ry="7" fill="#4A8B3E" stroke="#1F1A17" stroke-width="3" transform="rotate(30 410 410)"/>
+
+  <!-- Yellow legs gripping branch -->
+  <rect x="230" y="395" width="10" height="35" rx="4" fill="#F4B942" stroke="#1F1A17" stroke-width="3"/>
+  <rect x="272" y="395" width="10" height="35" rx="4" fill="#F4B942" stroke="#1F1A17" stroke-width="3"/>
+  <!-- Toes gripping -->
+  <path d="M 230 430 Q 220 438 215 432" fill="none" stroke="#F4B942" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 230 430 Q 220 438 215 432" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 240 430 Q 245 440 252 435" fill="none" stroke="#F4B942" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 240 430 Q 245 440 252 435" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 272 430 Q 267 440 260 435" fill="none" stroke="#F4B942" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 272 430 Q 267 440 260 435" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 282 430 Q 292 438 297 432" fill="none" stroke="#F4B942" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 282 430 Q 292 438 297 432" fill="none" stroke="#1F1A17" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Body (black plump) -->
+  <ellipse cx="256" cy="320" rx="110" ry="105" fill="#1F1A17" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Belly accent (chest patch) -->
+  <ellipse cx="256" cy="350" rx="50" ry="40" fill="#FAF3E0" stroke="#1F1A17" stroke-width="4"/>
+
+  <!-- Wing pointing forward (teacher gesture) -->
+  <path d="M 175 290 Q 110 270 90 310 Q 100 330 140 335 Q 175 330 190 320 Z" fill="#1F1A17" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Wing feather lines -->
+  <path d="M 110 305 Q 130 310 155 315" fill="none" stroke="#3A3A55" stroke-width="2"/>
+  <path d="M 115 320 Q 135 322 160 325" fill="none" stroke="#3A3A55" stroke-width="2"/>
+
+  <!-- Other wing folded -->
+  <ellipse cx="335" cy="320" rx="35" ry="50" fill="#2A2A40" stroke="#1F1A17" stroke-width="4"/>
+  <path d="M 335 290 Q 340 320 335 350" fill="none" stroke="#3A3A55" stroke-width="2"/>
+
+  <!-- Head -->
+  <ellipse cx="256" cy="200" rx="78" ry="75" fill="#1F1A17" stroke="#1F1A17" stroke-width="5"/>
+
+  <!-- Big curved rainbow beak -->
+  <path d="M 305 175 Q 410 175 430 220 Q 425 240 395 240 Q 360 240 320 230 Q 290 220 290 200 Z" fill="#F4B942" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Rainbow segments -->
+  <path d="M 340 178 Q 345 215 340 235" fill="none" stroke="#1F1A17" stroke-width="2"/>
+  <path d="M 375 180 Q 380 215 375 240" fill="none" stroke="#1F1A17" stroke-width="2"/>
+  <path d="M 405 195 Q 410 220 405 240" fill="none" stroke="#1F1A17" stroke-width="2"/>
+  <!-- Color fills -->
+  <path d="M 305 175 Q 305 200 340 230 L 340 178 Q 320 175 305 175 Z" fill="#F4B942"/>
+  <path d="M 340 178 Q 358 178 375 180 L 375 240 Q 358 235 340 230 Z" fill="#E89556"/>
+  <path d="M 375 180 Q 392 185 405 195 L 405 240 Q 388 240 375 240 Z" fill="#E54F3B"/>
+  <path d="M 405 195 Q 425 205 430 220 Q 425 240 405 240 Z" fill="#4A8B3E"/>
+  <!-- Beak outline overlay -->
+  <path d="M 305 175 Q 410 175 430 220 Q 425 240 395 240 Q 360 240 320 230 Q 290 220 290 200 Z" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Beak ridge -->
+  <path d="M 305 188 Q 360 188 420 215" fill="none" stroke="#1F1A17" stroke-width="2" opacity="0.6"/>
+
+  <!-- Big white eye -->
+  <circle cx="240" cy="185" r="22" fill="#FAF3E0" stroke="#1F1A17" stroke-width="4"/>
+  <circle cx="244" cy="188" r="9" fill="#1F1A17"/>
+  <circle cx="247" cy="184" r="3" fill="#FFFFFF"/>
+
+  <!-- Raised eyebrow -->
+  <path d="M 220 158 Q 240 148 262 156" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Speech bubble with quotation -->
+  <ellipse cx="430" cy="135" rx="40" ry="32" fill="#FAF3E0" stroke="#1F1A17" stroke-width="4"/>
+  <path d="M 405 155 L 395 175 L 415 162 Z" fill="#FAF3E0" stroke="#1F1A17" stroke-width="4" stroke-linejoin="round"/>
+  <text x="430" y="150" font-family="Arial" font-size="40" font-weight="bold" fill="#1F1A17" text-anchor="middle">"</text>
+
+  <!-- Blush on cheek -->
+  <ellipse cx="215" cy="225" rx="10" ry="6" fill="#E58A8A" opacity="0.5"/>
+</svg>

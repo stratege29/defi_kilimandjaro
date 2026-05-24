@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>defi_kilimandjaro</string>
+	<string>Kilimandjaro</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -36,25 +36,13 @@
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<string>ca-app-pub-3872682728320036~5131850861</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-		<key>NSAllowsLocalNetworking</key>
-		<true/>
-	</dict>
-	<key>NSBonjourServices</key>
-	<array>
-		<string>_http._tcp</string>
-		<string>_dartobservatory._tcp</string>
-	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Pour scanner le QR code de ton ami et lancer un duel temps réel.</string>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>Connexion aux services Firebase locaux (mode développement uniquement).</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Kilimandjaro n'enregistre pas l'audio. Cette autorisation est référencée par les bibliothèques d'analyse vidéo du scanner QR mais n'est jamais demandée à l'utilisateur.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

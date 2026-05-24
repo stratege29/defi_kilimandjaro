@@ -21,6 +21,7 @@ import 'package:defi_kilimandjaro/presentation/mountains/mountain_list_view.dart
 import 'package:defi_kilimandjaro/presentation/my_packs/my_packs_view.dart';
 import 'package:defi_kilimandjaro/presentation/onboarding/onboarding_view.dart';
 import 'package:defi_kilimandjaro/presentation/pack_chooser/pack_chooser_view.dart';
+import 'package:defi_kilimandjaro/presentation/profile/avatar_picker_view.dart';
 import 'package:defi_kilimandjaro/presentation/profile/profile_view.dart';
 import 'package:defi_kilimandjaro/presentation/shop/shop_view.dart';
 import 'package:defi_kilimandjaro/presentation/splash/splash_view.dart';
@@ -40,6 +41,7 @@ abstract final class AppRoutes {
   static const mountains = '/mountains';
   static const mountain = '/mountain';
   static const profile = '/profile';
+  static const avatarPicker = '/profile/avatar';
   static const shop = '/shop';
   static const duel = '/duel';
   static const duelCreate = '/duel/create';
@@ -164,7 +166,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         final extra = state.extra;
         final args = extra is GameArgs
             ? extra
-            : GameArgs(devinette: extra! as Devinette);
+            : GameArgs.legacy(devinette: extra! as Devinette);
         return GameView(args: args);
       },
     ),
@@ -184,6 +186,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       path: AppRoutes.profile,
       name: 'profile',
       builder: (_, __) => const ProfileView(),
+    ),
+    GoRoute(
+      path: AppRoutes.avatarPicker,
+      name: 'avatar-picker',
+      builder: (_, __) => const AvatarPickerView(),
     ),
     GoRoute(
       path: AppRoutes.shop,

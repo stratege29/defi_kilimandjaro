@@ -5,50 +5,103 @@ import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// État local de l'écran de duel pour le joueur courant.
+/// Etat local de l'ecran de duel pour le joueur courant.
 class DuelLocalState {
   const DuelLocalState({
     required this.selectedIndices,
     required this.timeLeft,
+    required this.currentRound,
     this.submitted = false,
   });
 
-  factory DuelLocalState.initial() =>
-      const DuelLocalState(selectedIndices: <int>[], timeLeft: 30);
+  factory DuelLocalState.initial() => const DuelLocalState(
+        selectedIndices: <int>[],
+        timeLeft: 30,
+        currentRound: 0,
+      );
 
   final List<int> selectedIndices;
   final int timeLeft;
+
+  /// Round local observe : quand il change, le controller reset le state.
+  final int currentRound;
+
+  /// True si le joueur a valide le bon mot pour le round courant.
   final bool submitted;
 
   DuelLocalState copyWith({
     List<int>? selectedIndices,
     int? timeLeft,
+    int? currentRound,
     bool? submitted,
   }) {
     return DuelLocalState(
       selectedIndices: selectedIndices ?? this.selectedIndices,
       timeLeft: timeLeft ?? this.timeLeft,
+      currentRound: currentRound ?? this.currentRound,
       submitted: submitted ?? this.submitted,
     );
   }
 }
 
-/// Contrôleur local d'un duel.
+/// Controleur local d'un duel multi-rounds.
 ///
-/// - Maintient la sélection des tuiles côté client.
-/// - Pousse la progression à RTDB sur chaque changement.
-/// - Submit la victoire au serveur quand le mot est valide.
+/// Responsabilites :
+/// - Maintient la selection des tuiles cote client.
+/// - Pousse la progression a RTDB sur chaque changement (barre adverse).
+/// - Detecte la fin du round (mot valide) et appelle submitRoundWin via repo.
+/// - Observe [DuelSession.currentRound] : quand il change (signale par RTDB),
+///   reset le state local pour le nouveau round.
+/// - Gere le timer 30 s par round ; en cas de timeout appelle forfeit.
+///
+/// Phases ignorees par le controller (gerees par l'UI via phaseStartedAtMs) :
+/// - intro, countdown, roundEnd.
 class DuelController extends StateNotifier<DuelLocalState> {
   DuelController({
     required this.session,
+    required this.selfUid,
     required this.repository,
   }) : super(DuelLocalState.initial()) {
-    _startTimer();
+    if (session.phase == DuelPhase.active) {
+      _startTimer();
+    }
   }
 
   final DuelSession session;
+  final String selfUid;
   final DuelRepository repository;
   Timer? _timer;
+
+  /// Appele depuis l'UI quand la session RTDB est mise a jour.
+  ///
+  /// Si le round a change (nouveau round demarre par advanceRound CF),
+  /// reset le state local et demarre un nouveau timer.
+  void onSessionUpdated(DuelSession updated) {
+    final roundChanged = updated.currentRound != state.currentRound;
+    final isNowActive = updated.phase == DuelPhase.active;
+
+    // Si la phase n'est plus active (roundEnd, countdown, finished),
+    // arreter immediatement le timer local : on n'a plus rien a faire
+    // pendant les animations inter-rounds. Evite que le perdant continue
+    // a decrementer son timer pendant que le round est deja termine.
+    if (!isNowActive && _timer != null) {
+      _timer?.cancel();
+      _timer = null;
+    }
+
+    if (roundChanged && isNowActive) {
+      _timer?.cancel();
+      state = DuelLocalState(
+        selectedIndices: const <int>[],
+        timeLeft: 30,
+        currentRound: updated.currentRound,
+      );
+      _startTimer();
+    } else if (!roundChanged && isNowActive && _timer == null) {
+      // Phase active sans changement de round (ex: reconnexion).
+      _startTimer();
+    }
+  }
 
   void selectTile(int gridIndex) {
     if (state.submitted) return;
@@ -56,7 +109,7 @@ class DuelController extends StateNotifier<DuelLocalState> {
 
     final selected = List<int>.from(state.selectedIndices);
 
-    // Slide-back.
+    // Slide-back : glisser en arriere sur l'avant-derniere tuile efface la derniere.
     if (selected.length >= 2 && selected[selected.length - 2] == gridIndex) {
       selected.removeLast();
       state = state.copyWith(selectedIndices: selected);
@@ -68,9 +121,9 @@ class DuelController extends StateNotifier<DuelLocalState> {
     state = state.copyWith(selectedIndices: selected);
     _pushProgress();
 
-    // Auto-validate when length matches.
-    if (selected.length == session.answer.length) {
-      _validate();
+    final roundData = _currentRoundData();
+    if (roundData != null && selected.length == roundData.answer.length) {
+      _validate(roundData);
     }
   }
 
@@ -80,26 +133,33 @@ class DuelController extends StateNotifier<DuelLocalState> {
     _pushProgress();
   }
 
-  void _validate() {
-    final formed = state.selectedIndices
-        .map((i) => session.lettersPool[i])
-        .join();
-    if (formed == session.answer) {
+  void _validate(RoundData roundData) {
+    final formed =
+        state.selectedIndices.map((i) => roundData.lettersPool[i]).join();
+    if (formed == roundData.answer) {
       state = state.copyWith(submitted: true);
-      unawaited(repository.submitWin(session.matchId));
+      // Fire-and-forget : on swallow l'erreur (le serveur est idempotent,
+      // si l'autre joueur a gagné en parallèle, ça retourne failed-precondition
+      // et c'est normal).
+      repository
+          .submitRoundWin(session.matchId, state.currentRound, selfUid)
+          .catchError((Object _) => '');
     } else {
-      // Mauvaise réponse → effacer.
       state = state.copyWith(selectedIndices: const <int>[]);
       _pushProgress();
     }
   }
 
   void _pushProgress() {
+    final roundData = _currentRoundData();
+    if (roundData == null) return;
     final p = min<double>(
-      state.selectedIndices.length / max(session.answer.length, 1),
+      state.selectedIndices.length / max(roundData.answer.length, 1),
       1,
     );
-    unawaited(repository.updateMyProgress(session.matchId, p));
+    unawaited(
+      repository.updateProgress(session.matchId, state.currentRound, p),
+    );
   }
 
   void _startTimer() {
@@ -111,10 +171,23 @@ class DuelController extends StateNotifier<DuelLocalState> {
       }
       state = state.copyWith(timeLeft: state.timeLeft - 1);
       if (state.timeLeft == 0) {
-        // Forfait local — l'autre joueur peut gagner.
-        unawaited(repository.forfeit(session.matchId));
+        // Timeout du round : signaler au serveur via submitRoundTimeout.
+        // Si les 2 joueurs sont en timeout, le serveur :
+        //   - rounds 0,1 : passe a roundEnd (personne ne gagne)
+        //   - round 2 (dernier) : termine le match avec calcul du gagnant
+        _timer?.cancel();
+        // Idempotent : si l'autre client a deja appele, no-op cote serveur.
+        repository
+            .submitRoundTimeout(session.matchId, state.currentRound)
+            .catchError((Object _) {});
       }
     });
+  }
+
+  RoundData? _currentRoundData() {
+    final idx = state.currentRound;
+    if (idx < 0 || idx >= session.rounds.length) return null;
+    return session.rounds[idx];
   }
 
   @override
@@ -126,8 +199,12 @@ class DuelController extends StateNotifier<DuelLocalState> {
 
 final duelControllerProvider = StateNotifierProvider.autoDispose
     .family<DuelController, DuelLocalState, DuelSession>(
-  (ref, session) => DuelController(
-    session: session,
-    repository: ref.watch(duelRepositoryProvider),
-  ),
+  (ref, session) {
+    final repo = ref.watch(duelRepositoryProvider);
+    return DuelController(
+      session: session,
+      selfUid: repo.currentUid,
+      repository: repo,
+    );
+  },
 );

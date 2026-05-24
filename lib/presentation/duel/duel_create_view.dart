@@ -98,8 +98,20 @@ class _WaitingBody extends ConsumerWidget {
     ) {
       final session = next.value;
       if (session == null) return;
-      if (session.players.length >= 2 && session.phase == DuelPhase.active) {
-        context.go(AppRoutes.duelPlay, extra: session);
+      // Phase 3 : la jointure passe par intro→countdown avant active.
+      // On navigue dès que la partie est dans une phase de jeu active.
+      final gameStarted = session.players.length >= 2 &&
+          (session.phase == DuelPhase.intro ||
+              session.phase == DuelPhase.countdown ||
+              session.phase == DuelPhase.active);
+      if (gameStarted) {
+        // Defer la navigation au prochain frame pour éviter le conflit
+        // "There is nothing to pop" de go_router quand ref.listen se
+        // déclenche pendant un build.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
+          context.go(AppRoutes.duelPlay, extra: session);
+        });
       }
     });
 
@@ -109,12 +121,6 @@ class _WaitingBody extends ConsumerWidget {
       createdBy: '',
       createdAt: 0,
       phase: DuelPhase.waiting,
-      answer: '',
-      lettersPool: const [],
-      riddle: '',
-      explanation: '',
-      proverb: '',
-      players: const {},
     ).toQrPayload();
 
     return Padding(
@@ -159,8 +165,16 @@ class _WaitingBody extends ConsumerWidget {
             'Code : $matchId',
             style: AppTypography.bebas(size: 22, color: AppColors.orSoleil),
           ),
-          const SizedBox(height: 6),
-          _ManualEntryBlock(matchId: matchId, secret: secret),
+          const SizedBox(height: 4),
+          Text(
+            'Ton ami tape ce code à 6 caractères dans «Rejoindre un défi».',
+            style: AppTypography.crimson(
+              size: 12,
+              color: AppColors.texteSecondaire,
+              style: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: 16),
           asyncSession.when(
             loading: () => _statusBox('Connexion...'),

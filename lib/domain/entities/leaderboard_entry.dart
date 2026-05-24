@@ -10,6 +10,7 @@ class LeaderboardEntry extends Equatable {
     required this.displayName,
     required this.elo,
     required this.rank,
+    this.avatarId,
   });
 
   final String uid;
@@ -21,9 +22,12 @@ class LeaderboardEntry extends Equatable {
   /// Position dans le classement (1-based).
   final int rank;
 
+  /// Id de l'avatar choisi (cf. `AvatarCatalog`). Null = fallback initiale.
+  final String? avatarId;
+
   /// Libellé de l'altitude affiché dans l'UI : "1247 m".
   String get altitudeLabel => '$elo m';
 
   @override
-  List<Object?> get props => [uid, displayName, elo, rank];
+  List<Object?> get props => [uid, displayName, elo, rank, avatarId];
 }

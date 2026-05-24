@@ -31,6 +31,7 @@ class WeightedDevinetteSelectionService implements DevinetteSelectionService {
     required PackMix mix,
     required int targetDifficulty,
     required Set<String> excludeIds,
+    int? wordLengthBucket,
     int? seed,
   }) async {
     if (mix.weights.isEmpty) {
@@ -52,6 +53,7 @@ class WeightedDevinetteSelectionService implements DevinetteSelectionService {
       final picked = _pickFromList(
         list: list,
         targetDifficulty: targetDifficulty,
+        wordLengthBucket: wordLengthBucket,
         excludeIds: excludeIds,
         rng: rng,
       );
@@ -81,11 +83,18 @@ class WeightedDevinetteSelectionService implements DevinetteSelectionService {
   /// cible avec fallback progressif (±1, ±2, ...) et en excluant `excludeIds`.
   /// Renvoie `null` si aucune candidate n'est trouvée même au-delà du
   /// delta max.
+  ///
+  /// Quand [wordLengthBucket] est fourni, raffine chaque palier de
+  /// difficulté par distance croissante au bucket cible de longueur
+  /// de mot (avant de remonter au palier suivant). Préserve donc le
+  /// matching de difficulté en priorité sur la longueur — la cohérence
+  /// de difficulté pèse davantage que la longueur exacte.
   Devinette? _pickFromList({
     required List<Devinette> list,
     required int targetDifficulty,
     required Set<String> excludeIds,
     required Random rng,
+    int? wordLengthBucket,
   }) {
     if (list.isEmpty) return null;
     final filtered = list
@@ -97,13 +106,42 @@ class WeightedDevinetteSelectionService implements DevinetteSelectionService {
       final pool = filtered.where((d) {
         return (d.difficulty - targetDifficulty).abs() == delta;
       }).toList(growable: false);
-      if (pool.isNotEmpty) {
+      if (pool.isEmpty) continue;
+
+      // Pas de filtrage secondaire : on tire dans le pool de difficulté.
+      if (wordLengthBucket == null) {
         return pool[rng.nextInt(pool.length)];
       }
+
+      // Raffinement par bucket de longueur de mot, distance croissante.
+      // _maxBucketDelta = 4 suffit (buckets 1..5).
+      for (var bucketDelta = 0; bucketDelta <= 4; bucketDelta++) {
+        final subPool = pool.where((d) {
+          final bucket = _wordLengthBucketFor(d.answer.length);
+          return (bucket - wordLengthBucket).abs() == bucketDelta;
+        }).toList(growable: false);
+        if (subPool.isNotEmpty) {
+          return subPool[rng.nextInt(subPool.length)];
+        }
+      }
+      // Filet : pool de difficulté non vide mais aucune longueur ne
+      // matche (théoriquement impossible avec bucketDelta jusqu'à 4).
+      return pool[rng.nextInt(pool.length)];
     }
     // Dernier filet de sécurité : on a des candidates mais aucune dans
     // [target ± maxDelta] (cas pathologique). On rend la première dispo.
     return filtered.first;
+  }
+
+  /// Inverse de `LevelDifficultyResolver._expectedWordLengthForBucket` :
+  /// classe une longueur de mot dans un bucket 1..5. Tenu en sync manuel
+  /// avec le resolver (un test garde-fou couvre l'aller-retour).
+  static int _wordLengthBucketFor(int wordLength) {
+    if (wordLength <= 4) return 1;
+    if (wordLength <= 6) return 2;
+    if (wordLength == 7) return 3;
+    if (wordLength == 8) return 4;
+    return 5;
   }
 
   /// Tirage pondéré classique par cumulative distribution.

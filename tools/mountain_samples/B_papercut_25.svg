@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Sky -->
+  <rect width="200" height="200" fill="#FED7AA"/>
+
+  <!-- Sun behind mountain -->
+  <circle cx="115" cy="80" r="32" fill="#FBBF24"/>
+
+  <!-- Far range -->
+  <path d="M 0,200 L 0,160 L 30,135 L 55,155 L 85,130 L 110,150 L 140,125 L 175,150 L 200,140 L 200,200 Z" fill="#C2410C"/>
+
+  <!-- Mid range -->
+  <path d="M 0,200 L 0,180 L 40,140 L 80,170 L 130,135 L 170,165 L 200,155 L 200,200 Z" fill="#9A3412"/>
+
+  <!-- Main peak -->
+  <path d="M 25,200 L 115,55 L 200,200 Z" fill="#7C2D12"/>
+
+  <!-- Snow cap -->
+  <path d="M 115,55 L 100,82 L 110,78 L 120,86 L 130,82 Z" fill="#FAFAF9"/>
+
+  <!-- Side peak left -->
+  <path d="M 0,200 L 0,160 L 45,110 L 75,170 L 70,200 Z" fill="#5C2410"/>
+  <path d="M 45,110 L 38,128 L 52,128 Z" fill="#E7E5E4"/>
+
+  <!-- Foreground silhouette -->
+  <path d="M 0,200 L 0,192 Q 50,182 100,190 T 200,188 L 200,200 Z" fill="#1C0701"/>
+</svg>

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- vieux_sage : boubou bleu royal et or, longue barbe blanche, canne, clin d'œil -->
+  <defs>
+    <radialGradient id="bg3" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#FFE9C9"/>
+      <stop offset="100%" stop-color="#3B4B8C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="230" fill="url(#bg3)"/>
+
+  <!-- Boubou bleu royal flottant -->
+  <path d="M 90 510 Q 100 380 180 340 L 332 340 Q 412 380 422 510 Z" fill="#1E3A8A" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Motifs or géométriques -->
+  <path d="M 150 420 L 170 410 L 170 430 Z" fill="#F4B942"/>
+  <path d="M 220 460 L 240 450 L 240 470 Z" fill="#F4B942"/>
+  <path d="M 290 460 L 310 450 L 310 470 Z" fill="#F4B942"/>
+  <path d="M 360 420 L 380 410 L 380 430 Z" fill="#F4B942"/>
+  <circle cx="195" cy="445" r="5" fill="#F4B942"/>
+  <circle cx="335" cy="445" r="5" fill="#F4B942"/>
+  <path d="M 180 380 Q 256 370 332 380" fill="none" stroke="#F4B942" stroke-width="4"/>
+
+  <!-- Canne en bois sculpté -->
+  <path d="M 80 250 Q 70 280 80 320 L 75 510 L 95 510 L 90 320 Q 100 280 90 250 Z" fill="#7A4E2B" stroke="#1F1A17" stroke-width="4"/>
+  <circle cx="85" cy="245" r="18" fill="#D97742" stroke="#1F1A17" stroke-width="4"/>
+  <path d="M 78 240 Q 85 232 92 240" stroke="#7A4E2B" stroke-width="2" fill="none"/>
+  <!-- Sculptures sur la canne -->
+  <circle cx="82" cy="380" r="3" fill="#1F1A17"/>
+  <circle cx="83" cy="420" r="3" fill="#1F1A17"/>
+  <circle cx="82" cy="460" r="3" fill="#1F1A17"/>
+
+  <!-- Cou -->
+  <rect x="228" y="335" width="56" height="35" rx="8" fill="#8B5A2B" stroke="#1F1A17" stroke-width="4"/>
+
+  <!-- Tête -->
+  <ellipse cx="256" cy="240" rx="118" ry="128" fill="#A06A3E" stroke="#1F1A17" stroke-width="5"/>
+
+  <!-- Crâne dégarni / cheveux blancs sur les côtés -->
+  <path d="M 138 230 Q 130 180 160 165 Q 180 175 175 200" fill="#FAF3E0" stroke="#1F1A17" stroke-width="4"/>
+  <path d="M 374 230 Q 382 180 352 165 Q 332 175 337 200" fill="#FAF3E0" stroke="#1F1A17" stroke-width="4"/>
+  <!-- Quelques mèches blanches sur le dessus -->
+  <path d="M 220 140 Q 230 130 240 140" fill="none" stroke="#FAF3E0" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 270 138 Q 280 128 290 138" fill="none" stroke="#FAF3E0" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Oreilles -->
+  <ellipse cx="140" cy="245" rx="14" ry="22" fill="#8B5A2B" stroke="#1F1A17" stroke-width="4"/>
+  <ellipse cx="372" cy="245" rx="14" ry="22" fill="#8B5A2B" stroke="#1F1A17" stroke-width="4"/>
+
+  <!-- Œil gauche grand ouvert -->
+  <circle cx="215" cy="250" r="14" fill="#FFFFFF" stroke="#1F1A17" stroke-width="4"/>
+  <circle cx="217" cy="252" r="7" fill="#1F1A17"/>
+  <circle cx="219" cy="249" r="2" fill="#FFFFFF"/>
+
+  <!-- Œil droit : clin d'œil malicieux -->
+  <path d="M 282 252 Q 297 240 312 252" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Rides -->
+  <path d="M 188 248 Q 178 252 175 262" fill="none" stroke="#7A4E2B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 188 268 Q 178 272 178 280" fill="none" stroke="#7A4E2B" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 327 250 Q 335 254 337 263" fill="none" stroke="#7A4E2B" stroke-width="3" stroke-linecap="round"/>
+  <!-- Patte d'oie -->
+  <path d="M 195 230 L 185 222" stroke="#7A4E2B" stroke-width="2"/>
+  <path d="M 195 240 L 184 238" stroke="#7A4E2B" stroke-width="2"/>
+
+  <!-- Joues -->
+  <ellipse cx="178" cy="298" rx="14" ry="9" fill="#E58A8A" opacity="0.5"/>
+  <ellipse cx="334" cy="298" rx="14" ry="9" fill="#E58A8A" opacity="0.5"/>
+
+  <!-- Nez -->
+  <path d="M 256 265 Q 248 290 252 300 Q 256 305 264 302" fill="none" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Sourire avec une seule dent -->
+  <path d="M 222 320 Q 256 348 290 320" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 222 320 Q 256 348 290 320 Z" fill="#3A1F0F" opacity="0.7"/>
+  <rect x="251" y="320" width="10" height="14" rx="2" fill="#FAF3E0" stroke="#1F1A17" stroke-width="2"/>
+
+  <!-- Longue barbe blanche qui descend -->
+  <path d="M 200 330 Q 170 410 200 480 Q 256 510 312 480 Q 342 410 312 330 Q 290 360 256 360 Q 222 360 200 330 Z" fill="#FAF3E0" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M 215 390 Q 215 430 230 460" fill="none" stroke="#D4CFB8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 256 400 L 256 488" stroke="#D4CFB8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 297 390 Q 297 430 282 460" fill="none" stroke="#D4CFB8" stroke-width="3" stroke-linecap="round"/>
+</svg>

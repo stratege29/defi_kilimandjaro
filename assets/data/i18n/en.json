@@ -92,7 +92,50 @@
       "message": "All cauris, levels and titles will be lost. This cannot be undone.",
       "confirm": "Reset"
     },
-    "title_progress": "Finish {threshold} levels to unlock ({current}/{threshold})"
+    "title_progress": "Finish {threshold} levels to unlock ({current}/{threshold})",
+    "avatar_badge": {
+      "semantics": "Change my avatar"
+    },
+    "avatar_picker": {
+      "title": "PICK AN AVATAR",
+      "validate": "CONFIRM",
+      "locked_snackbar": "Reach altitude {elo} m to unlock this avatar",
+      "category": {
+        "griot": "Griots & sages",
+        "masque": "Traditional masks",
+        "vie_quotidienne": "Daily life",
+        "aliment": "Local flavors",
+        "instrument": "Instruments",
+        "faune": "African wildlife",
+        "wildcard": "Bonus"
+      }
+    }
+  },
+  "avatar": {
+    "griot_classique": "The Griot",
+    "griot_moderne": "Griot 2.0",
+    "vieux_sage": "The Old Sage",
+    "tortue_savante": "Wise Tortoise",
+    "masque_baoule_lune": "Moon Mask",
+    "masque_dan": "Dan Mask",
+    "masque_senoufo_kpelie": "Kpélié",
+    "gbaka_conducteur": "Gbaka Driver",
+    "vendeuse_attieke": "Attiéké Mama",
+    "maman_bebe": "Mom & Baby",
+    "case_kawai": "Little Hut",
+    "grand_marche": "At the Market",
+    "cabosse_cacao": "Cocoa Pod",
+    "mangue_souriante": "Ripe Mango",
+    "igname_dansante": "Dancing Yam",
+    "piment_furieux": "Furious Chili",
+    "tamtam_tete": "Tam-Tam",
+    "balafon_baby": "Baby Balafon",
+    "calebasse_tete": "Calabash Head",
+    "elephant_ivoire": "Ivory Elephant",
+    "hippo_jovial": "Jolly Hippo",
+    "toucan_bavard": "Chatty Toucan",
+    "panthere_royale": "Royal Panther",
+    "squelette_ancetre": "Mystic Ancestor"
   },
   "shop": {
     "title": "SHOP",
@@ -181,6 +224,27 @@
     "share_text": "I just climbed {delta}m on Kilimandjaro Ivorian Wisdom!\nChallenge me: {link}",
     "share_text_no_delta": "Challenge me on Kilimandjaro Ivorian Wisdom!\nDuel: {link}",
     "share_error": "Unable to share the challenge.",
+    "round": {
+      "label": "Round {current} / {total}",
+      "difficulty_easy": "Easy",
+      "difficulty_medium": "Medium",
+      "difficulty_hard": "Hard",
+      "intro_vs": "VS",
+      "intro_me": "Me",
+      "intro_opponent": "Opponent",
+      "countdown_lock_label": "Grid locked — wait for GO",
+      "countdown_label": "Countdown: {n}",
+      "go": "GO!",
+      "round_won": "Round won!",
+      "round_lost": "Round lost",
+      "round_draw": "Draw",
+      "next_round": "Next round: {difficulty} ({letters} letters)",
+      "final_round": "Last round — final standings coming",
+      "nobody_found": "Nobody found the word",
+      "score_label": "Score: You {self} - Opponent {opponent}",
+      "rounds_detail": "ROUND BREAKDOWN",
+      "final_score_label": "Final score: You {self} - Opponent {opponent}"
+    },
     "result_ranked": {
       "altitude_gained": "+{delta} m altitude gained",
       "altitude_lost": "{delta} m altitude",
@@ -283,6 +347,12 @@
     "owned_section": "Owned packs",
     "available_section": "Available packs",
     "coming_soon": "Coming soon",
-    "coming_soon_sub": "Purchase with cauris or IAP — Phase 4"
+    "coming_soon_sub": "Purchase with cauris or IAP — Phase 4",
+    "sync_button": "Check for updates",
+    "syncing": "Downloading {pack}…",
+    "sync_success": "{updated} pack(s) updated",
+    "sync_up_to_date": "Everything up to date",
+    "sync_error": "Sync failed",
+    "sync_aborted_memory": "Sync paused (low memory) — try again later"
   }
 }

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="skyA25" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FED7AA"/>
+      <stop offset="100%" stop-color="#F97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#skyA25)"/>
+
+  <!-- Distant peaks -->
+  <polygon points="0,180 35,130 75,180" fill="#7C2D12"/>
+  <polygon points="35,130 55,155 75,180" fill="#92400E"/>
+
+  <!-- Side peak (right) -->
+  <polygon points="135,200 175,95 200,200" fill="#451A03"/>
+  <polygon points="175,95 200,200 188,200" fill="#78350F"/>
+  <polygon points="175,95 165,115 185,115" fill="#FAFAF9"/>
+
+  <!-- Main peak (center, larger) -->
+  <polygon points="40,200 115,55 195,200" fill="#3F1D03"/>
+  <polygon points="115,55 155,130 195,200" fill="#78350F"/>
+  <polygon points="115,55 80,130 40,200" fill="#5C2410"/>
+  <polygon points="115,55 115,140 70,200" fill="#451A03"/>
+  <polygon points="115,55 115,140 165,200" fill="#5C2410"/>
+
+  <!-- Snow cap -->
+  <polygon points="115,55 100,85 130,85" fill="#FAFAF9"/>
+  <polygon points="115,55 130,85 122,85" fill="#E7E5E4"/>
+
+  <!-- Foreground -->
+  <polygon points="0,200 0,185 60,178 130,190 200,180 200,200" fill="#1C0701"/>
+</svg>

@@ -1,0 +1,80 @@
+<!-- KILIMANDJARO — Tanzanie, 5895m, plateau. BOSS FINAL du jeu, plus haut sommet d'Afrique.
+     Stratovolcan massif à sommet plat (Kibo), avec le pic secondaire Mawenzi en arête, calotte
+     glaciaire iconique, savane tanzanienne avec acacias et silhouettes de la plaine. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+
+  <!-- Nuages mi-altitude (Kilimandjaro typique : nuages bas et plaine ouverte) -->
+  <ellipse cx="32" cy="128" rx="28" ry="3.5" fill="#FAFAF9" opacity="0.65"/>
+  <ellipse cx="178" cy="135" rx="22" ry="3" fill="#FAFAF9" opacity="0.55"/>
+
+  <!-- Crête de la plaine en silhouette -->
+  <polygon points="0,158 30,150 60,154 90,150 130,154 160,150 200,154 200,170 0,170" fill="#1E1B4B" opacity="0.9"/>
+
+  <!-- MAWENZI : pic secondaire dentelé à droite -->
+  <polygon points="148,170 168,108 175,92 182,108 192,135 200,170" fill="#0C0A09"/>
+  <polygon points="168,108 175,92 182,108 178,95 175,92" fill="#3F3F46"/>
+  <polygon points="175,92 178,98 172,98" fill="#52525B"/>
+  <polygon points="148,170 168,108 175,92 175,170" fill="#1C1917"/>
+  <polygon points="175,92 182,108 192,135 200,170 185,148" fill="#27272A"/>
+
+  <!-- KIBO : massif principal à sommet plat (silhouette emblématique) -->
+  <!-- Base/silhouette -->
+  <polygon points="0,170 5,148 18,128 35,108 55,90 75,78 95,70 122,68 138,72 152,80 162,92 170,108 173,170" fill="#0C0A09"/>
+
+  <!-- Face éclairée (orange chaud reflet) -->
+  <polygon points="122,68 138,72 152,80 162,92 170,108 173,170 140,170" fill="#1C1917"/>
+  <polygon points="138,72 152,80 162,92 148,98 142,82" fill="#27272A"/>
+  <polygon points="152,80 162,92 170,108 160,118" fill="#3F3F46"/>
+
+  <!-- Face sombre gauche -->
+  <polygon points="0,170 5,148 18,128 35,108 55,90 75,78 60,170 35,170" fill="#000"/>
+  <polygon points="18,128 35,108 55,90 42,150" fill="#0C0A09"/>
+
+  <!-- Ridge facets -->
+  <polygon points="55,90 75,78 95,70 82,128" fill="#1C1917"/>
+  <polygon points="75,78 95,70 122,68 105,118" fill="#1C1917"/>
+  <polygon points="95,70 122,68 110,90 100,90" fill="#27272A"/>
+  <polygon points="82,128 105,118 100,170 70,170" fill="#0C0A09"/>
+  <polygon points="105,118 130,128 122,170 100,170" fill="#1C1917"/>
+
+  <!-- CALOTTE GLACIAIRE SOMMITALE (signature emblématique Uhuru Peak) -->
+  <polygon points="55,90 75,78 95,70 122,68 138,72 152,80 162,92 148,98 132,82 105,78 88,82 70,90" fill="#FAFAF9"/>
+  <polygon points="75,78 95,70 122,68 138,72 110,75 95,75" fill="#FAFAF9"/>
+  <polygon points="95,70 122,68 130,72 105,72" fill="#FAFAF9"/>
+  <polygon points="55,90 75,78 75,86 60,95" fill="#E7E5E4"/>
+  <polygon points="138,72 152,80 162,92 148,98 142,86 135,80" fill="#E7E5E4"/>
+
+  <!-- Plateau-top ligne distincte (forme "plate" caractéristique de Kibo) -->
+  <line x1="75" y1="78" x2="138" y2="78" stroke="#D6D3D1" stroke-width="0.8"/>
+  <polygon points="75,78 138,78 130,82 85,82" fill="#FAFAF9"/>
+
+  <!-- Glaciers majeurs descendant les flancs (signature Furtwängler/Rebmann) -->
+  <polygon points="70,90 76,128 82,98" fill="#FAFAF9"/>
+  <polygon points="88,82 92,140 96,100" fill="#FAFAF9" opacity="0.95"/>
+  <polygon points="105,78 109,148 113,100" fill="#FAFAF9"/>
+  <polygon points="122,80 126,142 130,100" fill="#FAFAF9" opacity="0.95"/>
+  <polygon points="135,80 138,138 142,98" fill="#FAFAF9" opacity="0.9"/>
+  <polygon points="148,98 150,128 144,108" fill="#FAFAF9" opacity="0.8"/>
+
+  <!-- Cratère sommital (subtile dépression) -->
+  <ellipse cx="105" cy="76" rx="14" ry="1.5" fill="#A1A1AA"/>
+
+  <!-- Étincelle d'aube sur le sommet (Uhuru highlight) -->
+
+  <!-- Savane tanzanienne -->
+  <polygon points="0,200 0,172 50,176 110,174 170,176 200,174 200,200" fill="#1C0701"/>
+  <polygon points="0,200 0,184 60,188 130,186 200,188 200,200" fill="#000"/>
+
+  <!-- Acacias signature (silhouettes parapluie) -->
+  <line x1="22" y1="195" x2="22" y2="176" stroke="#000" stroke-width="1.3"/>
+  <ellipse cx="22" cy="174" rx="11" ry="2" fill="#000"/>
+  <line x1="52" y1="197" x2="52" y2="182" stroke="#000" stroke-width="0.9"/>
+  <ellipse cx="52" cy="180" rx="7" ry="1.5" fill="#000"/>
+  <line x1="148" y1="197" x2="148" y2="183" stroke="#000" stroke-width="0.9"/>
+  <ellipse cx="148" cy="181" rx="6" ry="1.4" fill="#000"/>
+  <line x1="173" y1="195" x2="173" y2="176" stroke="#000" stroke-width="1.3"/>
+  <ellipse cx="173" cy="174" rx="11" ry="2" fill="#000"/>
+  <line x1="190" y1="197" x2="190" y2="184" stroke="#000" stroke-width="0.7"/>
+  <ellipse cx="190" cy="182" rx="5" ry="1.2" fill="#000"/>
+</svg>

@@ -1,0 +1,32 @@
+<!-- Chappal Waddi — Nigéria, 2419m, crest. "Montagne de la mort", crête forestière à la frontière camerounaise, Gashaka Gumti. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_ng" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FED7AA"/><stop offset="100%" stop-color="#FBBF24"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_ng)"/>
+  <circle cx="158" cy="55" r="18" fill="#FB923C" opacity="0.85"/>
+  <rect y="135" width="200" height="6" fill="#FED7AA" opacity="0.5"/>
+  <polygon points="0,160 30,148 60,158 90,148 130,158 160,148 200,158 200,180 0,180" fill="#1A2E05" opacity="0.7"/>
+
+  <!-- Crête multi-pics forestière -->
+  <polygon points="0,180 12,138 28,115 48,95 62,118 82,82 100,100 118,75 138,92 158,72 178,98 195,135 200,180" fill="#1A2E05"/>
+
+  <!-- Facettes éclairées -->
+  <polygon points="28,115 48,95 62,118 48,130" fill="#3F6212"/>
+  <polygon points="62,118 82,82 100,100 82,118" fill="#4D7C0F"/>
+  <polygon points="100,100 118,75 138,92 122,108" fill="#65A30D"/>
+  <polygon points="118,75 138,92 130,88" fill="#84CC16"/>
+  <polygon points="138,92 158,72 178,98 160,112" fill="#4D7C0F"/>
+
+  <!-- Facettes sombres -->
+  <polygon points="12,138 28,115 28,160" fill="#052e16"/>
+  <polygon points="48,95 62,118 62,148" fill="#052e16"/>
+  <polygon points="82,82 100,100 100,135" fill="#052e16"/>
+  <polygon points="118,75 138,92 138,128" fill="#052e16"/>
+  <polygon points="158,72 178,98 178,135" fill="#052e16"/>
+
+  <!-- Forêt sur versants -->
+  <polygon points="0,180 25,150 45,170 65,160 80,180" fill="#052e16"/>
+  <polygon points="110,180 135,158 155,170 175,160 200,180" fill="#052e16"/>
+
+  <!-- Foreground -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#022c1a"/>
+</svg>

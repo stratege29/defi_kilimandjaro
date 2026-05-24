@@ -2,11 +2,12 @@ import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
-import 'package:defi_kilimandjaro/core/utils/difficulty_curve.dart';
+import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
+import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
@@ -135,7 +136,7 @@ class _GameViewState extends ConsumerState<GameView>
         _overlayShown = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          _showVictoryOverlay(context, next.timeLeft);
+          _showVictoryOverlay(context, next.timeLeft, next.starsEarned);
         });
       } else if (next.phase == GamePhase.lost &&
           (previous == null || previous.phase != GamePhase.lost)) {
@@ -163,13 +164,26 @@ class _GameViewState extends ConsumerState<GameView>
               const SizedBox(height: 8),
               // Riddle card.
               _RiddleCard(riddle: widget.args.devinette.riddle),
+              if (widget.args.config.isBoss ||
+                  widget.args.config.modifiers.isNotEmpty) ...<Widget>[
+                const SizedBox(height: 8),
+                _ModifierBadges(
+                  modifiers: widget.args.config.modifiers,
+                  isBoss: widget.args.config.isBoss,
+                ),
+              ],
               const SizedBox(height: 10),
-              // Timer bar.
-              TimerBar(timeLeft: gameState.timeLeft, totalTime: 30),
+              // Timer bar — totalTime calibré sur la config du niveau.
+              TimerBar(
+                timeLeft: gameState.timeLeft,
+                totalTime: widget.args.config.timerSeconds,
+              ),
               const SizedBox(height: 12),
-              // Answer cells.
+              // Answer cells — quand `reverse` est actif on affiche les
+              // cases dans l'ordre de saisie (mot inversé) pour que le
+              // remplissage gauche→droite reste intuitif.
               AnswerCells(
-                answer: widget.args.devinette.answer,
+                answer: gameState.expectedAnswer,
                 formedLetters: gameState.formedWord,
                 isValidated: gameState.validationCorrect,
               ),
@@ -180,8 +194,9 @@ class _GameViewState extends ConsumerState<GameView>
                   child: CircularGrid(
                     letters: gameState.displayLetters,
                     selectedIndices: gameState.selectedIndices,
-                    hintRevealedCount: gameState.hintRevealedCount,
-                    answer: widget.args.devinette.answer,
+                    hintTileIndices: gameState.hintTileIndices,
+                    hiddenIndices: gameState.fogHiddenIndices,
+                    shuffledIndices: gameState.shuffledIndices,
                     phase: gameState.phase,
                     onTileEntered: controller.selectTile,
                     onDragEnd: () {
@@ -306,7 +321,7 @@ class _GameViewState extends ConsumerState<GameView>
     }
   }
 
-  void _showVictoryOverlay(BuildContext ctx, int timeLeft) {
+  void _showVictoryOverlay(BuildContext ctx, int timeLeft, int starsEarned) {
     showDialog<void>(
       context: ctx,
       barrierDismissible: false,
@@ -314,6 +329,8 @@ class _GameViewState extends ConsumerState<GameView>
       builder: (_) => VictoryView(
         devinette: widget.args.devinette,
         timeLeft: timeLeft,
+        starsEarned: starsEarned,
+        isBoss: widget.args.config.isBoss,
         onNext: () {
           // Ferme l'overlay puis enchaîne automatiquement sur la prochaine
           // étape : devinette suivante de la même montagne, ou montagne
@@ -418,13 +435,22 @@ class _GameViewState extends ConsumerState<GameView>
         ),
         orElse: () => null,
       );
-      final targetDifficulty = mountain != null
-          ? difficultyForAltitude(mountain.altitude)
-          : 1;
+      // Pour la devinette suivante en chaîne, on se base sur le niveau
+      // que le joueur s'apprête à atteindre (completedLevels + 1).
+      // Si pas de montagne (mode Hub) → config fallback.
+      final nextLevelIndex =
+          mountain != null ? mountain.completedLevels + 1 : null;
+      final config = mountain != null
+          ? LevelDifficultyResolver.resolve(
+              mountain: mountain,
+              levelIndex: nextLevelIndex!,
+            )
+          : LevelDifficultyResolver.fallback();
 
       final next = await selectionService.nextDevinette(
         mix: progress.activePackMix,
-        targetDifficulty: targetDifficulty,
+        targetDifficulty: config.difficultyTier,
+        wordLengthBucket: config.wordLengthBucket,
         excludeIds: progress.recentDevinetteIds.toSet(),
       );
       await ref
@@ -433,7 +459,12 @@ class _GameViewState extends ConsumerState<GameView>
       if (!mounted) return;
       context.pushReplacement(
         AppRoutes.game,
-        extra: GameArgs(devinette: next, mountainId: mountainId),
+        extra: GameArgs(
+          devinette: next,
+          mountainId: mountainId,
+          levelIndex: nextLevelIndex,
+          config: config,
+        ),
       );
     } on Exception catch (_) {
       if (!mounted) return;
@@ -689,6 +720,124 @@ class _RiddleCard extends StatelessWidget {
                 height: 1.45,
                 color: AppColors.textePrimaire,
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Row de badges pour les modifiers actifs (un pill par modifier).
+/// Indication explicite des défis présents pour éviter les pièges
+/// déloyaux : le joueur sait que le mot est à l'envers, que des lettres
+/// vont bouger, que la grille va se brumer, etc.
+class _ModifierBadges extends StatelessWidget {
+  const _ModifierBadges({required this.modifiers, this.isBoss = false});
+
+  final Set<LevelModifier> modifiers;
+  final bool isBoss;
+
+  @override
+  Widget build(BuildContext context) {
+    // Filtre aux modifiers qui ont un effet visible côté joueur — on
+    // n'affiche pas un badge pour `thinAir` (déjà perceptible via le timer
+    // plus court).
+    final visible = modifiers
+        .where((m) => _badgeForModifier(m) != null)
+        .toList(growable: false);
+    if (visible.isEmpty && !isBoss) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 6,
+        runSpacing: 6,
+        children: <Widget>[
+          if (isBoss)
+            const _ModifierPill(
+              icon: Icons.workspace_premium_rounded,
+              label: 'BOSS',
+              color: AppColors.orJour,
+            ),
+          for (final m in visible) _badgeForModifier(m)!,
+        ],
+      ),
+    );
+  }
+
+  static Widget? _badgeForModifier(LevelModifier m) {
+    switch (m) {
+      case LevelModifier.reverse:
+        return const _ModifierPill(
+          icon: Icons.swap_horiz_rounded,
+          label: "Mot à l'envers",
+          color: AppColors.rouge,
+        );
+      case LevelModifier.wind:
+        return const _ModifierPill(
+          icon: Icons.air_rounded,
+          label: 'Vent',
+          color: AppColors.cielHauteur,
+        );
+      case LevelModifier.earthquake:
+        return const _ModifierPill(
+          icon: Icons.terrain_rounded,
+          label: 'Tremblement',
+          color: AppColors.laterite,
+        );
+      case LevelModifier.fog:
+        return const _ModifierPill(
+          icon: Icons.cloud_rounded,
+          label: 'Brouillard',
+          color: AppColors.cielHauteur,
+        );
+      case LevelModifier.shuffle:
+        return const _ModifierPill(
+          icon: Icons.shuffle_rounded,
+          label: 'Remélange',
+          color: AppColors.rouge,
+        );
+      // ignore: no_default_cases
+      default:
+        // thinAir + autres modifiers non-implémentés visuellement → pas
+        // de badge pour l'instant. La couverture S3 se limite aux 4 cités.
+        return null;
+    }
+  }
+}
+
+class _ModifierPill extends StatelessWidget {
+  const _ModifierPill({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.7), width: 1.2),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: AppTypography.bebas().copyWith(
+              fontSize: 12,
+              letterSpacing: 1.1,
+              color: color,
             ),
           ),
         ],

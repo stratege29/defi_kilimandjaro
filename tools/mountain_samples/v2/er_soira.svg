@@ -1,0 +1,33 @@
+<!-- Mont Soira — Érythrée, 3018m, dome. Plus haut sommet érythréen, hauts plateaux semi-arides avec cultures en terrasses. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_er" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FED7AA"/><stop offset="100%" stop-color="#FB923C"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_er)"/>
+  <circle cx="158" cy="55" r="18" fill="#EA580C" opacity="0.85"/>
+  <rect y="145" width="200" height="6" fill="#FCD34D" opacity="0.4"/>
+
+  <!-- Distant plateaux -->
+  <polygon points="0,162 30,150 65,158 105,150 145,158 180,150 200,160 200,180 0,180" fill="#7C2D12" opacity="0.6"/>
+
+  <!-- Dôme principal -->
+  <polygon points="15,180 30,125 60,93 100,75 145,90 175,123 188,180" fill="#92400E"/>
+  <polygon points="15,180 30,125 60,93 80,128 65,180" fill="#5C2410"/>
+  <polygon points="60,93 100,75 95,125 80,128" fill="#A16207"/>
+  <polygon points="100,75 145,90 135,125 95,125" fill="#B45309"/>
+  <polygon points="145,90 175,123 188,180 145,180" fill="#CA8A04"/>
+  <polygon points="80,128 95,125 135,125 130,180 65,180" fill="#A16207"/>
+  <polygon points="95,125 135,125 130,180 105,158" fill="#B45309"/>
+  <polygon points="100,75 115,83 105,90" fill="#D97706"/>
+
+  <!-- Terrasses agricoles (signature des hauts plateaux érythréens) -->
+  <path d="M 30,150 Q 100,140 175,150" fill="none" stroke="#5C2410" stroke-width="0.7"/>
+  <path d="M 35,160 Q 100,150 170,160" fill="none" stroke="#5C2410" stroke-width="0.7"/>
+  <path d="M 40,170 Q 100,160 165,170" fill="none" stroke="#5C2410" stroke-width="0.7"/>
+
+  <!-- Buissons épars -->
+  <circle cx="50" cy="165" r="1.5" fill="#365314"/>
+  <circle cx="155" cy="165" r="1.5" fill="#365314"/>
+
+  <!-- Plaine sèche -->
+  <polygon points="0,200 0,182 60,186 130,184 200,186 200,200" fill="#CA8A04"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#854D0E"/>
+</svg>

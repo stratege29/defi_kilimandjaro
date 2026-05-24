@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- calebasse_tete : calabash-head character with carved patterns -->
+  <defs>
+    <radialGradient id="bgCal" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#FFE0B5"/>
+      <stop offset="100%" stop-color="#D97742" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="230" fill="url(#bgCal)"/>
+
+  <!-- Shoulders / indigo cloth -->
+  <path d="M 110 480 Q 256 380 402 480 L 402 512 L 110 512 Z" fill="#3B4B8C" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Cloth pattern -->
+  <circle cx="180" cy="450" r="5" fill="#F4B942"/>
+  <circle cx="256" cy="430" r="5" fill="#F4B942"/>
+  <circle cx="332" cy="450" r="5" fill="#F4B942"/>
+
+  <!-- Neck -->
+  <rect x="230" y="340" width="52" height="40" rx="8" fill="#8B5A2B" stroke="#1F1A17" stroke-width="4"/>
+
+  <!-- Calabash gourd head -->
+  <ellipse cx="256" cy="240" rx="125" ry="135" fill="#D97742" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Lighter highlight side -->
+  <path d="M 180 170 Q 160 250 180 320 Q 130 280 140 230 Q 150 180 180 170 Z" fill="#E89556" opacity="0.6"/>
+
+  <!-- Stem on top -->
+  <path d="M 250 110 Q 255 95 265 100 Q 270 108 260 115 Z" fill="#5B7A3E" stroke="#1F1A17" stroke-width="3"/>
+
+  <!-- Carved geometric patterns -->
+  <!-- Triangle row -->
+  <path d="M 175 200 L 190 215 L 205 200 Z" fill="none" stroke="#5A3A1B" stroke-width="3"/>
+  <path d="M 215 195 L 230 210 L 245 195 Z" fill="none" stroke="#5A3A1B" stroke-width="3"/>
+  <path d="M 268 195 L 283 210 L 298 195 Z" fill="none" stroke="#5A3A1B" stroke-width="3"/>
+  <path d="M 308 195 L 323 210 L 338 195 Z" fill="none" stroke="#5A3A1B" stroke-width="3"/>
+  <!-- Dots row -->
+  <circle cx="175" cy="290" r="4" fill="#5A3A1B"/>
+  <circle cx="200" cy="295" r="4" fill="#5A3A1B"/>
+  <circle cx="225" cy="298" r="4" fill="#5A3A1B"/>
+  <circle cx="288" cy="298" r="4" fill="#5A3A1B"/>
+  <circle cx="313" cy="295" r="4" fill="#5A3A1B"/>
+  <circle cx="338" cy="290" r="4" fill="#5A3A1B"/>
+  <!-- Zigzag pattern lower -->
+  <path d="M 165 325 L 180 315 L 195 325 L 210 315 L 225 325" fill="none" stroke="#5A3A1B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 287 325 L 302 315 L 317 325 L 332 315 L 347 325" fill="none" stroke="#5A3A1B" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Glowing narrow eye slits -->
+  <path d="M 200 240 Q 220 232 240 240 Q 220 250 200 240 Z" fill="#F4B942" stroke="#1F1A17" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M 272 240 Q 292 232 312 240 Q 292 250 272 240 Z" fill="#F4B942" stroke="#1F1A17" stroke-width="4" stroke-linejoin="round"/>
+  <!-- Glow inside -->
+  <ellipse cx="220" cy="240" rx="8" ry="2" fill="#FFFFFF" opacity="0.7"/>
+  <ellipse cx="292" cy="240" rx="8" ry="2" fill="#FFFFFF" opacity="0.7"/>
+
+  <!-- Small mouth slit -->
+  <path d="M 238 305 Q 256 314 274 305" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Straw conical hat on top -->
+  <path d="M 165 145 Q 256 65 347 145 Q 256 130 165 145 Z" fill="#F4B942" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Straw stripes -->
+  <path d="M 200 130 Q 220 105 245 90" fill="none" stroke="#C8941B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 230 125 Q 245 100 265 85" fill="none" stroke="#C8941B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 270 122 Q 280 95 295 85" fill="none" stroke="#C8941B" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 305 128 Q 310 100 325 95" fill="none" stroke="#C8941B" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Hat band -->
+  <path d="M 175 142 Q 256 132 340 142" fill="none" stroke="#7A4E2B" stroke-width="4" stroke-linecap="round"/>
+</svg>

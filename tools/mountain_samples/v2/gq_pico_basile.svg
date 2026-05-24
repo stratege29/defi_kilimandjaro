@@ -1,0 +1,38 @@
+<!-- Pico Basile — Guinée Équatoriale, 3008m, dent. Volcan tropical de l'île de Bioko, sommet pointu encapuchonné de nuages, forêt équatoriale dense. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_gq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#BAE6FD"/><stop offset="55%" stop-color="#FEF3C7"/><stop offset="100%" stop-color="#FBBF24"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_gq)"/>
+  <circle cx="160" cy="50" r="15" fill="#FB923C" opacity="0.75"/>
+
+  <!-- Nuage encapuchonnant le sommet (signature Pico Basile) -->
+  <ellipse cx="100" cy="70" rx="40" ry="7" fill="#FAFAF9" opacity="0.85"/>
+  <ellipse cx="105" cy="62" rx="30" ry="5" fill="#FAFAF9" opacity="0.9"/>
+  <ellipse cx="95" cy="58" rx="20" ry="3" fill="#E7E5E4" opacity="0.7"/>
+
+  <!-- Océan Atlantique équatorial -->
+  <rect y="155" width="200" height="20" fill="#0EA5E9"/>
+  <polygon points="0,155 200,155 200,158 0,158" fill="#38BDF8"/>
+
+  <!-- Pic principal très aigu (forme "dent") -->
+  <polygon points="40,180 100,55 160,180" fill="#1C1917"/>
+  <polygon points="40,180 100,55 100,180" fill="#292524"/>
+  <polygon points="100,55 90,110 75,160 60,180" fill="#3F3F46"/>
+  <polygon points="100,55 115,108 130,160 145,180 100,180" fill="#52525B"/>
+  <polygon points="100,55 110,90 115,108" fill="#71717A"/>
+  <polygon points="100,55 100,180 92,170 87,135 90,110" fill="#27272A"/>
+
+  <!-- Arête sommitale aiguë -->
+  <polygon points="100,55 102,68 98,68" fill="#A1A1AA"/>
+
+  <!-- Forêt tropicale dense sur les flancs -->
+  <polygon points="40,180 50,165 65,175 80,158 95,178 100,180" fill="#052e16"/>
+  <polygon points="100,180 110,162 125,175 140,158 155,178 160,180" fill="#1A2E05"/>
+
+  <!-- Plage + palmiers -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#14532D"/>
+  <polygon points="0,200 0,195 60,197 130,196 200,197 200,200" fill="#FDE68A"/>
+  <line x1="20" y1="195" x2="20" y2="178" stroke="#052e16" stroke-width="1.5"/>
+  <path d="M 20,178 q -8,-2 -10,2 M 20,178 q 8,-2 10,2 M 20,178 q -4,-5 -2,-9 M 20,178 q 4,-5 2,-9" fill="none" stroke="#052e16" stroke-width="1.2"/>
+  <line x1="180" y1="195" x2="180" y2="180" stroke="#052e16" stroke-width="1.4"/>
+  <path d="M 180,180 q -7,-2 -9,2 M 180,180 q 7,-2 9,2 M 180,180 q -3,-4 -1,-7 M 180,180 q 3,-4 1,-7" fill="none" stroke="#052e16" stroke-width="1"/>
+</svg>

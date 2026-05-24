@@ -1,0 +1,44 @@
+<!-- Toubkal — Maroc, 4167m, dome. Plus haut sommet d'Afrique du Nord, Haut Atlas, neige éternelle de novembre à juin, vallées de terre rouge berbères. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_ma" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#BAE6FD"/><stop offset="55%" stop-color="#FED7AA"/><stop offset="100%" stop-color="#FB923C"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_ma)"/>
+  <circle cx="160" cy="55" r="16" fill="#EA580C" opacity="0.8"/>
+
+  <!-- Crêtes de l'Atlas en arrière-plan -->
+  <polygon points="0,160 25,148 50,158 80,150 110,158 140,150 170,158 200,150 200,180 0,180" fill="#7C2D12" opacity="0.6"/>
+
+  <!-- Dôme principal pyramidal -->
+  <polygon points="20,180 35,140 65,100 95,75 110,65 120,75 145,95 170,130 185,180" fill="#92400E"/>
+
+  <!-- Calotte de neige (substantielle au-dessus de 3500m) -->
+  <polygon points="95,75 110,65 120,75 145,95 130,98 110,82 95,90" fill="#FAFAF9"/>
+  <polygon points="95,75 110,65 120,75 115,85 100,82" fill="#FAFAF9"/>
+  <polygon points="110,65 120,75 115,72" fill="#E7E5E4"/>
+
+  <!-- Coulées de neige -->
+  <polygon points="100,82 105,115 95,108" fill="#FAFAF9"/>
+  <polygon points="115,85 118,118 110,110" fill="#FAFAF9" opacity="0.8"/>
+  <polygon points="130,98 125,130 118,120" fill="#FAFAF9" opacity="0.7"/>
+
+  <!-- Facettes éclairées -->
+  <polygon points="120,75 145,95 170,130 185,180 145,180" fill="#A16207"/>
+  <polygon points="145,95 170,130 155,140" fill="#B45309"/>
+
+  <!-- Facettes sombres -->
+  <polygon points="20,180 35,140 65,100 95,75 95,180 65,180" fill="#5C2410"/>
+  <polygon points="35,140 65,100 50,160" fill="#7C2D12"/>
+
+  <!-- Mid -->
+  <polygon points="95,75 95,180 110,65" fill="#92400E"/>
+  <polygon points="95,75 95,180 80,170 75,130 85,110" fill="#7C2D12"/>
+
+  <!-- Terre rouge berbère (vallée du Toubkal) -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#9A3412"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#7C2D12"/>
+
+  <!-- Village berbère stylisé (maisons cubiques de pisé) -->
+  <rect x="25" y="190" width="6" height="5" fill="#451A03"/>
+  <rect x="32" y="188" width="5" height="7" fill="#451A03"/>
+  <rect x="170" y="189" width="6" height="6" fill="#451A03"/>
+  <rect x="178" y="187" width="5" height="8" fill="#451A03"/>
+</svg>

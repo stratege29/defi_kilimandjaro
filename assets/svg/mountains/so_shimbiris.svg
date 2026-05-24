@@ -1,0 +1,30 @@
+<!-- Shimbiris — Somalie, 2416m, plateau. Plus haut sommet de la chaîne du Cal Madow, plateau aride de la Corne d'Afrique. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Plateau principal: sommet quasi-plat, versants doux -->
+  <polygon points="0,180 5,135 25,118 60,108 110,102 145,108 175,120 195,140 200,180" fill="#92400E"/>
+
+  <!-- Sommet plateau (top quasi-plat) -->
+  <polygon points="25,118 60,108 110,102 145,108 175,120 165,128 110,118 60,120 35,125" fill="#B45309"/>
+  <polygon points="25,118 175,120 175,128 25,128" fill="#7C2D12"/>
+
+  <!-- Strates -->
+  <polygon points="10,150 195,148 195,151 10,153" fill="#7C2D12"/>
+  <polygon points="5,165 198,163 198,166 5,168" fill="#451A03"/>
+
+  <!-- Face droite (lit) -->
+  <polygon points="145,108 175,120 195,140 200,180 175,180" fill="#A16207"/>
+
+  <!-- Face gauche (ombre) -->
+  <polygon points="0,180 5,135 25,118 30,180" fill="#5C2410"/>
+
+  <!-- Quelques touffes -->
+  <polygon points="40,160 42,154 44,160" fill="#365314"/>
+  <polygon points="155,162 157,156 159,162" fill="#365314"/>
+
+  <!-- Plaine sèche -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#CA8A04"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#854D0E"/>
+  <circle cx="40" cy="194" r="1.5" fill="#1C0701"/>
+  <circle cx="170" cy="195" r="1.5" fill="#1C0701"/>
+</svg>

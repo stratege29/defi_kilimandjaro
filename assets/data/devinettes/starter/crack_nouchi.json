@@ -538,5 +538,261 @@
     "estimated_time_s": 25,
     "tags": ["attitude", "intermediaire"],
     "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_031",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MOULOULOU",
+    "answer_normalized": "mouloulou",
+    "letters_pool": [
+      "M",
+      "O",
+      "U",
+      "L",
+      "O",
+      "U",
+      "L",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Fête folle, bamboche sans fin, j'explose la nuit dans les maquis abidjanais."
+    },
+    "explanation": {
+      "fr": "Mouloulou = fête très animée, bamboche, soirée déchaînée. Terme très populaire en nouchi pour décrire une célébration joyeuse et débridée."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "fete",
+      "emotion",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_032",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GRIGUITON",
+    "answer_normalized": "griguiton",
+    "letters_pool": [
+      "G",
+      "R",
+      "I",
+      "G",
+      "U",
+      "I",
+      "T",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Débile, débordé, qui débarque de nulle part. Je n'ai aucune classe."
+    },
+    "explanation": {
+      "fr": "Griguiton = personne bizarre, débile, sans style. Insulte légère et amusante en nouchi pour qualifier quelqu'un d'excentrique ou de ridicule."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "personne",
+      "insult",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_033",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TALONNEUR",
+    "answer_normalized": "talonneur",
+    "letters_pool": [
+      "T",
+      "A",
+      "L",
+      "O",
+      "N",
+      "N",
+      "E",
+      "U",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Je te suis partout, je fouille tes poches. Gare à toi la nuit dans le marché."
+    },
+    "explanation": {
+      "fr": "Talonneur = pickpocket, voleur, criminel urbain qui suit ses victimes et les dépouille. Terme très utilisé en nouchi pour désigner les arnaqueurs."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "personne",
+      "crime",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_034",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KOUAKOUA",
+    "answer_normalized": "kouakoua",
+    "letters_pool": [
+      "K",
+      "O",
+      "U",
+      "A",
+      "K",
+      "O",
+      "U",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Je tremblote, je tremble de peur. Mon corps ne tient plus debout."
+    },
+    "explanation": {
+      "fr": "Kouakoua = avoir peur, trembler, être terrifié. Onomatopée expressive très courante pour décrire la panique ou la terreur."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "emotion",
+      "action",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_035",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GRIGRIGRI",
+    "answer_normalized": "grigrigri",
+    "letters_pool": [
+      "G",
+      "R",
+      "I",
+      "G",
+      "R",
+      "I",
+      "G",
+      "R",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Ruse, taquinerie, petite combine pour rire. Je ne suis pas méchante, juste drôle."
+    },
+    "explanation": {
+      "fr": "Grigrigri = taquinerie, petite ruse amusante, jeu de mots espiègle. Terme tendre et léger du nouchi pour une blague sans malveillance."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "humour",
+      "action",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_036",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SAKOUKOU",
+    "answer_normalized": "sakoukou",
+    "letters_pool": [
+      "S",
+      "A",
+      "K",
+      "O",
+      "U",
+      "K",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Costume étriqué, vêtement ridicule. Je regarde le mec qui le porte et je rigole."
+    },
+    "explanation": {
+      "fr": "Sakoukou = vêtement ridicule, costume qui serre trop, fringues démodées. Terme moqueur en nouchi urbain pour critiquer le style vestimentaire."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "vetement",
+      "attitude",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_037",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BOUBOUKLAK",
+    "answer_normalized": "boubouklak",
+    "letters_pool": [
+      "B",
+      "O",
+      "U",
+      "B",
+      "O",
+      "U",
+      "K",
+      "L",
+      "A",
+      "K"
+    ],
+    "riddle": {
+      "fr": "Chaos total, débordement complet. La situation a explosé et c'est l'anarchie."
+    },
+    "explanation": {
+      "fr": "Boubouklak = confusion totale, chaos, débordement. Terme onomatopéique très expressif du nouchi pour décrire le désordre et la pagaille."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "situation",
+      "emotion",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_038",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ABOUBOULOU",
+    "answer_normalized": "abouboulou",
+    "letters_pool": [
+      "A",
+      "B",
+      "O",
+      "U",
+      "B",
+      "O",
+      "U",
+      "L",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Grosse bosse, personne très enrobée. Je ne rentre plus nulle part."
+    },
+    "explanation": {
+      "fr": "Abouboulou = grosse personne, personne très enrobée avec une protubérance. Terme moquer en nouchi pour décrire l'obésité de façon crue et amusante."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "personne",
+      "appearance",
+      "hardcore"
+    ],
+    "format_version": 3
   }
 ]

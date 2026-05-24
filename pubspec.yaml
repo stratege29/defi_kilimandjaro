@@ -1,7 +1,7 @@
 name: defi_kilimandjaro
 description: "Word Connect culturel africain — Sagesse Ivoirienne"
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.1.0+10
 
 environment:
   sdk: ^3.10.1
@@ -10,9 +10,10 @@ environment:
 dependencies:
   app_links: ^6.3.0
   archive: ^4.0.2
+  audio_session: ^0.1.21
   cached_network_image: ^3.4.1
   cloud_firestore: ^6.3.0
-  cloud_functions: ^6.2.0
+  cloud_functions: ^6.3.0
   collection: ^1.19.1
   crypto: ^3.0.6
   cupertino_icons: ^1.0.8
@@ -50,6 +51,7 @@ dependencies:
   shared_preferences: ^2.3.3
   sqlite3_flutter_libs: ^0.5.26
   uuid: ^4.5.1
+  vector_graphics: ^1.1.13
 
 dependency_overrides:
   # analyzer 7.x ↔ analyzer_plugin 0.12.x mismatch (Element vs Element2 API
@@ -71,6 +73,7 @@ dev_dependencies:
   mockito: ^5.4.4
   riverpod_generator: ^2.6.3
   riverpod_lint: ^2.6.3
+  vector_graphics_compiler: ^1.1.13
   very_good_analysis: ^7.0.0
 
 flutter:
@@ -83,6 +86,7 @@ flutter:
     - assets/data/devinettes/starter/
     - assets/data/i18n/
     - assets/svg/
+    - assets/svg/mountains/
     - assets/images/brand/
     - assets/images/mascot/
     - assets/images/tiles/
@@ -97,6 +101,7 @@ flutter:
     - assets/images/badges/
     - assets/images/shop/
     - assets/images/duel/
+    - assets/images/avatars/
 
 # ----------------------------------------------------------------------------
 # App icon (run: dart run flutter_launcher_icons)

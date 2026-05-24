@@ -39,13 +39,15 @@ Devinette _make({
   required String id,
   required String pack,
   int difficulty = 1,
+  String? answer,
 }) {
+  final ans = (answer ?? id).toUpperCase();
   return Devinette(
     id: id,
     pack: pack,
     country: 'ci',
-    answer: id.toUpperCase(),
-    lettersPool: id.toUpperCase().split(''),
+    answer: ans,
+    lettersPool: ans.split(''),
     riddleByLang: <String, String>{'fr': 'riddle-$id'},
     explanationByLang: <String, String>{'fr': 'expl-$id'},
     difficulty: difficulty,
@@ -174,6 +176,85 @@ void main() {
         seed: 7,
       );
       expect(d.id, 'exact');
+    });
+  });
+
+  group('Filtre par wordLengthBucket', () {
+    test('à difficulté égale, préfère la longueur la plus proche du bucket',
+        () async {
+      // 3 devinettes diff=2, longueurs 4 / 6 / 9 → buckets 1 / 2 / 5.
+      final repo = _FakeDevinetteRepository({
+        'p': [
+          _make(id: 'short', pack: 'p', difficulty: 2, answer: 'ABCD'),
+          _make(id: 'mid', pack: 'p', difficulty: 2, answer: 'ABCDEF'),
+          _make(id: 'long', pack: 'p', difficulty: 2, answer: 'ABCDEFGHI'),
+        ],
+      });
+      final service = WeightedDevinetteSelectionService(repository: repo);
+      // Bucket cible 5 (≥ 9 lettres) → la seule à bucket 5 est `long`.
+      final pick = await service.nextDevinette(
+        mix: PackMix.single('p'),
+        targetDifficulty: 2,
+        wordLengthBucket: 5,
+        excludeIds: const <String>{},
+        seed: 0,
+      );
+      expect(pick.id, 'long');
+    });
+
+    test('matching difficulté prime sur matching longueur', () async {
+      // Une seule devinette à difficulté exacte (bucket éloigné), plusieurs
+      // à difficulté ±1 (bucket parfait). Le service doit choisir la
+      // devinette à difficulté exacte — la difficulté est plus importante.
+      final repo = _FakeDevinetteRepository({
+        'p': [
+          // diff=3 (exact), bucket 1 (loin de la cible 5)
+          _make(id: 'exact', pack: 'p', difficulty: 3, answer: 'AB'),
+          // diff=2, bucket 5 (cible)
+          _make(
+            id: 'near1',
+            pack: 'p',
+            difficulty: 2,
+            answer: 'ABCDEFGHI',
+          ),
+          // diff=4, bucket 5 (cible)
+          _make(
+            id: 'near2',
+            pack: 'p',
+            difficulty: 4,
+            answer: 'ABCDEFGHIJ',
+          ),
+        ],
+      });
+      final service = WeightedDevinetteSelectionService(repository: repo);
+      final pick = await service.nextDevinette(
+        mix: PackMix.single('p'),
+        targetDifficulty: 3,
+        wordLengthBucket: 5,
+        excludeIds: const <String>{},
+        seed: 0,
+      );
+      expect(pick.id, 'exact');
+    });
+
+    test('wordLengthBucket null → comportement legacy (ignore longueur)',
+        () async {
+      // Pool entièrement de longueurs incohérentes avec la cible : le
+      // service doit quand même piocher (puisque le filtre est désactivé).
+      final repo = _FakeDevinetteRepository({
+        'p': [
+          _make(id: 'a', pack: 'p', difficulty: 2, answer: 'AB'),
+          _make(id: 'b', pack: 'p', difficulty: 2, answer: 'CD'),
+        ],
+      });
+      final service = WeightedDevinetteSelectionService(repository: repo);
+      final pick = await service.nextDevinette(
+        mix: PackMix.single('p'),
+        targetDifficulty: 2,
+        excludeIds: const <String>{},
+        seed: 0,
+      );
+      expect(<String>['a', 'b'], contains(pick.id));
     });
   });
 

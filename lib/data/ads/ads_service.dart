@@ -9,8 +9,17 @@ import 'package:logger/logger.dart';
 
 /// Wrap léger autour de google_mobile_ads.
 ///
-/// **Mode TEST par défaut** — utilise les unit IDs publics de Google.
-/// Remplace par les vrais IDs AdMob une fois le compte configuré.
+/// **Sélection des unit IDs** :
+/// - Debug (toutes plateformes) → test units publics Google. Évite de
+///   générer de fausses impressions sur le compte AdMob réel pendant le
+///   dev / hot reload.
+/// - Release iOS → vrais unit IDs de production (`ca-app-pub-38726827...`).
+/// - Release Android → encore en test IDs (TODO : créer les unités
+///   AdMob Android et remplacer ci-dessous).
+///
+/// Le `GADApplicationIdentifier` global est dans `ios/Runner/Info.plist`
+/// (toujours le vrai App ID prod — la SDK l'utilise pour s'identifier au
+/// compte AdMob, indépendamment des unit IDs).
 class AdsService {
   AdsService(this._progress);
 
@@ -23,22 +32,49 @@ class AdsService {
   bool _initialized = false;
   bool get initialized => _initialized;
 
-  /// Test ad units publics Google (toujours fonctionnels en debug).
+  /// Test unit IDs publics Google — utilisés en debug et sur Android tant
+  /// que les unités prod Android ne sont pas créées.
+  static const String _testRewardedIOS =
+      'ca-app-pub-3940256099942544/1712485313';
+  static const String _testRewardedAndroid =
+      'ca-app-pub-3940256099942544/5224354917';
+  static const String _testInterstitialIOS =
+      'ca-app-pub-3940256099942544/4411468910';
+  static const String _testInterstitialAndroid =
+      'ca-app-pub-3940256099942544/1033173712';
+
+  /// Unit IDs de production (compte AdMob ultimesgriots).
+  static const String _prodRewardedIOS =
+      'ca-app-pub-3872682728320036/4739151934';
+  static const String _prodInterstitialIOS =
+      'ca-app-pub-3872682728320036/1482433200';
+  // TODO(admob): créer les unités Android et remplacer les test IDs
+  // ci-dessous par les vrais IDs prod Android.
+
   static String get _rewardedUnitId {
-    if (Platform.isIOS) return 'ca-app-pub-3940256099942544/1712485313';
-    return 'ca-app-pub-3940256099942544/5224354917';
+    if (kDebugMode) {
+      return Platform.isIOS ? _testRewardedIOS : _testRewardedAndroid;
+    }
+    if (Platform.isIOS) return _prodRewardedIOS;
+    return _testRewardedAndroid; // TODO(admob): prod Android.
   }
 
   static String get _interstitialUnitId {
-    if (Platform.isIOS) return 'ca-app-pub-3940256099942544/4411468910';
-    return 'ca-app-pub-3940256099942544/1033173712';
+    if (kDebugMode) {
+      return Platform.isIOS ? _testInterstitialIOS : _testInterstitialAndroid;
+    }
+    if (Platform.isIOS) return _prodInterstitialIOS;
+    return _testInterstitialAndroid; // TODO(admob): prod Android.
   }
 
   Future<void> init() async {
     if (_initialized) return;
     await MobileAds.instance.initialize();
     _initialized = true;
-    _log.i('AdMob initialized (test units)');
+    final mode = kDebugMode
+        ? 'test units'
+        : (Platform.isIOS ? 'prod units' : 'test units (Android pending)');
+    _log.i('AdMob initialized ($mode)');
     unawaited(_loadRewarded());
     unawaited(_loadInterstitial());
   }

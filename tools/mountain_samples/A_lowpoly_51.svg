@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="skyA51" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="50%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#F97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#skyA51)"/>
+
+  <!-- Stars -->
+  <circle cx="30" cy="25" r="1.2" fill="#FAFAF9"/>
+  <circle cx="55" cy="18" r="0.9" fill="#FAFAF9"/>
+  <circle cx="180" cy="30" r="1" fill="#FAFAF9"/>
+  <circle cx="160" cy="15" r="0.8" fill="#FAFAF9"/>
+
+  <!-- Distant left silhouette -->
+  <polygon points="0,200 0,160 25,140 50,155 70,200" fill="#1E1B4B" opacity="0.9"/>
+
+  <!-- Distant right silhouette -->
+  <polygon points="160,200 175,150 200,165 200,200" fill="#1E1B4B" opacity="0.9"/>
+
+  <!-- Kilimanjaro: massive flat-top silhouette -->
+  <!-- Base shadow -->
+  <polygon points="0,200 25,170 60,150 80,90 130,75 160,95 175,140 200,170 200,200" fill="#0C0A09"/>
+
+  <!-- Light faces -->
+  <polygon points="130,75 160,95 175,140 200,170 200,200 140,200" fill="#27272A"/>
+  <polygon points="130,75 175,140 145,160" fill="#3F3F46"/>
+
+  <!-- Dark faces -->
+  <polygon points="0,200 25,170 60,150 80,90 130,75 95,200" fill="#18181B"/>
+  <polygon points="60,150 80,90 75,180" fill="#27272A"/>
+
+  <!-- Ridge facets -->
+  <polygon points="80,90 130,75 105,130" fill="#3F3F46"/>
+  <polygon points="105,130 130,75 145,160" fill="#27272A"/>
+
+  <!-- Snow cap (signature wide plateau) -->
+  <polygon points="80,90 130,75 160,95 145,108 110,100 85,105" fill="#FAFAF9"/>
+  <polygon points="85,105 110,100 95,115" fill="#E7E5E4"/>
+  <polygon points="110,100 145,108 130,118" fill="#D6D3D1"/>
+
+  <!-- Snow streaks -->
+  <polygon points="95,115 105,130 115,118" fill="#FAFAF9"/>
+  <polygon points="130,118 145,108 142,130" fill="#FAFAF9"/>
+
+  <!-- Foreground -->
+  <polygon points="0,200 0,192 50,196 110,193 165,196 200,193 200,200" fill="#000"/>
+</svg>

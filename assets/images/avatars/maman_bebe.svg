@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- maman_bebe : mère portant bébé sur le dos, boubou indigo et or -->
+  <defs>
+    <radialGradient id="bgMaman" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#FFD9E6"/>
+      <stop offset="100%" stop-color="#3B4B8C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="230" fill="url(#bgMaman)"/>
+
+  <!-- Corps de la mère : boubou indigo -->
+  <path d="M 100 510 Q 120 380 220 360 L 320 360 Q 420 380 412 510 Z" fill="#3B4B8C" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Motifs or sur boubou -->
+  <circle cx="180" cy="450" r="5" fill="#F4B942"/>
+  <circle cx="220" cy="430" r="5" fill="#F4B942"/>
+  <circle cx="260" cy="450" r="5" fill="#F4B942"/>
+  <circle cx="300" cy="430" r="5" fill="#F4B942"/>
+  <circle cx="340" cy="450" r="5" fill="#F4B942"/>
+  <path d="M 180 480 Q 256 470 332 480" fill="none" stroke="#F4B942" stroke-width="3"/>
+  <path d="M 180 410 Q 256 400 332 410" fill="none" stroke="#F4B942" stroke-width="3"/>
+
+  <!-- Pagne porte-bébé (passe en travers de la poitrine en noeud) -->
+  <path d="M 130 380 Q 200 360 260 410 Q 320 430 380 380 Q 385 400 370 420 Q 280 460 220 430 Q 160 405 130 380 Z" fill="#E54F3B" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Motifs sur le pagne -->
+  <circle cx="180" cy="395" r="4" fill="#F4B942"/>
+  <circle cx="240" cy="420" r="4" fill="#F4B942"/>
+  <circle cx="320" cy="410" r="4" fill="#F4B942"/>
+  <!-- Noeud central -->
+  <path d="M 256 405 Q 268 395 280 410 Q 270 425 256 420 Q 242 425 232 410 Q 244 395 256 405 Z" fill="#FAF3E0" stroke="#1F1A17" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Bébé qui dépasse à droite (épaule droite de la mère) -->
+  <!-- Petite tête de bébé -->
+  <ellipse cx="380" cy="290" rx="38" ry="42" fill="#A06A3E" stroke="#1F1A17" stroke-width="5"/>
+  <!-- Petit bonnet du bébé -->
+  <path d="M 348 275 Q 355 245 380 240 Q 405 245 412 275 Q 395 265 380 265 Q 365 265 348 275 Z" fill="#F4B942" stroke="#1F1A17" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="380" cy="238" r="6" fill="#E54F3B" stroke="#1F1A17" stroke-width="3"/>
+  <!-- Yeux fermés du bébé -->
+  <path d="M 363 290 Q 370 285 377 290" fill="none" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 385 290 Q 392 285 399 290" fill="none" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+  <!-- Joues bébé -->
+  <ellipse cx="358" cy="308" rx="8" ry="5" fill="#E58A8A" opacity="0.6"/>
+  <ellipse cx="404" cy="308" rx="8" ry="5" fill="#E58A8A" opacity="0.6"/>
+  <!-- Petit sourire bébé -->
+  <path d="M 371 315 Q 380 322 389 315" fill="none" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+  <!-- Petits bras du bébé qui dépassent -->
+  <ellipse cx="345" cy="345" rx="12" ry="18" fill="#A06A3E" stroke="#1F1A17" stroke-width="4" transform="rotate(-20 345 345)"/>
+  <ellipse cx="418" cy="345" rx="12" ry="18" fill="#A06A3E" stroke="#1F1A17" stroke-width="4" transform="rotate(20 418 345)"/>
+
+  <!-- Cou de la mère -->
+  <rect x="208" y="340" width="56" height="35" rx="8" fill="#8B5A2B" stroke="#1F1A17" stroke-width="4"/>
+
+  <!-- Tête de la mère (légèrement décalée à gauche pour laisser place au bébé) -->
+  <ellipse cx="236" cy="240" rx="115" ry="125" fill="#A06A3E" stroke="#1F1A17" stroke-width="5"/>
+
+  <!-- Oreille gauche -->
+  <ellipse cx="125" cy="248" rx="14" ry="22" fill="#8B5A2B" stroke="#1F1A17" stroke-width="4"/>
+  <circle cx="120" cy="275" r="6" fill="#F4B942" stroke="#1F1A17" stroke-width="2"/>
+
+  <!-- Foulard indigo avec motifs or -->
+  <path d="M 122 195 Q 130 130 236 120 Q 342 130 348 195 Q 330 175 236 175 Q 138 175 122 195 Z" fill="#3B4B8C" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Noeud du foulard -->
+  <path d="M 200 130 Q 220 95 236 105 Q 252 95 272 130 Q 256 142 236 138 Q 216 142 200 130 Z" fill="#3B4B8C" stroke="#1F1A17" stroke-width="5" stroke-linejoin="round"/>
+  <!-- Motifs or sur le foulard -->
+  <circle cx="170" cy="180" r="4" fill="#F4B942"/>
+  <circle cx="210" cy="170" r="4" fill="#F4B942"/>
+  <circle cx="260" cy="170" r="4" fill="#F4B942"/>
+  <circle cx="300" cy="180" r="4" fill="#F4B942"/>
+  <path d="M 150 195 Q 236 185 332 195" fill="none" stroke="#F4B942" stroke-width="3"/>
+
+  <!-- Yeux fermés sereins -->
+  <path d="M 180 255 Q 195 245 210 255" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 262 255 Q 277 245 292 255" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Joues -->
+  <ellipse cx="150" cy="298" rx="14" ry="9" fill="#E58A8A" opacity="0.55"/>
+  <ellipse cx="322" cy="298" rx="14" ry="9" fill="#E58A8A" opacity="0.55"/>
+
+  <!-- Nez -->
+  <path d="M 236 270 Q 228 290 232 300 Q 236 305 244 302" fill="none" stroke="#1F1A17" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Sourire serein -->
+  <path d="M 206 320 Q 236 340 266 320" fill="none" stroke="#1F1A17" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Petits coeurs flottants -->
+  <path d="M 80 150 Q 75 142 82 138 Q 89 142 84 150 Q 82 154 80 150 Z" fill="#E58A8A" stroke="#1F1A17" stroke-width="2"/>
+  <path d="M 440 180 Q 435 172 442 168 Q 449 172 444 180 Q 442 184 440 180 Z" fill="#E58A8A" stroke="#1F1A17" stroke-width="2"/>
+  <path d="M 70 320 Q 65 312 72 308 Q 79 312 74 320 Q 72 324 70 320 Z" fill="#E58A8A" stroke="#1F1A17" stroke-width="2"/>
+</svg>

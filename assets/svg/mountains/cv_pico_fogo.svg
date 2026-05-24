@@ -1,0 +1,43 @@
+<!-- Pico do Fogo — Cap-Vert, 2829m, cone. Volcan ACTIF de l'île de Fogo, cône parfait à l'intérieur d'une caldeira en fer-à-cheval, paysage de lave noire. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Panache de fumée volcanique (Pico do Fogo en activité) -->
+  <ellipse cx="105" cy="48" rx="14" ry="5" fill="#52525B" opacity="0.85"/>
+  <ellipse cx="112" cy="35" rx="18" ry="5" fill="#52525B" opacity="0.7"/>
+  <ellipse cx="122" cy="22" rx="20" ry="4" fill="#52525B" opacity="0.5"/>
+  <ellipse cx="135" cy="14" rx="15" ry="3" fill="#71717A" opacity="0.35"/>
+
+  <!-- Océan Atlantique -->
+  <rect y="155" width="200" height="20" fill="#0EA5E9"/>
+  <polygon points="0,155 200,155 200,158 0,158" fill="#38BDF8"/>
+
+  <!-- Caldeira en fer-à-cheval (mur extérieur visible à gauche) -->
+  <polygon points="0,180 5,140 20,120 35,110 35,170" fill="#1C1917"/>
+  <polygon points="0,180 5,140 20,120 25,135 15,170" fill="#0C0A09"/>
+
+  <!-- Cône principal -->
+  <polygon points="35,180 105,55 170,180" fill="#1C1917"/>
+  <polygon points="35,180 105,55 105,180" fill="#292524"/>
+  <polygon points="105,55 95,100 80,155 65,180" fill="#44403C"/>
+  <polygon points="105,55 125,108 140,160 155,180 105,180" fill="#57534E"/>
+  <polygon points="105,55 120,90 125,108" fill="#78716C"/>
+  <polygon points="105,55 105,180 95,170 90,130 95,100" fill="#292524"/>
+
+  <!-- Cratère sommital -->
+  <polygon points="100,55 105,55 110,55 108,62 102,62" fill="#7F1D1D"/>
+  <ellipse cx="105" cy="58" rx="4" ry="1.5" fill="#DC2626"/>
+
+  <!-- Coulées de lave fraîches (signature Fogo) -->
+  <polygon points="95,130 105,170 80,175" fill="#7F1D1D"/>
+  <polygon points="80,170 95,180 70,180" fill="#451A03"/>
+  <polygon points="120,130 140,170 110,170" fill="#7F1D1D"/>
+  <polygon points="135,170 155,180 130,180" fill="#451A03"/>
+
+  <!-- Plaine de cendres volcaniques (Chã das Caldeiras) -->
+  <polygon points="0,180 35,178 105,180 170,178 200,180 200,200 0,200" fill="#1C1917"/>
+  <polygon points="0,200 0,192 60,194 130,193 200,194 200,200" fill="#0C0A09"/>
+  <circle cx="40" cy="195" r="1.5" fill="#451A03"/>
+  <circle cx="65" cy="196" r="1.2" fill="#451A03"/>
+  <circle cx="155" cy="195" r="1.5" fill="#451A03"/>
+  <circle cx="180" cy="196" r="1.2" fill="#451A03"/>
+</svg>

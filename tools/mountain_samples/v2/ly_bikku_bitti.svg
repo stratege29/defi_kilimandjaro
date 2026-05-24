@@ -1,0 +1,22 @@
+<!-- Bikku Bitti — Libye, 2267m, mesa. Massif gréseux du Tibesti, plein Sahara, ocres sombres. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_ly" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FED7AA"/><stop offset="100%" stop-color="#EA580C"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_ly)"/>
+  <circle cx="158" cy="55" r="20" fill="#DC2626" opacity="0.85"/>
+  <rect y="150" width="200" height="10" fill="#FCD34D" opacity="0.5"/>
+  <polygon points="0,170 8,160 25,162 35,170" fill="#7C2D12" opacity="0.6"/>
+  <polygon points="170,170 180,158 195,160 200,170" fill="#7C2D12" opacity="0.6"/>
+  <polygon points="20,175 30,105 60,98 145,100 175,108 185,175" fill="#92400E"/>
+  <polygon points="30,105 60,98 145,100 175,108 145,112 60,108 30,110" fill="#C2410C"/>
+  <polygon points="30,105 175,108 175,118 30,115" fill="#7C2D12"/>
+  <polygon points="25,128 184,130 184,133 25,131" fill="#7C2D12"/>
+  <polygon points="22,145 184,148 184,151 22,148" fill="#451A03"/>
+  <polygon points="22,162 184,165 184,168 22,165" fill="#7C2D12"/>
+  <polygon points="175,108 185,175 175,115" fill="#A16207"/>
+  <polygon points="20,175 30,105 35,175" fill="#451A03"/>
+  <polygon points="20,175 30,170 185,170 195,180 5,180" fill="#7C2D12"/>
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#FBBF24"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#D97706"/>
+  <path d="M 30,196 q 12,-5 24,0" stroke="#92400E" stroke-width="1" fill="none"/>
+  <path d="M 140,196 q 12,-4 24,0" stroke="#92400E" stroke-width="1" fill="none"/>
+</svg>

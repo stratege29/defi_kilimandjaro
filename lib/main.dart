@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -69,9 +70,18 @@ Future<void> main() async {
 }
 
 Future<void> _bootstrap() async {
+  // [BOOT] timeline via print() — visible dans Xcode console (debug + flutter run).
+  // ignore: avoid_print
+  print('[BOOT] 0 _bootstrap entered');
   WidgetsFlutterBinding.ensureInitialized();
+  // ignore: avoid_print
+  print('[BOOT] 1 WidgetsFlutterBinding OK');
   await EasyLocalization.ensureInitialized();
+  // ignore: avoid_print
+  print('[BOOT] 2 EasyLocalization OK');
   await AudioEngine.instance.init();
+  // ignore: avoid_print
+  print('[BOOT] 3 AudioEngine OK');
 
   // Firebase: initialize then ensure an anonymous session exists so
   // every player has a UID for duels even before signing in with
@@ -93,8 +103,7 @@ Future<void> _bootstrap() async {
     }
 
     // App Check: must run right after Firebase.initializeApp and before any
-    // authenticated call (Auth, Firestore, RTDB, Cloud Functions). See
-    // lib/data/firebase/app_check_setup.dart for provider configuration.
+    // authenticated call (Auth, Firestore, RTDB, Cloud Functions).
     await activateAppCheck();
 
     // Local emulator wiring — opt-in via --dart-define USE_FIREBASE_EMULATOR=true
@@ -188,25 +197,40 @@ Future<void> _bootstrap() async {
     FirebaseMessaging.onMessageOpenedApp.listen(_navigateToMatchFromFcm);
 
     // FCM : verifier si l'app a ete ouverte depuis une notif (app terminee).
-    final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-    if (initialMessage != null) {
-      // Delay pour laisser le router s'initialiser.
-      unawaited(
-        Future<void>.delayed(const Duration(milliseconds: 500), () {
-          _navigateToMatchFromFcm(initialMessage);
-        }),
-      );
+    // Timeout 3s — getInitialMessage() peut hanger indéfiniment sur iOS si
+    // APNs n'est pas encore prêt (cas typique : 1er lancement en TestFlight
+    // sans embedded.mobileprovision). On accepte de rater le deep-link plutôt
+    // que de bloquer le splash.
+    try {
+      final initialMessage = await FirebaseMessaging.instance
+          .getInitialMessage()
+          .timeout(const Duration(seconds: 3));
+      if (initialMessage != null) {
+        unawaited(
+          Future<void>.delayed(const Duration(milliseconds: 500), () {
+            _navigateToMatchFromFcm(initialMessage);
+          }),
+        );
+      }
+    } on Object {
+      // Timeout ou erreur FCM — l'app boot quand même.
     }
+    // ignore: avoid_print
+    print('[BOOT] 4 Firebase block OK');
   } catch (e) {
     // Fail-soft: solo gameplay continues without backend if Firebase fails.
     // ignore: avoid_print
-    print('🔧 Firebase bootstrap failed: $e');
+    print('[BOOT] 4 Firebase bootstrap failed: $e');
   }
 
   final prefs = await SharedPreferences.getInstance();
+  // ignore: avoid_print
+  print('[BOOT] 5 SharedPreferences OK');
 
   SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlay);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // ignore: avoid_print
+  print('[BOOT] 6 SystemChrome OK — calling runApp');
 
   runApp(
     EasyLocalization(
@@ -243,17 +267,26 @@ class _BootGateState extends ConsumerState<_BootGate> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // ignore: avoid_print
+      print('[BOOT] 7 post-frame entered');
+
       // IAP init is fire-and-forget.
       unawaited(ref.read(iapServiceProvider).init());
+      // ignore: avoid_print
+      print('[BOOT] 8 IAP triggered');
 
       // FCM token storage (permission + persistance Firestore).
       // Fire-and-forget : ne doit pas bloquer le boot.
       unawaited(ref.read(fcmRepositoryProvider).init());
+      // ignore: avoid_print
+      print('[BOOT] 9 FCM triggered');
 
       // FCM foreground : notif in-app quand un duel challenge arrive.
       _fcmForegroundSub = FirebaseMessaging.onMessage.listen(
         _onForegroundMessage,
       );
+      // ignore: avoid_print
+      print('[BOOT] 10 FCM listener attached');
 
       // UMP consent before AdMob (RGPD UE compliance).
       await ref.read(consentServiceProvider).requestConsent();
@@ -262,11 +295,14 @@ class _BootGateState extends ConsumerState<_BootGate> {
 
       // Deep links : ecoute les URL scheme kilimandjaro://duel/*
       unawaited(ref.read(deepLinkServiceProvider).init());
+      // ignore: avoid_print
+      print('[BOOT] 11 deep links triggered');
 
-      // OTA content sync : télécharge les packs distants depuis Firebase
-      // Storage et peuple le cache Drift. Fire-and-forget — les échecs
-      // sont loggés mais l'app continue sur le starter pack bundlé.
-      unawaited(ref.read(manifestSyncServiceProvider).refresh());
+      // OTA content sync DÉSACTIVÉ TEMPORAIREMENT — suspect d'OOM iOS 26.
+      // Réactiver après confirmation que ce n'est pas le coupable.
+      //   unawaited(ref.read(manifestSyncServiceProvider).refresh());
+      // ignore: avoid_print
+      print('[BOOT] 12 OTA sync skipped (debug)');
     });
   }
 

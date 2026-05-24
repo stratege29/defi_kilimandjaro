@@ -2,6 +2,7 @@ import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/audio/audio_engine.dart';
 import 'package:defi_kilimandjaro/audio/instruments/balafon.dart';
 import 'package:defi_kilimandjaro/audio/instruments/djembe.dart';
+import 'package:defi_kilimandjaro/audio/instruments/duel_round_end.dart';
 import 'package:defi_kilimandjaro/audio/instruments/griot_fanfare.dart';
 import 'package:defi_kilimandjaro/audio/instruments/kora.dart';
 import 'package:defi_kilimandjaro/audio/instruments/lobby_duel.dart';
@@ -99,6 +100,40 @@ void main() {
       expect(tac.length, lessThan(duelStart.length));
     });
 
+    test('DuelRoundEnd samples produce valid WAV byte buffers', () {
+      final wavs = <(String, List<int>)>[
+        ('roundWon', DuelRoundEnd.renderRoundWon()),
+        ('roundLost', DuelRoundEnd.renderRoundLost()),
+        ('roundDraw', DuelRoundEnd.renderRoundDraw()),
+      ];
+      for (final (name, w) in wavs) {
+        expect(
+          w.length,
+          greaterThan(44),
+          reason: '$name WAV should have header + data',
+        );
+        expect(
+          String.fromCharCodes(w.sublist(0, 4)),
+          'RIFF',
+          reason: '$name should start with RIFF',
+        );
+        expect(
+          String.fromCharCodes(w.sublist(8, 12)),
+          'WAVE',
+          reason: '$name should be WAVE format',
+        );
+      }
+    });
+
+    test('DuelRoundEnd.renderRoundWon is the longest of the three cues', () {
+      // roundWon (~950 ms) > roundLost (~800 ms) > roundDraw (~750 ms).
+      final won = DuelRoundEnd.renderRoundWon();
+      final lost = DuelRoundEnd.renderRoundLost();
+      final draw = DuelRoundEnd.renderRoundDraw();
+      expect(won.length, greaterThan(lost.length));
+      expect(lost.length, greaterThan(draw.length));
+    });
+
     test('WavBuffer.normalize peaks at target', () {
       final buf = WavBuffer.silence(0.01)
         ..[0] = 0.2
@@ -181,6 +216,19 @@ void main() {
     test('playDuelStart is no-op when muted', () async {
       await controller.setMuted(muted: true);
       await expectLater(controller.playDuelStart(), completes);
+    });
+
+    test('playRoundWon/Lost/Draw do not throw', () async {
+      await expectLater(controller.playRoundWon(), completes);
+      await expectLater(controller.playRoundLost(), completes);
+      await expectLater(controller.playRoundDraw(), completes);
+    });
+
+    test('playRoundWon/Lost/Draw are no-ops when muted', () async {
+      await controller.setMuted(muted: true);
+      await expectLater(controller.playRoundWon(), completes);
+      await expectLater(controller.playRoundLost(), completes);
+      await expectLater(controller.playRoundDraw(), completes);
     });
 
     test('suspend() cancels the loop', () async {
