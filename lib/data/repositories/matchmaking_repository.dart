@@ -132,6 +132,32 @@ class MatchmakingRepository {
     }
   }
 
+  /// Repond a un challenge async (rematch).
+  ///
+  /// Appele par l'opponent depuis le dialog modal in-app.
+  /// - [accept] true  : nettoie pending_challenges. Le client doit ensuite
+  ///   appeler joinOpen pour rejoindre effectivement le match.
+  /// - [accept] false : marque le match `declined=true` + phase=finished.
+  ///   Le caller detecte le refus via son stream RTDB et passe en noOpponent.
+  Future<void> respondToChallenge({
+    required String matchId,
+    required bool accept,
+  }) async {
+    try {
+      await _fn('respondToChallenge').call<dynamic>(<String, dynamic>{
+        'matchId': matchId,
+        'accept': accept,
+      });
+      _log.i('respondToChallenge: $matchId accept=$accept');
+    } on FirebaseFunctionsException catch (e) {
+      _log.e('respondToChallenge error: ${e.code} ${e.message}');
+      rethrow;
+    } on Exception catch (e) {
+      _log.e('respondToChallenge unexpected error', error: e);
+      rethrow;
+    }
+  }
+
   /// Clôture un match ranked et déclenche le calcul ELO côté serveur.
   ///
   /// [matchId] : identifiant du match terminé.

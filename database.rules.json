@@ -9,6 +9,12 @@
     "matches": {
       "$matchId": {
         ".read": "auth != null",
+        // Autorise les participants existants ET le target_uid (rematch async)
+        // ET le createur (QR local) a ecrire sur le match. Couvre joinOpen
+        // (ecrit players + phase + phase_started_at en transaction atomique).
+        // Anti-cheat : les transitions de phase non triviales (active, finished)
+        // restent gerees par les Cloud Functions cote serveur via Admin SDK.
+        ".write": "auth != null && (data.child('players').child(auth.uid).exists() || data.child('target_uid').val() === auth.uid || data.child('created_by').val() === auth.uid)",
         "players": {
           "$uid": {
             ".write": "auth != null && auth.uid === $uid",
@@ -27,6 +33,12 @@
             }
           }
         }
+      }
+    },
+    "pending_challenges": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
       }
     }
   }

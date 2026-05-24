@@ -126,10 +126,13 @@ export const requestRematch = onCall<
     const cache = await _loadDevinettesCache();
     const rounds = _pickThreeRounds(cache);
 
-    // --- Lire l'ELO du caller ---
+    // --- Lire profil caller (ELO + display_name pour le dialog in-app) ---
     const profileSnap = await db.collection("profiles").doc(callerUid).get();
+    const profileData = profileSnap.data() ?? {};
     const callerElo: number =
-      (profileSnap.data()?.["elo"] as number | undefined) ?? ELO_INITIAL;
+      (profileData["elo"] as number | undefined) ?? ELO_INITIAL;
+    const callerName: string =
+      (profileData["display_name"] as string | undefined) ?? "Un grimpeur";
 
     // --- Creer le nouveau match ---
     const newMatchId = _generateMatchId();
@@ -164,7 +167,21 @@ export const requestRematch = onCall<
       },
     };
 
-    await rtdb.ref(`matches/${newMatchId}`).set(matchData);
+    // Ecriture atomique : match + pending_challenge.
+    // Le pending_challenge est observe en stream RTDB par l'opponent s'il
+    // est online. Permet d'afficher un dialog modal in-app instantane
+    // (< 1s), au lieu d'esperer que la notif FCM soit vue dans le system
+    // tray. Pattern Discord game invite / chess.com challenge.
+    const updates: Record<string, unknown> = {
+      [`matches/${newMatchId}`]: matchData,
+      [`pending_challenges/${opponentUid}`]: {
+        matchId: newMatchId,
+        fromUid: callerUid,
+        fromName: callerName,
+        createdAt: now,
+      },
+    };
+    await rtdb.ref().update(updates);
 
     logger.info(
       `[requestRematch] caller=${callerUid} vs opponent=${opponentUid} ` +
