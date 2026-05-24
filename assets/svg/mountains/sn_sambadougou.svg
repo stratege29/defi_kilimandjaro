@@ -1,0 +1,43 @@
+<!-- Sambadougou — Sénégal, 648m, dome
+     Inselberg rocheux isolé dans la savane de Kédougou (Sénégal oriental). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Savanna plain back -->
+  <polygon points="0,180 200,180 200,200 0,200" fill="#A16207"/>
+
+  <!-- Distant baobabs silhouettes -->
+  <line x1="18" y1="180" x2="18" y2="172" stroke="#451A03" stroke-width="1.6"/>
+  <ellipse cx="18" cy="170" rx="5" ry="2.5" fill="#451A03"/>
+  <line x1="188" y1="180" x2="188" y2="173" stroke="#451A03" stroke-width="1.4"/>
+  <ellipse cx="188" cy="172" rx="4" ry="2" fill="#451A03"/>
+
+  <!-- Distant flat hills -->
+
+  <!-- Main inselberg: rounded dome rising abruptly -->
+  <!-- Base shadow -->
+  <polygon points="35,180 50,140 75,110 110,95 145,105 165,135 175,180" fill="#5C2410"/>
+  <!-- Dark left face -->
+  <polygon points="35,180 50,140 75,110 90,140 80,180" fill="#7C2D12"/>
+  <!-- Mid facet -->
+  <polygon points="75,110 110,95 100,130 90,140" fill="#92400E"/>
+  <!-- Lit right facet -->
+  <polygon points="110,95 145,105 130,135 100,130" fill="#B45309"/>
+  <!-- Right slope -->
+  <polygon points="145,105 165,135 175,180 130,180" fill="#A16207"/>
+  <polygon points="130,135 145,160 100,150 90,140" fill="#854D0E"/>
+  <polygon points="100,130 130,135 100,150" fill="#92400E"/>
+  <polygon points="90,140 100,150 80,180" fill="#5C2410"/>
+  <polygon points="100,150 145,160 130,180 80,180" fill="#78350F"/>
+  <polygon points="145,160 165,135 175,180 130,180" fill="#92400E"/>
+  <!-- Top highlight -->
+  <polygon points="110,95 125,115 105,118" fill="#C2410C"/>
+
+  <!-- Foreground grass -->
+  <polygon points="0,200 0,188 60,193 130,189 200,192 200,200" fill="#451A03"/>
+  <g stroke="#451A03" stroke-width="0.7" stroke-linecap="round">
+    <line x1="40" y1="195" x2="42" y2="190"/>
+    <line x1="48" y1="196" x2="50" y2="191"/>
+    <line x1="155" y1="195" x2="157" y2="190"/>
+    <line x1="163" y1="196" x2="165" y2="191"/>
+  </g>
+</svg>

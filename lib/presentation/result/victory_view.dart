@@ -32,6 +32,8 @@ class VictoryView extends StatefulWidget {
     required this.devinette,
     required this.timeLeft,
     required this.onNext,
+    this.starsEarned = 0,
+    this.isBoss = false,
     super.key,
   });
 
@@ -39,6 +41,15 @@ class VictoryView extends StatefulWidget {
 
   /// Secondes restantes au moment de la victoire (pour bonus cauris).
   final int timeLeft;
+
+  /// Nombre d'étoiles obtenues (0-3). 0 ne devrait jamais arriver ici
+  /// puisque l'overlay n'est affiché que sur victoire (≥ 1).
+  final int starsEarned;
+
+  /// Niveau boss (dernier niveau de la montagne). Quand vrai, l'écran
+  /// est enrichi : couronne dorée flottante au-dessus du griot, label
+  /// "BOSS VAINCU", particules plus denses.
+  final bool isBoss;
 
   /// Callback appelé quand l'utilisateur tape SUIVANT.
   final VoidCallback onNext;
@@ -140,6 +151,8 @@ class _VictoryViewState extends State<VictoryView>
                 caurisAnim: _caurisAnim,
                 celebScale: _celebScale,
                 onNext: widget.onNext,
+                starsEarned: widget.starsEarned,
+                isBoss: widget.isBoss,
               ),
             ),
           ),
@@ -159,12 +172,16 @@ class _VictoryCard extends StatelessWidget {
     required this.caurisAnim,
     required this.celebScale,
     required this.onNext,
+    required this.starsEarned,
+    required this.isBoss,
   });
 
   final Devinette devinette;
   final Animation<int> caurisAnim;
   final Animation<double> celebScale;
   final VoidCallback onNext;
+  final int starsEarned;
+  final bool isBoss;
 
   @override
   Widget build(BuildContext context) {
@@ -194,11 +211,73 @@ class _VictoryCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          // Mascotte griot 96pt — bouncing victory pose.
-          ScaleTransition(
-            scale: celebScale,
-            child: Image.asset(AppAssets.griotVictory, width: 96, height: 96),
+          // Label "BOSS VAINCU" en haut quand niveau boss — signature
+          // visuelle forte avant même la mascotte.
+          if (isBoss) ...<Widget>[
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Icon(
+                  Icons.workspace_premium_rounded,
+                  size: 22,
+                  color: AppColors.orJour,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'BOSS VAINCU',
+                  style: AppTypography.bebas().copyWith(
+                    fontSize: 18,
+                    letterSpacing: 2.5,
+                    color: AppColors.orJour,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                const Icon(
+                  Icons.workspace_premium_rounded,
+                  size: 22,
+                  color: AppColors.orJour,
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+          ],
+          // Mascotte griot 96pt — bouncing victory pose. En mode boss,
+          // surmontée d'une couronne flottante.
+          Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.topCenter,
+            children: <Widget>[
+              ScaleTransition(
+                scale: celebScale,
+                child: Image.asset(
+                  AppAssets.griotVictory,
+                  width: 96,
+                  height: 96,
+                ),
+              ),
+              if (isBoss)
+                Positioned(
+                  top: -14,
+                  child: Icon(
+                    Icons.emoji_events_rounded,
+                    size: 36,
+                    color: AppColors.orJour,
+                    shadows: <Shadow>[
+                      Shadow(
+                        color: Colors.black.withValues(alpha: 0.65),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ),
+          const SizedBox(height: 12),
+          // 3 étoiles — feedback de performance instantané. Affichées
+          // dorées (acquises) ou grises (manquées). 1 étoile = victoire,
+          // 2 = sans indice, 3 = victoire en ≤ 50 % du temps.
+          _StarsRow(earned: starsEarned),
           const SizedBox(height: 16),
           // Mot-réponse — Fraunces displayMd 40pt w700, gold.
           // Moment éditorial fort : la 1re fois que le mot ivoirien
@@ -234,6 +313,35 @@ class _VictoryCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Rangée des 3 étoiles — chaque étoile prend une couleur or si acquise,
+/// gris sombre si manquée. Apparaît au-dessus du mot-réponse pour donner
+/// le feedback de performance avant même le contenu pédagogique.
+class _StarsRow extends StatelessWidget {
+  const _StarsRow({required this.earned});
+
+  final int earned;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (var i = 1; i <= 3; i++) ...<Widget>[
+          if (i > 1) const SizedBox(width: 6),
+          Icon(
+            i <= earned ? Icons.star_rounded : Icons.star_outline_rounded,
+            size: 32,
+            color: i <= earned
+                ? AppColors.orJour
+                : AppColors.textePrimaire.withValues(alpha: 0.25),
+          ),
+        ],
+      ],
     );
   }
 }

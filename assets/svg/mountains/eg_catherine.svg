@@ -1,0 +1,36 @@
+<!-- Mont Catherine — Égypte, 2629m, crest. Plus haut sommet du Sinaï, crête granitique aride, site religieux historique. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Pics distants -->
+
+  <!-- Crête multi-pics granitique du Sinaï -->
+  <polygon points="0,180 10,150 25,125 45,105 60,128 80,90 100,108 120,75 138,98 158,82 178,108 195,140 200,180" fill="#92400E"/>
+
+  <!-- Facettes éclairées -->
+  <polygon points="25,125 45,105 60,128 50,135" fill="#B45309"/>
+  <polygon points="60,128 80,90 100,108 82,128" fill="#A16207"/>
+  <polygon points="100,108 120,75 138,98 122,118" fill="#C2410C"/>
+  <polygon points="120,75 138,98 130,90" fill="#DC2626"/>
+  <polygon points="138,98 158,82 178,108 160,122" fill="#B45309"/>
+
+  <!-- Touche de neige sur pic dominant (>2600m, hiver Sinaï) -->
+  <polygon points="120,75 125,82 115,82" fill="#FAFAF9"/>
+  <polygon points="120,75 130,80 124,84" fill="#E7E5E4"/>
+
+  <!-- Facettes sombres -->
+  <polygon points="10,150 25,125 25,160" fill="#451A03"/>
+  <polygon points="45,105 60,128 60,150" fill="#5C2410"/>
+  <polygon points="80,90 100,108 100,135" fill="#5C2410"/>
+  <polygon points="120,75 138,98 138,130" fill="#5C2410"/>
+  <polygon points="158,82 178,108 178,140" fill="#5C2410"/>
+
+  <!-- Quelques rochers en pied -->
+  <polygon points="0,180 30,168 60,180" fill="#451A03"/>
+  <polygon points="135,180 165,170 195,180" fill="#451A03"/>
+
+  <!-- Désert aride -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#FCD34D"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#D97706"/>
+  <circle cx="50" cy="195" r="1.8" fill="#7C2D12"/>
+  <circle cx="160" cy="195" r="1.8" fill="#7C2D12"/>
+</svg>

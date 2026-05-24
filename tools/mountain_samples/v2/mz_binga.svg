@@ -1,0 +1,30 @@
+<!-- Monte Binga — Mozambique, 2436m, dome. Plus haut sommet du Mozambique, massif Chimanimani à la frontière du Zimbabwe. Quartzite, prairies. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_mz" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FEF3C7"/><stop offset="100%" stop-color="#FBBF24"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_mz)"/>
+  <circle cx="158" cy="55" r="18" fill="#F97316" opacity="0.85"/>
+  <rect y="135" width="200" height="6" fill="#FEF3C7" opacity="0.45"/>
+  <polygon points="0,162 30,150 65,158 105,150 145,158 180,150 200,158 200,180 0,180" fill="#365314" opacity="0.6"/>
+
+  <!-- Dôme de quartzite -->
+  <polygon points="15,180 30,130 60,100 100,82 145,95 175,128 188,180" fill="#854D0E"/>
+  <polygon points="15,180 30,130 60,100 80,135 65,180" fill="#5C2410"/>
+  <polygon points="60,100 100,82 95,130 80,135" fill="#92400E"/>
+  <polygon points="100,82 145,95 135,128 95,130" fill="#A16207"/>
+  <polygon points="145,95 175,128 188,180 145,180" fill="#B45309"/>
+  <polygon points="80,135 95,130 135,128 130,180 65,180" fill="#92400E"/>
+  <polygon points="95,130 135,128 130,180 100,160" fill="#A16207"/>
+
+  <!-- Affleurements de quartzite blanc-jaune (signature Chimanimani) -->
+  <polygon points="100,82 115,90 105,98" fill="#FDE68A"/>
+  <polygon points="115,90 135,93 125,100" fill="#FCD34D"/>
+  <polygon points="78,120 92,115 87,128" fill="#FDE68A" opacity="0.7"/>
+
+  <!-- Prairies sur les versants -->
+  <polygon points="55,160 65,150 75,160" fill="#65A30D"/>
+  <polygon points="140,160 150,150 160,160" fill="#65A30D"/>
+
+  <!-- Foreground -->
+  <polygon points="0,200 0,182 60,186 130,184 200,186 200,200" fill="#365314"/>
+  <polygon points="0,200 30,195 80,196 140,194 200,195 200,200" fill="#1A2E05"/>
+</svg>

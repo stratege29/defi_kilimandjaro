@@ -1,0 +1,48 @@
+<!-- Mont Sokbaro — Bénin, 658m, dome
+     Point culminant du Bénin, dôme forestier dans la chaîne de l'Atacora. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="sky_bj" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FEF3C7"/>
+      <stop offset="100%" stop-color="#FCD34D"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#sky_bj)"/>
+  <circle cx="155" cy="60" r="18" fill="#F97316" opacity="0.85"/>
+
+  <!-- Atacora distant ridge -->
+  <polygon points="0,165 35,150 70,158 105,148 140,156 175,150 200,162 200,178 0,178" fill="#854D0E" opacity="0.75"/>
+
+  <!-- Mid forest plateau -->
+  <polygon points="0,180 30,168 80,172 130,166 175,170 200,165 200,200 0,200" fill="#3F6212"/>
+
+  <!-- Main dome: wide, forested, rounded -->
+  <!-- Base/shadow -->
+  <polygon points="25,180 40,150 65,125 100,110 140,118 165,142 180,180" fill="#365314"/>
+  <!-- Left dark face -->
+  <polygon points="25,180 40,150 65,125 80,150 70,180" fill="#1A2E05"/>
+  <!-- Mid facet -->
+  <polygon points="65,125 100,110 95,145 80,150" fill="#3F6212"/>
+  <!-- Right lit facet -->
+  <polygon points="100,110 140,118 130,148 95,145" fill="#4D7C0F"/>
+  <!-- Right slope (light) -->
+  <polygon points="140,118 165,142 180,180 145,180" fill="#65A30D"/>
+  <!-- Mid bottom -->
+  <polygon points="95,145 130,148 140,180 70,180" fill="#3F6212"/>
+  <!-- Forest canopy texture -->
+  <polygon points="80,150 95,145 100,160 85,165" fill="#4D7C0F"/>
+  <polygon points="130,148 145,160 130,170 115,158" fill="#365314"/>
+  <!-- Top highlight (rocky outcrop) -->
+  <polygon points="100,110 115,118 105,128" fill="#A16207"/>
+  <polygon points="115,118 140,118 125,128" fill="#854D0E"/>
+
+  <!-- Tree silhouettes on foreground -->
+  <g fill="#1A2E05">
+    <polygon points="20,180 22,168 25,180"/>
+    <polygon points="40,180 42,170 45,180"/>
+    <polygon points="180,180 182,170 185,180"/>
+  </g>
+
+  <!-- Foreground earth -->
+  <polygon points="0,200 0,188 40,192 110,189 180,191 200,189 200,200" fill="#1C0701"/>
+</svg>

@@ -1,0 +1,38 @@
+<!-- Mont Karthala — Comores, 2361m, cone. Volcan-bouclier actif avec immense caldeira, panache de vapeur, océan Indien. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Panache volcanique (signature Karthala actif) -->
+  <ellipse cx="105" cy="55" rx="18" ry="6" fill="#FAFAF9" opacity="0.8"/>
+  <ellipse cx="115" cy="42" rx="22" ry="5" fill="#FAFAF9" opacity="0.7"/>
+  <ellipse cx="125" cy="32" rx="18" ry="4" fill="#FAFAF9" opacity="0.55"/>
+
+  <!-- Océan -->
+  <rect y="155" width="200" height="20" fill="#0EA5E9"/>
+  <polygon points="0,155 200,155 200,158 0,158" fill="#38BDF8"/>
+
+  <!-- Volcan-bouclier (large, caldeira) -->
+  <polygon points="20,180 50,140 80,105 90,80 95,75 115,75 120,80 130,105 160,140 185,180" fill="#1C1917"/>
+
+  <!-- Caldeira (sommet plat avec dépression) -->
+  <polygon points="90,80 95,75 115,75 120,80 115,90 95,90" fill="#44403C"/>
+  <polygon points="95,85 115,85 110,92 100,92" fill="#7F1D1D"/>
+
+  <!-- Face éclairée -->
+  <polygon points="115,75 120,80 130,105 160,140 185,180 130,180" fill="#292524"/>
+  <polygon points="120,80 130,105 145,130" fill="#44403C"/>
+
+  <!-- Face sombre -->
+  <polygon points="20,180 50,140 80,105 90,80 95,75 100,150 75,180" fill="#0C0A09"/>
+  <polygon points="50,140 80,105 90,80 70,150" fill="#292524"/>
+
+  <!-- Coulée de lave -->
+  <polygon points="100,150 110,170 85,175" fill="#7F1D1D"/>
+  <polygon points="120,150 135,170 110,170" fill="#451A03"/>
+
+  <!-- Forêt tropicale à la base -->
+  <polygon points="20,180 35,165 50,175 70,160 85,178 100,165 115,178 130,160 145,175 165,165 185,180" fill="#14532D"/>
+
+  <!-- Plage -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#14532D"/>
+  <polygon points="0,200 0,195 60,197 130,196 200,197 200,200" fill="#FDE68A"/>
+</svg>

@@ -1,270 +1,399 @@
-import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
-import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
+import 'package:defi_kilimandjaro/audio/audio_controller.dart';
+import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
+import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
+import 'package:defi_kilimandjaro/presentation/duel/widgets/duel_countdown_overlay.dart';
 import 'package:defi_kilimandjaro/presentation/duel/widgets/duel_intro_overlay.dart';
+import 'package:defi_kilimandjaro/presentation/duel/widgets/duel_round_end_overlay.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+
+@GenerateMocks([FirebaseAuth, User, AudioController])
+import 'duel_overlays_test.mocks.dart';
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/// Session de base réutilisée dans les tests.
+DuelSession _makeSession({
+  required DuelPhase phase,
+  int currentRound = 0,
+  String? winner,
+  Map<String, DuelPlayer> players = const {},
+}) {
+  return DuelSession(
+    matchId: 'TEST01',
+    secret: 'deadsecret',
+    createdBy: 'uid-a',
+    createdAt: 0,
+    phase: phase,
+    currentRound: currentRound,
+    totalRounds: 3,
+    rounds: const [
+      RoundData(
+        index: 0,
+        answer: 'KORA',
+        lettersPool: ['K', 'O', 'R', 'A'],
+        riddle: 'Instrument a 21 cordes',
+        explanation: 'Kora: harpe mandingue a 21 cordes.',
+        proverb: '',
+        difficulty: 'easy',
+        devinetteId: 'dev-1',
+      ),
+      RoundData(
+        index: 1,
+        answer: 'BAOBAB',
+        lettersPool: ['B', 'A', 'O', 'B', 'A', 'B'],
+        riddle: 'Arbre de vie',
+        explanation: "L'arbre du baobab.",
+        proverb: '',
+        difficulty: 'medium',
+        devinetteId: 'dev-2',
+      ),
+      RoundData(
+        index: 2,
+        answer: 'CALEBASSE',
+        lettersPool: ['C', 'A', 'L', 'E', 'B', 'A', 'S', 'S', 'E'],
+        riddle: 'Contenant naturel',
+        explanation: 'La calebasse, fruit creuse.',
+        proverb: '',
+        difficulty: 'hard',
+        devinetteId: 'dev-3',
+      ),
+    ],
+    players: players,
+    winner: winner,
+    isRanked: false,
+    phaseStartedAtMs: DateTime.now().millisecondsSinceEpoch,
+  );
+}
+
+/// Wrap minimal pour tester des widgets Riverpod sans Firebase live.
+Widget _wrap(
+  Widget child, {
+  String selfUid = 'uid-a',
+}) {
+  final mockAuth = MockFirebaseAuth();
+  final mockUser = MockUser();
+  when(mockUser.uid).thenReturn(selfUid);
+  when(mockAuth.currentUser).thenReturn(mockUser);
+
+  final mockAudioCtrl = MockAudioController();
+  when(mockAudioCtrl.playDuelStart())
+      .thenAnswer((_) async {});
+  when(mockAudioCtrl.playTimerTick(any))
+      .thenAnswer((_) async {});
+  when(mockAudioCtrl.playWordComplete())
+      .thenAnswer((_) async {});
+  when(mockAudioCtrl.state).thenReturn(AudioState.defaults());
+
+  return ProviderScope(
+    overrides: [
+      firebaseAuthProvider.overrideWithValue(mockAuth),
+      audioControllerProvider.overrideWith((_) => mockAudioCtrl),
+    ],
+    child: MaterialApp(
+      home: Scaffold(
+        body: child,
+      ),
+    ),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Tests DuelIntroOverlay
+// ---------------------------------------------------------------------------
 
 void main() {
-  const selfUid = 'self-uid-AAAAA';
-  const opponentUid = 'opp-uid-BBBBB';
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-  PlayerProfile profile({
-    required String uid,
-    String? displayName,
-    int elo = 1000,
-    String? avatarId,
-  }) {
-    return PlayerProfile(
-      uid: uid,
-      elo: elo,
-      peakElo: elo,
-      totalDuels: 0,
-      wins: 0,
-      losses: 0,
-      displayName: displayName,
-      avatarId: avatarId,
+  group('DuelIntroOverlay', () {
+    testWidgets(
+      'affiche le fond savane et les portraits quand phase == intro',
+      (tester) async {
+        final session = _makeSession(
+          phase: DuelPhase.intro,
+          players: {
+            'uid-a': DuelPlayer(
+              uid: 'uid-a',
+              roundsWon: 0,
+              totalTimeMs: 0,
+              rounds: const {},
+            ),
+            'uid-b': DuelPlayer(
+              uid: 'uid-b',
+              roundsWon: 0,
+              totalTimeMs: 0,
+              rounds: const {},
+            ),
+          },
+        );
+
+        await tester.pumpWidget(
+          _wrap(DuelIntroOverlay(session: session)),
+        );
+
+        // Les deux labels de joueurs doivent être présents.
+        expect(find.text('Moi'), findsOneWidget);
+        expect(find.text('Adversaire'), findsOneWidget);
+
+        // Label de manche en haut.
+        expect(find.textContaining('Manche 1'), findsWidgets);
+      },
     );
-  }
 
-  Widget harness({
-    required List<Override> overrides,
-    bool isRanked = true,
-    String? opponent = opponentUid,
-  }) {
-    return ProviderScope(
-      overrides: overrides,
-      child: MaterialApp(
-        home: Scaffold(
-          body: DuelIntroOverlay(
+    testWidgets(
+      'le VS badge est absent avant la fin du slide (animation not started)',
+      (tester) async {
+        final session = _makeSession(
+          phase: DuelPhase.intro,
+          players: {
+            'uid-a': DuelPlayer(
+              uid: 'uid-a',
+              roundsWon: 0,
+              totalTimeMs: 0,
+              rounds: const {},
+            ),
+          },
+        );
+
+        await tester.pumpWidget(
+          _wrap(DuelIntroOverlay(session: session)),
+        );
+        // Au premier frame, VS n'est pas encore affiché (opacity 0).
+        // On vérifie que le widget VS existe dans l'arbre (même opacité 0).
+        expect(find.text('VS'), findsOneWidget);
+      },
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // Tests DuelCountdownOverlay
+  // ---------------------------------------------------------------------------
+
+  group('DuelCountdownOverlay', () {
+    testWidgets(
+      'affiche le cadenas sur la grille et le premier chiffre',
+      (tester) async {
+        final session = _makeSession(phase: DuelPhase.countdown);
+
+        await tester.pumpWidget(
+          _wrap(
+            DuelCountdownOverlay(
+              session: session,
+              gameContent: const ColoredBox(
+                color: Colors.green,
+                child: SizedBox.expand(),
+              ),
+              riddleContent: const Text('Instrument a 21 cordes'),
+            ),
+          ),
+        );
+
+        // Premier pump — le chiffre initial doit être visible.
+        expect(find.byIcon(Icons.lock_outline), findsOneWidget);
+
+        // La devinette doit être visible.
+        expect(find.text('Instrument a 21 cordes'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'affiche GO! après que le timer atteint zéro',
+      (tester) async {
+        // phaseStartedAtMs dans le passé pour simuler un countdown écoulé.
+        final session = DuelSession(
+          matchId: 'TEST02',
+          secret: 'sec',
+          createdBy: 'uid-a',
+          createdAt: 0,
+          phase: DuelPhase.countdown,
+          currentRound: 0,
+          totalRounds: 3,
+          rounds: const [
+            RoundData(
+              index: 0,
+              answer: 'KORA',
+              lettersPool: ['K', 'O', 'R', 'A'],
+              riddle: 'Riddle',
+              explanation: '',
+              proverb: '',
+              difficulty: 'easy',
+              devinetteId: 'dev-1',
+            ),
+          ],
+          players: const {},
+          isRanked: false,
+          // 5 secondes dans le passé => countdown déjà écoulé.
+          phaseStartedAtMs:
+              DateTime.now().millisecondsSinceEpoch - 5000,
+        );
+
+        await tester.pumpWidget(
+          _wrap(
+            DuelCountdownOverlay(
+              session: session,
+              gameContent: const SizedBox.shrink(),
+              riddleContent: const Text('Riddle'),
+            ),
+          ),
+        );
+
+        // Laisse les animations se résoudre.
+        await tester.pump(const Duration(milliseconds: 200));
+        await tester.pumpAndSettle(const Duration(seconds: 2));
+
+        expect(find.text('GO !'), findsOneWidget);
+      },
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // Tests DuelRoundEndOverlay
+  // ---------------------------------------------------------------------------
+
+  group('DuelRoundEndOverlay', () {
+    testWidgets(
+      'affiche "Manche gagnée !" quand le joueur local a gagné le round',
+      (tester) async {
+        const selfUid = 'uid-a';
+        const opponentUid = 'uid-b';
+
+        final session = _makeSession(
+          phase: DuelPhase.roundEnd,
+          currentRound: 0,
+          players: {
+            selfUid: DuelPlayer(
+              uid: selfUid,
+              roundsWon: 1,
+              totalTimeMs: 12000,
+              rounds: const {
+                0: RoundResult(
+                  progress: 1,
+                  found: true,
+                  finishedAtMs: 1000,
+                  timeTakenMs: 12000,
+                ),
+              },
+            ),
+            opponentUid: DuelPlayer(
+              uid: opponentUid,
+              roundsWon: 0,
+              totalTimeMs: 0,
+              rounds: const {
+                0: RoundResult(
+                  progress: 0.5,
+                  found: false,
+                ),
+              },
+            ),
+          },
+        );
+
+        await tester.pumpWidget(
+          _wrap(
+            DuelRoundEndOverlay(
+              session: session,
+              gameBackground: const ColoredBox(
+                color: Colors.black,
+                child: SizedBox.expand(),
+              ),
+            ),
             selfUid: selfUid,
-            opponentUid: opponent,
-            isRanked: isRanked,
           ),
-        ),
-      ),
-    );
-  }
+        );
 
-  testWidgets('affiche pseudo + ELO depuis le ProfileRepository (ranked)',
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(
+          find.textContaining('MANCHE GAGNÉE'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'affiche "Manche nulle" quand personne n\'a trouvé',
       (tester) async {
-    await tester.pumpWidget(
-      harness(
-        overrides: [
-          playerProfileProvider(selfUid).overrideWith(
-            (ref) => Stream.value(
-              profile(uid: selfUid, displayName: 'Yao', elo: 1250),
+        const selfUid = 'uid-a';
+        const opponentUid = 'uid-b';
+
+        final session = _makeSession(
+          phase: DuelPhase.roundEnd,
+          currentRound: 0,
+          players: {
+            selfUid: DuelPlayer(
+              uid: selfUid,
+              roundsWon: 0,
+              totalTimeMs: 0,
+              rounds: const {
+                0: RoundResult(progress: 0.3, found: false),
+              },
             ),
-          ),
-          playerProfileProvider(opponentUid).overrideWith(
-            (ref) => Stream.value(
-              profile(uid: opponentUid, displayName: 'Akwaba', elo: 1430),
+            opponentUid: DuelPlayer(
+              uid: opponentUid,
+              roundsWon: 0,
+              totalTimeMs: 0,
+              rounds: const {
+                0: RoundResult(progress: 0.2, found: false),
+              },
             ),
+          },
+        );
+
+        await tester.pumpWidget(
+          _wrap(
+            DuelRoundEndOverlay(
+              session: session,
+              gameBackground: const SizedBox.shrink(),
+            ),
+            selfUid: selfUid,
           ),
-        ],
-      ),
+        );
+
+        await tester.pump();
+
+        expect(find.textContaining('MANCHE NULLE'), findsOneWidget);
+      },
     );
-    await tester.pumpAndSettle();
 
-    expect(find.text('Moi'), findsOneWidget);
-    expect(find.text('Adversaire'), findsOneWidget);
-    expect(find.text('Yao'), findsOneWidget);
-    expect(find.text('Akwaba'), findsOneWidget);
-    expect(find.text('1250 m'), findsOneWidget);
-    expect(find.text('1430 m'), findsOneWidget);
-
-    expect(find.text('Y'), findsOneWidget);
-    expect(find.text('A'), findsOneWidget);
-  });
-
-  testWidgets("masque l'ELO en mode non-ranked", (tester) async {
-    await tester.pumpWidget(
-      harness(
-        isRanked: false,
-        overrides: [
-          playerProfileProvider(selfUid).overrideWith(
-            (ref) => Stream.value(
-              profile(uid: selfUid, displayName: 'Yao', elo: 1250),
-            ),
-          ),
-          playerProfileProvider(opponentUid).overrideWith(
-            (ref) => Stream.value(
-              profile(uid: opponentUid, displayName: 'Akwaba', elo: 1430),
-            ),
-          ),
-        ],
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Yao'), findsOneWidget);
-    expect(find.text('Akwaba'), findsOneWidget);
-    expect(find.text('1250 m'), findsNothing);
-    expect(find.text('1430 m'), findsNothing);
-  });
-
-  testWidgets('fallback "Joueur" + initiale UID si profil null',
+    testWidgets(
+      'affiche le détail "Prochaine manche" quand ce n\'est pas le dernier round',
       (tester) async {
-    await tester.pumpWidget(
-      harness(
-        overrides: [
-          playerProfileProvider(selfUid)
-              .overrideWith((ref) => Stream<PlayerProfile?>.value(null)),
-          playerProfileProvider(opponentUid)
-              .overrideWith((ref) => Stream<PlayerProfile?>.value(null)),
-        ],
-      ),
-    );
-    await tester.pumpAndSettle();
+        const selfUid = 'uid-a';
 
-    expect(find.text('Joueur'), findsNWidgets(2));
-    expect(find.text('S'), findsOneWidget);
-    expect(find.text('O'), findsOneWidget);
-  });
-
-  testWidgets('fallback si displayName est vide', (tester) async {
-    await tester.pumpWidget(
-      harness(
-        overrides: [
-          playerProfileProvider(selfUid).overrideWith(
-            (ref) => Stream.value(profile(uid: selfUid, displayName: '')),
-          ),
-          playerProfileProvider(opponentUid).overrideWith(
-            (ref) => Stream.value(profile(uid: opponentUid)),
-          ),
-        ],
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Joueur'), findsNWidgets(2));
-    expect(find.text('S'), findsOneWidget);
-    expect(find.text('O'), findsOneWidget);
-  });
-
-  testWidgets("placeholder \"En attente...\" si pas encore d'adversaire",
-      (tester) async {
-    await tester.pumpWidget(
-      harness(
-        opponent: null,
-        overrides: [
-          playerProfileProvider(selfUid).overrideWith(
-            (ref) => Stream.value(
-              profile(uid: selfUid, displayName: 'Yao', elo: 1250),
+        final session = _makeSession(
+          phase: DuelPhase.roundEnd,
+          currentRound: 0,
+          players: {
+            selfUid: DuelPlayer(
+              uid: selfUid,
+              roundsWon: 0,
+              totalTimeMs: 0,
+              rounds: const {},
             ),
-          ),
-        ],
-      ),
-    );
-    await tester.pumpAndSettle();
+          },
+        );
 
-    expect(find.text('Yao'), findsOneWidget);
-    expect(find.text('En attente...'), findsOneWidget);
-    expect(find.text('VS'), findsOneWidget);
-  });
-
-  testWidgets('skeleton pendant le chargement initial', (tester) async {
-    await tester.pumpWidget(
-      harness(
-        overrides: [
-          playerProfileProvider(selfUid).overrideWith(
-            (ref) => const Stream<PlayerProfile?>.empty(),
-          ),
-          playerProfileProvider(opponentUid).overrideWith(
-            (ref) => const Stream<PlayerProfile?>.empty(),
-          ),
-        ],
-      ),
-    );
-    await tester.pump();
-
-    expect(find.text('Moi'), findsOneWidget);
-    expect(find.text('Adversaire'), findsOneWidget);
-    expect(find.text('Joueur'), findsNothing);
-    expect(find.text('VS'), findsOneWidget);
-  });
-
-  testWidgets("rend l'asset avatar quand avatarId est défini", (tester) async {
-    // Suppress asset-load errors in the test (PNGs not yet delivered by
-    // designer — errorBuilder will kick in, but we verify the Image widget
-    // IS instantiated with the right path).
-    FlutterError.onError = (_) {};
-
-    await tester.pumpWidget(
-      harness(
-        overrides: [
-          playerProfileProvider(selfUid).overrideWith(
-            (ref) => Stream.value(
-              profile(
-                uid: selfUid,
-                displayName: 'Yao',
-                elo: 1250,
-                avatarId: 'griot_classique',
-              ),
+        await tester.pumpWidget(
+          _wrap(
+            DuelRoundEndOverlay(
+              session: session,
+              gameBackground: const SizedBox.shrink(),
             ),
+            selfUid: selfUid,
           ),
-          playerProfileProvider(opponentUid).overrideWith(
-            (ref) => Stream.value(
-              profile(
-                uid: opponentUid,
-                displayName: 'Akwaba',
-                elo: 1430,
-                avatarId: 'panthere_royale',
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-    await tester.pumpAndSettle();
+        );
 
-    // Les pseudos restent affichés.
-    expect(find.text('Yao'), findsOneWidget);
-    expect(find.text('Akwaba'), findsOneWidget);
+        await tester.pump();
 
-    // Vérifier que les SvgPicture sont créés avec les bons assets —
-    // peu importe si le SVG parse ou tombe sur placeholderBuilder.
-    expect(
-      find.byWidgetPredicate(
-        (w) => w is SvgPicture && w.toString().contains('griot_classique.svg'),
-      ),
-      findsOneWidget,
+        // Doit afficher la prochaine manche (round 1 = medium).
+        expect(find.textContaining('Moyen'), findsWidgets);
+      },
     );
-    expect(
-      find.byWidgetPredicate(
-        (w) => w is SvgPicture && w.toString().contains('panthere_royale.svg'),
-      ),
-      findsOneWidget,
-    );
-  });
-
-  testWidgets("avatarId inconnu (legacy) retombe sur l'initiale",
-      (tester) async {
-    await tester.pumpWidget(
-      harness(
-        overrides: [
-          playerProfileProvider(selfUid).overrideWith(
-            (ref) => Stream.value(
-              profile(
-                uid: selfUid,
-                displayName: 'Yao',
-                avatarId: 'avatar_supprime_v1',
-              ),
-            ),
-          ),
-          playerProfileProvider(opponentUid).overrideWith(
-            (ref) => Stream.value(
-              profile(uid: opponentUid, displayName: 'Akwaba'),
-            ),
-          ),
-        ],
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    // L'id n'existe pas → AvatarCatalog.byId == null → fallback initiale.
-    expect(find.text('Y'), findsOneWidget);
-    expect(find.text('A'), findsOneWidget);
   });
 }

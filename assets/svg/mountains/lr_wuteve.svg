@@ -1,0 +1,14 @@
+<!-- Mont Wuteve — Libéria, 1380m, crest. Crête forestière du massif du Nimba, multiples pics. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="0,180 10,150 25,130 45,108 55,135 75,100 90,118 105,85 125,110 140,95 155,125 175,108 190,140 200,180" fill="#1A2E05"/>
+  <polygon points="25,130 45,108 55,135 35,150" fill="#365314"/>
+  <polygon points="55,135 75,100 90,118 75,140" fill="#3F6212"/>
+  <polygon points="90,118 105,85 125,110 115,135" fill="#4D7C0F"/>
+  <polygon points="125,110 140,95 155,125 140,135" fill="#65A30D"/>
+  <polygon points="155,125 175,108 190,140 170,145" fill="#4D7C0F"/>
+  <polygon points="0,180 35,150 50,170 75,160 90,180" fill="#052e16"/>
+  <polygon points="115,180 130,160 150,170 175,160 200,180" fill="#052e16"/>
+  <polygon points="105,85 110,90 100,92" fill="#84CC16"/>
+  <polygon points="75,100 80,108 70,107" fill="#65A30D"/>
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#1C0701"/>
+</svg>

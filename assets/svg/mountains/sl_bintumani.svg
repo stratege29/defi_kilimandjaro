@@ -1,0 +1,15 @@
+<!-- Bintumani — Sierra Leone, 1948m, dome. Loma Mountains, dôme forestier ouest-africain avec affleurement granitique. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="20,180 35,135 70,100 110,85 150,98 175,130 185,180" fill="#365314"/>
+  <polygon points="20,180 35,135 70,100 85,135 70,180" fill="#1A2E05"/>
+  <polygon points="70,100 110,85 100,128 85,135" fill="#3F6212"/>
+  <polygon points="110,85 150,98 135,130 100,128" fill="#4D7C0F"/>
+  <polygon points="150,98 175,130 185,180 145,180" fill="#65A30D"/>
+  <polygon points="85,135 100,128 135,130 130,180 70,180" fill="#3F6212"/>
+  <polygon points="100,128 135,130 130,180 100,160" fill="#4D7C0F"/>
+  <polygon points="110,85 122,92 115,98" fill="#A1A1AA"/>
+  <polygon points="122,92 140,93 130,100" fill="#71717A"/>
+  <polygon points="55,170 70,158 80,168" fill="#1A2E05"/>
+  <polygon points="135,170 150,158 165,168" fill="#365314"/>
+  <polygon points="0,200 0,182 60,186 130,184 200,186 200,200" fill="#052e16"/>
+</svg>

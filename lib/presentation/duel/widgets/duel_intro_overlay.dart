@@ -1,134 +1,270 @@
+import 'dart:async';
+
+import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
-import 'package:defi_kilimandjaro/domain/avatars/avatar.dart';
 import 'package:defi_kilimandjaro/domain/avatars/avatar_catalog.dart';
+import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
+import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-/// Overlay d'introduction d'un duel — affiche les deux portraits avec
-/// pseudo réel et ELO (si ranked), branché sur [playerProfileProvider].
+/// Superposition animée affichée pendant la phase [DuelPhase.intro].
 ///
-/// Affichage :
-/// - Portrait gauche : "Moi" + pseudo + initiale + ELO (si ranked)
-/// - "VS" central
-/// - Portrait droit : "Adversaire" + pseudo + initiale + ELO (si ranked)
+/// Deux portraits se rapprochent du centre depuis les bords de l'écran
+/// (~1 s, [Curves.easeOutBack]), puis un flash blanc et le VS doré
+/// apparaissent en [ScaleTransition].
 ///
-/// Fallback (profil introuvable ou displayName vide) :
-/// - Pseudo = "Joueur"
-/// - Initiale = première lettre de l'UID
-class DuelIntroOverlay extends ConsumerWidget {
-  const DuelIntroOverlay({
-    required this.selfUid,
-    required this.opponentUid,
-    required this.isRanked,
-    super.key,
-  });
+/// Durée totale : ~2,5 s.
+/// La transition vers [DuelPhase.countdown] est déclenchée côté serveur par
+/// la Cloud Function `advanceRound` — ce widget n'a pas à la piloter.
+class DuelIntroOverlay extends ConsumerStatefulWidget {
+  const DuelIntroOverlay({required this.session, super.key});
 
-  /// UID du joueur courant.
-  final String selfUid;
-
-  /// UID de l'adversaire — null si non encore connecté.
-  final String? opponentUid;
-
-  /// True pour un duel ranked (matchmaking ELO) : affiche le score ELO.
-  final bool isRanked;
+  final DuelSession session;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ColoredBox(
-      color: Colors.black.withValues(alpha: 0.75),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: _DuelPortrait(
-                  uid: selfUid,
-                  label: 'Moi',
-                  isSelf: true,
-                  showElo: isRanked,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text(
-                  'VS',
-                  style: AppTypography.bebas(
-                    size: 32,
-                    color: AppColors.orSoleil,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: opponentUid == null
-                    ? const _WaitingPortrait()
-                    : _DuelPortrait(
-                        uid: opponentUid!,
-                        label: 'Adversaire',
-                        isSelf: false,
-                        showElo: isRanked,
-                      ),
-              ),
-            ],
+  ConsumerState<DuelIntroOverlay> createState() => _DuelIntroOverlayState();
+}
+
+class _DuelIntroOverlayState extends ConsumerState<DuelIntroOverlay>
+    with TickerProviderStateMixin {
+  late final AnimationController _slideCtrl;
+  late final AnimationController _vsCtrl;
+  late final AnimationController _flashCtrl;
+
+  late final Animation<double> _selfSlide;
+  late final Animation<double> _opponentSlide;
+  late final Animation<double> _vsScale;
+  late final Animation<double> _vsOpacity;
+  late final Animation<double> _flashOpacity;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _slideCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _vsCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+
+    _flashCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 280),
+    );
+
+    // Portraits glissent de ±1 (hors écran) vers 0 (centre de leur côté).
+    _selfSlide = Tween<double>(begin: -1, end: 0).animate(
+      CurvedAnimation(parent: _slideCtrl, curve: Curves.easeOutBack),
+    );
+    _opponentSlide = Tween<double>(begin: 1, end: 0).animate(
+      CurvedAnimation(parent: _slideCtrl, curve: Curves.easeOutBack),
+    );
+
+    _vsScale = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _vsCtrl, curve: Curves.easeOutBack),
+    );
+    _vsOpacity = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _vsCtrl,
+        curve: const Interval(0, 0.5, curve: Curves.easeIn),
+      ),
+    );
+
+    _flashOpacity = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0, end: 0.85),
+        weight: 40,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.85, end: 0),
+        weight: 60,
+      ),
+    ]).animate(_flashCtrl);
+
+    _playSequence();
+  }
+
+  Future<void> _playSequence() async {
+    // 1. Slides portraits.
+    await _slideCtrl.forward();
+
+    // 2. Flash + VS simultanément.
+    unawaited(_flashCtrl.forward());
+    unawaited(_vsCtrl.forward());
+
+    // 3. Son duel start.
+    unawaited(
+      ref.read(audioControllerProvider.notifier).playDuelStart(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _slideCtrl.dispose();
+    _vsCtrl.dispose();
+    _flashCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selfUid =
+        ref.watch(firebaseAuthProvider).currentUser?.uid ?? '';
+    final self = widget.session.players[selfUid];
+    final opponent = widget.session.opponentOf(selfUid);
+
+    final screenWidth = MediaQuery.sizeOf(context).width;
+
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Fond dégradé savane sombre.
+          const _SavannahBackground(),
+
+          // Flash blanc au croisement des portraits.
+          AnimatedBuilder(
+            animation: _flashOpacity,
+            builder: (_, __) => Opacity(
+              opacity: _flashOpacity.value,
+              child: const ColoredBox(color: Colors.white),
+            ),
           ),
+
+          // Portraits + noms.
+          SafeArea(
+            child: AnimatedBuilder(
+              animation: _slideCtrl,
+              builder: (_, __) => Row(
+                children: [
+                  // Joueur local — glisse depuis la gauche.
+                  Expanded(
+                    child: Transform.translate(
+                      offset: Offset(_selfSlide.value * screenWidth / 2, 0),
+                      child: _PlayerPortrait(
+                        label: 'Moi',
+                        uid: selfUid,
+                        roundsWon: self?.roundsWon ?? 0,
+                        alignment: Alignment.centerRight,
+                        showElo: widget.session.isRanked,
+                      ),
+                    ),
+                  ),
+
+                  // Espace central pour le VS.
+                  const SizedBox(width: 72),
+
+                  // Adversaire — glisse depuis la droite.
+                  Expanded(
+                    child: Transform.translate(
+                      offset:
+                          Offset(_opponentSlide.value * screenWidth / 2, 0),
+                      child: _PlayerPortrait(
+                        label: 'Adversaire',
+                        uid: opponent?.uid ?? '',
+                        roundsWon: opponent?.roundsWon ?? 0,
+                        alignment: Alignment.centerLeft,
+                        showElo: widget.session.isRanked,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // VS doré centré.
+          Center(
+            child: AnimatedBuilder(
+              animation: _vsCtrl,
+              builder: (_, __) => FadeTransition(
+                opacity: _vsOpacity,
+                child: ScaleTransition(
+                  scale: _vsScale,
+                  child: const _VsBadge(),
+                ),
+              ),
+            ),
+          ),
+
+          // Indicateur de manche en haut.
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              bottom: false,
+              child: _RoundLabel(
+                currentRound: widget.session.currentRound,
+                totalRounds: widget.session.totalRounds,
+                difficulty:
+                    widget.session.currentRoundData?.difficulty ?? 'easy',
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sous-widgets privés
+// ---------------------------------------------------------------------------
+
+class _SavannahBackground extends StatelessWidget {
+  const _SavannahBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    return const DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.boisFonce,
+            AppColors.vertForet,
+            Colors.black,
+          ],
+          stops: [0, 0.45, 1],
         ),
       ),
     );
   }
 }
 
-class _DuelPortrait extends ConsumerWidget {
-  const _DuelPortrait({
-    required this.uid,
+/// Portrait d'un joueur — branché sur [playerProfileProvider] pour afficher :
+/// - Pseudo réel (fallback "Joueur" si profil null / displayName vide)
+/// - Avatar SVG si [PlayerProfile.avatarId] défini (fallback initiale du
+///   pseudo, sinon initiale UID)
+/// - Score ELO en mètres si [showElo] (i.e. duel ranked)
+///
+/// [label] reste affiché en petite étiquette ("Moi" / "Adversaire") au-dessus
+/// du pseudo pour identifier rapidement chaque côté.
+class _PlayerPortrait extends ConsumerWidget {
+  const _PlayerPortrait({
     required this.label,
-    required this.isSelf,
+    required this.uid,
+    required this.roundsWon,
+    required this.alignment,
     required this.showElo,
   });
 
-  final String uid;
   final String label;
-  final bool isSelf;
+  final String uid;
+  final int roundsWon;
+  final Alignment alignment;
   final bool showElo;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final color = isSelf ? AppColors.vertClair : AppColors.orSoleil;
-    final asyncProfile = ref.watch(playerProfileProvider(uid));
-
-    return asyncProfile.when(
-      loading: () => _PortraitSkeleton(label: label, color: color),
-      error: (_, __) => _PortraitContent(
-        label: label,
-        color: color,
-        pseudo: _fallbackPseudo,
-        initial: _fallbackInitial(uid),
-        avatar: null,
-        eloLabel: null,
-      ),
-      data: (profile) {
-        final pseudo = (profile?.displayName?.isNotEmpty ?? false)
-            ? profile!.displayName!
-            : _fallbackPseudo;
-        final initial = (profile?.displayName?.isNotEmpty ?? false)
-            ? _initialOf(profile!.displayName!)
-            : _fallbackInitial(uid);
-        final eloLabel = (showElo && profile != null) ? profile.altitudeLabel : null;
-        final avatar = AvatarCatalog.byId(profile?.avatarId);
-        return _PortraitContent(
-          label: label,
-          color: color,
-          pseudo: pseudo,
-          initial: initial,
-          avatar: avatar,
-          eloLabel: eloLabel,
-        );
-      },
-    );
-  }
 
   static const String _fallbackPseudo = 'Joueur';
 
@@ -140,169 +276,185 @@ class _DuelPortrait extends ConsumerWidget {
     if (trimmed.isEmpty) return '?';
     return trimmed.substring(0, 1).toUpperCase();
   }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Si pas d'uid (adversaire pas encore connecté), rendu placeholder.
+    final asyncProfile = uid.isEmpty
+        ? const AsyncValue<PlayerProfile?>.data(null)
+        : ref.watch(playerProfileProvider(uid));
+
+    final profile = asyncProfile.asData?.value;
+    final hasDisplayName = profile?.displayName?.isNotEmpty ?? false;
+    final pseudo = hasDisplayName ? profile!.displayName! : _fallbackPseudo;
+    final initial =
+        hasDisplayName ? _initialOf(profile!.displayName!) : _fallbackInitial(uid);
+    final avatar = AvatarCatalog.byId(profile?.avatarId);
+    final eloLabel = (showElo && profile != null) ? '${profile.elo} m' : null;
+
+    return Semantics(
+      label: '$label $pseudo, $roundsWon manche(s) gagnée(s)',
+      child: Align(
+        alignment: alignment,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Étiquette "Moi" / "Adversaire" en petit au-dessus.
+              Text(
+                label,
+                style: AppTypography.labelSm.copyWith(
+                  color: AppColors.orJour,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 6),
+              // Avatar circulaire (SVG ou initiale).
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.surfaceContainer,
+                  border: Border.all(
+                    color: AppColors.orJour,
+                    width: 3,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.orJour.withValues(alpha: 0.4),
+                      blurRadius: 16,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                clipBehavior: avatar != null ? Clip.antiAlias : Clip.none,
+                child: avatar != null
+                    ? SvgPicture.asset(
+                        avatar.assetPath,
+                        fit: BoxFit.cover,
+                        placeholderBuilder: (_) =>
+                            _InitialBadge(initial: initial),
+                      )
+                    : _InitialBadge(initial: initial),
+              ),
+              const SizedBox(height: 10),
+              // Pseudo.
+              Text(
+                pseudo,
+                style: AppTypography.headingMd,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              if (eloLabel != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  eloLabel,
+                  style: AppTypography.bebas(
+                    size: 12,
+                    color: AppColors.texteSecondaire,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _PortraitContent extends StatelessWidget {
-  const _PortraitContent({
-    required this.label,
-    required this.color,
-    required this.pseudo,
-    required this.initial,
-    required this.avatar,
-    required this.eloLabel,
-  });
+class _InitialBadge extends StatelessWidget {
+  const _InitialBadge({required this.initial});
 
-  final String label;
-  final Color color;
-  final String pseudo;
   final String initial;
-  final Avatar? avatar;
-  final String? eloLabel;
 
-  Widget _buildInitialBadge() {
-    return Container(
-      width: 80,
-      height: 80,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color.withValues(alpha: 0.15),
-        border: Border.all(color: color, width: 2),
-      ),
-      alignment: Alignment.center,
+  @override
+  Widget build(BuildContext context) {
+    return Center(
       child: Text(
         initial,
-        style: AppTypography.bebas(size: 38, color: color),
+        style: AppTypography.displaySm,
       ),
     );
   }
+}
 
-  Widget _buildAvatarBadge(Avatar a) {
-    return Container(
-      width: 80,
-      height: 80,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: color, width: 2),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: SvgPicture.asset(
-        a.assetPath,
-        fit: BoxFit.cover,
-        placeholderBuilder: (_) => _buildInitialBadge(),
-      ),
-    );
-  }
+class _VsBadge extends StatelessWidget {
+  const _VsBadge();
 
   @override
   Widget build(BuildContext context) {
-    final a = avatar;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: AppTypography.bebas(size: 14, color: color),
+    return Semantics(
+      label: 'VS',
+      child: Container(
+        width: 64,
+        height: 64,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.orJour,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.orJour.withValues(alpha: 0.7),
+              blurRadius: 24,
+              spreadRadius: 6,
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
-        if (a == null) _buildInitialBadge() else _buildAvatarBadge(a),
-        const SizedBox(height: 8),
-        Text(
-          pseudo,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-          style: AppTypography.crimson(size: 14),
-        ),
-        if (eloLabel != null) ...[
-          const SizedBox(height: 2),
-          Text(
-            eloLabel!,
+        child: Center(
+          child: Text(
+            'VS',
             style: AppTypography.bebas(
-              size: 12,
-              color: AppColors.texteSecondaire,
+              size: 24,
+              color: AppColors.vertForet,
+              letterSpacing: 2,
             ),
           ),
-        ],
-      ],
+        ),
+      ),
     );
   }
 }
 
-class _PortraitSkeleton extends StatelessWidget {
-  const _PortraitSkeleton({required this.label, required this.color});
+class _RoundLabel extends StatelessWidget {
+  const _RoundLabel({
+    required this.currentRound,
+    required this.totalRounds,
+    required this.difficulty,
+  });
 
-  final String label;
-  final Color color;
+  final int currentRound;
+  final int totalRounds;
+  final String difficulty;
 
-  @override
-  Widget build(BuildContext context) {
-    final dim = color.withValues(alpha: 0.25);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: AppTypography.bebas(size: 14, color: color),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: dim,
-            border: Border.all(color: dim, width: 2),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: 70,
-          height: 12,
-          decoration: BoxDecoration(
-            color: dim,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-      ],
-    );
+  String get _difficultyLabel {
+    return switch (difficulty) {
+      'easy' => 'Facile',
+      'medium' => 'Moyen',
+      'hard' => 'Difficile',
+      _ => difficulty,
+    };
   }
-}
-
-class _WaitingPortrait extends StatelessWidget {
-  const _WaitingPortrait();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'En attente...',
-          style: AppTypography.bebas(
-            size: 14,
-            color: AppColors.texteSecondaire,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          width: 80,
-          height: 80,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.silhouetteVerrouillee.withValues(alpha: 0.3),
-            border: Border.all(
-              color: AppColors.silhouetteVerrouillee,
-              width: 2,
-            ),
+            color: Colors.black.withValues(alpha: 0.45),
+            borderRadius: BorderRadius.circular(20),
           ),
-          alignment: Alignment.center,
-          child: const Icon(
-            Icons.person_outline,
-            color: AppColors.texteTertiaire,
-            size: 36,
+          child: Text(
+            'Manche ${currentRound + 1} / $totalRounds — $_difficultyLabel',
+            style: AppTypography.labelSm,
           ),
         ),
-      ],
+      ),
     );
   }
 }

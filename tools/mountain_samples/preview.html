@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>Kilimandjaro — Échantillons montagnes</title>
+<style>
+  :root {
+    --bg: #0f0f10;
+    --panel: #1a1a1c;
+    --text: #f5f5f4;
+    --muted: #a8a29e;
+    --accent: #fbbf24;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px 24px 80px;
+  }
+  h1 { margin: 0 0 6px; font-size: 22px; }
+  .sub { color: var(--muted); margin-bottom: 32px; font-size: 14px; max-width: 900px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 110px repeat(3, 1fr);
+    gap: 14px;
+    max-width: 1200px;
+  }
+  .head {
+    font-weight: 600;
+    text-align: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #333;
+  }
+  .head small {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .row-label {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: right;
+    padding-right: 10px;
+    align-self: center;
+  }
+  .row-label b { color: var(--text); display: block; font-size: 15px; margin-bottom: 2px;}
+  .tile {
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .tile svg {
+    width: 100%;
+    height: auto;
+    max-width: 260px;
+    border-radius: 10px;
+    display: block;
+    aspect-ratio: 1 / 1;
+  }
+  .tile .badge {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: ui-monospace, monospace;
+  }
+
+  /* Mini-grid: how it looks at 80px (the actual "sommets" tile size) */
+  .mini-section {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid #333;
+  }
+  .mini-section h2 { margin: 0 0 6px; font-size: 16px; }
+  .mini-section .sub { margin-bottom: 18px; }
+  .mini-grid {
+    display: grid;
+    grid-template-columns: 110px repeat(9, 80px);
+    gap: 12px;
+    align-items: center;
+  }
+  .mini-grid .mini-tile {
+    width: 80px;
+    height: 80px;
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 4px;
+  }
+  .mini-grid svg { width: 100%; height: 100%; border-radius: 6px; display: block; }
+
+  .legend {
+    margin-top: 56px;
+    padding: 20px;
+    background: var(--panel);
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: 1200px;
+  }
+  .legend b { color: var(--text); }
+  .legend code {
+    background: #0c0c0d;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+  <h1>Kilimandjaro — Échantillons des 3 styles</h1>
+  <div class="sub">Compare sur 3 stages de progression : 1 (colline), 25 (massif intermédiaire), 51 (Kilimandjaro signature). En bas, vue "vignettes 80×80" qui simule l'écran "Sommets".</div>
+
+  <div class="grid">
+    <div></div>
+    <div class="head">Style A — Low-poly<small>Facettes géométriques</small></div>
+    <div class="head">Style B — Papier découpé<small>Silhouettes plates</small></div>
+    <div class="head">Style C — Gravure<small>Linogravure + adinkra</small></div>
+
+    <div class="row-label"><b>Stage 1</b>colline</div>
+    <div class="tile">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <defs><linearGradient id="skyA01" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FEF3C7"/><stop offset="100%" stop-color="#FBBF24"/></linearGradient></defs>
+        <rect width="200" height="200" fill="url(#skyA01)"/>
+        <circle cx="158" cy="58" r="22" fill="#F97316" opacity="0.85"/>
+        <polygon points="0,170 50,140 110,165 110,200 0,200" fill="#A16207"/>
+        <polygon points="50,140 80,152 110,165" fill="#854D0E"/>
+        <polygon points="35,200 110,90 110,200" fill="#78350F"/>
+        <polygon points="110,90 200,200 110,200" fill="#A16207"/>
+        <polygon points="110,90 75,150 35,200" fill="#92400E"/>
+        <polygon points="110,90 150,150 200,200" fill="#B45309"/>
+        <polygon points="110,90 95,130 130,130" fill="#854D0E"/>
+        <polygon points="0,200 0,185 30,195 60,200" fill="#451A03"/>
+      </svg>
+      <span class="badge">A_lowpoly_01</span>
+    </div>
+    <div class="tile">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <rect width="200" height="200" fill="#FDE68A"/>
+        <circle cx="150" cy="65" r="26" fill="#FB923C"/>
+        <path d="M 0,165 Q 50,135 100,150 T 200,140 L 200,200 L 0,200 Z" fill="#D97706"/>
+        <path d="M 0,200 L 0,175 Q 60,145 130,170 T 200,160 L 200,200 Z" fill="#B45309"/>
+        <path d="M 20,200 Q 110,75 195,200 Z" fill="#92400E"/>
+        <path d="M 0,200 L 0,190 Q 70,170 140,185 T 200,180 L 200,200 Z" fill="#451A03"/>
+      </svg>
+      <span class="badge">B_papercut_01</span>
+    </div>
+    <div class="tile">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <rect width="200" height="200" fill="#FEF3C7"/>
+        <circle cx="150" cy="60" r="20" fill="none" stroke="#7C2D12" stroke-width="1.5"/>
+        <circle cx="150" cy="60" r="14" fill="none" stroke="#7C2D12" stroke-width="0.8"/>
+        <circle cx="150" cy="60" r="8" fill="#C2410C"/>
+        <g stroke="#7C2D12" stroke-width="1.2" stroke-linecap="round">
+          <line x1="150" y1="28" x2="150" y2="36"/><line x1="150" y1="84" x2="150" y2="92"/>
+          <line x1="118" y1="60" x2="126" y2="60"/><line x1="174" y1="60" x2="182" y2="60"/>
+          <line x1="128" y1="38" x2="133" y2="43"/><line x1="167" y1="77" x2="172" y2="82"/>
+          <line x1="172" y1="38" x2="167" y2="43"/><line x1="133" y1="77" x2="128" y2="82"/>
+        </g>
+        <path d="M 0,200 L 0,165 Q 50,120 110,135 Q 160,145 200,120 L 200,200 Z" fill="#7C2D12"/>
+        <g stroke="#FEF3C7" stroke-width="0.6" opacity="0.8">
+          <line x1="115" y1="145" x2="135" y2="135"/><line x1="125" y1="155" x2="155" y2="138"/>
+          <line x1="140" y1="165" x2="175" y2="142"/><line x1="155" y1="175" x2="190" y2="148"/>
+        </g>
+        <g fill="none" stroke="#FEF3C7" stroke-width="1.2">
+          <circle cx="55" cy="170" r="6"/>
+          <path d="M 55,164 L 55,176 M 49,170 L 61,170"/>
+        </g>
+        <g stroke="#3F1D03" stroke-width="0.8" stroke-linecap="round">
+          <line x1="5" y1="195" x2="15" y2="195"/><line x1="25" y1="197" x2="40" y2="197"/>
+          <line x1="60" y1="194" x2="75" y2="194"/><line x1="95" y1="196" x2="115" y2="196"/>
+          <line x1="135" y1="195" x2="155" y2="195"/><line x1="170" y1="197" x2="190" y2="197"/>
+        </g>
+        <path d="M 0,165 Q 50,120 110,135 Q 160,145 200,120" fill="none" stroke="#3F1D03" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+      <span class="badge">C_engraving_01</span>
+    </div>
+
+    <div class="row-label"><b>Stage 25</b>massif</div>
+    <div class="tile">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <defs><linearGradient id="skyA25" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FED7AA"/><stop offset="100%" stop-color="#F97316"/></linearGradient></defs>
+        <rect width="200" height="200" fill="url(#skyA25)"/>
+        <polygon points="0,180 35,130 75,180" fill="#7C2D12"/>
+        <polygon points="35,130 55,155 75,180" fill="#92400E"/>
+        <polygon points="135,200 175,95 200,200" fill="#451A03"/>
+        <polygon points="175,95 200,200 188,200" fill="#78350F"/>
+        <polygon points="175,95 165,115 185,115" fill="#FAFAF9"/>
+        <polygon points="40,200 115,55 195,200" fill="#3F1D03"/>
+        <polygon points="115,55 155,130 195,200" fill="#78350F"/>
+        <polygon points="115,55 80,130 40,200" fill="#5C2410"/>
+        <polygon points="115,55 115,140 70,200" fill="#451A03"/>
+        <polygon points="115,55 115,140 165,200" fill="#5C2410"/>
+        <polygon points="115,55 100,85 130,85" fill="#FAFAF9"/>
+        <polygon points="115,55 130,85 122,85" fill="#E7E5E4"/>
+        <polygon points="0,200 0,185 60,178 130,190 200,180 200,200" fill="#1C0701"/>
+      </svg>
+      <span class="badge">A_lowpoly_25</span>
+    </div>
+    <div class="tile">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <rect width="200" height="200" fill="#FED7AA"/>
+        <circle cx="115" cy="80" r="32" fill="#FBBF24"/>
+        <path d="M 0,200 L 0,160 L 30,135 L 55,155 L 85,130 L 110,150 L 140,125 L 175,150 L 200,140 L 200,200 Z" fill="#C2410C"/>
+        <path d="M 0,200 L 0,180 L 40,140 L 80,170 L 130,135 L 170,165 L 200,155 L 200,200 Z" fill="#9A3412"/>
+        <path d="M 25,200 L 115,55 L 200,200 Z" fill="#7C2D12"/>
+        <path d="M 115,55 L 100,82 L 110,78 L 120,86 L 130,82 Z" fill="#FAFAF9"/>
+        <path d="M 0,200 L 0,160 L 45,110 L 75,170 L 70,200 Z" fill="#5C2410"/>
+        <path d="M 45,110 L 38,128 L 52,128 Z" fill="#E7E5E4"/>
+        <path d="M 0,200 L 0,192 Q 50,182 100,190 T 200,188 L 200,200 Z" fill="#1C0701"/>
+      </svg>
+      <span class="badge">B_papercut_25</span>
+    </div>
+    <div class="tile">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <rect width="200" height="200" fill="#FEF3C7"/>
+        <circle cx="115" cy="75" r="22" fill="none" stroke="#7C2D12" stroke-width="1.2"/>
+        <circle cx="115" cy="75" r="14" fill="#FCD34D" opacity="0.6"/>
+        <path d="M 0,200 L 0,150 L 25,135 L 50,148 L 75,128 L 100,142 L 130,125 L 160,145 L 200,135 L 200,200 Z" fill="none" stroke="#7C2D12" stroke-width="1.2" stroke-linejoin="round"/>
+        <path d="M 0,200 L 0,175 L 30,160 L 60,170 L 90,155 L 130,168 L 170,158 L 200,170 L 200,200 Z" fill="#FCD34D"/>
+        <path d="M 0,200 L 0,175 L 30,160 L 60,170 L 90,155 L 130,168 L 170,158 L 200,170 L 200,200 Z" fill="none" stroke="#7C2D12" stroke-width="1.4" stroke-linejoin="round"/>
+        <g stroke="#7C2D12" stroke-width="0.5">
+          <line x1="10" y1="185" x2="20" y2="178"/><line x1="20" y1="190" x2="35" y2="178"/>
+          <line x1="40" y1="188" x2="55" y2="172"/><line x1="100" y1="185" x2="118" y2="170"/>
+          <line x1="115" y1="190" x2="135" y2="172"/><line x1="140" y1="188" x2="160" y2="170"/>
+          <line x1="170" y1="190" x2="190" y2="175"/>
+        </g>
+        <path d="M 25,200 L 115,55 L 200,200 Z" fill="#7C2D12"/>
+        <path d="M 115,55 L 100,85 L 110,80 L 120,88 L 130,82 Z" fill="#FEF3C7"/>
+        <path d="M 115,55 L 100,85 L 110,80 L 120,88 L 130,82 Z" fill="none" stroke="#3F1D03" stroke-width="0.8"/>
+        <g stroke="#FEF3C7" stroke-width="0.7" opacity="0.85">
+          <line x1="50" y1="190" x2="115" y2="80"/><line x1="60" y1="195" x2="115" y2="105"/>
+          <line x1="75" y1="195" x2="115" y2="130"/><line x1="90" y1="195" x2="115" y2="155"/>
+        </g>
+        <g fill="none" stroke="#FEF3C7" stroke-width="1.4">
+          <path d="M 160,170 L 160,150 M 152,162 L 168,162 M 156,156 L 164,168 M 156,168 L 164,156"/>
+        </g>
+        <path d="M 25,200 L 115,55 L 200,200" fill="none" stroke="#1C0701" stroke-width="2" stroke-linejoin="round"/>
+        <g stroke="#3F1D03" stroke-width="0.9" stroke-linecap="round">
+          <line x1="5" y1="195" x2="18" y2="195"/><line x1="30" y1="197" x2="50" y2="197"/>
+          <line x1="65" y1="195" x2="85" y2="195"/><line x1="100" y1="197" x2="125" y2="197"/>
+          <line x1="140" y1="195" x2="165" y2="195"/><line x1="175" y1="197" x2="195" y2="197"/>
+        </g>
+      </svg>
+      <span class="badge">C_engraving_25</span>
+    </div>
+
+    <div class="row-label"><b>Stage 51</b>Kilimandjaro</div>
+    <div class="tile">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <defs><linearGradient id="skyA51" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1E3A8A"/><stop offset="50%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#F97316"/></linearGradient></defs>
+        <rect width="200" height="200" fill="url(#skyA51)"/>
+        <circle cx="30" cy="25" r="1.2" fill="#FAFAF9"/><circle cx="55" cy="18" r="0.9" fill="#FAFAF9"/>
+        <circle cx="180" cy="30" r="1" fill="#FAFAF9"/><circle cx="160" cy="15" r="0.8" fill="#FAFAF9"/>
+        <polygon points="0,200 0,160 25,140 50,155 70,200" fill="#1E1B4B" opacity="0.9"/>
+        <polygon points="160,200 175,150 200,165 200,200" fill="#1E1B4B" opacity="0.9"/>
+        <polygon points="0,200 25,170 60,150 80,90 130,75 160,95 175,140 200,170 200,200" fill="#0C0A09"/>
+        <polygon points="130,75 160,95 175,140 200,170 200,200 140,200" fill="#27272A"/>
+        <polygon points="130,75 175,140 145,160" fill="#3F3F46"/>
+        <polygon points="0,200 25,170 60,150 80,90 130,75 95,200" fill="#18181B"/>
+        <polygon points="60,150 80,90 75,180" fill="#27272A"/>
+        <polygon points="80,90 130,75 105,130" fill="#3F3F46"/>
+        <polygon points="105,130 130,75 145,160" fill="#27272A"/>
+        <polygon points="80,90 130,75 160,95 145,108 110,100 85,105" fill="#FAFAF9"/>
+        <polygon points="85,105 110,100 95,115" fill="#E7E5E4"/>
+        <polygon points="110,100 145,108 130,118" fill="#D6D3D1"/>
+        <polygon points="95,115 105,130 115,118" fill="#FAFAF9"/>
+        <polygon points="130,118 145,108 142,130" fill="#FAFAF9"/>
+        <polygon points="0,200 0,192 50,196 110,193 165,196 200,193 200,200" fill="#000"/>
+      </svg>
+      <span class="badge">A_lowpoly_51</span>
+    </div>
+    <div class="tile">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <defs><linearGradient id="skyB51" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#312E81"/><stop offset="55%" stop-color="#DB2777"/><stop offset="100%" stop-color="#F59E0B"/></linearGradient></defs>
+        <rect width="200" height="200" fill="url(#skyB51)"/>
+        <circle cx="25" cy="22" r="1.2" fill="#FAFAF9"/><circle cx="45" cy="14" r="0.8" fill="#FAFAF9"/>
+        <circle cx="170" cy="20" r="1" fill="#FAFAF9"/>
+        <circle cx="100" cy="118" r="22" fill="#FCD34D" opacity="0.85"/>
+        <path d="M 0,200 L 0,150 L 25,138 L 55,148 L 80,135 L 115,145 L 145,132 L 175,148 L 200,140 L 200,200 Z" fill="#581C87" opacity="0.7"/>
+        <path d="M 0,200 L 0,170 L 35,155 L 70,165 L 105,150 L 145,160 L 180,150 L 200,165 L 200,200 Z" fill="#4C1D95" opacity="0.85"/>
+        <path d="M 0,200 L 0,180 L 30,170 L 60,150 L 78,105 L 95,92 L 135,90 L 155,105 L 170,135 L 195,170 L 200,180 L 200,200 Z" fill="#1C0701"/>
+        <path d="M 78,105 L 95,92 L 135,90 L 155,105 L 148,112 L 132,103 L 115,108 L 98,102 L 88,110 Z" fill="#FAFAF9"/>
+        <path d="M 88,110 L 92,135 L 96,118 Z" fill="#FAFAF9" opacity="0.7"/>
+        <path d="M 132,103 L 140,128 L 144,115 Z" fill="#FAFAF9" opacity="0.7"/>
+        <path d="M 115,108 L 118,140 L 122,118 Z" fill="#FAFAF9" opacity="0.55"/>
+        <path d="M 0,200 L 0,193 Q 60,184 120,191 T 200,189 L 200,200 Z" fill="#000"/>
+      </svg>
+      <span class="badge">B_papercut_51</span>
+    </div>
+    <div class="tile">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <rect width="200" height="200" fill="#FEF3C7"/>
+        <rect x="4" y="4" width="192" height="192" fill="none" stroke="#3F1D03" stroke-width="0.8"/>
+        <rect x="8" y="8" width="184" height="184" fill="none" stroke="#3F1D03" stroke-width="0.4"/>
+        <circle cx="100" cy="80" r="35" fill="none" stroke="#7C2D12" stroke-width="0.6"/>
+        <circle cx="100" cy="80" r="28" fill="none" stroke="#7C2D12" stroke-width="0.5"/>
+        <circle cx="100" cy="80" r="20" fill="#C2410C" opacity="0.45"/>
+        <g stroke="#7C2D12" stroke-width="0.4" opacity="0.7">
+          <line x1="100" y1="15" x2="100" y2="40"/><line x1="55" y1="80" x2="62" y2="80"/>
+          <line x1="138" y1="80" x2="145" y2="80"/><line x1="65" y1="45" x2="72" y2="52"/>
+          <line x1="128" y1="52" x2="135" y2="45"/><line x1="70" y1="35" x2="78" y2="48"/>
+          <line x1="122" y1="48" x2="130" y2="35"/>
+        </g>
+        <path d="M 0,200 L 0,145 L 28,130 L 50,145 L 78,125 L 108,140 L 138,120 L 168,138 L 200,128 L 200,200 Z" fill="none" stroke="#7C2D12" stroke-width="1" stroke-linejoin="round"/>
+        <path d="M 0,200 L 0,170 L 35,155 L 60,165 L 90,148 L 130,162 L 175,150 L 200,165 L 200,200 Z" fill="#C2410C"/>
+        <path d="M 0,200 L 0,170 L 35,155 L 60,165 L 90,148 L 130,162 L 175,150 L 200,165 L 200,200 Z" fill="none" stroke="#3F1D03" stroke-width="1.2" stroke-linejoin="round"/>
+        <path d="M 15,200 L 35,180 L 60,160 L 78,108 L 95,95 L 135,93 L 152,108 L 168,150 L 185,180 L 200,200 Z" fill="#7C2D12"/>
+        <path d="M 78,108 L 95,95 L 135,93 L 152,108 L 145,114 L 130,105 L 115,110 L 100,103 L 88,113 Z" fill="#FEF3C7"/>
+        <path d="M 78,108 L 95,95 L 135,93 L 152,108 L 145,114 L 130,105 L 115,110 L 100,103 L 88,113 Z" fill="none" stroke="#1C0701" stroke-width="0.8"/>
+        <g stroke="#FEF3C7" stroke-width="1.5" stroke-linecap="round">
+          <line x1="92" y1="115" x2="95" y2="138"/><line x1="115" y1="115" x2="118" y2="145"/>
+          <line x1="138" y1="113" x2="142" y2="140"/>
+        </g>
+        <g stroke="#FEF3C7" stroke-width="0.6" opacity="0.9">
+          <line x1="22" y1="195" x2="78" y2="115"/><line x1="35" y1="200" x2="78" y2="130"/>
+          <line x1="50" y1="200" x2="78" y2="155"/><line x1="65" y1="200" x2="78" y2="180"/>
+        </g>
+        <g fill="none" stroke="#FEF3C7" stroke-width="1.1">
+          <circle cx="172" cy="175" r="7"/><circle cx="172" cy="175" r="4"/>
+          <circle cx="172" cy="175" r="1.5" fill="#FEF3C7"/>
+        </g>
+        <g fill="none" stroke="#FEF3C7" stroke-width="1">
+          <path d="M 28,180 q 3,-6 8,-6 q 5,0 5,5 q 0,5 -5,5 M 36,179 l 4,3"/>
+        </g>
+        <path d="M 15,200 L 35,180 L 60,160 L 78,108 L 95,95 L 135,93 L 152,108 L 168,150 L 185,180 L 200,200" fill="none" stroke="#1C0701" stroke-width="2" stroke-linejoin="round"/>
+        <g stroke="#3F1D03" stroke-width="1" stroke-linecap="round">
+          <line x1="15" y1="195" x2="28" y2="195"/><line x1="40" y1="197" x2="65" y2="197"/>
+          <line x1="80" y1="195" x2="115" y2="195"/><line x1="130" y1="197" x2="155" y2="195"/>
+          <line x1="170" y1="195" x2="185" y2="195"/>
+        </g>
+      </svg>
+      <span class="badge">C_engraving_51</span>
+    </div>
+  </div>
+
+  <div class="legend">
+    <b>Comment lire :</b> chaque style est testé sur 3 niveaux de progression visuelle pour valider que la déclinaison "colline → Kilimandjaro" tient sur 51 stages.<br/>
+    <b>À évaluer :</b> lisibilité en vignette, cohérence culturelle, capacité à se décliner en 51 variations sans répétition perçue.<br/>
+    <b>Prochaine étape :</b> tu choisis 1 style → je code le générateur paramétrique <code>tools/generate_mountains.dart</code> qui produit les 51 SVG + compile en <code>.vec</code> via <code>vector_graphics_compiler</code>.
+  </div>
+</body>
+</html>

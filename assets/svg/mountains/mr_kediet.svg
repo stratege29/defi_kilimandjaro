@@ -1,0 +1,15 @@
+<!-- Kediet ej Jill — Mauritanie, 915m, mesa. Massif ferrugineux sombre près de Zouérat, plein Sahara. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="25,170 30,110 175,108 180,170" fill="#1E1B4B"/>
+  <polygon points="30,110 175,108 175,118 30,118" fill="#3F3F46"/>
+  <polygon points="28,125 178,125 178,130 28,130" fill="#7F1D1D"/>
+  <polygon points="27,140 178,140 178,143 27,143" fill="#1C1917"/>
+  <polygon points="27,150 178,150 178,153 27,153" fill="#7F1D1D"/>
+  <polygon points="175,108 180,170 180,115" fill="#27272A"/>
+  <polygon points="25,170 30,110 30,170" fill="#0C0A09"/>
+  <polygon points="25,170 180,170 195,180 5,180" fill="#7F1D1D"/>
+  <polygon points="0,200 0,180 60,185 130,182 200,184 200,200" fill="#FBBF24"/>
+  <polygon points="0,200 30,192 80,194 140,191 200,193 200,200" fill="#D97706"/>
+  <path d="M 50,195 q 10,-4 20,0" stroke="#92400E" stroke-width="1" fill="none"/>
+  <path d="M 130,196 q 12,-3 22,1" stroke="#92400E" stroke-width="1" fill="none"/>
+</svg>

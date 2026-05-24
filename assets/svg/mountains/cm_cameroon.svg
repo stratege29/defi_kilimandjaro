@@ -1,0 +1,55 @@
+<!-- Mont Cameroun — Cameroun, 4040m, cone. "Montagne de la Grandeur", stratovolcan actif isolé qui surgit de l'océan Atlantique, étages écologiques visibles (tropical → alpin). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+
+  <!-- Léger panache de vapeur sommital (volcan actif) -->
+  <ellipse cx="100" cy="48" rx="10" ry="3" fill="#A1A1AA" opacity="0.6"/>
+  <ellipse cx="108" cy="40" rx="14" ry="3" fill="#A1A1AA" opacity="0.45"/>
+
+  <!-- Océan Atlantique -->
+  <rect y="158" width="200" height="20" fill="#0EA5E9"/>
+  <polygon points="0,158 200,158 200,161 0,161" fill="#38BDF8"/>
+
+  <!-- Stratovolcan massif (Mont Cameroun se dresse abruptement de l'océan) -->
+  <polygon points="0,180 15,140 35,110 60,85 85,68 100,55 115,68 140,85 165,110 185,140 200,180" fill="#1C1917"/>
+
+  <!-- Face droite (lit) -->
+  <polygon points="100,55 115,68 140,85 165,110 185,140 200,180 130,180" fill="#292524"/>
+  <polygon points="115,68 140,85 165,110 145,130" fill="#44403C"/>
+
+  <!-- Face gauche (ombre) -->
+  <polygon points="0,180 15,140 35,110 60,85 85,68 100,55 100,180 70,180" fill="#0C0A09"/>
+  <polygon points="35,110 60,85 85,68 70,130" fill="#1C1917"/>
+
+  <!-- Arête sommitale -->
+  <polygon points="100,55 105,62 95,62" fill="#71717A"/>
+
+  <!-- Touche de neige/glace occasionnelle au sommet (>4000m, possible en saison fraîche) -->
+  <polygon points="95,62 100,55 105,62 102,68 98,68" fill="#FAFAF9"/>
+  <polygon points="100,55 105,62 102,68" fill="#E7E5E4"/>
+
+  <!-- Étages écologiques : alpin (gris/violet) -->
+  <polygon points="60,85 85,68 100,55 95,100 75,108" fill="#3F3F46"/>
+  <polygon points="115,68 140,85 130,108 110,100 100,55" fill="#3F3F46"/>
+
+  <!-- Étage subalpin / montagnard (brun verdâtre) -->
+  <polygon points="35,110 60,85 75,108 50,135" fill="#365314"/>
+  <polygon points="140,85 165,110 155,135 130,108" fill="#365314"/>
+
+  <!-- Étage tropical (vert vif à la base) -->
+  <polygon points="0,180 15,140 35,110 50,135 30,170 10,180" fill="#1A2E05"/>
+  <polygon points="165,110 185,140 200,180 175,175 155,135" fill="#1A2E05"/>
+  <polygon points="50,135 75,108 95,100 100,180 70,180" fill="#3F6212"/>
+  <polygon points="100,180 110,100 130,108 155,135 130,180" fill="#3F6212"/>
+
+  <!-- Coulée de lave ancienne visible (signature Mt Cameroun éruptions récentes) -->
+
+  <!-- Plage tropicale -->
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#14532D"/>
+  <polygon points="0,200 0,193 60,196 130,194 200,195 200,200" fill="#FDE68A"/>
+
+  <!-- Cocotier -->
+  <line x1="25" y1="195" x2="25" y2="180" stroke="#052e16" stroke-width="1.5"/>
+  <path d="M 25,180 q -8,-2 -10,2 M 25,180 q 8,-2 10,2 M 25,180 q -4,-5 -2,-9 M 25,180 q 4,-5 2,-9" fill="none" stroke="#052e16" stroke-width="1.2"/>
+  <line x1="180" y1="195" x2="180" y2="180" stroke="#052e16" stroke-width="1.4"/>
+  <path d="M 180,180 q -7,-2 -9,2 M 180,180 q 7,-2 9,2 M 180,180 q -3,-4 -1,-7 M 180,180 q 3,-4 1,-7" fill="none" stroke="#052e16" stroke-width="1"/>
+</svg>

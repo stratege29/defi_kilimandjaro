@@ -130,6 +130,10 @@ class AudioController extends StateNotifier<AudioState> {
   /// Victoire — fanfare griot (balafon + kora + tam-tam).
   Future<void> playVictory() => _engine.play(AudioCue.victory);
 
+  /// Victoire BOSS — fanfare enrichie (intro djembé grave + griot
+  /// élargi + queue tam-tam, ~2.8 s).
+  Future<void> playBossVictory() => _engine.play(AudioCue.bossVictory);
+
   /// Échec — balafon descendant + tam-tam lent.
   Future<void> playFailure() => _engine.play(AudioCue.failure);
 

@@ -224,6 +224,27 @@
     "share_text": "J'ai gravi {delta}m d'altitude sur Kilimandjaro Sagesse Ivoirienne !\nDéfie-moi : {link}",
     "share_text_no_delta": "Affronte-moi sur Kilimandjaro Sagesse Ivoirienne !\nDéfi : {link}",
     "share_error": "Impossible de partager le défi.",
+    "round": {
+      "label": "Manche {current} / {total}",
+      "difficulty_easy": "Facile",
+      "difficulty_medium": "Moyen",
+      "difficulty_hard": "Difficile",
+      "intro_vs": "VS",
+      "intro_me": "Moi",
+      "intro_opponent": "Adversaire",
+      "countdown_lock_label": "Grille verrouillée — attend le GO",
+      "countdown_label": "Compte à rebours : {n}",
+      "go": "GO !",
+      "round_won": "Manche gagnée !",
+      "round_lost": "Manche perdue",
+      "round_draw": "Manche nulle",
+      "next_round": "Prochaine manche : {difficulty} ({letters} lettres)",
+      "final_round": "Derniere manche — le classement final arrive",
+      "nobody_found": "Personne n'a trouve le mot",
+      "score_label": "Score : Toi {self} - Adversaire {opponent}",
+      "rounds_detail": "DÉTAIL DES MANCHES",
+      "final_score_label": "Score final : Toi {self} - Adversaire {opponent}"
+    },
     "result_ranked": {
       "altitude_gained": "+{delta} m d'altitude conquis",
       "altitude_lost": "{delta} m d'altitude",
@@ -326,6 +347,12 @@
     "owned_section": "Packs possédés",
     "available_section": "Packs disponibles",
     "coming_soon": "Bientôt disponible",
-    "coming_soon_sub": "Achat avec cauris ou IAP — Phase 4"
+    "coming_soon_sub": "Achat avec cauris ou IAP — Phase 4",
+    "sync_button": "Vérifier les mises à jour",
+    "syncing": "Téléchargement de {pack}…",
+    "sync_success": "{updated} pack(s) mis à jour",
+    "sync_up_to_date": "Tout est à jour",
+    "sync_error": "Échec de la synchronisation",
+    "sync_aborted_memory": "Sync interrompue (mémoire faible) — réessayer plus tard"
   }
 }

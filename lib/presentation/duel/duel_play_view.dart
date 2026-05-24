@@ -1,13 +1,16 @@
 import 'dart:async';
 
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_controller.dart';
+import 'package:defi_kilimandjaro/presentation/duel/widgets/duel_countdown_overlay.dart';
 import 'package:defi_kilimandjaro/presentation/duel/widgets/duel_intro_overlay.dart';
+import 'package:defi_kilimandjaro/presentation/duel/widgets/duel_round_end_overlay.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/answer_cells.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/circular_grid.dart';
@@ -16,13 +19,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Écran de duel temps réel.
+/// Écran de duel temps réel — Phase 3 (3 manches).
 ///
-/// Reçoit la [DuelSession] initiale via `state.extra`, puis suit les
-/// updates via `duelSessionStreamProvider`.
+/// Orchestre les phases via un [Stack] :
 ///
-/// Si la session est ranked, joue le son de démarrage de duel une seule
-/// fois au montage (cf. spec PR #2 § Audio wiring).
+/// - [DuelPhase.waiting]   → en attente (existant)
+/// - [DuelPhase.intro]     → [DuelIntroOverlay] par-dessus
+/// - [DuelPhase.countdown] → [DuelCountdownOverlay] (grille floue + cadenas)
+/// - [DuelPhase.active]    → gameplay normal
+/// - [DuelPhase.roundEnd]  → [DuelRoundEndOverlay] par-dessus
+/// - [DuelPhase.finished]  → navigation vers DuelResultView
 class DuelPlayView extends ConsumerStatefulWidget {
   const DuelPlayView({required this.initialSession, super.key});
 
@@ -33,30 +39,48 @@ class DuelPlayView extends ConsumerStatefulWidget {
 }
 
 class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
-  static const Duration _introDuration = Duration(milliseconds: 2500);
+  /// Timer qui declenche advancePhase apres l'animation locale (3s) sur
+  /// roundEnd et countdown. Re-armé à chaque changement de phase.
+  Timer? _phaseAdvanceTimer;
 
-  bool _showIntro = true;
-  Timer? _introTimer;
+  /// Phase observée au dernier tick pour détecter les transitions.
+  DuelPhase? _lastObservedPhase;
 
   @override
   void initState() {
     super.initState();
-    // Wire audio : gong de démarrage uniquement pour les duels ranked.
+    // Son de démarrage pour les duels ranked.
     if (widget.initialSession.isRanked) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(audioControllerProvider.notifier).playDuelStart().ignore();
       });
     }
-    _introTimer = Timer(_introDuration, () {
-      if (!mounted) return;
-      setState(() => _showIntro = false);
-    });
   }
 
   @override
   void dispose() {
-    _introTimer?.cancel();
+    _phaseAdvanceTimer?.cancel();
     super.dispose();
+  }
+
+  /// Programme un appel a `advancePhase` 3.2s apres l'entree en `roundEnd`
+  /// ou `countdown` (3s d'animation + 0.2s tolerance latence reseau).
+  ///
+  /// Les 2 clients vont appeler en parallele. Grace a l'idempotence cote
+  /// serveur (MIN_ELAPSED_MS + check phase courante), un seul gagne et
+  /// l'autre voit la phase deja avancee.
+  void _scheduleAdvancePhase(String matchId, DuelPhase newPhase) {
+    _phaseAdvanceTimer?.cancel();
+    if (newPhase != DuelPhase.roundEnd && newPhase != DuelPhase.countdown) {
+      return;
+    }
+    _phaseAdvanceTimer = Timer(const Duration(milliseconds: 3200), () {
+      if (!mounted) return;
+      // Best-effort : on ignore l'erreur, le serveur est idempotent.
+      ref.read(duelRepositoryProvider).advancePhase(matchId).catchError((
+        Object _,
+      ) {});
+    });
   }
 
   @override
@@ -70,20 +94,27 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
             .value ??
         widget.initialSession;
 
-    // IMPORTANT: keyed on initialSession (stable widget field) — using the
-    // live session as key would recreate the controller on every RTDB
-    // update and wipe the local selection.
-    final localState = ref.watch(duelControllerProvider(widget.initialSession));
+    // Controller local — stable sur toute la session (keyed sur initialSession).
+    final localState =
+        ref.watch(duelControllerProvider(widget.initialSession));
     final controller = ref.read(
       duelControllerProvider(widget.initialSession).notifier,
     );
 
-    // Naviguer vers le résultat dès que la phase est finished.
+    // Propager la session mise à jour au controller (gestion du round switch).
     ref.listen<AsyncValue<DuelSession?>>(
       duelSessionStreamProvider(widget.initialSession.matchId),
-      (prev, next) {
+      (_, next) {
         final s = next.value;
         if (s == null) return;
+        controller.onSessionUpdated(s);
+        // Détection de transition de phase : si on entre dans roundEnd ou
+        // countdown, on schedule l'appel à advancePhase après 3s d'animation.
+        if (s.phase != _lastObservedPhase) {
+          _lastObservedPhase = s.phase;
+          _scheduleAdvancePhase(s.matchId, s.phase);
+        }
+        // Navigation automatique vers résultat.
         if (s.phase == DuelPhase.finished) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!context.mounted) return;
@@ -99,88 +130,184 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
     final selfPlayer = liveSession.players[selfUid];
     final opponent = liveSession.opponentOf(selfUid);
 
+    // --- Contenu gameplay de base ---
+    final gameplayContent = _GameplayContent(
+      session: liveSession,
+      localState: localState,
+      controller: controller,
+      selfPlayer: selfPlayer,
+      opponent: opponent,
+      formedLetters: formedLetters,
+      onForfeit: () async {
+        await ref
+            .read(duelRepositoryProvider)
+            .forfeit(liveSession.matchId);
+        if (!context.mounted) return;
+        context.pop();
+      },
+    );
+
     return Scaffold(
       backgroundColor: AppColors.vertForet,
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          SafeArea(
-            child: Column(
-              children: [
-                _DuelHeader(
-                  selfProgress: selfPlayer?.progress ?? 0,
-                  opponentProgress: opponent?.progress ?? 0,
-                  opponentLabel:
-                      opponent != null ? 'Adversaire' : 'En attente...',
-                ),
-                const SizedBox(height: 12),
-                _RiddleCard(riddle: liveSession.riddle),
-                const SizedBox(height: 10),
-                TimerBar(timeLeft: localState.timeLeft, totalTime: 30),
-                const SizedBox(height: 14),
-                AnswerCells(
-                  answer: liveSession.answer,
-                  formedLetters: formedLetters,
-                  isValidated: localState.submitted,
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: Center(
-                    child: CircularGrid(
-                      letters: liveSession.lettersPool,
-                      selectedIndices: localState.selectedIndices,
-                      hintTileIndices: const <int>[],
-                      phase: localState.submitted
-                          ? GamePhase.won
-                          : (localState.timeLeft == 0
-                                ? GamePhase.lost
-                                : GamePhase.playing),
-                      seed: liveSession.answer,
-                      onTileEntered: controller.selectTile,
-                      onDragEnd: () {},
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _BottomControls(
-                  onClear: controller.clearSelection,
-                  onForfeit: () async {
-                    await ref
-                        .read(duelRepositoryProvider)
-                        .forfeit(liveSession.matchId);
-                    if (!context.mounted) return;
-                    context.pop();
-                  },
-                ),
-                const SizedBox(height: 12),
-              ],
+          // Couche de base : gameplay normal.
+          gameplayContent,
+
+          // Phase overlay : AnimatedSwitcher pour transition fluide.
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            switchInCurve: Curves.easeIn,
+            switchOutCurve: Curves.easeOut,
+            child: _buildOverlay(
+              phase: liveSession.phase,
+              session: liveSession,
+              gameContent: gameplayContent,
             ),
           ),
-          if (_showIntro)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: DuelIntroOverlay(
-                  selfUid: selfUid,
-                  opponentUid: opponent?.uid,
-                  isRanked: liveSession.isRanked,
-                ),
-              ),
-            ),
         ],
       ),
     );
   }
-} // _DuelPlayViewState
+
+  Widget _buildOverlay({
+    required DuelPhase phase,
+    required DuelSession session,
+    required Widget gameContent,
+  }) {
+    switch (phase) {
+      case DuelPhase.intro:
+        return DuelIntroOverlay(
+          key: const ValueKey('intro'),
+          session: session,
+        );
+
+      case DuelPhase.countdown:
+        return DuelCountdownOverlay(
+          key: const ValueKey('countdown'),
+          session: session,
+          gameContent: gameContent,
+          riddleContent: _RiddleCard(riddle: session.riddle),
+        );
+
+      case DuelPhase.roundEnd:
+        return DuelRoundEndOverlay(
+          key: const ValueKey('roundEnd'),
+          session: session,
+          gameBackground: gameContent,
+        );
+
+      case DuelPhase.waiting:
+      case DuelPhase.active:
+      case DuelPhase.finished:
+        // Aucun overlay — clé unique pour que AnimatedSwitcher retire
+        // l'overlay précédent proprement.
+        return const SizedBox.shrink(key: ValueKey('none'));
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Contenu gameplay de base (affiché en permanence sous les overlays)
+// ---------------------------------------------------------------------------
+
+class _GameplayContent extends StatelessWidget {
+  const _GameplayContent({
+    required this.session,
+    required this.localState,
+    required this.controller,
+    required this.selfPlayer,
+    required this.opponent,
+    required this.formedLetters,
+    required this.onForfeit,
+  });
+
+  final DuelSession session;
+  final DuelLocalState localState;
+  final DuelController controller;
+  final DuelPlayer? selfPlayer;
+  final DuelPlayer? opponent;
+  final String formedLetters;
+  final VoidCallback onForfeit;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        children: [
+          _DuelHeader(
+            selfRoundsWon: selfPlayer?.roundsWon ?? 0,
+            opponentRoundsWon: opponent?.roundsWon ?? 0,
+            selfProgress: selfPlayer?.progress ?? 0,
+            opponentProgress: opponent?.progress ?? 0,
+            opponentLabel:
+                opponent != null ? 'Adversaire' : 'En attente...',
+            currentRound: session.currentRound,
+            totalRounds: session.totalRounds,
+          ),
+          const SizedBox(height: 12),
+          _RiddleCard(riddle: session.riddle),
+          const SizedBox(height: 10),
+          TimerBar(timeLeft: localState.timeLeft, totalTime: 30),
+          const SizedBox(height: 14),
+          AnswerCells(
+            answer: session.answer,
+            formedLetters: formedLetters,
+            isValidated: localState.submitted,
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: Center(
+              child: CircularGrid(
+                letters: session.lettersPool,
+                selectedIndices: localState.selectedIndices,
+                hintTileIndices: const <int>[],
+                phase: localState.submitted
+                    ? GamePhase.won
+                    : (localState.timeLeft == 0
+                          ? GamePhase.lost
+                          : GamePhase.playing),
+                seed: session.answer,
+                onTileEntered: controller.selectTile,
+                onDragEnd: () {},
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          _BottomControls(
+            onClear: controller.clearSelection,
+            onForfeit: onForfeit,
+          ),
+          const SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Header 3-manches avec score de manches gagnées
+// ---------------------------------------------------------------------------
 
 class _DuelHeader extends StatelessWidget {
   const _DuelHeader({
+    required this.selfRoundsWon,
+    required this.opponentRoundsWon,
     required this.selfProgress,
     required this.opponentProgress,
     required this.opponentLabel,
+    required this.currentRound,
+    required this.totalRounds,
   });
 
+  final int selfRoundsWon;
+  final int opponentRoundsWon;
   final double selfProgress;
   final double opponentProgress;
   final String opponentLabel;
+  final int currentRound;
+  final int totalRounds;
 
   @override
   Widget build(BuildContext context) {
@@ -189,23 +316,50 @@ class _DuelHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.35),
         border: Border(
-          bottom: BorderSide(color: AppColors.orSoleil.withValues(alpha: 0.2)),
+          bottom: BorderSide(
+            color: AppColors.orSoleil.withValues(alpha: 0.2),
+          ),
         ),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              const Text('⚔️', style: TextStyle(fontSize: 18)),
+              const Icon(Icons.emoji_events_outlined, size: 18, color: AppColors.orSoleil),
               const SizedBox(width: 6),
               Text('DUEL EN COURS', style: AppTypography.bebas(size: 14)),
               const Spacer(),
+              // Score de manches.
+              Semantics(
+                label:
+                    'Score manches : Toi $selfRoundsWon - Adversaire $opponentRoundsWon',
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.orJour.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.orJour.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Text(
+                    '$selfRoundsWon - $opponentRoundsWon',
+                    style: AppTypography.bebas(
+                      color: AppColors.orSoleil,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Indicateur de manche.
               Text(
-                opponentLabel,
-                style: AppTypography.crimson(
+                '${currentRound + 1}/$totalRounds',
+                style: AppTypography.bebas(
                   size: 12,
                   color: AppColors.texteSecondaire,
-                  style: FontStyle.italic,
                 ),
               ),
             ],
@@ -214,7 +368,7 @@ class _DuelHeader extends StatelessWidget {
           _ProgressRow(label: 'Moi', value: selfProgress, isSelf: true),
           const SizedBox(height: 4),
           _ProgressRow(
-            label: 'Adversaire',
+            label: opponentLabel,
             value: opponentProgress,
             isSelf: false,
           ),
@@ -254,7 +408,7 @@ class _ProgressRow extends StatelessWidget {
               value: value,
               minHeight: 6,
               backgroundColor: AppColors.boisFonce.withValues(alpha: 0.5),
-              valueColor: AlwaysStoppedAnimation(color),
+              valueColor: AlwaysStoppedAnimation<Color>(color),
             ),
           ),
         ),
@@ -272,28 +426,49 @@ class _ProgressRow extends StatelessWidget {
   }
 }
 
+/// Carte devinette du duel — meme style que le mode solo (`game_view.dart`)
+/// avec l'avatar du griot a gauche et le texte en bodyMd non-italique.
 class _RiddleCard extends StatelessWidget {
   const _RiddleCard({required this.riddle});
+
   final String riddle;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.fromLTRB(14, 16, 16, 16),
       decoration: BoxDecoration(
-        color: AppColors.bois.withValues(alpha: 0.35),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.4)),
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AppColors.orJour.withValues(alpha: 0.6),
+          width: 1.5,
+        ),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
-        children: [
-          const Text('🧙🏿', style: TextStyle(fontSize: 28)),
-          const SizedBox(width: 10),
+        children: <Widget>[
+          Image.asset(
+            AppAssets.griotIdle,
+            width: 56,
+            height: 56,
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
               riddle,
-              style: AppTypography.crimson(size: 14, style: FontStyle.italic),
+              style: AppTypography.bodyMd.copyWith(
+                fontSize: 16,
+                height: 1.45,
+                color: AppColors.textePrimaire,
+              ),
             ),
           ),
         ],
@@ -303,7 +478,10 @@ class _RiddleCard extends StatelessWidget {
 }
 
 class _BottomControls extends StatelessWidget {
-  const _BottomControls({required this.onClear, required this.onForfeit});
+  const _BottomControls({
+    required this.onClear,
+    required this.onForfeit,
+  });
 
   final VoidCallback onClear;
   final VoidCallback onForfeit;

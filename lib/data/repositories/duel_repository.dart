@@ -1,96 +1,63 @@
 import 'dart:async';
-import 'dart:math';
 
-import 'package:defi_kilimandjaro/data/repositories/devinette_repository_impl.dart';
-import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
-import 'package:defi_kilimandjaro/domain/repositories/devinette_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
-/// Repository des duels temps réel via Firebase Realtime Database.
+/// Repository des duels temps reel via Firebase Realtime Database.
 ///
-/// Schéma `/matches/{matchId}` documenté dans [DuelSession].
+/// Schema `/matches/{matchId}` documente dans [DuelSession].
+/// Les 3 rounds sont pre-tires cote serveur (Cloud Function requestMatch) et
+/// stockes sous `/matches/{matchId}/rounds/{0,1,2}`.
 class DuelRepository {
   DuelRepository({
     required this.database,
     required this.auth,
-    required this.devinetteRepo,
+    required this.functions,
   });
 
   final FirebaseDatabase database;
   final FirebaseAuth auth;
-  final DevinetteRepository devinetteRepo;
+  final FirebaseFunctions functions;
   final Logger _log = Logger();
-  final Random _rng = Random.secure();
 
   DatabaseReference _matchRef(String matchId) =>
       database.ref('matches/$matchId');
 
-  String _generateMatchId() {
-    // 6 caractères alphanumeric uppercase, lisible.
-    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-    return List<String>.generate(
-      6,
-      (_) => chars[_rng.nextInt(chars.length)],
-    ).join();
-  }
-
-  String _generateSecret() {
-    final bytes = List<int>.generate(12, (_) => _rng.nextInt(256));
-    return bytes
-        .map((b) => b.toRadixString(16).padLeft(2, '0'))
-        .join();
-  }
-
   String get currentUid {
     final uid = auth.currentUser?.uid;
     if (uid == null) {
-      throw StateError('Aucun utilisateur connecté (auth anonymous requise)');
+      throw StateError('Aucun utilisateur connecte (auth anonymous requise)');
     }
     return uid;
   }
 
-  /// Crée un duel et retourne ses identifiants. La devinette est tirée au
-  /// hasard du pack [packId] (par défaut "culture_ci").
+  /// Cree un duel ami (non-ranked) via QR code.
   ///
-  /// NB : le schema RTDB conserve la clé `proverb` (vide) pour la rétro-compat
-  /// du parsing [DuelSession.fromJson] tant que l'UI du duel n'a pas été
-  /// rebatie en Phase 3.
-  Future<({String matchId, String secret})> createDuel({
-    String packId = 'culture_ci',
-  }) async {
-    final devinette = await devinetteRepo.randomFromPack(packId);
-    final shuffled = _shuffle(devinette.lettersPool);
-
-    final matchId = _generateMatchId();
-    final secret = _generateSecret();
-    final uid = currentUid;
-    final now = DateTime.now().millisecondsSinceEpoch;
-
-    await _matchRef(matchId).set(<String, dynamic>{
-      'secret': secret,
-      'created_by': uid,
-      'created_at': now,
-      'phase': DuelPhase.waiting.name,
-      'answer': devinette.answer,
-      'letters_pool': shuffled,
-      'riddle': devinette.riddle,
-      'explanation': devinette.explanation,
-      'proverb': '',
-      'players': <String, dynamic>{
-        uid: const DuelPlayer(uid: 'self', progress: 0).toJson()
-          ..remove('finished_at'),
-      },
-    });
-    _log.i('Duel créé: $matchId by $uid');
+  /// Cree un duel local (QR code / deep-link, non-ranked).
+  ///
+  /// Appelle la Cloud Function `createLocalDuel` qui tire les 3 rounds
+  /// (easy/medium/hard) cote serveur (anti-cheat) et ecrit le match
+  /// dans RTDB. Le client recoit juste matchId + secret pour generer
+  /// le QR code.
+  Future<({String matchId, String secret})> createDuel() async {
+    final callable = functions.httpsCallable('createLocalDuel');
+    final result = await callable.call<Map<Object?, Object?>>();
+    final data = result.data.cast<String, dynamic>();
+    final matchId = data['matchId'] as String?;
+    final secret = data['secret'] as String?;
+    if (matchId == null || secret == null) {
+      throw StateError('Reponse createLocalDuel invalide');
+    }
+    _log.i('Duel local cree: $matchId');
     return (matchId: matchId, secret: secret);
   }
 
-  /// Rejoint un duel existant. Vérifie le secret.
-  /// Démarre la phase `active` quand le 2e joueur arrive.
+  /// Rejoint un duel existant. Verifie le secret.
+  /// Demarre la phase `countdown` quand le 2e joueur arrive.
   Future<void> joinDuel({
     required String matchId,
     required String secret,
@@ -106,7 +73,6 @@ class DuelRepository {
       throw StateError('Secret invalide');
     }
     if (data['created_by'] == uid) {
-      // Le créateur revient à sa propre session — no-op.
       return;
     }
     final players =
@@ -117,9 +83,15 @@ class DuelRepository {
     }
 
     await ref.update(<String, Object?>{
-      'players/$uid':
-          const DuelPlayer(uid: 'self', progress: 0).toJson()..remove('finished_at'),
-      'phase': DuelPhase.active.name,
+      'players/$uid': <String, dynamic>{
+        'progress': 0,
+        'found': false,
+        'rounds_won': 0,
+        'total_time_ms': 0,
+        'rounds': <String, dynamic>{},
+      },
+      'phase': DuelPhase.countdown.name,
+      'phase_started_at': DateTime.now().millisecondsSinceEpoch,
     });
     _log.i('Duel rejoint: $matchId par $uid');
   }
@@ -136,45 +108,63 @@ class DuelRepository {
     });
   }
 
-  /// Met à jour la progression du joueur courant.
-  Future<void> updateMyProgress(String matchId, double progress) async {
+  /// Met a jour la progression du joueur courant dans le round actif.
+  ///
+  /// Ecrit dans `/matches/{matchId}/players/{uid}/rounds/{round}/progress`
+  /// ET dans `/matches/{matchId}/players/{uid}/progress` (progression globale
+  /// utilisee pour la barre de progression de l'adversaire).
+  Future<void> updateProgress(
+    String matchId,
+    int round,
+    double progress,
+  ) async {
     final uid = currentUid;
-    await _matchRef(matchId).child('players/$uid/progress').set(
-          progress.clamp(0.0, 1.0),
-        );
-  }
-
-  /// Marque le joueur courant comme ayant trouvé le mot. Premier arrivé
-  /// devient le winner si la phase est encore active.
-  Future<void> submitWin(String matchId) async {
-    final uid = currentUid;
-    final ref = _matchRef(matchId);
-    final now = DateTime.now().millisecondsSinceEpoch;
-
-    final snapshot = await ref.get();
-    if (!snapshot.exists) return;
-    final data = (snapshot.value! as Map).cast<String, dynamic>();
-    final phase = data['phase'] as String? ?? 'waiting';
-    if (phase == DuelPhase.finished.name) return;
-
-    // Atomic-ish update: marquer joueur + phase + winner.
-    await ref.update(<String, Object?>{
-      'players/$uid/found': true,
-      'players/$uid/finished_at': now,
-      'players/$uid/progress': 1.0,
-      'phase': DuelPhase.finished.name,
-      'winner': uid,
+    final clamped = progress.clamp(0.0, 1.0);
+    await _matchRef(matchId).update(<String, Object?>{
+      'players/$uid/progress': clamped,
+      'players/$uid/rounds/$round/progress': clamped,
     });
   }
 
-  /// Abandon — déclare l'autre joueur gagnant si présent.
+  /// Appelle la Cloud Function submitRoundWin.
+  ///
+  /// Le serveur valide l'etat et met a jour rounds_won, total_time_ms, phase.
+  /// Retourne la prochaine phase ("countdown" ou "finished").
+  Future<String> submitRoundWin(
+    String matchId,
+    int round,
+    String winnerUid,
+  ) async {
+    final callable = functions.httpsCallable('submitRoundWin');
+    final result = await callable.call<Map<String, dynamic>>(<String, dynamic>{
+      'match_id': matchId,
+      'round': round,
+      'winner_uid': winnerUid,
+    });
+    return result.data['next_phase'] as String? ?? 'finished';
+  }
+
+  /// Demande au serveur d'avancer la phase (roundEnd -> countdown ou
+  /// countdown -> active). Appele par le client apres son animation de 3s.
+  ///
+  /// Idempotent : les 2 clients peuvent appeler simultanement, le serveur
+  /// gere via verification du delai minimal et de la phase courante.
+  Future<void> advancePhase(String matchId) async {
+    final callable = functions.httpsCallable('advancePhase');
+    await callable.call<Map<String, dynamic>>(<String, dynamic>{
+      'match_id': matchId,
+    });
+  }
+
+  /// Forfait — declare l'autre joueur gagnant si present.
   Future<void> forfeit(String matchId) async {
     final uid = currentUid;
     final ref = _matchRef(matchId);
     final snapshot = await ref.get();
     if (!snapshot.exists) return;
     final data = (snapshot.value! as Map).cast<String, dynamic>();
-    if ((data['phase'] as String?) == DuelPhase.finished.name) return;
+    final phase = data['phase'] as String? ?? 'waiting';
+    if (phase == DuelPhase.finished.name) return;
 
     final players =
         (data['players'] as Map?)?.cast<String, dynamic>() ??
@@ -183,20 +173,12 @@ class DuelRepository {
         players.keys.firstWhere((k) => k != uid, orElse: () => '');
     await ref.update(<String, Object?>{
       'phase': DuelPhase.finished.name,
+      'phase_started_at': DateTime.now().millisecondsSinceEpoch,
       if (otherUid.isNotEmpty) 'winner': otherUid,
     });
   }
 
-  /// Rejoint un match ouvert (deep link / share) sans vérification de secret.
-  ///
-  /// Vérifie que le match :
-  /// - existe
-  /// - est en phase [DuelPhase.waiting]
-  /// - n'a qu'un seul joueur (le créateur), ou que l'uid courant est déjà
-  ///   dedans (retour tolérant).
-  ///
-  /// Lance un [StateError] en cas d'erreur (match introuvable, plein,
-  /// ou déjà terminé).
+  /// Rejoint un match ouvert (deep link / share) sans verification de secret.
   Future<DuelSession> joinOpen(String matchId) async {
     final uid = currentUid;
     final ref = _matchRef(matchId);
@@ -218,15 +200,19 @@ class DuelRepository {
 
     if (!players.containsKey(uid)) {
       await ref.update(<String, Object?>{
-        'players/$uid':
-            const DuelPlayer(uid: 'self', progress: 0).toJson()
-              ..remove('finished_at'),
-        'phase': DuelPhase.active.name,
+        'players/$uid': <String, dynamic>{
+          'progress': 0,
+          'found': false,
+          'rounds_won': 0,
+          'total_time_ms': 0,
+          'rounds': <String, dynamic>{},
+        },
+        'phase': DuelPhase.countdown.name,
+        'phase_started_at': DateTime.now().millisecondsSinceEpoch,
       });
     }
     _log.i('joinOpen: $matchId par $uid');
 
-    // Relis la session mise à jour.
     final updated = await ref.get();
     return DuelSession.fromJson(
       matchId,
@@ -234,7 +220,7 @@ class DuelRepository {
     );
   }
 
-  /// Supprime la session (créateur seulement).
+  /// Supprime la session (createur seulement).
   Future<void> deleteIfOwner(String matchId) async {
     final uid = currentUid;
     final snapshot = await _matchRef(matchId).get();
@@ -243,18 +229,6 @@ class DuelRepository {
     if (data['created_by'] == uid) {
       await _matchRef(matchId).remove();
     }
-  }
-
-  static List<String> _shuffle(List<String> letters) {
-    final list = List<String>.from(letters);
-    final rng = Random.secure();
-    for (var i = list.length - 1; i > 0; i--) {
-      final j = rng.nextInt(i + 1);
-      final tmp = list[i];
-      list[i] = list[j];
-      list[j] = tmp;
-    }
-    return list;
   }
 }
 
@@ -266,39 +240,20 @@ final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;
 });
 
+final firebaseFunctionsProvider = Provider<FirebaseFunctions>((ref) {
+  return FirebaseFunctions.instanceFor(region: 'europe-west1');
+});
+
 final duelRepositoryProvider = Provider<DuelRepository>((ref) {
   return DuelRepository(
     database: ref.watch(firebaseDatabaseProvider),
     auth: ref.watch(firebaseAuthProvider),
-    devinetteRepo: ref.watch(devinetteRepositoryProvider),
+    functions: ref.watch(firebaseFunctionsProvider),
   );
 });
 
-/// Stream typé d'une session de duel.
+/// Stream type d'une session de duel.
 final duelSessionStreamProvider =
     StreamProvider.family<DuelSession?, String>((ref, matchId) {
   return ref.watch(duelRepositoryProvider).watch(matchId);
 });
-
-/// Devinette mock pour conversion entre DuelSession et entité de jeu si
-/// jamais on veut réutiliser des widgets existants. Pour l'instant le
-/// duel game widget consomme directement DuelSession.
-Devinette devinetteFromDuel(DuelSession session) {
-  return Devinette(
-    id: 'duel_${session.matchId}',
-    pack: 'duel',
-    country: 'ci',
-    answer: session.answer,
-    lettersPool: session.lettersPool,
-    // v3 schema: monolingual duel payload wrapped under active locale.
-    riddleByLang: <String, String>{
-      DevinetteLocale.activeLang: session.riddle,
-    },
-    explanationByLang: <String, String>{
-      DevinetteLocale.activeLang: session.explanation,
-    },
-    difficulty: 1,
-    estimatedTimeS: 30,
-    tags: const ['duel'],
-  );
-}

@@ -1,0 +1,18 @@
+<!-- Mousa Ali — Djibouti, 2028m, cone. Cône volcanique basaltique de la dépression de l'Afar, paysage lunaire aride. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="40,180 105,75 170,180" fill="#1C1917"/>
+  <polygon points="40,180 105,75 105,180" fill="#292524"/>
+  <polygon points="105,75 95,115 80,165 65,180" fill="#44403C"/>
+  <polygon points="105,75 125,118 140,165 155,180 105,180" fill="#57534E"/>
+  <polygon points="105,75 120,100 125,118" fill="#78716C"/>
+  <polygon points="105,75 105,180 95,170 90,135 95,115" fill="#292524"/>
+  <polygon points="80,150 90,170 75,175" fill="#0C0A09"/>
+  <polygon points="125,150 140,170 120,175" fill="#0C0A09"/>
+  <polygon points="100,75 105,75 110,75 108,80 102,80" fill="#0C0A09"/>
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#7C2D12"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#451A03"/>
+  <circle cx="30" cy="195" r="2" fill="#0C0A09"/>
+  <circle cx="50" cy="196" r="1.5" fill="#0C0A09"/>
+  <circle cx="160" cy="195" r="2" fill="#0C0A09"/>
+  <circle cx="180" cy="196" r="1.5" fill="#0C0A09"/>
+</svg>

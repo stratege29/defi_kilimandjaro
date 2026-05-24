@@ -1,0 +1,19 @@
+<!-- Jebel ech Chambi — Tunisie, 1544m, crest. Plus haut sommet tunisien, Atlas, semi-aride, pins épars. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <polygon points="0,180 15,140 30,115 50,100 65,120 85,90 100,105 120,80 140,95 160,75 180,100 195,135 200,180" fill="#7C2D12"/>
+  <polygon points="30,115 50,100 65,120 50,135" fill="#A16207"/>
+  <polygon points="65,120 85,90 100,105 85,125" fill="#92400E"/>
+  <polygon points="100,105 120,80 140,95 125,110" fill="#A16207"/>
+  <polygon points="140,95 160,75 180,100 165,115" fill="#B45309"/>
+  <polygon points="15,140 30,115 30,160" fill="#451A03"/>
+  <polygon points="50,100 65,120 65,150" fill="#5C2410"/>
+  <polygon points="85,90 100,105 100,140" fill="#5C2410"/>
+  <polygon points="120,80 140,95 140,130" fill="#5C2410"/>
+  <polygon points="160,75 180,100 180,135" fill="#5C2410"/>
+  <polygon points="40,155 42,148 44,155" fill="#365314"/>
+  <polygon points="55,160 57,152 59,160" fill="#365314"/>
+  <polygon points="155,160 157,153 159,160" fill="#365314"/>
+  <polygon points="170,158 172,150 174,158" fill="#365314"/>
+  <polygon points="0,200 0,180 60,184 130,182 200,184 200,200" fill="#CA8A04"/>
+  <polygon points="0,200 30,193 80,195 140,192 200,194 200,200" fill="#92400E"/>
+</svg>

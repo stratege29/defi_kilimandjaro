@@ -29,12 +29,24 @@ class CircularGrid extends StatefulWidget {
     required this.phase,
     required this.onTileEntered,
     required this.onDragEnd,
+    this.shuffledIndices = const <int>[],
     this.seed,
+    this.hiddenIndices = const <int>{},
     super.key,
   });
 
   /// Lettres dans l'ordre shufflé.
   final List<String> letters;
+
+  /// Permutation des indices du pool original. `shuffledIndices[gridIdx]`
+  /// donne l'index dans le pool sous-jacent (identité stable d'une lettre).
+  /// Sert de clé (`ValueKey`) pour que Flutter trace les tuiles d'un build
+  /// à l'autre et anime leurs déplacements via `AnimatedPositioned` quand
+  /// wind / earthquake / shuffle permutent les positions.
+  ///
+  /// Par défaut vide pour rétro-compat avec les call-sites synthétiques
+  /// (tests) qui n'ont pas besoin d'animation de swap.
+  final List<int> shuffledIndices;
 
   /// Indices des tuiles sélectionnées.
   final List<int> selectedIndices;
@@ -43,6 +55,11 @@ class CircularGrid extends StatefulWidget {
   /// par `GameState.hintTileIndices` pour pointer la prochaine lettre
   /// de la réponse (et non une tuile aléatoire de la grille).
   final List<int> hintTileIndices;
+
+  /// Indices des tuiles masquées par le modifier `fog`. Rendues avec
+  /// opacité 0 et ignorées par le hit-test. Tournent toutes les 5 s
+  /// côté `GameController`.
+  final Set<int> hiddenIndices;
 
   /// Phase du jeu.
   final Object phase;
@@ -61,7 +78,8 @@ class CircularGrid extends StatefulWidget {
   State<CircularGrid> createState() => _CircularGridState();
 }
 
-class _CircularGridState extends State<CircularGrid> {
+class _CircularGridState extends State<CircularGrid>
+    with SingleTickerProviderStateMixin {
   /// Diamètre d'une tuile — 60pt (au-dessus du 48pt minimum tactile Material,
   /// confort pouce optimal pour ascending swipe gesture).
   static const double _tileSize = 60;
@@ -99,16 +117,105 @@ class _CircularGridState extends State<CircularGrid> {
   /// proprement le tracé quand la sélection rétrécit (re-tap, slide-back).
   final List<int> _letterTrailIndices = <int>[];
 
+  /// Controller de shake déclenché chaque fois que `shuffledIndices`
+  /// change (wind / earthquake / shuffle). Translate la grille entière
+  /// sur l'axe X en oscillation rapide pour donner un feedback visuel
+  /// "ça vient de bouger" au-delà du glissement des tuiles concernées.
+  /// Sert aussi de driver pour l'animation du trail doré qui suit les
+  /// lettres pendant leur glissement (synchro avec AnimatedPositioned).
+  late final AnimationController _shakeCtrl;
+
+  /// Snapshot des points snap du trail JUSTE AVANT un swap. Utilisé
+  /// pour interpoler entre l'ancienne position du trail et la nouvelle
+  /// pendant l'animation `_shakeCtrl`. Vide hors animation.
+  List<Offset> _oldSnapPoints = const <Offset>[];
+
   @override
   void initState() {
     super.initState();
     _pattern = pickPattern(widget.letters.length, math.Random());
+    _shakeCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+  }
+
+  @override
+  void dispose() {
+    _shakeCtrl.dispose();
+    super.dispose();
   }
 
   @override
   void didUpdateWidget(CircularGrid oldWidget) {
     super.didUpdateWidget(oldWidget);
     _syncTrailWithSelection(oldWidget.selectedIndices.length);
+    // Détecte un changement de permutation pour déclencher le shake.
+    // On compare entry-par-entry — listEquals serait plus lourd ; ici la
+    // taille reste constante donc une boucle suffit.
+    final newPerm = widget.shuffledIndices;
+    final oldPerm = oldWidget.shuffledIndices;
+    if (newPerm.length == oldPerm.length && newPerm.isNotEmpty) {
+      var changed = false;
+      for (var i = 0; i < newPerm.length; i++) {
+        if (newPerm[i] != oldPerm[i]) {
+          changed = true;
+          break;
+        }
+      }
+      if (changed) {
+        // Capture l'ancien trail AVANT le rebuild pour pouvoir interpoler
+        // pendant l'animation et donner l'illusion que le trait glisse
+        // avec les lettres (synchro avec AnimatedPositioned).
+        _oldSnapPoints = List<Offset>.from(_trail);
+        _shakeCtrl
+          ..reset()
+          ..forward();
+        // La re-synchro effective des snap points se fait dans build()
+        // une fois _tileCenters mis à jour par le layout. Tenter de
+        // rebuild ici lit des centres potentiellement obsolètes.
+      }
+    }
+  }
+
+  /// Points actuels du trail à afficher, en tenant compte de l'animation
+  /// de swap en cours. Pendant `_shakeCtrl.isAnimating` ET si on a un
+  /// snapshot de la même taille, on lerp ancien→nouveau via la même
+  /// courbe que `AnimatedPositioned` (easeInOutCubic, durée 450 ms) —
+  /// le trait glisse donc en synchro avec les tuiles. Hors animation,
+  /// on rend `_trail` tel quel.
+  List<Offset> get _animatedTrail {
+    if (!_shakeCtrl.isAnimating ||
+        _oldSnapPoints.length != _trail.length ||
+        _trail.isEmpty) {
+      return _trail;
+    }
+    final t = Curves.easeInOutCubic.transform(_shakeCtrl.value);
+    return List<Offset>.generate(_trail.length, (i) {
+      return Offset.lerp(_oldSnapPoints[i], _trail[i], t) ?? _trail[i];
+    });
+  }
+
+  /// Synchronise IN-PLACE les snap points de `_trail` avec les centres
+  /// actuels des tuiles sélectionnées. Appelé à chaque `build()` après
+  /// la mise à jour de `_tileCenters` pour garantir que le golden path
+  /// reste collé aux lettres, même si :
+  /// - un swap (wind / earthquake / shuffle) vient de bouger les lettres
+  /// - le layout change (resize, rotation)
+  /// - une lettre sélectionnée bouge entre 2 frames
+  ///
+  /// Préserve les éventuels points free-form (queue du drag) entre les
+  /// snaps — seul les snap points sont écrasés.
+  void _syncTrailSnapPointsToTileCenters() {
+    if (widget.selectedIndices.length != _letterTrailIndices.length) return;
+    for (var k = 0; k < widget.selectedIndices.length; k++) {
+      final gridIdx = widget.selectedIndices[k];
+      final snapTrailIdx = _letterTrailIndices[k];
+      if (snapTrailIdx >= _trail.length || gridIdx >= _tileCenters.length) {
+        continue;
+      }
+      _trail[snapTrailIdx] = _tileCenters[gridIdx];
+    }
   }
 
   /// Aligne `_trail` / `_letterTrailIndices` sur l'état courant de la
@@ -143,6 +250,9 @@ class _CircularGridState extends State<CircularGrid> {
     const fullRadius = _tileSize / 2;
     const smallRadius = _tileSize * 0.40;
     for (var i = 0; i < _tileCenters.length; i++) {
+      // Une tuile masquée par le fog ne capte pas le touch — le doigt
+      // passe « à travers » comme si la case n'existait pas.
+      if (widget.hiddenIndices.contains(i)) continue;
       final dist = (_tileCenters[i] - localPos).distance;
       final r = _smallHitIndices.contains(i) ? smallRadius : fullRadius;
       if (dist <= r) return i;
@@ -226,42 +336,90 @@ class _CircularGridState extends State<CircularGrid> {
           ..clear()
           ..addAll(layout.centers);
         _smallHitIndices = layout.smallHitIndices;
+        // Garantit que les snap points du golden path sont collés aux
+        // tuiles sélectionnées à chaque build, indépendamment du timing
+        // de `didUpdateWidget` (qui voit potentiellement un `_tileCenters`
+        // périmé entre 2 frames).
+        _syncTrailSnapPointsToTileCenters();
 
         return SizedBox(
           width: layout.size.width,
           height: layout.size.height,
-          child: Listener(
-            onPointerDown: _onPointerDown,
-            onPointerMove: _onPointerMove,
-            onPointerUp: _onPointerUp,
-            child: Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: GoldenPath(
-                    points: _trail,
-                    fingerPosition: _fingerPosition,
-                  ),
-                ),
-                ...List<Widget>.generate(count, (i) {
-                  final center = layout.centers[i];
-                  final isSelected = widget.selectedIndices.contains(i);
-                  final isHint = widget.hintTileIndices.contains(i);
-                  return Positioned(
-                    left: center.dx - _tileSize / 2,
-                    top: center.dy - _tileSize / 2,
-                    width: _tileSize,
-                    height: _tileSize,
-                    child: _Tile(
-                      letter: widget.letters[i],
-                      isSelected: isSelected,
-                      isHint: isHint,
-                      selectionOrder: isSelected
-                          ? widget.selectedIndices.indexOf(i) + 1
-                          : null,
+          child: AnimatedBuilder(
+            animation: _shakeCtrl,
+            builder: (context, child) {
+              // 3 oscillations sur la durée du controller (450 ms), amplitude
+              // 8 px, fade-out linéaire pour que le shake s'atténue.
+              final t = _shakeCtrl.value;
+              final amplitude = 8.0 * (1.0 - t);
+              final offsetX = math.sin(t * math.pi * 6) * amplitude;
+              return Transform.translate(
+                offset: Offset(offsetX, 0),
+                child: child,
+              );
+            },
+            child: Listener(
+              onPointerDown: _onPointerDown,
+              onPointerMove: _onPointerMove,
+              onPointerUp: _onPointerUp,
+              child: Stack(
+                children: <Widget>[
+                  Positioned.fill(
+                    // AnimatedBuilder INTERNE écoutant `_shakeCtrl` :
+                    // garantit que `_animatedTrail` est ré-évalué à
+                    // chaque frame de l'animation. Sans ça, le getter
+                    // est lu une seule fois dans le `child:` du
+                    // AnimatedBuilder externe (qui n'est construit
+                    // qu'une fois — c'est précisément l'optim du
+                    // `child:` Flutter) et le trail reste figé.
+                    child: AnimatedBuilder(
+                      animation: _shakeCtrl,
+                      builder: (context, _) {
+                        return GoldenPath(
+                          points: _animatedTrail,
+                          fingerPosition: _fingerPosition,
+                        );
+                      },
                     ),
-                  );
-                }),
-              ],
+                  ),
+                  ...List<Widget>.generate(count, (i) {
+                    final center = layout.centers[i];
+                    final isSelected = widget.selectedIndices.contains(i);
+                    final isHint = widget.hintTileIndices.contains(i);
+                    final isHidden = widget.hiddenIndices.contains(i);
+                    // Clé stable : si shuffledIndices est fourni, on prend
+                    // l'index du pool sous-jacent (identité de la lettre,
+                    // stable à travers les permutations). Sinon fallback
+                    // sur l'index grille (comportement legacy sans anim).
+                    final stableKey = widget.shuffledIndices.length == count
+                        ? ValueKey<int>(widget.shuffledIndices[i])
+                        : ValueKey<int>(-(i + 1));
+                    return AnimatedPositioned(
+                      key: stableKey,
+                      duration: const Duration(milliseconds: 450),
+                      curve: Curves.easeInOutCubic,
+                      left: center.dx - _tileSize / 2,
+                      top: center.dy - _tileSize / 2,
+                      width: _tileSize,
+                      height: _tileSize,
+                      child: AnimatedOpacity(
+                        // Fog : fade-out à 0 quand la tuile est masquée,
+                        // re-fade-in quand elle ré-apparaît.
+                        duration: const Duration(milliseconds: 400),
+                        opacity: isHidden ? 0.0 : 1.0,
+                        child: _Tile(
+                          letter: widget.letters[i],
+                          isSelected: isSelected,
+                          isHint: isHint,
+                          selectionOrder: isSelected
+                              ? widget.selectedIndices.indexOf(i) + 1
+                              : null,
+                        ),
+                      ),
+                    );
+                  }),
+                ],
+              ),
             ),
           ),
         );

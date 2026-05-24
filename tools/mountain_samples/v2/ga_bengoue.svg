@@ -1,0 +1,22 @@
+<!-- Mont Bengoué — Gabon, 1070m, dome. Forêt équatoriale, Ogooué-Ivindo, avec affleurements rocheux. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs><linearGradient id="sky_ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#BAE6FD"/><stop offset="55%" stop-color="#FEF3C7"/><stop offset="100%" stop-color="#FCD34D"/></linearGradient></defs>
+  <rect width="200" height="200" fill="url(#sky_ga)"/>
+  <circle cx="158" cy="55" r="16" fill="#FB923C" opacity="0.8"/>
+  <rect y="125" width="200" height="10" fill="#FEF3C7" opacity="0.5"/>
+  <polygon points="0,160 35,148 70,156 110,150 145,158 200,150 200,180 0,180" fill="#365314" opacity="0.7"/>
+  <polygon points="25,180 40,140 75,105 115,85 150,105 170,140 180,180" fill="#1A2E05"/>
+  <polygon points="25,180 40,140 75,105 90,135 80,180" fill="#052e16"/>
+  <polygon points="75,105 115,85 100,128 90,135" fill="#365314"/>
+  <polygon points="115,85 150,105 140,135 100,128" fill="#4D7C0F"/>
+  <polygon points="150,105 170,140 180,180 145,180" fill="#65A30D"/>
+  <polygon points="90,135 100,128 140,135 135,180 80,180" fill="#3F6212"/>
+  <polygon points="100,128 140,135 135,180 100,160" fill="#4D7C0F"/>
+  <polygon points="115,85 125,95 110,98" fill="#71717A"/>
+  <polygon points="125,95 145,100 135,108" fill="#52525B"/>
+  <polygon points="0,200 0,182 50,186 110,184 160,186 200,184 200,200" fill="#052e16"/>
+  <line x1="40" y1="195" x2="40" y2="173" stroke="#1A2E05" stroke-width="1.8"/>
+  <path d="M 40,173 q -10,-2 -13,3 M 40,173 q 10,-2 13,3 M 40,173 q -5,-7 -2,-12 M 40,173 q 5,-7 2,-12" fill="none" stroke="#1A2E05" stroke-width="1.2"/>
+  <line x1="165" y1="195" x2="165" y2="175" stroke="#1A2E05" stroke-width="1.5"/>
+  <path d="M 165,175 q -8,-2 -11,2 M 165,175 q 8,-2 11,2 M 165,175 q -4,-6 -1,-10 M 165,175 q 4,-6 1,-10" fill="none" stroke="#1A2E05" stroke-width="1"/>
+</svg>

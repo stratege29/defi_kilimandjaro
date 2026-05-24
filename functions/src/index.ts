@@ -18,6 +18,9 @@ initializeApp();
 export { requestMatch } from "./matchmaking/requestMatch";
 export { cancelMatch } from "./matchmaking/cancelMatch";
 export { endMatch } from "./matchmaking/endMatch";
+export { submitRoundWin } from "./matchmaking/submitRoundWin";
+export { advancePhase } from "./matchmaking/advancePhase";
+export { createLocalDuel } from "./matchmaking/createLocalDuel";
 
 // --- Social & Viral (Phase 7) ---
 export { sendChallengeNotif } from "./matchmaking/sendChallengeNotif";
@@ -26,4 +29,6 @@ export { requestRematch } from "./matchmaking/requestRematch";
 // --- UGC (user-generated devinettes) ---
 export { submitDevinette } from "./devinettes/submitDevinette";
 export { reportDevinette } from "./devinettes/reportDevinette";
+
+// --- Curation ---
 export { rebuildCommunityPack } from "./curation/rebuildCommunityPack";

@@ -1670,5 +1670,328 @@
       "justice"
     ],
     "format_version": 3
+  },
+  {
+    "id": "culture_ci_061",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOUTOUKOU",
+    "answer_normalized": "koutoukou",
+    "letters_pool": [
+      "K",
+      "O",
+      "U",
+      "T",
+      "O",
+      "U",
+      "K",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Alcool de palme brûlant, on me boit au village sous les baobabs. Je monte à la tête vite."
+    },
+    "explanation": {
+      "fr": "Le koutoukou est un alcool traditionnel ivoirien distillé du jus de palme, très fort et populaire dans les villages et les maquis."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "boisson",
+      "tradition",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_062",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GNAMAKODE",
+    "answer_normalized": "gnamakode",
+    "letters_pool": [
+      "G",
+      "N",
+      "A",
+      "M",
+      "A",
+      "K",
+      "O",
+      "D",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Sauce arachide très épaisse où trempe la viande, je suis servie avec riz ou foutou."
+    },
+    "explanation": {
+      "fr": "Le gnamakode est une sauce traditionnelle ivoirienne à base d'arachide, viande et légumes, très riche et populaire dans les repas familiaux."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "sauce",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_063",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "YAMOUSSOUKRO",
+    "answer_normalized": "yamoussoukro",
+    "letters_pool": [
+      "Y",
+      "A",
+      "M",
+      "O",
+      "U",
+      "S",
+      "S",
+      "O",
+      "U",
+      "K",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Capitale du cacao, ville mystérieuse du centre, j'ai grandi d'un coup d'un crayon politique."
+    },
+    "explanation": {
+      "fr": "Yamoussoukro est la capitale politique officielle de la Côte d'Ivoire depuis 1983, bâtie au centre du pays, connue pour la Basilique Notre-Dame de la Paix."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 40,
+    "tags": [
+      "geographie",
+      "capital",
+      "histoire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_064",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SAMBAKRU",
+    "answer_normalized": "sambakru",
+    "letters_pool": [
+      "S",
+      "A",
+      "M",
+      "B",
+      "A",
+      "K",
+      "R",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Danse militaire des soldats, j'accompagne les marches d'honneur et les cérémonies guerrières."
+    },
+    "explanation": {
+      "fr": "Le sambakru est une danse guerrière traditionnelle ivoirienne associée aux mouvements militaires et aux cérémonies d'honneur du peuple akan."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "danse",
+      "tradition",
+      "ceremonie"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_065",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KONTOMIRE",
+    "answer_normalized": "kontomire",
+    "letters_pool": [
+      "K",
+      "O",
+      "N",
+      "T",
+      "O",
+      "M",
+      "I",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Feuilles vertes du jardin, je suis hachée dans la sauce pour relever le goût."
+    },
+    "explanation": {
+      "fr": "Le kontomire est une plante herbacée dont les feuilles sont très consommées en Côte d'Ivoire et dans toute l'Afrique de l'Ouest, utilisées dans les sauces traditionnelles."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "legume",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_066",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOUHINTOU",
+    "answer_normalized": "kouhintou",
+    "letters_pool": [
+      "K",
+      "O",
+      "U",
+      "H",
+      "I",
+      "N",
+      "T",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Danse guerrière des jeunes filles, je saute et je crie avec force. C'est mon moment."
+    },
+    "explanation": {
+      "fr": "Le kouhintou est une danse traditionnelle baoulé de jeunes filles, danse de célébration et de fierté, dansée lors des fêtes et cérémonies."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "danse",
+      "tradition",
+      "baule"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_067",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SOUMBALA",
+    "answer_normalized": "soumbala",
+    "letters_pool": [
+      "S",
+      "O",
+      "U",
+      "M",
+      "B",
+      "A",
+      "L",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Condiment fermenté de graines, je parfume les sauces et les ragoûts. Je sens très fort."
+    },
+    "explanation": {
+      "fr": "Le soumbala est un condiment ouest-africain fermenté issu des graines de néré, très odorant et savoureux, indispensable dans la cuisine ivoirienne traditionnelle."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "condiment",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_068",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GBALITCHEÏ",
+    "answer_normalized": "gbalitchei",
+    "letters_pool": [
+      "G",
+      "B",
+      "A",
+      "L",
+      "I",
+      "T",
+      "C",
+      "H",
+      "E",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Danse zaouli de femmes, j'ondule avec grâce. Mes hanches racontent une histoire."
+    },
+    "explanation": {
+      "fr": "Le gbalitchei est une danse traditionnelle baoulé très sensuelle exécutée par les femmes, caractérisée par des mouvements ondulants des hanches et du buste."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 40,
+    "tags": [
+      "danse",
+      "tradition",
+      "baule"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_069",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GRANDBASSAM",
+    "answer_normalized": "grandbassam",
+    "letters_pool": [
+      "G",
+      "R",
+      "A",
+      "N",
+      "D",
+      "B",
+      "A",
+      "S",
+      "S",
+      "A",
+      "M"
+    ],
+    "riddle": {
+      "fr": "Port historique sur le golfe, ancien comptoir colonial, je regarde la mer avec nostalgie architecturale."
+    },
+    "explanation": {
+      "fr": "Grand-Bassam est une ville côtière historique de Côte d'Ivoire, ancienne capitale coloniale, site UNESCO protégé pour ses magnifiques façades coloniales."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 40,
+    "tags": [
+      "geographie",
+      "histoire",
+      "cote"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_070",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DENGUELE",
+    "answer_normalized": "denguele",
+    "letters_pool": [
+      "D",
+      "E",
+      "N",
+      "G",
+      "U",
+      "E",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Région enclavée du nord-ouest, je suis un pays lobi et sénoufo où les montagnes gardent les secrets."
+    },
+    "explanation": {
+      "fr": "La Dénguélé est une région historique du nord-ouest ivoirien, pays du peuple lobi, caractérisée par une géographie montagneuse et une forte identité culturelle."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "geographie",
+      "region",
+      "nord"
+    ],
+    "format_version": 3
   }
 ]
