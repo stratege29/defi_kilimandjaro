@@ -6,7 +6,10 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
+import 'package:defi_kilimandjaro/domain/avatars/avatar_catalog.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
+import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_controller.dart';
 import 'package:defi_kilimandjaro/presentation/duel/widgets/duel_countdown_overlay.dart';
 import 'package:defi_kilimandjaro/presentation/duel/widgets/duel_intro_overlay.dart';
@@ -17,6 +20,7 @@ import 'package:defi_kilimandjaro/presentation/game/widgets/circular_grid.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/timer_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 /// Écran de duel temps réel — Phase 3 (3 manches).
@@ -138,6 +142,7 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
       session: liveSession,
       localState: localState,
       controller: controller,
+      selfUid: selfUid,
       selfPlayer: selfPlayer,
       opponent: opponent,
       formedLetters: formedLetters,
@@ -220,6 +225,7 @@ class _GameplayContent extends StatelessWidget {
     required this.session,
     required this.localState,
     required this.controller,
+    required this.selfUid,
     required this.selfPlayer,
     required this.opponent,
     required this.formedLetters,
@@ -229,6 +235,7 @@ class _GameplayContent extends StatelessWidget {
   final DuelSession session;
   final DuelLocalState localState;
   final DuelController controller;
+  final String selfUid;
   final DuelPlayer? selfPlayer;
   final DuelPlayer? opponent;
   final String formedLetters;
@@ -240,12 +247,12 @@ class _GameplayContent extends StatelessWidget {
       child: Column(
         children: [
           _DuelHeader(
+            selfUid: selfUid,
+            opponentUid: opponent?.uid ?? '',
             selfRoundsWon: selfPlayer?.roundsWon ?? 0,
             opponentRoundsWon: opponent?.roundsWon ?? 0,
             selfProgress: selfPlayer?.progress ?? 0,
             opponentProgress: opponent?.progress ?? 0,
-            opponentLabel:
-                opponent != null ? 'Adversaire' : 'En attente...',
             currentRound: session.currentRound,
             totalRounds: session.totalRounds,
           ),
@@ -301,20 +308,22 @@ class _GameplayContent extends StatelessWidget {
 
 class _DuelHeader extends StatelessWidget {
   const _DuelHeader({
+    required this.selfUid,
+    required this.opponentUid,
     required this.selfRoundsWon,
     required this.opponentRoundsWon,
     required this.selfProgress,
     required this.opponentProgress,
-    required this.opponentLabel,
     required this.currentRound,
     required this.totalRounds,
   });
 
+  final String selfUid;
+  final String opponentUid;
   final int selfRoundsWon;
   final int opponentRoundsWon;
   final double selfProgress;
   final double opponentProgress;
-  final String opponentLabel;
   final int currentRound;
   final int totalRounds;
 
@@ -374,10 +383,14 @@ class _DuelHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          _ProgressRow(label: 'Moi', value: selfProgress, isSelf: true),
+          _ProgressRow(
+            uid: selfUid,
+            value: selfProgress,
+            isSelf: true,
+          ),
           const SizedBox(height: 4),
           _ProgressRow(
-            label: opponentLabel,
+            uid: opponentUid,
             value: opponentProgress,
             isSelf: false,
           ),
@@ -387,26 +400,70 @@ class _DuelHeader extends StatelessWidget {
   }
 }
 
-class _ProgressRow extends StatelessWidget {
+/// Ligne de progression d'un joueur (HUD).
+///
+/// Branche sur [playerProfileProvider] pour afficher mini-avatar + pseudo
+/// réel. Fallback :
+/// - pseudo : "Moi" / "Adversaire" si pas de displayName, "En attente..." si
+///   uid vide (adversaire pas encore connecté).
+/// - avatar : initiale du pseudo (ou "?" si uid vide).
+class _ProgressRow extends ConsumerWidget {
   const _ProgressRow({
-    required this.label,
+    required this.uid,
     required this.value,
     required this.isSelf,
   });
 
-  final String label;
+  final String uid;
   final double value;
   final bool isSelf;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final color = isSelf ? AppColors.vertClair : AppColors.orSoleil;
+    final asyncProfile = uid.isEmpty
+        ? const AsyncValue<PlayerProfile?>.data(null)
+        : ref.watch(playerProfileProvider(uid));
+    final profile = asyncProfile.asData?.value;
+    final hasName = profile?.displayName?.isNotEmpty ?? false;
+    final label = hasName
+        ? profile!.displayName!
+        : (uid.isEmpty
+            ? 'En attente...'
+            : (isSelf ? 'Moi' : 'Adversaire'));
+    final avatar = AvatarCatalog.byId(profile?.avatarId);
+    final initial = label.isEmpty ? '?' : label.substring(0, 1).toUpperCase();
+
     return Row(
       children: [
+        Container(
+          width: 22,
+          height: 22,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.surfaceContainer,
+            border: Border.all(
+              color: color.withValues(alpha: 0.7),
+              width: 1.2,
+            ),
+          ),
+          clipBehavior: avatar != null ? Clip.antiAlias : Clip.none,
+          child: avatar != null
+              ? SvgPicture.asset(avatar.assetPath, fit: BoxFit.cover)
+              : Center(
+                  child: Text(
+                    initial,
+                    style: AppTypography.bebas(size: 11, color: color),
+                  ),
+                ),
+        ),
+        const SizedBox(width: 6),
         SizedBox(
-          width: 80,
+          width: 70,
           child: Text(
             label,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
             style: AppTypography.bebas(size: 12, color: color),
           ),
         ),

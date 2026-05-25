@@ -14,8 +14,10 @@ import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart'
     show kAltitudeHeroTag;
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
+import 'package:defi_kilimandjaro/presentation/leaderboard/widgets/display_name_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -65,6 +67,7 @@ class ProfileView extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
           children: [
             _ProfileHero(
+              profile: profileAsync.value,
               title: title,
               levelsCompleted: progress.totalLevelsCompleted,
               mountainsConquered: conquered.length,
@@ -220,21 +223,67 @@ class ProfileView extends ConsumerWidget {
 // Hero éditorial — avatar halo doré + nom Fraunces + chip titre + contexte
 // ---------------------------------------------------------------------------
 
-class _ProfileHero extends StatelessWidget {
+class _ProfileHero extends ConsumerWidget {
   const _ProfileHero({
+    required this.profile,
     required this.title,
     required this.levelsCompleted,
     required this.mountainsConquered,
     required this.cauris,
   });
 
+  final PlayerProfile? profile;
   final HonorificTitle? title;
   final int levelsCompleted;
   final int mountainsConquered;
   final int cauris;
 
+  Future<void> _editDisplayName(BuildContext context, WidgetRef ref) async {
+    final (result, name) = await DisplayNamePromptDialog.show(context);
+    if (!context.mounted) return;
+    if (result != DisplayNamePromptResult.confirmed || name == null) return;
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    try {
+      await ref
+          .read(profileRepositoryProvider)
+          .updateDisplayName(uid, name);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.surfaceContainer,
+          content: Text(
+            'Nom mis à jour : $name',
+            style: AppTypography.bodyMd.copyWith(
+              color: AppColors.textePrimaire,
+            ),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } on Exception {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.error,
+          content: Text(
+            'Échec de la mise à jour du nom.',
+            style: AppTypography.bodyMd.copyWith(
+              color: AppColors.textePrimaire,
+            ),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasName = profile?.displayName?.isNotEmpty ?? false;
+    final displayName = hasName ? profile!.displayName! : 'Grimpeur anonyme';
+
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
       decoration: BoxDecoration(
@@ -265,11 +314,55 @@ class _ProfileHero extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Joueur',
-                  style: AppTypography.displaySm.copyWith(
-                    fontSize: 26,
-                    color: AppColors.textePrimaire,
+                Semantics(
+                  button: true,
+                  label: 'Modifier le nom de grimpeur',
+                  child: InkWell(
+                    onTap: () => _editDisplayName(context, ref),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 2,
+                        horizontal: 4,
+                      ),
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              displayName,
+                              style: AppTypography.displaySm.copyWith(
+                                fontSize: 24,
+                                color: hasName
+                                    ? AppColors.textePrimaire
+                                    : AppColors.texteSecondaire,
+                                fontStyle: hasName
+                                    ? FontStyle.normal
+                                    : FontStyle.italic,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppColors.orJour.withValues(alpha: 0.15),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color:
+                                    AppColors.orJour.withValues(alpha: 0.5),
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.edit,
+                              size: 12,
+                              color: AppColors.orJour,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 6),

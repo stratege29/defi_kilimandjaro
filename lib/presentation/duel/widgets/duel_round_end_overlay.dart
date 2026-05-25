@@ -4,9 +4,13 @@ import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
+import 'package:defi_kilimandjaro/domain/avatars/avatar_catalog.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
+import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// Superposition inter-rounds affichée pendant la phase [DuelPhase.roundEnd].
 ///
@@ -146,6 +150,8 @@ class _DuelRoundEndOverlayState extends ConsumerState<DuelRoundEndOverlay> {
                       label:
                           'Score : Toi $selfScore - Adversaire $opponentScore',
                       child: _AnimatedScore(
+                        selfUid: selfUid,
+                        opponentUid: opponent?.uid ?? '',
                         selfScore: selfScore,
                         opponentScore: opponentScore,
                         selfWonThisRound: selfWonRound,
@@ -156,6 +162,8 @@ class _DuelRoundEndOverlayState extends ConsumerState<DuelRoundEndOverlay> {
 
                     // Temps du round.
                     _RoundTimeRow(
+                      selfUid: selfUid,
+                      opponentUid: opponent?.uid ?? '',
                       selfRound: selfRound,
                       opponentRound: opponentRound,
                     ),
@@ -334,12 +342,16 @@ class _GoldenPulseState extends State<_GoldenPulse>
 /// Score animé avec compteur 0→N en 500 ms sur le côté gagnant.
 class _AnimatedScore extends StatefulWidget {
   const _AnimatedScore({
+    required this.selfUid,
+    required this.opponentUid,
     required this.selfScore,
     required this.opponentScore,
     required this.selfWonThisRound,
     required this.opponentWonThisRound,
   });
 
+  final String selfUid;
+  final String opponentUid;
   final int selfScore;
   final int opponentScore;
   final bool selfWonThisRound;
@@ -395,8 +407,9 @@ class _AnimatedScoreState extends State<_AnimatedScore>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _ScoreDigit(
+              uid: widget.selfUid,
               value: _selfAnim.value,
-              label: 'Toi',
+              fallbackLabel: 'Toi',
               highlighted: widget.selfWonThisRound,
             ),
             Padding(
@@ -409,8 +422,9 @@ class _AnimatedScoreState extends State<_AnimatedScore>
               ),
             ),
             _ScoreDigit(
+              uid: widget.opponentUid,
               value: _opponentAnim.value,
-              label: 'Adv.',
+              fallbackLabel: 'Adv.',
               highlighted: widget.opponentWonThisRound,
             ),
           ],
@@ -420,24 +434,51 @@ class _AnimatedScoreState extends State<_AnimatedScore>
   }
 }
 
-class _ScoreDigit extends StatelessWidget {
+class _ScoreDigit extends ConsumerWidget {
   const _ScoreDigit({
+    required this.uid,
     required this.value,
-    required this.label,
+    required this.fallbackLabel,
     required this.highlighted,
   });
 
+  final String uid;
   final int value;
-  final String label;
+  final String fallbackLabel;
   final bool highlighted;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final color = highlighted ? AppColors.orJour : AppColors.textePrimaire;
+    final asyncProfile = uid.isEmpty
+        ? const AsyncValue<PlayerProfile?>.data(null)
+        : ref.watch(playerProfileProvider(uid));
+    final profile = asyncProfile.asData?.value;
+    final hasName = profile?.displayName?.isNotEmpty ?? false;
+    final label = hasName ? profile!.displayName! : fallbackLabel;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        _MiniAvatar(
+          uid: uid,
+          profile: profile,
+          size: 40,
+          borderColor: color,
+          highlighted: highlighted,
+        ),
+        const SizedBox(height: 6),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 110),
+          child: Text(
+            label,
+            style: AppTypography.labelSm.copyWith(color: color),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(height: 4),
         Text(
           '$value',
           style: AppTypography.displayLg.copyWith(
@@ -445,7 +486,6 @@ class _ScoreDigit extends StatelessWidget {
             fontSize: 64,
           ),
         ),
-        Text(label, style: AppTypography.labelSm.copyWith(color: color)),
       ],
     );
   }
@@ -453,10 +493,14 @@ class _ScoreDigit extends StatelessWidget {
 
 class _RoundTimeRow extends StatelessWidget {
   const _RoundTimeRow({
+    required this.selfUid,
+    required this.opponentUid,
     required this.selfRound,
     required this.opponentRound,
   });
 
+  final String selfUid;
+  final String opponentUid;
   final RoundResult? selfRound;
   final RoundResult? opponentRound;
 
@@ -486,34 +530,141 @@ class _RoundTimeRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _TimeCell(label: 'Toi', value: selfTime),
+          Expanded(
+            child: _TimeCell(
+              uid: selfUid,
+              fallbackLabel: 'Toi',
+              value: selfTime,
+            ),
+          ),
           Container(
             width: 1,
             height: 36,
             color: AppColors.texteSecondaire.withValues(alpha: 0.3),
           ),
-          _TimeCell(label: 'Adversaire', value: opponentTime),
+          Expanded(
+            child: _TimeCell(
+              uid: opponentUid,
+              fallbackLabel: 'Adversaire',
+              value: opponentTime,
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _TimeCell extends StatelessWidget {
-  const _TimeCell({required this.label, required this.value});
+class _TimeCell extends ConsumerWidget {
+  const _TimeCell({
+    required this.uid,
+    required this.fallbackLabel,
+    required this.value,
+  });
 
-  final String label;
+  final String uid;
+  final String fallbackLabel;
   final String value;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncProfile = uid.isEmpty
+        ? const AsyncValue<PlayerProfile?>.data(null)
+        : ref.watch(playerProfileProvider(uid));
+    final profile = asyncProfile.asData?.value;
+    final hasName = profile?.displayName?.isNotEmpty ?? false;
+    final label = hasName ? profile!.displayName! : fallbackLabel;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(value, style: AppTypography.headingMd),
-        const SizedBox(height: 2),
-        Text(label, style: AppTypography.bodySm),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _MiniAvatar(
+              uid: uid,
+              profile: profile,
+              size: 18,
+              borderColor: AppColors.texteSecondaire,
+              highlighted: false,
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                style: AppTypography.bodySm,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+          ],
+        ),
       ],
+    );
+  }
+}
+
+/// Mini avatar circulaire — SVG du catalogue si avatarId défini, sinon
+/// initiale du pseudo (ou de l'uid en fallback).
+class _MiniAvatar extends StatelessWidget {
+  const _MiniAvatar({
+    required this.uid,
+    required this.profile,
+    required this.size,
+    required this.borderColor,
+    required this.highlighted,
+  });
+
+  final String uid;
+  final PlayerProfile? profile;
+  final double size;
+  final Color borderColor;
+  final bool highlighted;
+
+  @override
+  Widget build(BuildContext context) {
+    final avatar = AvatarCatalog.byId(profile?.avatarId);
+    final name = profile?.displayName;
+    final initialSource = (name?.isNotEmpty ?? false)
+        ? name!
+        : (uid.isEmpty ? '?' : uid);
+    final initial = initialSource.substring(0, 1).toUpperCase();
+    final borderWidth = highlighted ? 2.0 : 1.4;
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.surfaceContainer,
+        border: Border.all(
+          color: borderColor.withValues(alpha: highlighted ? 0.9 : 0.55),
+          width: borderWidth,
+        ),
+        boxShadow: highlighted
+            ? <BoxShadow>[
+                BoxShadow(
+                  color: borderColor.withValues(alpha: 0.45),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
+      ),
+      clipBehavior: avatar != null ? Clip.antiAlias : Clip.none,
+      child: avatar != null
+          ? SvgPicture.asset(avatar.assetPath, fit: BoxFit.cover)
+          : Center(
+              child: Text(
+                initial,
+                style: AppTypography.bebas(
+                  size: size * 0.5,
+                  color: borderColor,
+                ),
+              ),
+            ),
     );
   }
 }
