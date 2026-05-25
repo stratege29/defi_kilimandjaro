@@ -18,6 +18,7 @@ import 'package:defi_kilimandjaro/presentation/home/providers/current_mountain_p
 import 'package:defi_kilimandjaro/presentation/home/widgets/duels_carousel.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/news_carousel.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/packs_section.dart';
+import 'package:defi_kilimandjaro/presentation/home/widgets/quickmatch_overlay.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/recommended_match_banner.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/stats_row.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
@@ -607,7 +608,10 @@ class _StickyCtaBar extends ConsumerWidget {
                 icon: Icons.bolt,
                 label: 'DÉFIER',
                 color: AppColors.vertClair,
-                onTap: () => context.push(AppRoutes.duelLobby),
+                // Overlay quickmatch : démarre le matchmaking en modale sans
+                // quitter l'accueil. Navigation auto vers /duel/play à la
+                // détection d'un adversaire.
+                onTap: () => showQuickmatchOverlay(context),
               ),
             ),
         ],
