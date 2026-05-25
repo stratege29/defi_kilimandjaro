@@ -7,12 +7,16 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/matchmaking_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
+import 'package:defi_kilimandjaro/domain/avatars/avatar_catalog.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
+import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_controller.dart'
     show lobbyPreviousMatchIdProvider, lobbyRematchUidProvider;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
@@ -112,12 +116,22 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
         }
       }
 
+      // Pseudo adverse pour le texte de partage (déjà streamé par le banner).
+      final opponentUid = _opponentUid();
+      final opponentProfile = opponentUid == null
+          ? null
+          : ref.read(playerProfileProvider(opponentUid)).valueOrNull;
+      final opponentName =
+          (opponentProfile?.displayName?.isNotEmpty ?? false)
+              ? opponentProfile!.displayName!
+              : 'un adversaire';
+
       final delta = _eloDelta?.delta;
       final altitudeText =
           delta != null ? '${delta >= 0 ? '+' : ''}${delta}m' : '';
       final shareText = altitudeText.isNotEmpty
-          ? "J'ai gravi $altitudeText d'altitude sur Kilimandjaro Sagesse Ivoirienne !\nDéfie-moi : $deepLink"
-          : 'Affronte-moi sur Kilimandjaro Sagesse Ivoirienne !\nDéfi : $deepLink';
+          ? "J'ai affronté $opponentName et gravi $altitudeText d'altitude sur Kilimandjaro Sagesse Ivoirienne !\nDéfie-moi : $deepLink"
+          : "J'ai affronté $opponentName sur Kilimandjaro Sagesse Ivoirienne !\nDéfi : $deepLink";
 
       if (imageFile != null) {
         await SharePlus.instance.share(
@@ -201,12 +215,22 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                             ),
                           ),
 
+                          // Bandeau VS — pseudos + avatars des 2 joueurs.
+                          const SizedBox(height: 16),
+                          _PlayerVsBanner(
+                            selfUid: myUid,
+                            opponentUid: opponent?.uid ?? '',
+                            won: won,
+                          ),
+
                           // Score final en grand.
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
                           Semantics(
                             label:
                                 'Score final : Toi $selfScore - Adversaire $opponentScore',
                             child: _FinalScoreBadge(
+                              selfUid: myUid,
+                              opponentUid: opponent?.uid ?? '',
                               selfScore: selfScore,
                               opponentScore: opponentScore,
                               won: won,
@@ -329,11 +353,15 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
 
 class _FinalScoreBadge extends StatelessWidget {
   const _FinalScoreBadge({
+    required this.selfUid,
+    required this.opponentUid,
     required this.selfScore,
     required this.opponentScore,
     required this.won,
   });
 
+  final String selfUid;
+  final String opponentUid;
   final int selfScore;
   final int opponentScore;
   final bool won;
@@ -355,7 +383,12 @@ class _FinalScoreBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _ScoreCol(label: 'Toi', value: selfScore, highlighted: won),
+          _ScoreCol(
+            uid: selfUid,
+            fallbackLabel: 'Toi',
+            value: selfScore,
+            highlighted: won,
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Text(
@@ -366,7 +399,8 @@ class _FinalScoreBadge extends StatelessWidget {
             ),
           ),
           _ScoreCol(
-            label: 'Adv.',
+            uid: opponentUid,
+            fallbackLabel: 'Adv.',
             value: opponentScore,
             highlighted: !won,
           ),
@@ -376,20 +410,28 @@ class _FinalScoreBadge extends StatelessWidget {
   }
 }
 
-class _ScoreCol extends StatelessWidget {
+class _ScoreCol extends ConsumerWidget {
   const _ScoreCol({
-    required this.label,
+    required this.uid,
+    required this.fallbackLabel,
     required this.value,
     required this.highlighted,
   });
 
-  final String label;
+  final String uid;
+  final String fallbackLabel;
   final int value;
   final bool highlighted;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final color = highlighted ? AppColors.orJour : AppColors.textePrimaire;
+    final asyncProfile = uid.isEmpty
+        ? const AsyncValue<PlayerProfile?>.data(null)
+        : ref.watch(playerProfileProvider(uid));
+    final profile = asyncProfile.asData?.value;
+    final hasName = profile?.displayName?.isNotEmpty ?? false;
+    final label = hasName ? profile!.displayName! : fallbackLabel;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -397,8 +439,190 @@ class _ScoreCol extends StatelessWidget {
           '$value',
           style: AppTypography.displayLg.copyWith(color: color),
         ),
-        Text(label, style: AppTypography.labelSm.copyWith(color: color)),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 110),
+          child: Text(
+            label,
+            style: AppTypography.labelSm.copyWith(color: color),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            textAlign: TextAlign.center,
+          ),
+        ),
       ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Bandeau VS — avatars + pseudos des 2 joueurs en haut du récap
+// ---------------------------------------------------------------------------
+
+class _PlayerVsBanner extends ConsumerWidget {
+  const _PlayerVsBanner({
+    required this.selfUid,
+    required this.opponentUid,
+    required this.won,
+  });
+
+  final String selfUid;
+  final String opponentUid;
+  final bool won;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selfProfile = selfUid.isEmpty
+        ? null
+        : ref.watch(playerProfileProvider(selfUid)).valueOrNull;
+    final opponentProfile = opponentUid.isEmpty
+        ? null
+        : ref.watch(playerProfileProvider(opponentUid)).valueOrNull;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Expanded(
+          child: _PlayerVsSide(
+            uid: selfUid,
+            profile: selfProfile,
+            fallbackLabel: 'Toi',
+            highlighted: won,
+            alignEnd: true,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.orJour.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: AppColors.orJour.withValues(alpha: 0.5),
+              ),
+            ),
+            child: Text(
+              'VS',
+              style: AppTypography.bebas(
+                color: AppColors.orJour,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: _PlayerVsSide(
+            uid: opponentUid,
+            profile: opponentProfile,
+            fallbackLabel: 'Adversaire',
+            highlighted: !won,
+            alignEnd: false,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PlayerVsSide extends StatelessWidget {
+  const _PlayerVsSide({
+    required this.uid,
+    required this.profile,
+    required this.fallbackLabel,
+    required this.highlighted,
+    required this.alignEnd,
+  });
+
+  final String uid;
+  final PlayerProfile? profile;
+  final String fallbackLabel;
+  final bool highlighted;
+  final bool alignEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasName = profile?.displayName?.isNotEmpty ?? false;
+    final label = hasName ? profile!.displayName! : fallbackLabel;
+    final color =
+        highlighted ? AppColors.orJour : AppColors.textePrimaire;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment:
+          alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        _ResultAvatar(
+          uid: uid,
+          profile: profile,
+          highlighted: highlighted,
+        ),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          style: AppTypography.headingSm.copyWith(color: color),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          textAlign: alignEnd ? TextAlign.end : TextAlign.start,
+        ),
+      ],
+    );
+  }
+}
+
+class _ResultAvatar extends StatelessWidget {
+  const _ResultAvatar({
+    required this.uid,
+    required this.profile,
+    required this.highlighted,
+  });
+
+  final String uid;
+  final PlayerProfile? profile;
+  final bool highlighted;
+
+  @override
+  Widget build(BuildContext context) {
+    final avatar = AvatarCatalog.byId(profile?.avatarId);
+    final name = profile?.displayName;
+    final initialSource = (name?.isNotEmpty ?? false)
+        ? name!
+        : (uid.isEmpty ? '?' : uid);
+    final initial = initialSource.substring(0, 1).toUpperCase();
+    final borderColor =
+        highlighted ? AppColors.orJour : AppColors.texteSecondaire;
+
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.surfaceContainer,
+        border: Border.all(
+          color: borderColor.withValues(alpha: highlighted ? 0.9 : 0.55),
+          width: highlighted ? 2.2 : 1.6,
+        ),
+        boxShadow: highlighted
+            ? <BoxShadow>[
+                BoxShadow(
+                  color: AppColors.orJour.withValues(alpha: 0.4),
+                  blurRadius: 14,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
+      ),
+      clipBehavior: avatar != null ? Clip.antiAlias : Clip.none,
+      child: avatar != null
+          ? SvgPicture.asset(avatar.assetPath, fit: BoxFit.cover)
+          : Center(
+              child: Text(
+                initial,
+                style: AppTypography.bebas(
+                  size: 24,
+                  color: borderColor,
+                ),
+              ),
+            ),
     );
   }
 }
