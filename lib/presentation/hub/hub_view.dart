@@ -69,6 +69,8 @@ class _HubViewState extends ConsumerState<HubView> {
         current: NavTab.defi,
         onTabSelected: (t) {
           switch (t) {
+            case NavTab.accueil:
+              context.go(AppRoutes.home);
             case NavTab.defi:
               break;
             case NavTab.sommets:

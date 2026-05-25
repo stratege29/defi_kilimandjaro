@@ -11,6 +11,7 @@ import 'package:defi_kilimandjaro/presentation/duel/duel_scan_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_view.dart';
+import 'package:defi_kilimandjaro/presentation/home/home_view.dart';
 import 'package:defi_kilimandjaro/presentation/hub/hub_view.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_confirm_view.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_scan_view.dart';
@@ -35,6 +36,11 @@ import 'package:go_router/go_router.dart';
 abstract final class AppRoutes {
   static const splash = '/';
   static const onboarding = '/onboarding';
+
+  /// Hub d'accueil — page d'atterrissage par défaut après onboarding.
+  static const home = '/accueil';
+
+  /// Hub Défi 1v1 (onglet « Défi » de la nav bottom).
   static const hub = '/hub';
   static const game = '/game';
   static const result = '/result';
@@ -138,7 +144,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final goingToChooser = loc == AppRoutes.packChooser;
 
       if (!hasChosen && !goingToChooser) return AppRoutes.packChooser;
-      if (hasChosen && goingToChooser) return AppRoutes.mountains;
+      if (hasChosen && goingToChooser) return AppRoutes.home;
       return null;
     },
   routes: <RouteBase>[
@@ -151,6 +157,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       path: AppRoutes.onboarding,
       name: 'onboarding',
       builder: (_, __) => const OnboardingView(),
+    ),
+    GoRoute(
+      path: AppRoutes.home,
+      name: 'home',
+      builder: (_, __) => const HomeView(),
     ),
     GoRoute(
       path: AppRoutes.hub,

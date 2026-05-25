@@ -49,7 +49,7 @@ class _SplashViewState extends ConsumerState<SplashView>
       if (!mounted) return;
       final prefs = ref.read(sharedPreferencesProvider);
       final destination = isOnboardingSeen(prefs)
-          ? AppRoutes.hub
+          ? AppRoutes.home
           : AppRoutes.onboarding;
       context.go(destination);
     });
