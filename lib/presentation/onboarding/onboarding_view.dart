@@ -64,7 +64,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
     final prefs = ref.read(sharedPreferencesProvider);
     await markOnboardingSeen(prefs);
     if (!mounted) return;
-    context.go(AppRoutes.hub);
+    context.go(AppRoutes.home);
   }
 
   @override

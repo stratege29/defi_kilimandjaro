@@ -10,6 +10,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Trio de cartes statistiques compactes : sommets · duels · précision.
+///
+/// Chiffres en Fraunces 28 (signature éditoriale premium type Apple/Stripe),
+/// labels en Crimson italique. Fond surfaceContainer avec gradient diagonal
+/// pour la profondeur, accent or sur l'icône.
 class StatsRow extends ConsumerWidget {
   const StatsRow({super.key});
 
@@ -85,22 +89,51 @@ class _StatSquare extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
           decoration: BoxDecoration(
-            color: AppColors.bois.withValues(alpha: 0.20),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.3)),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.surfaceContainer.withValues(alpha: 0.55),
+                AppColors.surfaceContainer.withValues(alpha: 0.25),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.orSoleil.withValues(alpha: 0.32),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.18),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: AppColors.orSoleil, size: 18),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: AppTypography.bebas(size: 22, color: AppColors.orSoleil),
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: AppColors.orSoleil.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: AppColors.orSoleil, size: 16),
+              ),
+              const SizedBox(height: 8),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  value,
+                  style: AppTypography.playfair(
+                    size: 26,
+                    color: AppColors.textePrimaire,
+                  ),
+                ),
               ),
               const SizedBox(height: 2),
               Text(

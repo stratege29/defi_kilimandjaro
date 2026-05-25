@@ -73,7 +73,7 @@ class _PackChooserViewState extends ConsumerState<PackChooserView>
       await notifier.grantPack(packId);
       await notifier.setPackMix(PackMix.single(packId));
       if (!mounted) return;
-      context.go(AppRoutes.mountains);
+      context.go(AppRoutes.home);
     } on Exception {
       if (!mounted) return;
       setState(() => _confirming = false);
