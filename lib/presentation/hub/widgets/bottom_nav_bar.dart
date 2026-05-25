@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 /// **pill animée** (`AnimatedPositioned` 350 ms `easeOutCubic`, Wave Mobile
 /// Money pattern). La pill glisse d'un onglet à l'autre quand `current`
 /// change, ce qui donne immédiatement un feeling 2026.
-enum NavTab { defi, sommets, profil }
+enum NavTab { accueil, defi, sommets, profil }
 
 class AppBottomNavBar extends StatelessWidget {
   const AppBottomNavBar({
@@ -76,6 +76,15 @@ class AppBottomNavBar extends StatelessWidget {
                       // Row d'onglets — au-dessus de la pill.
                       Row(
                         children: [
+                          _NavItem(
+                            // Placeholder Material : pas encore de PNG dédié
+                            // dans assets/images/icons/. Voir `iconNavPlay`
+                            // pour le style cible à reproduire.
+                            icon: Icons.home_rounded,
+                            label: 'Accueil',
+                            active: current == NavTab.accueil,
+                            onTap: () => onTabSelected(NavTab.accueil),
+                          ),
                           _NavItem(
                             assetPath: AppAssets.iconNavPlay,
                             label: 'Défi',

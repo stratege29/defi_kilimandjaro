@@ -158,6 +158,8 @@ class ProfileView extends ConsumerWidget {
         current: NavTab.profil,
         onTabSelected: (t) {
           switch (t) {
+            case NavTab.accueil:
+              context.go(AppRoutes.home);
             case NavTab.defi:
               context.go(AppRoutes.hub);
             case NavTab.sommets:

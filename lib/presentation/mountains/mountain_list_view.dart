@@ -318,6 +318,8 @@ class _MountainListViewState extends ConsumerState<MountainListView>
         current: NavTab.sommets,
         onTabSelected: (t) {
           switch (t) {
+            case NavTab.accueil:
+              context.go(AppRoutes.home);
             case NavTab.defi:
               context.go(AppRoutes.hub);
             case NavTab.sommets:
