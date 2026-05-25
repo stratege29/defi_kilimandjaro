@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as developer;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -12,7 +11,6 @@ import 'package:defi_kilimandjaro/data/ads/consent_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/app_check_setup.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
-import 'package:defi_kilimandjaro/data/repositories/composite_devinette_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/fcm_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
@@ -83,6 +81,15 @@ Future<void> _bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
   // ignore: avoid_print
   print('[BOOT] 1 WidgetsFlutterBinding OK');
+
+  // Remplace l'ecran blanc (par defaut Flutter en release quand un widget
+  // throw) par un fallback visible. L'erreur est aussi loggee via
+  // FlutterError.onError → Crashlytics. Permet aux utilisateurs de savoir
+  // que quelque chose s'est mal passe et de relancer l'app, plutot que
+  // de rester sur un ecran vide en croyant que l'app est figee.
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return _AppErrorWidget(details: details);
+  };
   await EasyLocalization.ensureInitialized();
   // ignore: avoid_print
   print('[BOOT] 2 EasyLocalization OK');
@@ -381,6 +388,66 @@ class KilimandjaroApp extends ConsumerWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
+    );
+  }
+}
+
+/// Widget de fallback affiche a la place d'un widget qui throw au build.
+///
+/// Sans ce widget custom, Flutter en release affiche un ecran VIDE quand
+/// un widget throw (et un RedScreen en debug). L'utilisateur croit que
+/// l'app est figee. Ici on affiche un message + bouton "Reessayer" qui
+/// pop la route courante (souvent suffisant pour debloquer).
+///
+/// L'erreur reelle est dans Crashlytics via FlutterError.onError.
+class _AppErrorWidget extends StatelessWidget {
+  const _AppErrorWidget({required this.details});
+
+  final FlutterErrorDetails details;
+
+  @override
+  Widget build(BuildContext context) {
+    const isDebug = kDebugMode;
+    return Material(
+      color: const Color(0xFF0F2A14), // vertForet fallback (sans theme)
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                color: Color(0xFFE0B341), // orSoleil fallback
+                size: 56,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Une erreur est survenue',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFFE0B341),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                isDebug
+                    ? '${details.exception}'
+                    : "Reouvre l'app pour reessayer.\nL'erreur a ete signalee.",
+                textAlign: TextAlign.center,
+                maxLines: isDebug ? 8 : 3,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Color(0xFFE6D7B8),
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
