@@ -104,12 +104,16 @@
 - [ ] Streak quotidien + récompense escalier
 - [ ] Toggle son + toggle timer + bouton réinitialisation (confirm dialog)
 
-### Phase 4 — Monétisation (S8)
-- [ ] IAP packs Coins (test sandbox iOS + license tester Android)
-- [ ] AdMob — rewarded video "+50 coins", interstitiel après 3 échecs
-- [ ] No-Ads purchase 4,99 € (entitlement persistant)
-- [ ] Remote Config : drop rates, prix indices, A/B onboarding
-- [ ] Privacy Manifest iOS + Data Safety Android
+### Phase 4 — Monétisation (S8) — ✅ code prêt, actions consoles restantes
+- [x] IAP packs Cauris (5 paliers 49/199/499/1499/4999) — validation serveur via Cloud Function `validateIapReceipt`
+- [x] AdMob — rewarded video dynamique (montant + cap quotidien via Remote Config), 3 placements (in-game, victory "doubler", shop), interstitielle toutes les 3 victoires + min-interval 60s
+- [x] No-Ads purchase 4,99 € (entitlement persistant)
+- [x] Remote Config foundation : 12 clés `eco_*` / `ads_*` + killswitch global
+- [x] Streak quotidien escalier J1→J7 (10/20/40/60/100/150/300)
+- [x] Starter Pack 2,99 € (350 cauris, visible H+0→H+48 après install)
+- [x] Coût indice progressif intra-niveau (×1.5 par indice supplémentaire)
+- [x] Privacy Manifest iOS + NSUserTrackingUsageDescription (ATT post 2e victoire)
+- [ ] **Actions consoles** : créer clés Remote Config + Starter Pack iOS/Android + unités AdMob Android prod (cf. mémoire `phase4_manual_setup`)
 
 ### Phase 5 — MVP Solo Soumission (S9)
 - [ ] Polish accessibilité (zones tactiles 44×44 px min)

@@ -4,12 +4,17 @@ import 'dart:ui' as ui;
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
+import 'package:defi_kilimandjaro/data/ads/rewarded_daily_cap_service.dart';
+import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
+import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Écran 04 — Overlay Victoire (refonte world-class 2026).
 ///
@@ -27,10 +32,11 @@ import 'package:flutter/physics.dart';
 ///
 /// **Bugfix** : wrap en `Material(transparency)` — sans Material ancestor
 /// le `Text` Flutter rendait les soulignés debug "missing material".
-class VictoryView extends StatefulWidget {
+class VictoryView extends ConsumerStatefulWidget {
   const VictoryView({
     required this.devinette,
     required this.timeLeft,
+    required this.caurisAwarded,
     required this.onNext,
     this.starsEarned = 0,
     this.isBoss = false,
@@ -39,8 +45,13 @@ class VictoryView extends StatefulWidget {
 
   final Devinette devinette;
 
-  /// Secondes restantes au moment de la victoire (pour bonus cauris).
+  /// Secondes restantes au moment de la victoire (pour affichage info).
   final int timeLeft;
+
+  /// Récompense effective créditée par le controller. Pilote l'animation
+  /// du chip "+N CAURIS" et sert de base au bouton "Doubler la récompense"
+  /// (rewarded vidéo crédite un second [caurisAwarded] sur succès).
+  final int caurisAwarded;
 
   /// Nombre d'étoiles obtenues (0-3). 0 ne devrait jamais arriver ici
   /// puisque l'overlay n'est affiché que sur victoire (≥ 1).
@@ -55,10 +66,10 @@ class VictoryView extends StatefulWidget {
   final VoidCallback onNext;
 
   @override
-  State<VictoryView> createState() => _VictoryViewState();
+  ConsumerState<VictoryView> createState() => _VictoryViewState();
 }
 
-class _VictoryViewState extends State<VictoryView>
+class _VictoryViewState extends ConsumerState<VictoryView>
     with TickerProviderStateMixin {
   late final AnimationController _particleCtrl;
   late final AnimationController _celebCtrl;
@@ -69,7 +80,16 @@ class _VictoryViewState extends State<VictoryView>
   late final Animation<double> _cardScale;
   late final Animation<int> _caurisAnim;
 
-  int get _caurisEarned => 30 + widget.timeLeft;
+  int get _caurisEarned => widget.caurisAwarded;
+
+  /// Vrai après que le joueur a cliqué "Doubler" et que la pub s'est
+  /// terminée avec succès — masque le bouton et déclenche le second tween
+  /// d'animation.
+  bool _doubled = false;
+
+  /// Vrai pendant la transition (pub en cours / crédit cauris) pour éviter
+  /// les double-taps qui crédentteraient 2× la récompense bonus.
+  bool _doubling = false;
 
   @override
   void initState() {
@@ -125,6 +145,67 @@ class _VictoryViewState extends State<VictoryView>
     super.dispose();
   }
 
+  /// Construit le bouton "Doubler la récompense" si toutes les conditions
+  /// sont réunies : flag Remote Config activé, joueur sans No-Ads, killswitch
+  /// off, cap quotidien non atteint, pub pas encore visionnée pour cette
+  /// victoire. Retourne `SizedBox.shrink` sinon — le card omet alors la
+  /// row supplémentaire.
+  Widget _buildDoubleButton(BuildContext context) {
+    if (_doubled) return const SizedBox.shrink();
+
+    final econ = ref.watch(gameEconomyConfigProvider);
+    if (!econ.rewardedDoubleEnabled) return const SizedBox.shrink();
+
+    final progress = ref.watch(playerProgressProvider);
+    if (progress.noAdsPurchased) return const SizedBox.shrink();
+
+    if (!ref.watch(canOfferRewardedProvider)) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: _DoubleRewardButton(
+        bonus: widget.caurisAwarded,
+        loading: _doubling,
+        onTap: _doubling ? null : _handleDouble,
+      ),
+    );
+  }
+
+  /// Lance la rewarded vidéo et crédite un second `caurisAwarded` si le
+  /// joueur regarde jusqu'au bout. Affiche un snackbar de confirmation
+  /// puis cache le bouton + déclenche la 2e animation cauris.
+  Future<void> _handleDouble() async {
+    if (_doubling || _doubled) return;
+    setState(() => _doubling = true);
+
+    final bonus = widget.caurisAwarded;
+    final got = await ref
+        .read(adsServiceProvider)
+        .showRewardedForCauris(caurisReward: bonus);
+
+    if (!mounted) return;
+    if (got) {
+      setState(() {
+        _doubled = true;
+        _doubling = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '+$bonus Cauris bonus — récompense doublée !',
+            style: AppTypography.bebas(),
+          ),
+          backgroundColor: AppColors.orJour,
+          duration: const Duration(milliseconds: 1500),
+        ),
+      );
+    } else {
+      setState(() => _doubling = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Material(transparency) : fournit le DefaultTextStyle ancestor pour
@@ -153,6 +234,7 @@ class _VictoryViewState extends State<VictoryView>
                 onNext: widget.onNext,
                 starsEarned: widget.starsEarned,
                 isBoss: widget.isBoss,
+                doubleButton: _buildDoubleButton(context),
               ),
             ),
           ),
@@ -174,6 +256,7 @@ class _VictoryCard extends StatelessWidget {
     required this.onNext,
     required this.starsEarned,
     required this.isBoss,
+    required this.doubleButton,
   });
 
   final Devinette devinette;
@@ -182,6 +265,12 @@ class _VictoryCard extends StatelessWidget {
   final VoidCallback onNext;
   final int starsEarned;
   final bool isBoss;
+
+  /// Bouton optionnel "Doubler la récompense" (rewarded video). Vide
+  /// (SizedBox.shrink) quand les conditions ne sont pas réunies, ce qui
+  /// laisse le card visuellement inchangé pour les joueurs No-Ads / cap
+  /// atteint / killswitch.
+  final Widget doubleButton;
 
   @override
   Widget build(BuildContext context) {
@@ -304,6 +393,9 @@ class _VictoryCard extends StatelessWidget {
           const SizedBox(height: 24),
           // Reward cauris — chip pill animé (ka-ching).
           _CaurisRewardChip(caurisAnim: caurisAnim),
+          // Bouton optionnel "Doubler" — n'apparaît que si conditions
+          // remplies (cf. `_VictoryViewState._buildDoubleButton`).
+          doubleButton,
           const SizedBox(height: 24),
           // CTA primaire — design system 2026.
           AppButton(
@@ -312,6 +404,74 @@ class _VictoryCard extends StatelessWidget {
             fullWidth: true,
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Bouton "Doubler la récompense" — convertit ~25-40 % des victoires
+/// observées sur le segment Word puzzle. Style discret pour ne pas
+/// éclipser le CTA primaire "SUIVANT" : bordure or, fond translucide,
+/// icône play_circle + montant en gros.
+class _DoubleRewardButton extends StatelessWidget {
+  const _DoubleRewardButton({
+    required this.bonus,
+    required this.loading,
+    required this.onTap,
+  });
+
+  final int bonus;
+  final bool loading;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(100),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.orJour.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(100),
+            border: Border.all(
+              color: AppColors.orJour.withValues(alpha: 0.55),
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              if (loading)
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.orJour),
+                  ),
+                )
+              else
+                const Icon(
+                  Icons.play_circle_filled_rounded,
+                  size: 20,
+                  color: AppColors.orJour,
+                ),
+              const SizedBox(width: 8),
+              Text(
+                'DOUBLER (+$bonus)',
+                style: AppTypography.bebas(
+                  size: 14,
+                  color: AppColors.orJour,
+                ).copyWith(letterSpacing: 1.2),
+              ),
+              const SizedBox(width: 6),
+              const CaurisIcon(size: 16),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -2,11 +2,13 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
+import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/continue_ascent_card.dart';
+import 'package:defi_kilimandjaro/presentation/home/widgets/daily_streak_dialog.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/duels_carousel.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/home_header.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/news_carousel.dart';
@@ -33,11 +35,45 @@ import 'package:go_router/go_router.dart';
 /// - [NewsCarousel] : promos packs payants + UGC + classement
 /// - [StatsRow] : 3 carrés stats premium Fraunces
 /// - [StickyCtaBar] : GRIMPER (shimmer) + DÉFIER (outline)
-class HomeView extends ConsumerWidget {
+class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends ConsumerState<HomeView> {
+  /// True une fois que le popup streak a été affiché (ou ignoré) sur cette
+  /// session. Évite de le ré-déclencher si l'utilisateur revient à l'accueil
+  /// via la bottom nav après l'avoir vu.
+  bool _streakDialogShown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowStreak());
+  }
+
+  /// Affiche le popup streak escalier si claimable et pas déjà montré
+  /// dans la session. Best-effort : si Remote Config n'est pas prêt on
+  /// utilise les defaults, donc toujours fonctionnel.
+  Future<void> _maybeShowStreak() async {
+    if (_streakDialogShown) return;
+    if (!mounted) return;
+    final config = ref.read(gameEconomyConfigProvider);
+    final claim = ref
+        .read(playerProgressProvider.notifier)
+        .peekClaimableStreak(config: config);
+    if (claim == null) return;
+    _streakDialogShown = true;
+    await showDialog<int>(
+      context: context,
+      builder: (_) => DailyStreakDialog(streakDay: claim.streakDay),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.vertForet,
       body: SafeArea(

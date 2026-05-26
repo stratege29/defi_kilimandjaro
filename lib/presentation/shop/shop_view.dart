@@ -1,9 +1,13 @@
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
+import 'package:defi_kilimandjaro/data/ads/rewarded_daily_cap_service.dart';
+import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/iap/cauris_pack.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -49,6 +53,36 @@ class ShopView extends ConsumerWidget {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 children: [
+                  // Starter Pack — visible H+0 → H+48 après install, une
+                  // seule fois. Couronne le top des cartes pour maximiser
+                  // l'engagement à chaud.
+                  if (_isStarterEligible(progress))
+                    _StarterPackCard(
+                      cauris: starterPackCauris,
+                      priceLabel: ref
+                          .watch(caurisOffersProvider.notifier)
+                          .starterPackPriceLabel,
+                      available: ref
+                          .watch(caurisOffersProvider.notifier)
+                          .starterPackAvailable,
+                      remaining: _starterRemaining(progress.installDate!),
+                      onBuy: () => _handleBuyStarter(context, ref),
+                    ),
+                  // Carte rewarded au-dessus des packs payants : exposer
+                  // l'option gratuite **avant** le paywall augmente la
+                  // confiance et la conversion IAP au passage des joueurs
+                  // qui hésitent. Visible uniquement si offre encore
+                  // possible (cap quotidien, killswitch, No-Ads).
+                  if (!progress.noAdsPurchased &&
+                      ref.watch(canOfferRewardedProvider))
+                    _RewardedFreeCard(
+                      amount: ref.watch(
+                        gameEconomyConfigProvider.select(
+                          (c) => c.rewardedVideoBonus,
+                        ),
+                      ),
+                      onWatch: () => _handleWatchRewarded(context, ref),
+                    ),
                   for (final o in offers)
                     _PackCard(
                       offer: o,
@@ -79,6 +113,71 @@ class ShopView extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Fenêtre d'éligibilité Starter Pack : pas encore acheté, installé
+  /// il y a moins de 48 h, et date d'installation connue (`null` pour
+  /// les profils créés avant le déploiement Phase 4 — pas de starter).
+  static bool _isStarterEligible(PlayerProgress p) {
+    if (p.starterPackPurchased) return false;
+    final installed = p.installDate;
+    if (installed == null) return false;
+    return DateTime.now().difference(installed) < const Duration(hours: 48);
+  }
+
+  /// Temps restant avant expiration du Starter Pack (chronométré côté UI).
+  static Duration _starterRemaining(DateTime installDate) {
+    const window = Duration(hours: 48);
+    final elapsed = DateTime.now().difference(installDate);
+    final remaining = window - elapsed;
+    return remaining.isNegative ? Duration.zero : remaining;
+  }
+
+  Future<void> _handleBuyStarter(BuildContext context, WidgetRef ref) async {
+    final notifier = ref.read(caurisOffersProvider.notifier);
+    if (!notifier.starterPackAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Bientôt disponible', style: AppTypography.bebas()),
+          backgroundColor: AppColors.boisFonce,
+        ),
+      );
+      return;
+    }
+    final ok = await notifier.buyStarterPack();
+    if (!context.mounted) return;
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Achat non lancé — réessaie',
+            style: AppTypography.bebas(),
+          ),
+          backgroundColor: AppColors.rouge,
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleWatchRewarded(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final amount = ref.read(gameEconomyConfigProvider).rewardedVideoBonus;
+    final got = await ref.read(adsServiceProvider).showRewardedForCauris();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          got
+              ? '+$amount Cauris de Sagesse — merci !'
+              : 'Pub non disponible — réessaie plus tard',
+          style: AppTypography.bebas(),
+        ),
+        backgroundColor: got ? AppColors.vertClair : AppColors.boisFonce,
+        duration: const Duration(milliseconds: 1600),
       ),
     );
   }
@@ -453,6 +552,275 @@ class _NoAdsCard extends ConsumerWidget {
                       ),
                     ),
                   ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Starter Pack — carte premium one-time visible 48h après install.
+///
+/// Pourquoi ce placement & ce design :
+/// - Position #1 dans la liste (avant la carte rewarded + packs payants).
+/// - Compte à rebours visible "expire dans 47h 32min" : crée de l'urgence
+///   sans agressivité (la fenêtre est large).
+/// - Badge "OFFRE DE BIENVENUE" pour signifier que c'est exceptionnel.
+///
+/// Benchmark : conversion D1 +35-40% sur le segment word puzzle.
+class _StarterPackCard extends StatelessWidget {
+  const _StarterPackCard({
+    required this.cauris,
+    required this.priceLabel,
+    required this.available,
+    required this.remaining,
+    required this.onBuy,
+  });
+
+  final int cauris;
+  final String priceLabel;
+  final bool available;
+  final Duration remaining;
+  final VoidCallback onBuy;
+
+  String _formatRemaining(Duration d) {
+    final h = d.inHours;
+    final m = d.inMinutes.remainder(60);
+    if (h > 0) return '${h}h ${m.toString().padLeft(2, '0')}min';
+    return '${m}min';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.orJour.withValues(alpha: 0.30),
+            AppColors.orChaud.withValues(alpha: 0.18),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.orJour, width: 2),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: AppColors.orJour.withValues(alpha: 0.25),
+            blurRadius: 24,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: available ? onBuy : null,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.orJour,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'OFFRE DE BIENVENUE',
+                        style: AppTypography.bebas(
+                          size: 11,
+                          color: AppColors.vertForet,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Icon(
+                      Icons.timer_outlined,
+                      size: 14,
+                      color: AppColors.orJour.withValues(alpha: 0.85),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'expire dans ${_formatRemaining(remaining)}',
+                      style: AppTypography.bebas(
+                        size: 12,
+                        color: AppColors.orJour.withValues(alpha: 0.85),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: <Widget>[
+                    SizedBox(
+                      width: 72,
+                      height: 72,
+                      child: Image.asset(
+                        AppAssets.shopCaurisL,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                '$cauris Cauris',
+                                style: AppTypography.bebas(size: 22),
+                              ),
+                              const SizedBox(width: 6),
+                              const CaurisIcon(size: 16),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Boost de démarrage — achat unique',
+                            style: AppTypography.crimson(
+                              size: 12,
+                              color: AppColors.texteSecondaire,
+                              style: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: available
+                            ? AppColors.orJour
+                            : AppColors.bois.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        priceLabel,
+                        style: AppTypography.bebas(
+                          color: available
+                              ? AppColors.vertForet
+                              : AppColors.texteTertiaire,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Carte rewarded gratuite placée en tête de la boutique.
+///
+/// Pourquoi en haut : exposer l'option non-payante **avant** les packs
+/// augmente la confiance et lève l'objection "vous voulez juste mon
+/// argent". La conversion IAP au passage des joueurs free-to-play
+/// s'améliore (benchmark Wordscapes, Word Connect!).
+class _RewardedFreeCard extends StatelessWidget {
+  const _RewardedFreeCard({required this.amount, required this.onWatch});
+
+  final int amount;
+  final VoidCallback onWatch;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.orJour.withValues(alpha: 0.18),
+            AppColors.orChaud.withValues(alpha: 0.10),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.orJour.withValues(alpha: 0.55)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onWatch,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  width: 58,
+                  height: 58,
+                  decoration: BoxDecoration(
+                    color: AppColors.orJour.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.play_circle_filled_rounded,
+                    size: 34,
+                    color: AppColors.orJour,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Text(
+                            '+$amount Cauris',
+                            style: AppTypography.bebas(size: 18),
+                          ),
+                          const SizedBox(width: 6),
+                          const CaurisIcon(size: 14),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Gratuit — regarde une courte vidéo',
+                        style: AppTypography.crimson(
+                          size: 12,
+                          color: AppColors.texteSecondaire,
+                          style: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.orJour,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    'GRATUIT',
+                    style: AppTypography.bebas(color: AppColors.vertForet),
+                  ),
+                ),
               ],
             ),
           ),

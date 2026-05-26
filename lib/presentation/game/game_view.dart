@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
+import 'package:defi_kilimandjaro/data/ads/att_service.dart';
+import 'package:defi_kilimandjaro/data/ads/rewarded_daily_cap_service.dart';
+import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
@@ -136,7 +141,12 @@ class _GameViewState extends ConsumerState<GameView>
         _overlayShown = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          _showVictoryOverlay(context, next.timeLeft, next.starsEarned);
+          _showVictoryOverlay(
+            context,
+            next.timeLeft,
+            next.starsEarned,
+            next.caurisAwarded,
+          );
         });
       } else if (next.phase == GamePhase.lost &&
           (previous == null || previous.phase != GamePhase.lost)) {
@@ -207,11 +217,23 @@ class _GameViewState extends ConsumerState<GameView>
                 ),
               ),
               const SizedBox(height: 8),
-              // Rewarded video chip ("+50 🪙 regarder une pub").
-              if (!ref.watch(playerProgressProvider).noAdsPurchased)
+              // Rewarded video chip ("+N 🪙 regarder une pub").
+              // Visible si : pas No-Ads, killswitch off, cap quotidien non
+              // atteint. Le montant et le cap sont pilotés par Remote Config
+              // (cf. `GameEconomyConfig`).
+              if (!ref.watch(playerProgressProvider).noAdsPurchased &&
+                  ref.watch(canOfferRewardedProvider))
                 _RewardedAdChip(
                   enabled: gameState.phase == GamePhase.playing,
+                  amount: ref.watch(
+                    gameEconomyConfigProvider.select(
+                      (c) => c.rewardedVideoBonus,
+                    ),
+                  ),
                   onWatch: () async {
+                    final amount = ref
+                        .read(gameEconomyConfigProvider)
+                        .rewardedVideoBonus;
                     final got = await ref
                         .read(adsServiceProvider)
                         .showRewardedForCauris();
@@ -220,7 +242,7 @@ class _GameViewState extends ConsumerState<GameView>
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            '+50 Cauris de Sagesse',
+                            '+$amount Cauris de Sagesse',
                             style: AppTypography.bebas(),
                           ),
                           backgroundColor: AppColors.vertClair,
@@ -232,19 +254,7 @@ class _GameViewState extends ConsumerState<GameView>
                 ),
               const SizedBox(height: 8),
               // Bottom action buttons.
-              _ActionButtons(
-                onHint: controller.useHint,
-                onClear: controller.clearSelection,
-                onValidate: controller.validate,
-                canHint:
-                    gameState.cauris >= 20 &&
-                    gameState.hintRevealedCount <
-                        widget.args.devinette.answer.length &&
-                    gameState.phase == GamePhase.playing,
-                canValidate:
-                    gameState.selectedIndices.isNotEmpty &&
-                    gameState.phase == GamePhase.playing,
-              ),
+              _buildActionButtons(context, ref, controller, gameState),
               const SizedBox(height: 16),
             ],
           ),
@@ -321,7 +331,81 @@ class _GameViewState extends ConsumerState<GameView>
     }
   }
 
-  void _showVictoryOverlay(BuildContext ctx, int timeLeft, int starsEarned) {
+  /// Construit la rangée d'actions (Indice / Effacer / Valider) avec la
+  /// logique de coût dynamique + fallback rewarded.
+  ///
+  /// Cas du bouton **Indice** :
+  /// - Solde >= coût indice → `useHint()` normal.
+  /// - Solde < coût ET joueur peut voir une rewarded → snackbar CTA
+  ///   "Regarde une pub pour gagner +N cauris". Plus doux qu'un modal forcé
+  ///   et préserve la conversion IAP (le joueur garde le choix).
+  /// - Solde < coût ET pas de rewarded dispo (cap atteint, killswitch,
+  ///   No-Ads sans solde) → bouton réellement disabled.
+  Widget _buildActionButtons(
+    BuildContext context,
+    WidgetRef ref,
+    GameController controller,
+    GameState gameState,
+  ) {
+    final cost = controller.nextHintCost;
+    final hasLettersLeft =
+        gameState.hintRevealedCount < widget.args.devinette.answer.length;
+    final isPlaying = gameState.phase == GamePhase.playing;
+    final canAfford = gameState.cauris >= cost;
+    final canRewardedFallback = ref.watch(canOfferRewardedProvider) &&
+        !ref.watch(playerProgressProvider).noAdsPurchased;
+
+    return _ActionButtons(
+      hintCostLabel: '-$cost',
+      onHint: () {
+        if (canAfford) {
+          controller.useHint();
+          return;
+        }
+        // Solde insuffisant — propose la rewarded sans forcer.
+        final amount = ref.read(gameEconomyConfigProvider).rewardedVideoBonus;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Pas assez de cauris — regarde une pub pour gagner +$amount',
+              style: AppTypography.bebas(),
+            ),
+            backgroundColor: AppColors.boisFonce,
+            duration: const Duration(milliseconds: 2000),
+          ),
+        );
+      },
+      onClear: controller.clearSelection,
+      onValidate: controller.validate,
+      canHint: hasLettersLeft &&
+          isPlaying &&
+          (canAfford || canRewardedFallback),
+      canValidate:
+          gameState.selectedIndices.isNotEmpty && isPlaying,
+    );
+  }
+
+  void _showVictoryOverlay(
+    BuildContext ctx,
+    int timeLeft,
+    int starsEarned,
+    int caurisAwarded,
+  ) {
+    // Compte la victoire pour la cadence interstitielle (Étape D).
+    // L'incrément est fait au moment de l'overlay : si le joueur quitte
+    // avant de tap SUIVANT, sa victoire compte quand même.
+    ref.read(adsServiceProvider).noteVictory();
+
+    // ATT prompt (iOS) — déclenché à partir de la 2e victoire cumulée
+    // (joueur engagé). Idempotent, no-op si déjà prompted ou Android.
+    final totalVictories =
+        ref.read(playerProgressProvider).totalLevelsCompleted;
+    if (totalVictories >= 2) {
+      unawaited(
+        ref.read(attServiceProvider).maybePromptAfterEngagement(),
+      );
+    }
+
     showDialog<void>(
       context: ctx,
       barrierDismissible: false,
@@ -329,14 +413,17 @@ class _GameViewState extends ConsumerState<GameView>
       builder: (_) => VictoryView(
         devinette: widget.args.devinette,
         timeLeft: timeLeft,
+        caurisAwarded: caurisAwarded,
         starsEarned: starsEarned,
         isBoss: widget.args.config.isBoss,
-        onNext: () {
-          // Ferme l'overlay puis enchaîne automatiquement sur la prochaine
-          // étape : devinette suivante de la même montagne, ou montagne
-          // suivante si celle-ci vient d'être conquise.
+        onNext: () async {
+          // Ferme l'overlay, tente une interstitielle (transition naturelle
+          // entre 2 niveaux), puis enchaîne sur la suite. Le helper skip
+          // si pas atteint / min interval / killswitch / No-Ads / duel.
           ctx.pop();
-          _advanceAfterVictory();
+          await ref.read(adsServiceProvider).maybeShowInterstitial();
+          if (!mounted) return;
+          await _advanceAfterVictory();
         },
       ),
     );
@@ -482,16 +569,12 @@ class _GameViewState extends ConsumerState<GameView>
     BuildContext ctx,
     GameController controller,
   ) async {
-    // Records the failure and triggers an interstitial every 3 in a row,
-    // unless the player has bought "No-Ads".
-    final progress = ref.read(playerProgressProvider);
-    if (!progress.noAdsPurchased) {
-      final newCount = await ref
-          .read(playerProgressProvider.notifier)
-          .recordFailure();
-      if (newCount % 3 == 0) {
-        await ref.read(adsServiceProvider).maybeShowInterstitial();
-      }
+    // Échec : on incrémente seulement le compteur (utilisé pour stats /
+    // titres). L'interstitielle n'est plus déclenchée par les échecs
+    // (Étape D Phase 4) — punir l'échec dégrade l'expérience. La pub
+    // arrive maintenant entre deux niveaux après une victoire normale.
+    if (!ref.read(playerProgressProvider).noAdsPurchased) {
+      await ref.read(playerProgressProvider.notifier).recordFailure();
     }
     if (!ctx.mounted) return;
     await showDialog<void>(
@@ -511,8 +594,13 @@ class _GameViewState extends ConsumerState<GameView>
 }
 
 class _RewardedAdChip extends StatelessWidget {
-  const _RewardedAdChip({required this.enabled, required this.onWatch});
+  const _RewardedAdChip({
+    required this.enabled,
+    required this.amount,
+    required this.onWatch,
+  });
   final bool enabled;
+  final int amount;
   final VoidCallback onWatch;
 
   @override
@@ -546,7 +634,7 @@ class _RewardedAdChip extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '+50',
+                  '+$amount',
                   style: AppTypography.bebas(
                     size: 13,
                     color: AppColors.orSoleil.withValues(
@@ -853,6 +941,7 @@ class _ActionButtons extends StatelessWidget {
     required this.onValidate,
     required this.canHint,
     required this.canValidate,
+    required this.hintCostLabel,
   });
 
   final VoidCallback onHint;
@@ -860,6 +949,10 @@ class _ActionButtons extends StatelessWidget {
   final VoidCallback onValidate;
   final bool canHint;
   final bool canValidate;
+
+  /// Sous-titre affiché sur le bouton Indice (ex: "-20"). Dynamique pour
+  /// supporter le coût progressif intra-niveau (cf. `hintCostMultiplier`).
+  final String hintCostLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -871,7 +964,7 @@ class _ActionButtons extends StatelessWidget {
           Expanded(
             child: _GameButton(
               label: 'game.hint'.tr(),
-              subtitle: '-20',
+              subtitle: hintCostLabel,
               iconAsset: AppAssets.iconHint,
               color: AppColors.bois,
               enabled: canHint,

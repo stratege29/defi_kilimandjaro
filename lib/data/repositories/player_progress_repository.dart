@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
+import 'package:defi_kilimandjaro/domain/entities/game_economy_config.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
@@ -18,14 +20,18 @@ class PlayerProgressRepository {
   final SharedPreferences _prefs;
 
   /// Lit l'état actuel ou retourne l'état initial.
-  PlayerProgress load() {
+  ///
+  /// [initialCauris] : solde de bienvenue appliqué uniquement aux **nouveaux
+  /// joueurs** (aucun JSON persisté). Les profils existants conservent leur
+  /// solde — un override Remote Config ne re-crédite pas rétroactivement.
+  PlayerProgress load({int initialCauris = 120}) {
     final raw = _prefs.getString(_key);
-    if (raw == null) return PlayerProgress.initial();
+    if (raw == null) return PlayerProgress.initial(cauris: initialCauris);
     try {
       final json = jsonDecode(raw) as Map<String, dynamic>;
       return PlayerProgress.fromJson(json);
     } on FormatException {
-      return PlayerProgress.initial();
+      return PlayerProgress.initial(cauris: initialCauris);
     }
   }
 
@@ -57,9 +63,17 @@ final playerProgressRepositoryProvider = Provider<PlayerProgressRepository>((
 /// État courant de la progression — lu une fois au boot puis muté via
 /// [PlayerProgressNotifier].
 class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
-  PlayerProgressNotifier(this._repo) : super(_repo.load());
+  PlayerProgressNotifier(this._repo, {int initialCaurisIfNew = 120})
+      : _initialCauris = initialCaurisIfNew,
+        super(_repo.load(initialCauris: initialCaurisIfNew));
 
   final PlayerProgressRepository _repo;
+  final int _initialCauris;
+
+  /// Vrai si le joueur a acheté le pack "Supprimer les pubs". Lecture
+  /// publique pour les services qui ont besoin du flag sans avoir besoin
+  /// d'accéder à l'intégralité de l'état (cf. `AdsService`).
+  bool get isNoAdsPurchased => state.noAdsPurchased;
 
   /// Récompense après une victoire sur une montagne donnée.
   ///
@@ -134,6 +148,29 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     await _repo.save(newState);
   }
 
+  /// Marque l'achat Starter Pack — flip le flag + crédite immédiatement
+  /// les cauris bonus. Idempotent (un second appel retourne sans
+  /// modifier l'état).
+  Future<void> grantStarterPack({required int caurisBonus}) async {
+    if (state.starterPackPurchased) return;
+    final newState = state.copyWith(
+      starterPackPurchased: true,
+      cauris: state.cauris + caurisBonus,
+    );
+    state = newState;
+    await _repo.save(newState);
+  }
+
+  /// Initialise [PlayerProgress.installDate] si encore null. Appelé une
+  /// fois au boot (cf. `_BootGate`). Pas de risque de back-dater :
+  /// l'app n'a plus jamais accès au point d'install initial après ça.
+  Future<void> ensureInstallDate(DateTime now) async {
+    if (state.installDate != null) return;
+    final newState = state.copyWith(installDate: now);
+    state = newState;
+    await _repo.save(newState);
+  }
+
   /// Déduit le coût d'un indice. Retourne `false` si solde insuffisant.
   Future<bool> spendOnHint(int cost) async {
     if (state.cauris < cost) return false;
@@ -152,10 +189,70 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     await _repo.save(newState);
   }
 
+  // ---------------------------------------------------------------------
+  // Streak quotidien (Phase 4 — Étape C)
+  // ---------------------------------------------------------------------
+
+  /// Snapshot non-mutant de l'état du streak du jour. Retourne `null` si
+  /// le joueur a déjà claim aujourd'hui (rien à montrer). Sinon retourne
+  /// le `streakDay` qui sera atteint et le `bonus` qui sera crédité au
+  /// claim — l'UI s'en sert pour préparer le popup avant que le joueur
+  /// confirme.
+  ///
+  /// Logique calendrier :
+  /// - Jamais réclamé OU dernier claim > la veille → reset à `streakDay = 1`.
+  /// - Dernier claim hier → `streakDay = dailyStreak + 1`.
+  /// - Dernier claim aujourd'hui → null (déjà fait).
+  ({int streakDay, int bonus})? peekClaimableStreak({
+    required GameEconomyConfig config,
+    DateTime? now,
+  }) {
+    final today = _calendarDay(now ?? DateTime.now());
+    final last = state.lastStreakClaimDate == null
+        ? null
+        : _calendarDay(state.lastStreakClaimDate!);
+
+    if (last != null && last == today) {
+      return null; // Déjà claimé aujourd'hui — rien à montrer.
+    }
+
+    final isYesterday = last != null &&
+        today.difference(last).inDays == 1;
+    final nextStreak = isYesterday ? state.dailyStreak + 1 : 1;
+    final bonus = config.streakRewardForDay(nextStreak);
+    return (streakDay: nextStreak, bonus: bonus);
+  }
+
+  /// Crédite le bonus streak et persiste l'état. Idempotent : un second
+  /// claim le même jour est un no-op qui retourne `false`.
+  ///
+  /// Retourne le bonus effectivement crédité (0 si non claimé).
+  Future<int> claimDailyStreak({
+    required GameEconomyConfig config,
+    DateTime? now,
+  }) async {
+    final claimable = peekClaimableStreak(config: config, now: now);
+    if (claimable == null) return 0;
+    final today = now ?? DateTime.now();
+    final newState = state.copyWith(
+      cauris: state.cauris + claimable.bonus,
+      dailyStreak: claimable.streakDay,
+      lastStreakClaimDate: today,
+    );
+    state = newState;
+    await _repo.save(newState);
+    return claimable.bonus;
+  }
+
+  /// Tronque une date au jour calendaire (00:00 local). Sert à comparer
+  /// "même jour" sans se faire piéger par les heures.
+  static DateTime _calendarDay(DateTime dt) =>
+      DateTime(dt.year, dt.month, dt.day);
+
   /// Réinitialisation depuis l'écran Profil.
   Future<void> reset() async {
     await _repo.reset();
-    state = PlayerProgress.initial();
+    state = PlayerProgress.initial(cauris: _initialCauris);
   }
 
   /// **Outil de debug uniquement** — marque toutes les montagnes données
@@ -270,8 +367,13 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
 
 final playerProgressProvider =
     StateNotifierProvider<PlayerProgressNotifier, PlayerProgress>((ref) {
+      // Solde de bienvenue piloté par Remote Config (`eco_initial_cauris`).
+      // Le snapshot est lu une fois ici : si la valeur change après que le
+      // joueur a déjà créé son profil, ça n'affecte pas son solde existant.
+      final econ = ref.read(gameEconomyConfigProvider);
       return PlayerProgressNotifier(
         ref.watch(playerProgressRepositoryProvider),
+        initialCaurisIfNew: econ.initialCauris,
       );
     });
 

@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
+import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:defi_kilimandjaro/domain/entities/game_economy_config.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_star_rating.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
@@ -28,6 +30,7 @@ class GameState {
     this.reverseAnswer = false,
     this.starsEarned = 0,
     this.fogHiddenIndices = const <int>{},
+    this.caurisAwarded = 0,
   });
 
   final Devinette devinette;
@@ -69,6 +72,12 @@ class GameState {
   /// tuiles avec opacité 0 et ignore les taps dessus. Rotation 5 s côté
   /// controller. Vide quand le modifier n'est pas actif.
   final Set<int> fogHiddenIndices;
+
+  /// Cauris crédités à la **dernière** victoire (= delta, pas solde
+  /// cumulé). Lu par `VictoryView` pour animer le chip "+N CAURIS" et
+  /// servir de base au bouton "Doubler la récompense". 0 tant que la
+  /// partie n'est pas en phase `won`.
+  final int caurisAwarded;
 
   /// Séquence de lettres attendue compte tenu du modifier `reverse`.
   /// Stockée comme String pour permettre l'égalité directe avec
@@ -134,6 +143,7 @@ class GameState {
     bool? reverseAnswer,
     int? starsEarned,
     Set<int>? fogHiddenIndices,
+    int? caurisAwarded,
   }) {
     return GameState(
       devinette: devinette ?? this.devinette,
@@ -148,6 +158,7 @@ class GameState {
       reverseAnswer: reverseAnswer ?? this.reverseAnswer,
       starsEarned: starsEarned ?? this.starsEarned,
       fogHiddenIndices: fogHiddenIndices ?? this.fogHiddenIndices,
+      caurisAwarded: caurisAwarded ?? this.caurisAwarded,
     );
   }
 }
@@ -163,7 +174,7 @@ class GameState {
 /// - Récompense finale multipliée par `args.config.caurisMultiplier`
 ///   pour valoriser les niveaux difficiles.
 class GameController extends StateNotifier<GameState> {
-  GameController(this._args, this._audio, this._progress)
+  GameController(this._args, this._audio, this._progress, this._economy)
     : super(
         _initialState(_args, _progress.state.cauris),
       ) {
@@ -218,9 +229,6 @@ class GameController extends StateNotifier<GameState> {
     ];
   }
 
-  static const int _hintCost = 20;
-  static const int _caurisBase = 30;
-
   static const int _windPeriodSeconds = 8;
   static const int _earthquakePeriodSeconds = 6;
   static const int _fogPeriodSeconds = 5;
@@ -229,6 +237,11 @@ class GameController extends StateNotifier<GameState> {
   final GameArgs _args;
   final AudioController _audio;
   final PlayerProgressNotifier _progress;
+
+  /// Snapshot Remote Config capturé à la construction — figé pour la durée
+  /// du niveau pour ne pas mutiler les invariants (cf. doc du
+  /// `RemoteConfigService`).
+  final GameEconomyConfig _economy;
   Timer? _timer;
   Timer? _modifierTimer;
   int _modifierTick = 0;
@@ -307,19 +320,26 @@ class GameController extends StateNotifier<GameState> {
     );
   }
 
-  /// Révèle la prochaine lettre (coûte [_hintCost] cauris).
+  /// Coût en cauris du **prochain** indice à utiliser (avec scaling
+  /// intra-niveau : 1er = base, 2e = base × multiplier, etc.).
+  int get nextHintCost => _economy.hintCostForIndex(state.hintRevealedCount);
+
+  /// Révèle la prochaine lettre. Le coût est progressif intra-niveau
+  /// (cf. [GameEconomyConfig.hintCostMultiplier]) — 1er indice au prix
+  /// de base, suivants multipliés.
   void useHint() {
     if (state.phase != GamePhase.playing) return;
-    if (state.cauris < _hintCost) return;
+    final cost = nextHintCost;
+    if (state.cauris < cost) return;
     if (state.hintRevealedCount >= state.devinette.answer.length) return;
 
     state = state.copyWith(
-      cauris: state.cauris - _hintCost,
+      cauris: state.cauris - cost,
       hintRevealedCount: state.hintRevealedCount + 1,
     );
 
     // Persist deduction.
-    unawaited(_progress.spendOnHint(_hintCost));
+    unawaited(_progress.spendOnHint(cost));
     // Audio: kora 2 notes douces descendantes.
     unawaited(_audio.playHintUsed());
     unawaited(HapticFeedback.lightImpact());
@@ -333,9 +353,11 @@ class GameController extends StateNotifier<GameState> {
     final formed = state.formedWord;
     if (formed == state.expectedAnswer) {
       _timer?.cancel();
-      // Récompense : (base 30 + bonus vitesse 2×timeLeft) × multiplier
-      // de difficulté (1.0 → 2.5 selon le tier).
-      final raw = _caurisBase + state.timeLeft * 2;
+      // Récompense : (base + bonus vitesse × timeLeft) × multiplier
+      // de difficulté (1.0 → 2.5 selon le tier). Base et bonus pilotés
+      // par Remote Config (cf. `GameEconomyConfig`).
+      final raw =
+          _economy.winRewardBase + state.timeLeft * _economy.speedBonusPerSecond;
       final caurisAwarded = (raw * _args.config.caurisMultiplier).round();
       // Étoiles : (1) victoire (2) sans indice (3) ≥ 50 % timer restant.
       final stars = LevelStarRating.computeStars(
@@ -349,6 +371,7 @@ class GameController extends StateNotifier<GameState> {
         validationCorrect: true,
         cauris: state.cauris + caurisAwarded,
         starsEarned: stars,
+        caurisAwarded: caurisAwarded,
       );
       // Persiste la victoire (cauris + level mountain + total + lastPlay
       // + meilleur score étoile pour ce niveau).
@@ -587,5 +610,6 @@ final gameControllerProvider = StateNotifierProvider.autoDispose
         args,
         ref.read(audioControllerProvider.notifier),
         ref.read(playerProgressProvider.notifier),
+        ref.read(gameEconomyConfigProvider),
       ),
     );

@@ -62,6 +62,14 @@ enum CaurisPack {
 const String noAdsProductId = 'no_ads_remove';
 const String noAdsFallbackPrice = '4,99 €';
 
+/// Product ID du **Starter Pack** non-consumable (2,99 € — 350 cauris
+/// bonus, achat unique, visible 48h après install seulement).
+const String starterPackProductId = 'starter_pack_299';
+const String starterPackFallbackPrice = '2,99 €';
+
+/// Récompense créditée à l'achat du Starter Pack.
+const int starterPackCauris = 350;
+
 /// Snapshot d'un pack avec son prix résolu depuis le store.
 class CaurisPackOffer extends Equatable {
   const CaurisPackOffer({

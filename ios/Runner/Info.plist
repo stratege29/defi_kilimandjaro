@@ -43,6 +43,8 @@
 	<string>Pour scanner le QR code de ton ami et lancer un duel temps réel.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Kilimandjaro n'enregistre pas l'audio. Cette autorisation est référencée par les bibliothèques d'analyse vidéo du scanner QR mais n'est jamais demandée à l'utilisateur.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Autoriser le suivi pour personnaliser les pubs et soutenir le développement de Kilimandjaro. Tu peux refuser sans rien perdre du jeu.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
