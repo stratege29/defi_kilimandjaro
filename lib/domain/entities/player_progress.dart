@@ -14,8 +14,11 @@ class PlayerProgress extends Equatable {
     required this.ownedPacks,
     PackMix? activePackMix,
     this.lastPlayDate,
+    this.lastStreakClaimDate,
+    this.installDate,
     this.consecutiveFailures = 0,
     this.noAdsPurchased = false,
+    this.starterPackPurchased = false,
     this.recentDevinetteIds = const <String>[],
     this.freePackChosen,
     this.starsByLevel = const <String, int>{},
@@ -24,12 +27,17 @@ class PlayerProgress extends Equatable {
 
   /// État initial pour un nouveau joueur.
   ///
+  /// [cauris] : solde de bienvenue. Default 120 (= `GameEconomyConfig
+  /// .defaults.initialCauris`) ; le `PlayerProgressNotifier` override avec
+  /// la valeur Remote Config `eco_initial_cauris` quand il instancie un
+  /// profil "neuf".
+  ///
   /// Aucun pack possédé tant que l'onboarding n'a pas tranché : c'est le
   /// flow "choisir mon pack gratuit" qui appelle [PlayerProgressNotifier
   /// .chooseFreePack] et initialise `ownedPacks + freePackChosen` de
   /// façon atomique.
-  factory PlayerProgress.initial() => PlayerProgress(
-    cauris: 120,
+  factory PlayerProgress.initial({int cauris = 120}) => PlayerProgress(
+    cauris: cauris,
     completedLevelsByMountain: const <String, int>{},
     totalLevelsCompleted: 0,
     dailyStreak: 0,
@@ -56,8 +64,15 @@ class PlayerProgress extends Equatable {
       lastPlayDate: json['last_play'] == null
           ? null
           : DateTime.tryParse(json['last_play'] as String),
+      lastStreakClaimDate: json['last_streak_claim'] == null
+          ? null
+          : DateTime.tryParse(json['last_streak_claim'] as String),
+      installDate: json['install_date'] == null
+          ? null
+          : DateTime.tryParse(json['install_date'] as String),
       consecutiveFailures: (json['consecutive_failures'] as int?) ?? 0,
       noAdsPurchased: (json['no_ads'] as bool?) ?? false,
+      starterPackPurchased: (json['starter_pack'] as bool?) ?? false,
       recentDevinetteIds:
           ((json['recent_devinettes'] as List<dynamic>?) ?? <dynamic>[])
               .map((e) => e as String)
@@ -109,11 +124,19 @@ class PlayerProgress extends Equatable {
   /// Total cumul de niveaux gagnés (utile pour titres honorifiques).
   final int totalLevelsCompleted;
 
-  /// Streak quotidienne.
+  /// Streak quotidienne (jours consécutifs où le joueur a réclamé son
+  /// bonus quotidien). Reset à 1 quand le joueur saute un jour, capé par
+  /// la longueur de `GameEconomyConfig.streakRewards` côté UI.
   final int dailyStreak;
 
   /// Dernière date de jeu (jour calendaire, sans heure).
   final DateTime? lastPlayDate;
+
+  /// Date du **dernier claim** du bonus streak quotidien. `null` tant que
+  /// l'utilisateur n'a jamais réclamé. Différent de [lastPlayDate] : un
+  /// joueur peut jouer plusieurs fois dans la journée mais ne réclame son
+  /// bonus qu'une fois. Garde-fou anti double-claim.
+  final DateTime? lastStreakClaimDate;
 
   /// Compteur d'échecs consécutifs (reset à chaque victoire).
   /// Sert de trigger pour l'interstitielle (cf. plan.md §4 — 1 sur 3 échecs).
@@ -121,6 +144,17 @@ class PlayerProgress extends Equatable {
 
   /// Achat non-consumable "Supprimer les pubs" (4,99 €).
   final bool noAdsPurchased;
+
+  /// Achat one-time du **Starter Pack** (2,99 € — 350 cauris boost).
+  /// Visible dans la boutique uniquement les 48h qui suivent
+  /// [installDate]. Une fois acheté ou expiré, la carte disparaît.
+  final bool starterPackPurchased;
+
+  /// Date d'installation (= 1er lancement détecté). `null` pour les
+  /// profils existants au moment du déploiement de Phase 4 — ils
+  /// n'auront pas de starter pack puisque la fenêtre H+48 ne peut
+  /// plus s'appliquer (pas de point de référence).
+  final DateTime? installDate;
 
   /// Ids des dernières devinettes jouées (les plus récentes en tête).
   /// Limité à 5 entrées dans le notifier. Utilisé pour exclure ces ids
@@ -160,6 +194,10 @@ class PlayerProgress extends Equatable {
     'total': totalLevelsCompleted,
     'streak': dailyStreak,
     'last_play': lastPlayDate?.toIso8601String(),
+    if (lastStreakClaimDate != null)
+      'last_streak_claim': lastStreakClaimDate!.toIso8601String(),
+    if (installDate != null) 'install_date': installDate!.toIso8601String(),
+    if (starterPackPurchased) 'starter_pack': starterPackPurchased,
     'consecutive_failures': consecutiveFailures,
     'no_ads': noAdsPurchased,
     'recent_devinettes': recentDevinetteIds,
@@ -183,8 +221,11 @@ class PlayerProgress extends Equatable {
     int? totalLevelsCompleted,
     int? dailyStreak,
     DateTime? lastPlayDate,
+    DateTime? lastStreakClaimDate,
+    DateTime? installDate,
     int? consecutiveFailures,
     bool? noAdsPurchased,
+    bool? starterPackPurchased,
     List<String>? recentDevinetteIds,
     Set<String>? ownedPacks,
     String? freePackChosen,
@@ -198,8 +239,12 @@ class PlayerProgress extends Equatable {
       totalLevelsCompleted: totalLevelsCompleted ?? this.totalLevelsCompleted,
       dailyStreak: dailyStreak ?? this.dailyStreak,
       lastPlayDate: lastPlayDate ?? this.lastPlayDate,
+      lastStreakClaimDate: lastStreakClaimDate ?? this.lastStreakClaimDate,
+      installDate: installDate ?? this.installDate,
       consecutiveFailures: consecutiveFailures ?? this.consecutiveFailures,
       noAdsPurchased: noAdsPurchased ?? this.noAdsPurchased,
+      starterPackPurchased:
+          starterPackPurchased ?? this.starterPackPurchased,
       recentDevinetteIds: recentDevinetteIds ?? this.recentDevinetteIds,
       ownedPacks: ownedPacks ?? this.ownedPacks,
       freePackChosen: freePackChosen ?? this.freePackChosen,
@@ -215,8 +260,11 @@ class PlayerProgress extends Equatable {
     totalLevelsCompleted,
     dailyStreak,
     lastPlayDate,
+    lastStreakClaimDate,
+    installDate,
     consecutiveFailures,
     noAdsPurchased,
+    starterPackPurchased,
     recentDevinetteIds,
     ownedPacks,
     freePackChosen,

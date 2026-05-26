@@ -10,6 +10,7 @@ import 'package:defi_kilimandjaro/core/theme/app_theme.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/ads/consent_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/app_check_setup.dart';
+import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/composite_devinette_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/fcm_repository.dart';
@@ -70,6 +71,11 @@ Future<void> main() async {
   });
 }
 
+/// Instance partagée Remote Config — créée tôt pour pouvoir override le
+/// provider Riverpod avec, après que `init()` ait fetch les valeurs.
+/// Lecture des defaults garantie même si `init()` n'a pas tourné.
+final RemoteConfigService _remoteConfig = RemoteConfigService();
+
 Future<void> _bootstrap() async {
   // [BOOT] timeline via print() — visible dans Xcode console (debug + flutter run).
   // ignore: avoid_print
@@ -106,6 +112,10 @@ Future<void> _bootstrap() async {
     // App Check: must run right after Firebase.initializeApp and before any
     // authenticated call (Auth, Firestore, RTDB, Cloud Functions).
     await activateAppCheck();
+
+    // Remote Config : économie + ad fréquences + killswitch. Fail-soft —
+    // si le fetch échoue, les defaults baked-in restent actifs.
+    await _remoteConfig.init();
 
     // Local emulator wiring — opt-in via --dart-define USE_FIREBASE_EMULATOR=true
     // (cf. README emulator section). Doit être appelé AVANT toute requête
@@ -244,7 +254,10 @@ Future<void> _bootstrap() async {
       // est en FR hardcodé. Cohérence > détection système.
       startLocale: const Locale('fr'),
       child: ProviderScope(
-        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          remoteConfigServiceProvider.overrideWithValue(_remoteConfig),
+        ],
         child: const _BootGate(child: KilimandjaroApp()),
       ),
     ),
@@ -275,6 +288,14 @@ class _BootGateState extends ConsumerState<_BootGate> {
       unawaited(ref.read(iapServiceProvider).init());
       // ignore: avoid_print
       print('[BOOT] 8 IAP triggered');
+
+      // Trace l'install date au 1er lancement (utilisé par la fenêtre
+      // Starter Pack H+48). Idempotent si déjà set côté progress.
+      unawaited(
+        ref
+            .read(playerProgressProvider.notifier)
+            .ensureInstallDate(DateTime.now()),
+      );
 
       // FCM token storage (permission + persistance Firestore).
       // Fire-and-forget : ne doit pas bloquer le boot.

@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:defi_kilimandjaro/data/iap/cauris_pack.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,6 +42,7 @@ class IAPService {
     final allIds = <String>{
       ...CaurisPack.allProductIds(),
       noAdsProductId,
+      starterPackProductId,
     };
     final response = await _iap.queryProductDetails(allIds);
     if (response.error != null) {
@@ -62,8 +65,19 @@ class IAPService {
     return _iap.buyNonConsumable(purchaseParam: purchaseParam);
   }
 
+  /// Lance l'achat one-time du **Starter Pack** (2,99 € — 350 cauris).
+  Future<bool> buyStarterPack() async {
+    final details = _details[starterPackProductId];
+    if (details == null) return false;
+    final purchaseParam = PurchaseParam(productDetails: details);
+    return _iap.buyNonConsumable(purchaseParam: purchaseParam);
+  }
+
   /// Détails du No-Ads (null si pas dans le catalogue).
   ProductDetails? get noAdsDetails => _details[noAdsProductId];
+
+  /// Détails du Starter Pack (null si pas dans le catalogue).
+  ProductDetails? get starterPackDetails => _details[starterPackProductId];
 
   /// Liste des offres à afficher dans la boutique.
   ///
@@ -116,9 +130,21 @@ class IAPService {
   }
 
   Future<void> _grant(PurchaseDetails purchase) async {
+    // Grant local immédiat pour la réactivité UX (cauris affichés sans
+    // attendre l'aller-retour réseau). La validation serveur tourne en
+    // parallèle pour idempotence + audit log — un échec réseau ne perd
+    // donc PAS l'achat (le reçu reste sur le device et restore() le
+    // ré-emettra, où l'idempotence serveur évitera le double-crédit).
+    unawaited(_recordOnServer(purchase));
+
     if (purchase.productID == noAdsProductId) {
       await _progress.grantNoAds();
       _log.i('No-Ads accordé via IAP');
+      return;
+    }
+    if (purchase.productID == starterPackProductId) {
+      await _progress.grantStarterPack(caurisBonus: starterPackCauris);
+      _log.i('Starter Pack accordé (+$starterPackCauris cauris)');
       return;
     }
     final pack = CaurisPack.fromProductId(purchase.productID);
@@ -128,6 +154,33 @@ class IAPService {
     }
     await _progress.addCauris(pack.cauris);
     _log.i('+${pack.cauris} cauris crédités via IAP ${pack.productId}');
+  }
+
+  /// Fire-and-forget : appelle la Cloud Function `validateIapReceipt`
+  /// pour enregistrer le reçu côté Firestore (idempotent + audit).
+  /// N'affecte pas le grant local — un échec ne perd pas l'achat.
+  Future<void> _recordOnServer(PurchaseDetails purchase) async {
+    try {
+      final platform = Platform.isIOS ? 'ios' : 'android';
+      // purchaseID est l'orderId Android / transactionId iOS selon le SDK.
+      final orderOrTransactionId =
+          purchase.purchaseID ?? 'unknown_${DateTime.now().microsecondsSinceEpoch}';
+      final rawReceipt =
+          purchase.verificationData.serverVerificationData;
+      final purchaseDate = int.tryParse(purchase.transactionDate ?? '');
+      await FirebaseFunctions.instanceFor(region: 'europe-west1')
+          .httpsCallable('validateIapReceipt')
+          .call<Map<String, dynamic>>(<String, dynamic>{
+        'platform': platform,
+        'productId': purchase.productID,
+        'orderOrTransactionId': orderOrTransactionId,
+        'rawReceipt': rawReceipt,
+        if (purchaseDate != null) 'purchaseDateMs': purchaseDate,
+      });
+      _log.i('IAP validateIapReceipt → enregistré ${purchase.productID}');
+    } on Object catch (e) {
+      _log.w('IAP server validation failed (best-effort): $e');
+    }
   }
 
   Future<void> dispose() async {
@@ -162,10 +215,17 @@ class CaurisOffersNotifier extends StateNotifier<List<CaurisPackOffer>> {
 
   Future<bool> buyNoAds() => _service.buyNoAds();
 
+  Future<bool> buyStarterPack() => _service.buyStarterPack();
+
   String get noAdsPriceLabel =>
       _service.noAdsDetails?.price ?? noAdsFallbackPrice;
 
   bool get noAdsAvailable => _service.noAdsDetails != null;
+
+  String get starterPackPriceLabel =>
+      _service.starterPackDetails?.price ?? starterPackFallbackPrice;
+
+  bool get starterPackAvailable => _service.starterPackDetails != null;
 
   Future<void> restore() => _service.restore();
 }

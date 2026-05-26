@@ -48,3 +48,6 @@ export { reportDevinette } from "./devinettes/reportDevinette";
 
 // --- Curation ---
 export { rebuildCommunityPack } from "./curation/rebuildCommunityPack";
+
+// --- IAP server validation (Phase 4) ---
+export { validateIapReceipt } from "./iap/validateIapReceipt";
