@@ -195,13 +195,13 @@ class _GameViewState extends ConsumerState<GameView>
                   isBoss: widget.args.config.isBoss,
                 ),
               ],
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               // Timer bar — totalTime calibré sur la config du niveau.
               TimerBar(
                 timeLeft: gameState.timeLeft,
                 totalTime: widget.args.config.timerSeconds,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               // Answer cells — quand `reverse` est actif on affiche les
               // cases dans l'ordre de saisie (mot inversé) pour que le
               // remplissage gauche→droite reste intuitif.
@@ -210,8 +210,9 @@ class _GameViewState extends ConsumerState<GameView>
                 formedLetters: gameState.formedWord,
                 isValidated: gameState.validationCorrect,
               ),
-              const SizedBox(height: 12),
-              // Circular tile grid (expands to fill space).
+              const SizedBox(height: 10),
+              // Circular tile grid — `Expanded` absorbe l'espace gagné par
+              // la suppression du `_RewardedAdChip` pleine-largeur (~36pt).
               Expanded(
                 child: Center(
                   child: CircularGrid(
@@ -229,46 +230,15 @@ class _GameViewState extends ConsumerState<GameView>
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
-              // Rewarded video chip ("+N 🪙 regarder une pub").
-              // Visible si : pas No-Ads, killswitch off, cap quotidien non
-              // atteint. Le montant et le cap sont pilotés par Remote Config
-              // (cf. `GameEconomyConfig`).
-              if (!ref.watch(playerProgressProvider).noAdsPurchased &&
-                  ref.watch(canOfferRewardedProvider))
-                _RewardedAdChip(
-                  enabled: gameState.phase == GamePhase.playing,
-                  amount: ref.watch(
-                    gameEconomyConfigProvider.select(
-                      (c) => c.rewardedVideoBonus,
-                    ),
-                  ),
-                  onWatch: () async {
-                    final amount = ref
-                        .read(gameEconomyConfigProvider)
-                        .rewardedVideoBonus;
-                    final got = await ref
-                        .read(adsServiceProvider)
-                        .showRewardedForCauris();
-                    if (!context.mounted) return;
-                    if (got) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            '+$amount Cauris de Sagesse',
-                            style: AppTypography.bebas(),
-                          ),
-                          backgroundColor: AppColors.vertClair,
-                          duration: const Duration(milliseconds: 1200),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              const SizedBox(height: 8),
-              // Bottom action buttons.
+              const SizedBox(height: 10),
+              // Bottom action row — [Pub?] · Indice · Effacer.
+              // Le bouton Valider a été retiré (auto-validation déclenchée
+              // dans `selectTile` quand `state.isComplete`). Le chip pub
+              // pleine-largeur a été absorbé ici pour rendre son espace à
+              // la grille. Pub gating + montant rewarded sont pilotés par
+              // Remote Config via `_buildActionButtons` (cf. helper).
               _buildActionButtons(context, ref, controller, gameState),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
             ],
           ),
         ),
@@ -365,8 +335,9 @@ class _GameViewState extends ConsumerState<GameView>
         gameState.hintRevealedCount < widget.args.devinette.answer.length;
     final isPlaying = gameState.phase == GamePhase.playing;
     final canAfford = gameState.cauris >= cost;
-    final canRewardedFallback = ref.watch(canOfferRewardedProvider) &&
-        !ref.watch(playerProgressProvider).noAdsPurchased;
+    final progress = ref.watch(playerProgressProvider);
+    final adsAllowed =
+        ref.watch(canOfferRewardedProvider) && !progress.noAdsPurchased;
 
     // Indice gratuit du jour disponible ? Le drapeau a été crédité par
     // `claimFreeHintIfDue` au boot du home. Override le subtitle du
@@ -401,12 +372,36 @@ class _GameViewState extends ConsumerState<GameView>
         );
       },
       onClear: controller.clearSelection,
-      onValidate: controller.validate,
+      // Bouton Pub absorbé dans la row d'action — `null` quand No-Ads ou
+      // killswitch / cap quotidien atteint : la row se rééquilibre sur
+      // 2 colonnes (Indice + Effacer).
+      onWatchAd: adsAllowed
+          ? () async {
+              final amount = ref
+                  .read(gameEconomyConfigProvider)
+                  .rewardedVideoBonus;
+              final got = await ref
+                  .read(adsServiceProvider)
+                  .showRewardedForCauris();
+              if (!context.mounted) return;
+              if (got) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '+$amount Cauris de Sagesse',
+                      style: AppTypography.bebas(),
+                    ),
+                    backgroundColor: AppColors.vertClair,
+                    duration: const Duration(milliseconds: 1200),
+                  ),
+                );
+              }
+            }
+          : null,
       canHint: hasLettersLeft &&
           isPlaying &&
-          (hasFreeHint || canAfford || canRewardedFallback),
-      canValidate:
-          gameState.selectedIndices.isNotEmpty && isPlaying,
+          (hasFreeHint || canAfford || adsAllowed),
+      canWatchAd: isPlaying,
     );
   }
 
@@ -690,79 +685,6 @@ class _GameViewState extends ConsumerState<GameView>
   }
 }
 
-class _RewardedAdChip extends StatelessWidget {
-  const _RewardedAdChip({
-    required this.enabled,
-    required this.amount,
-    required this.onWatch,
-  });
-  final bool enabled;
-  final int amount;
-  final VoidCallback onWatch;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: enabled ? onWatch : null,
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.bois.withValues(alpha: 0.35),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.orSoleil.withValues(
-                  alpha: enabled ? 0.6 : 0.2,
-                ),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.play_circle_outline,
-                  size: 16,
-                  color: AppColors.orSoleil.withValues(
-                    alpha: enabled ? 0.95 : 0.4,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  '+$amount',
-                  style: AppTypography.bebas(
-                    size: 13,
-                    color: AppColors.orSoleil.withValues(
-                      alpha: enabled ? 0.95 : 0.4,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Opacity(
-                  opacity: enabled ? 1 : 0.4,
-                  child: const CaurisIcon(size: 14),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'regarder une pub',
-                  style: AppTypography.bebas(
-                    size: 13,
-                    color: AppColors.orSoleil.withValues(
-                      alpha: enabled ? 0.95 : 0.4,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Sub-widgets
 // ---------------------------------------------------------------------------
@@ -790,8 +712,11 @@ class _GameHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Header compact 1-ligne — le titre "KILIMANDJARO" a été retiré (le
+    // joueur sait sur quelle montagne il est, le drapeau + numéro de niveau
+    // suffisent). L'espace gagné est rendu à la devinette et à la grille.
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 8, 12, 4),
+      padding: const EdgeInsets.fromLTRB(4, 4, 12, 0),
       child: Row(
         children: <Widget>[
           IconButton(
@@ -799,33 +724,29 @@ class _GameHeader extends StatelessWidget {
             color: AppColors.orSoleil,
             onPressed: onBack,
             tooltip: 'game.back'.tr(),
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
           ),
           if (flagEmoji != null) ...[
-            Text(flagEmoji!, style: const TextStyle(fontSize: 22)),
-            const SizedBox(width: 8),
+            const SizedBox(width: 4),
+            Text(flagEmoji!, style: const TextStyle(fontSize: 20)),
           ],
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  (mountainName ?? 'KILIMANDJARO').toUpperCase(),
-                  style: AppTypography.bebas(size: 18, letterSpacing: 1.5),
-                  overflow: TextOverflow.ellipsis,
+          if (levelLabel != null) ...[
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                levelLabel!,
+                style: AppTypography.crimson(
+                  size: 13,
+                  color: AppColors.texteSecondaire,
+                  style: FontStyle.italic,
                 ),
-                if (levelLabel != null)
-                  Text(
-                    levelLabel!,
-                    style: AppTypography.crimson(
-                      size: 12,
-                      color: AppColors.texteSecondaire,
-                      style: FontStyle.italic,
-                    ),
-                  ),
-              ],
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
+          ] else
+            const Spacer(),
           const SizedBox(width: 8),
           // Cauris chip (la pile de cauris du joueur).
           _CaurisChip(cauris: cauris),
@@ -873,7 +794,7 @@ class _RiddleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.fromLTRB(14, 14, 16, 14),
+      padding: const EdgeInsets.fromLTRB(16, 16, 18, 16),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
@@ -892,17 +813,18 @@ class _RiddleCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // Griot avatar — réduit à 48pt pour libérer largeur texte.
-          Image.asset(AppAssets.griotIdle, width: 48, height: 48),
+          // Griot avatar — 44pt, gauche, sans rien ajouter en décoration.
+          Image.asset(AppAssets.griotIdle, width: 44, height: 44),
           const SizedBox(width: 12),
-          // Énoncé — bodyMd non-italique sur textePrimaire pour scan rapide.
-          // L'italique est réservé aux proverbes/encouragements.
+          // Énoncé — taille remontée à 22pt pour faire de la devinette le
+          // héros culturel de l'écran (cf. discussion produit). bodyMd
+          // non-italique, l'italique restant réservé aux proverbes.
           Expanded(
             child: Text(
               riddle,
               style: AppTypography.bodyMd.copyWith(
-                fontSize: 16,
-                height: 1.45,
+                fontSize: 22,
+                height: 1.35,
                 color: AppColors.textePrimaire,
               ),
             ),
@@ -1035,17 +957,20 @@ class _ActionButtons extends StatelessWidget {
   const _ActionButtons({
     required this.onHint,
     required this.onClear,
-    required this.onValidate,
+    required this.onWatchAd,
     required this.canHint,
-    required this.canValidate,
+    required this.canWatchAd,
     required this.hintCostLabel,
   });
 
   final VoidCallback onHint;
   final VoidCallback onClear;
-  final VoidCallback onValidate;
+
+  /// Callback rewarded video — `null` quand le joueur a acheté "No Ads".
+  /// Dans ce cas le bouton disparaît et la row passe sur 2 colonnes.
+  final VoidCallback? onWatchAd;
   final bool canHint;
-  final bool canValidate;
+  final bool canWatchAd;
 
   /// Sous-titre affiché sur le bouton Indice (ex: "-20"). Dynamique pour
   /// supporter le coût progressif intra-niveau (cf. `hintCostMultiplier`).
@@ -1053,11 +978,28 @@ class _ActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasAdButton = onWatchAd != null;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: <Widget>[
-          // Hint button.
+          // Bouton Pub à gauche (loin du pouce dominant droit) en violet
+          // ciel-hauteur, signalisation visuelle distincte des actions de
+          // jeu pour éviter un tap parasite pendant une session.
+          if (hasAdButton) ...[
+            Expanded(
+              child: _GameButton(
+                label: 'game.watch_ad_short'.tr(),
+                subtitle: '+50',
+                iconData: Icons.play_circle_outline,
+                color: AppColors.cielHauteur,
+                enabled: canWatchAd,
+                onTap: onWatchAd!,
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
+          // Bouton Indice.
           Expanded(
             child: _GameButton(
               label: 'game.hint'.tr(),
@@ -1069,24 +1011,13 @@ class _ActionButtons extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          // Clear button.
+          // Bouton Effacer.
           Expanded(
             child: _GameButton(
               label: 'game.clear'.tr(),
               iconAsset: AppAssets.iconErase,
               color: AppColors.boisFonce,
               onTap: onClear,
-            ),
-          ),
-          const SizedBox(width: 8),
-          // Validate button.
-          Expanded(
-            child: _GameButton(
-              label: 'game.validate'.tr(),
-              iconAsset: AppAssets.iconValidate,
-              color: AppColors.vertClair,
-              enabled: canValidate,
-              onTap: onValidate,
             ),
           ),
         ],
@@ -1102,12 +1033,19 @@ class _GameButton extends StatelessWidget {
     required this.onTap,
     this.subtitle,
     this.iconAsset,
+    this.iconData,
     this.enabled = true,
   });
 
   final String label;
   final String? subtitle;
+
+  /// Image asset (PNG sprite) — utilisé par les boutons jeu (Indice, Effacer).
   final String? iconAsset;
+
+  /// IconData Material — fallback pour le bouton Pub qui n'a pas de sprite.
+  /// Exclusif avec [iconAsset] : si les deux sont fournis [iconAsset] gagne.
+  final IconData? iconData;
   final Color color;
   final VoidCallback onTap;
   final bool enabled;
@@ -1138,6 +1076,9 @@ class _GameButton extends StatelessWidget {
               children: <Widget>[
                 if (iconAsset != null) ...[
                   Image.asset(iconAsset!, width: 28, height: 28),
+                  const SizedBox(width: 6),
+                ] else if (iconData != null) ...[
+                  Icon(iconData, size: 26, color: AppColors.textePrimaire),
                   const SizedBox(width: 6),
                 ],
                 Column(

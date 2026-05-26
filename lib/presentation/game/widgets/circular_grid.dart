@@ -80,9 +80,12 @@ class CircularGrid extends StatefulWidget {
 
 class _CircularGridState extends State<CircularGrid>
     with SingleTickerProviderStateMixin {
-  /// Diamètre d'une tuile — 60pt (au-dessus du 48pt minimum tactile Material,
-  /// confort pouce optimal pour ascending swipe gesture).
-  static const double _tileSize = 60;
+  /// Diamètre d'une tuile — 68pt (au-dessus du 48pt minimum tactile Material).
+  /// Bumpé de 60 → 68 après refonte gameplay : la suppression du chip
+  /// "regarder une pub" pleine-largeur libère ~36pt verticaux que la grille
+  /// (Expanded) absorbe, ce qui permet d'agrandir les tuiles de ~13 % sans
+  /// risque d'overflow sur les configurations à 5–7 lettres.
+  static const double _tileSize = 68;
 
   /// Pattern choisi pour CETTE session — stable durant toute la partie.
   /// Phase 1 : circle universel, hexagon 50/50 si count == 7.

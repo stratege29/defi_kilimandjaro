@@ -76,7 +76,10 @@ abstract final class AppAssets {
   static const String iconCaurisStack = '$_icons/coin_stack.png';
   static const String iconHint = '$_icons/hint_kola.png';
   static const String iconErase = '$_icons/erase_broom.png';
-  static const String iconValidate = '$_icons/validate_check.png';
+  // iconValidate retiré — auto-validation au mot complet rend le bouton
+  // « Valider » superflu (cf. refonte gameplay : 3 boutons → Pub/Indice/Effacer).
+  // L'asset validate_check.png est conservé dans /assets/icons/ au cas où
+  // un futur mode (ex. duel manuel) en aurait besoin.
   static const String iconLock = '$_icons/lock.png';
   static const String iconStreak = '$_icons/streak_flame.png';
   static const String iconStreakBroken = '$_icons/streak_broken.png';
