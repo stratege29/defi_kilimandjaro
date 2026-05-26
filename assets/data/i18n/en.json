@@ -34,7 +34,39 @@
     "hint_cost": "-20 cauris",
     "hint_free_badge": "FREE",
     "level": "Level",
-    "watch_ad_short": "Ad"
+    "watch_ad_short": "Ad",
+    "briefing": {
+      "title": "THE GRIOT WARNS YOU",
+      "intro_normal": "“This challenge is sterner. Prepare your wisdom, young apprentice.”",
+      "intro_boss": "“Behold a summit boss! Open wide your ears, young apprentice.”",
+      "cta": "I'm ready",
+      "modifier": {
+        "reverse": {
+          "name": "Reversed word",
+          "desc": "Letters are read from right to left."
+        },
+        "thin_air": {
+          "name": "Thin air",
+          "desc": "The altitude is harsh: you have less time than usual."
+        },
+        "wind": {
+          "name": "Wind",
+          "desc": "Letters drift between tiles. Watch the path carefully."
+        },
+        "earthquake": {
+          "name": "Tremor",
+          "desc": "The grid shakes and some letters swap positions."
+        },
+        "fog": {
+          "name": "Fog",
+          "desc": "A cloud hides some letters. Guess what it covers."
+        },
+        "shuffle": {
+          "name": "Reshuffle",
+          "desc": "Letters change place periodically. Stay sharp."
+        }
+      }
+    }
   },
   "result": {
     "victory": {

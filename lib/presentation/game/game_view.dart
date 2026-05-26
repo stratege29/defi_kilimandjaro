@@ -18,6 +18,7 @@ import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/answer_cells.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/circular_grid.dart';
+import 'package:defi_kilimandjaro/presentation/game/widgets/griot_briefing_overlay.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/timer_bar.dart';
 import 'package:defi_kilimandjaro/presentation/result/failure_view.dart';
 import 'package:defi_kilimandjaro/presentation/result/mountain_conquest_view.dart';
@@ -48,10 +49,48 @@ class _GameViewState extends ConsumerState<GameView>
   /// le timer en pause via [_pauseForModal]. Évite un double-resume.
   bool _modalPaused = false;
 
+  /// Vrai dès que le briefing « Le griot t'avertit » a été affiché. Empêche
+  /// la réapparition au [GameController.restart] (retry après échec), qui
+  /// reset `_overlayShown` mais ne doit pas re-déclencher le briefing.
+  bool _briefingShown = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // Briefing du griot — si le niveau a des modifiers ou est un boss, on
+    // pause le timer et on affiche un overlay narratif AVANT que le joueur
+    // soit confronté à la grille. Cf. discussion produit : "no surprises".
+    // Le timer démarre dans le constructeur du `GameController` (Timer.periodic
+    // à 1s) ; la pause via postFrame intervient bien avant le 1er tick.
+    final cfg = widget.args.config;
+    final needsBriefing = cfg.isBoss || cfg.modifiers.isNotEmpty;
+    if (needsBriefing) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _showGriotBriefing();
+      });
+    }
+  }
+
+  /// Affiche l'overlay de briefing modifiers/boss. Pause forcée du timer
+  /// pendant l'affichage ; reprise au dismiss (tap CTA ou tap fond).
+  Future<void> _showGriotBriefing() async {
+    if (_briefingShown) return;
+    _briefingShown = true;
+    _pauseForModal();
+    await showDialog<void>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.78),
+      builder: (dialogCtx) => GriotBriefingOverlay(
+        modifiers: widget.args.config.modifiers,
+        isBoss: widget.args.config.isBoss,
+        onConfirm: () => Navigator.of(dialogCtx).pop(),
+      ),
+    );
+    if (!mounted) return;
+    _resumeFromModal();
   }
 
   @override

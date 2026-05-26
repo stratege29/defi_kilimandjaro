@@ -34,7 +34,39 @@
     "hint_cost": "-20 cauris",
     "hint_free_badge": "GRATUIT",
     "level": "Niveau",
-    "watch_ad_short": "Pub"
+    "watch_ad_short": "Pub",
+    "briefing": {
+      "title": "LE GRIOT T'AVERTIT",
+      "intro_normal": "« Ce défi est plus rude. Prépare bien ta sagesse, jeune apprenti. »",
+      "intro_boss": "« Voici un boss du sommet ! Ouvre grand tes oreilles, jeune apprenti. »",
+      "cta": "Je suis prêt",
+      "modifier": {
+        "reverse": {
+          "name": "Mot à l'envers",
+          "desc": "Les lettres se lisent de droite à gauche."
+        },
+        "thin_air": {
+          "name": "Air rare",
+          "desc": "L'altitude est rude : tu auras moins de temps qu'à l'accoutumée."
+        },
+        "wind": {
+          "name": "Vent",
+          "desc": "Les lettres dérivent d'une case à l'autre. Sois attentif au tracé."
+        },
+        "earthquake": {
+          "name": "Tremblement",
+          "desc": "La grille tremble et certaines lettres s'échangent de position."
+        },
+        "fog": {
+          "name": "Brouillard",
+          "desc": "Un nuage masque certaines lettres. Devine ce qu'il cache."
+        },
+        "shuffle": {
+          "name": "Remélange",
+          "desc": "Les lettres changent de place régulièrement. Reste vigilant."
+        }
+      }
+    }
   },
   "result": {
     "victory": {
