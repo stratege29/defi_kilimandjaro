@@ -1,0 +1,68 @@
+{
+  "comment": "Template Remote Config Kilimandjaro — Phase 4 monetization. Source de verite : ce fichier, deploye via 'firebase deploy --only remoteconfig --project <env>'. Modifier les valeurs ici, commit, puis deployer pour garder l'historique git aligne avec la console Firebase.",
+  "parameters": {
+    "eco_hint_cost": {
+      "defaultValue": { "value": "20" },
+      "valueType": "NUMBER",
+      "description": "Cout du 1er indice dans un niveau."
+    },
+    "eco_hint_cost_multiplier": {
+      "defaultValue": { "value": "1.5" },
+      "valueType": "NUMBER",
+      "description": "Multiplicateur sur les indices suivants du meme niveau (2e=30, 3e=45)."
+    },
+    "eco_win_reward_base": {
+      "defaultValue": { "value": "30" },
+      "valueType": "NUMBER",
+      "description": "Base recompense victoire avant bonus vitesse et multiplier tier."
+    },
+    "eco_speed_bonus_per_second": {
+      "defaultValue": { "value": "2" },
+      "valueType": "NUMBER",
+      "description": "Cauris bonus par seconde restante au moment de la validation."
+    },
+    "eco_rewarded_video_bonus": {
+      "defaultValue": { "value": "50" },
+      "valueType": "NUMBER",
+      "description": "Cauris credites a chaque rewarded video terminee."
+    },
+    "eco_rewarded_double_enabled": {
+      "defaultValue": { "value": "true" },
+      "valueType": "BOOLEAN",
+      "description": "Active le bouton 'Doubler la recompense' sur l'ecran victoire."
+    },
+    "eco_rewarded_daily_cap": {
+      "defaultValue": { "value": "5" },
+      "valueType": "NUMBER",
+      "description": "Max rewarded video par jour par device (anti-farming)."
+    },
+    "eco_initial_cauris": {
+      "defaultValue": { "value": "120" },
+      "valueType": "NUMBER",
+      "description": "Solde initial offert au nouveau joueur."
+    },
+    "eco_streak_rewards": {
+      "defaultValue": { "value": "10,20,40,60,100,150,300" },
+      "valueType": "STRING",
+      "description": "CSV escalier streak J1->J7. Au-dela, derniere valeur reprise."
+    },
+    "ads_interstitial_every_n_levels": {
+      "defaultValue": { "value": "3" },
+      "valueType": "NUMBER",
+      "description": "Frequence interstitielle (toutes les N victoires)."
+    },
+    "ads_interstitial_min_interval_seconds": {
+      "defaultValue": { "value": "60" },
+      "valueType": "NUMBER",
+      "description": "Delai mini en secondes entre 2 interstitielles consecutives."
+    },
+    "ads_killswitch": {
+      "defaultValue": { "value": "false" },
+      "valueType": "BOOLEAN",
+      "description": "KILL GLOBAL — coupe rewarded + interstitielles sans store update."
+    }
+  },
+  "conditions": [],
+  "parameterGroups": {},
+  "version": {}
+}
