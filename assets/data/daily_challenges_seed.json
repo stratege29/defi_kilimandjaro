@@ -1,0 +1,452 @@
+[
+  {
+    "id": "daily_001",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FOUTOU",
+    "answer_normalized": "foutou",
+    "letters_pool": [
+      "F",
+      "O",
+      "U",
+      "T",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Dans le mortier on me pile longtemps. Igname ou banane, je deviens pâte tendre.",
+      "en": "Dans le mortier on me pile longtemps. Igname ou banane, je deviens pâte tendre."
+    },
+    "explanation": {
+      "fr": "Le foutou est une pâte pilée emblématique ivoirienne, préparée à base d'igname, de banane plantain ou de manioc, servie avec une sauce.",
+      "en": "Le foutou est une pâte pilée emblématique ivoirienne, préparée à base d'igname, de banane plantain ou de manioc, servie avec une sauce."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "cuisine",
+      "tradition",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_002",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ATTIEKE",
+    "answer_normalized": "attieke",
+    "letters_pool": [
+      "A",
+      "T",
+      "T",
+      "I",
+      "E",
+      "K",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Semoule de manioc, je viens d'Abidjan. Avec poisson braisé, je fais le bonheur du midi.",
+      "en": "Semoule de manioc, je viens d'Abidjan. Avec poisson braisé, je fais le bonheur du midi."
+    },
+    "explanation": {
+      "fr": "L'attieke est une semoule de manioc fermenté, plat populaire d'origine ébrié, souvent accompagné de poisson, viande ou sauce claire.",
+      "en": "L'attieke est une semoule de manioc fermenté, plat populaire d'origine ébrié, souvent accompagné de poisson, viande ou sauce claire."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_003",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GOMBO",
+    "answer_normalized": "gombo",
+    "letters_pool": [
+      "G",
+      "O",
+      "M",
+      "B",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Vert et long sur la branche, je rends la sauce onctueuse et glissante.",
+      "en": "Vert et long sur la branche, je rends la sauce onctueuse et glissante."
+    },
+    "explanation": {
+      "fr": "Le gombo est un legume tres utilise en cote d'ivoire pour sa texture filante, base de la fameuse sauce gombo accompagnant foutou ou riz.",
+      "en": "Le gombo est un legume tres utilise en cote d'ivoire pour sa texture filante, base de la fameuse sauce gombo accompagnant foutou ou riz."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "cuisine",
+      "legume"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_004",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ALLOCO",
+    "answer_normalized": "alloco",
+    "letters_pool": [
+      "A",
+      "L",
+      "L",
+      "O",
+      "C",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Banane bien mûre coupée en rondelles, je grésille dans l'huile et je dore au soleil.",
+      "en": "Banane bien mûre coupée en rondelles, je grésille dans l'huile et je dore au soleil."
+    },
+    "explanation": {
+      "fr": "L'alloco désigne des bananes plantains mûres frites, servies en accompagnement ou en street food, parfois avec piment et oignons.",
+      "en": "L'alloco désigne des bananes plantains mûres frites, servies en accompagnement ou en street food, parfois avec piment et oignons."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "cuisine",
+      "street-food"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_005",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POULE",
+    "answer_normalized": "poule",
+    "letters_pool": [
+      "P",
+      "O",
+      "U",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Je gratte la cour du matin au soir. Mes œufs nourrissent toute la maison.",
+      "en": "Je gratte la cour du matin au soir. Mes œufs nourrissent toute la maison."
+    },
+    "explanation": {
+      "fr": "La poule est un animal domestique courant dans la cour des concessions villageoises, élevée pour ses œufs et sa viande.",
+      "en": "La poule est un animal domestique courant dans la cour des concessions villageoises, élevée pour ses œufs et sa viande."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "animaux",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_006",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NATTE",
+    "answer_normalized": "natte",
+    "letters_pool": [
+      "N",
+      "A",
+      "T",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Tressée en feuilles ou en raphia, je deviens lit ou tapis pour la sieste.",
+      "en": "Tressée en feuilles ou en raphia, je deviens lit ou tapis pour la sieste."
+    },
+    "explanation": {
+      "fr": "La natte est un objet domestique tressé, utilisée pour s'asseoir, dormir ou recevoir, présente dans toutes les cours villageoises.",
+      "en": "La natte est un objet domestique tressé, utilisée pour s'asseoir, dormir ou recevoir, présente dans toutes les cours villageoises."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "objets",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_007",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PAGNE",
+    "answer_normalized": "pagne",
+    "letters_pool": [
+      "P",
+      "A",
+      "G",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Tissu coloré qu'on noue à la taille, je m'orne de motifs et raconte une histoire.",
+      "en": "Tissu coloré qu'on noue à la taille, je m'orne de motifs et raconte une histoire."
+    },
+    "explanation": {
+      "fr": "Le pagne est un textile imprimé porté quotidiennement, élément central du vestiaire féminin ivoirien et symbole d'élégance.",
+      "en": "Le pagne est un textile imprimé porté quotidiennement, élément central du vestiaire féminin ivoirien et symbole d'élégance."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "objets",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_008",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FOYER",
+    "answer_normalized": "foyer",
+    "letters_pool": [
+      "F",
+      "O",
+      "Y",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Trois pierres rondes, une marmite dessus. C'est ici que la famille se réchauffe.",
+      "en": "Trois pierres rondes, une marmite dessus. C'est ici que la famille se réchauffe."
+    },
+    "explanation": {
+      "fr": "Le foyer traditionnel se compose souvent de trois pierres soutenant la marmite au-dessus du feu, lieu central de la cuisine villageoise.",
+      "en": "Le foyer traditionnel se compose souvent de trois pierres soutenant la marmite au-dessus du feu, lieu central de la cuisine villageoise."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "objets",
+      "village",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_009",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ENJAILLE",
+    "answer_normalized": "enjaille",
+    "letters_pool": [
+      "E",
+      "N",
+      "J",
+      "A",
+      "I",
+      "L",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Quand le DJ joue le morceau parfait, c'est mon état. Je suis trop heureux.",
+      "en": "Quand le DJ joue le morceau parfait, c'est mon état. Je suis trop heureux."
+    },
+    "explanation": {
+      "fr": "Enjaillé = très content, ravi, transporté de joie. Du verbe anglais 'enjoy', popularisé par Magic System et DJ Arafat dans la musique abidjanaise.",
+      "en": "Enjaillé = très content, ravi, transporté de joie. Du verbe anglais 'enjoy', popularisé par Magic System et DJ Arafat dans la musique abidjanaise."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "emotion",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_010",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KPATA",
+    "answer_normalized": "kpata",
+    "letters_pool": [
+      "K",
+      "P",
+      "A",
+      "T",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Quand elle passe dans la rue, les regards arrêtent le temps. Elle est magnifique.",
+      "en": "Quand elle passe dans la rue, les regards arrêtent le temps. Elle est magnifique."
+    },
+    "explanation": {
+      "fr": "Kpata = très belle femme, beauté spectaculaire, canon. Expression admirative, souvent neutre, célèbre dans les maquis et la musique abidjanaise.",
+      "en": "Kpata = très belle femme, beauté spectaculaire, canon. Expression admirative, souvent neutre, célèbre dans les maquis et la musique abidjanaise."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_011",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FAROTER",
+    "answer_normalized": "faroter",
+    "letters_pool": [
+      "F",
+      "A",
+      "R",
+      "O",
+      "T",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Sortir les mille billets juste pour montrer qu'on a, c'est mon jeu favori.",
+      "en": "Sortir les mille billets juste pour montrer qu'on a, c'est mon jeu favori."
+    },
+    "explanation": {
+      "fr": "Faroter = frimer avec son argent, étaler sa richesse, se la raconter. Action très courante en milieu urbain, thème célèbre des chansons Coupé Décalé.",
+      "en": "Faroter = frimer avec son argent, étaler sa richesse, se la raconter. Action très courante en milieu urbain, thème célèbre des chansons Coupé Décalé."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "attitude",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_012",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBANGBAN",
+    "answer_normalized": "gbangban",
+    "letters_pool": [
+      "G",
+      "B",
+      "A",
+      "N",
+      "G",
+      "B",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Confus, désorienté, je ne sais plus où j'en suis.",
+      "en": "Confus, désorienté, je ne sais plus où j'en suis."
+    },
+    "explanation": {
+      "fr": "Gbangban = confus, interloqué, déstabilisé, pas au clair. Terme onomatopéique très expressif, couramment utilisé pour décrire une personne sous le choc ou perdue.",
+      "en": "Gbangban = confus, interloqué, déstabilisé, pas au clair. Terme onomatopéique très expressif, couramment utilisé pour décrire une personne sous le choc ou perdue."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "emotion",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_013",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MAQUIS",
+    "answer_normalized": "maquis",
+    "letters_pool": [
+      "M",
+      "A",
+      "Q",
+      "U",
+      "I",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Bar de quartier où on danse, on boit, on rigole tard le soir.",
+      "en": "Bar de quartier où on danse, on boit, on rigole tard le soir."
+    },
+    "explanation": {
+      "fr": "Maquis = petit bar typiquement ivoirien, lieu de vie nocturne et festive des quartiers populaires où on écoute la musique ivoirienne et on passe la nuit.",
+      "en": "Maquis = petit bar typiquement ivoirien, lieu de vie nocturne et festive des quartiers populaires où on écoute la musique ivoirienne et on passe la nuit."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "lieu",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_014",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CALER",
+    "answer_normalized": "caler",
+    "letters_pool": [
+      "C",
+      "A",
+      "L",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Arrêter quelqu'un, le bloquer, l'empêcher de bouger. C'est un art abidjanais.",
+      "en": "Arrêter quelqu'un, le bloquer, l'empêcher de bouger. C'est un art abidjanais."
+    },
+    "explanation": {
+      "fr": "Caler = arrêter, bloquer, séduire et retenir quelqu'un. Peut aussi signifier avoir du caractère, tenir bon. Très utilisé dans le contexte de séduction urbaine.",
+      "en": "Caler = arrêter, bloquer, séduire et retenir quelqu'un. Peut aussi signifier avoir du caractère, tenir bon. Très utilisé dans le contexte de séduction urbaine."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "daily_015",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CHAUD",
+    "answer_normalized": "chaud",
+    "letters_pool": [
+      "C",
+      "H",
+      "A",
+      "U",
+      "D"
+    ],
+    "riddle": {
+      "fr": "C'est mon état quand je suis excité, agressif ou très en forme.",
+      "en": "C'est mon état quand je suis excité, agressif ou très en forme."
+    },
+    "explanation": {
+      "fr": "Chaud = excité, agressif, en colère, ou très en forme. Utilisé aussi pour décrire une situation intense ou dangereuse dans les contextes urbains.",
+      "en": "Chaud = excité, agressif, en colère, ou très en forme. Utilisé aussi pour décrire une situation intense ou dangereuse dans les contextes urbains."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "emotion",
+      "mainstream"
+    ],
+    "format_version": 3
+  }
+]
