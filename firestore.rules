@@ -119,6 +119,22 @@ service cloud.firestore {
     }
 
     // -------------------------------------------------------------------------
+    // Daily challenges — pool curated cross-joueurs
+    // -------------------------------------------------------------------------
+    // Lecture publique (cohérent avec content_index/content_packs) : tous les
+    // joueurs lisent le doc `{yyyy-MM-dd}` du défi du jour. Pas d'auth requise
+    // — le contenu n'est pas sensible et le mode solo doit fonctionner avant
+    // login. Écriture **bloquée côté client** : seed/override pushé via
+    // `functions/scripts/seed_daily_challenges.js` (admin SDK).
+    //
+    // Schéma attendu d'un doc : voir `Devinette.toJson()` côté Dart.
+    // Le client tolère le doc absent (fallback bundle local).
+    match /daily_challenges/{dateId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // -------------------------------------------------------------------------
     // UGC — soumissions
     // -------------------------------------------------------------------------
     match /submissions/{submissionId} {
