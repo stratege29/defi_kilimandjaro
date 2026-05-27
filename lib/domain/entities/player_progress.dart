@@ -22,6 +22,11 @@ class PlayerProgress extends Equatable {
     this.recentDevinetteIds = const <String>[],
     this.freePackChosen,
     this.starsByLevel = const <String, int>{},
+    this.failsByLevel = const <String, int>{},
+    this.dailyChallengeStreak = 0,
+    this.lastDailyChallengeDate,
+    this.freezeTokens = 0,
+    this.lastFreezeUsedDate,
   }) : activePackMix =
            activePackMix ?? _defaultPackMix(ownedPacks, freePackChosen);
 
@@ -84,6 +89,17 @@ class PlayerProgress extends Equatable {
       starsByLevel: ((json['stars_by_level'] as Map<String, dynamic>?) ??
               <String, dynamic>{})
           .map((k, v) => MapEntry(k, v as int)),
+      failsByLevel: ((json['fails_by_level'] as Map<String, dynamic>?) ??
+              <String, dynamic>{})
+          .map((k, v) => MapEntry(k, v as int)),
+      dailyChallengeStreak: (json['daily_challenge_streak'] as int?) ?? 0,
+      lastDailyChallengeDate: json['last_daily_challenge_date'] == null
+          ? null
+          : DateTime.tryParse(json['last_daily_challenge_date'] as String),
+      freezeTokens: (json['freeze_tokens'] as int?) ?? 0,
+      lastFreezeUsedDate: json['last_freeze_used_date'] == null
+          ? null
+          : DateTime.tryParse(json['last_freeze_used_date'] as String),
     );
   }
 
@@ -184,6 +200,43 @@ class PlayerProgress extends Equatable {
   /// map.
   final Map<String, int> starsByLevel;
 
+  /// Compteur d'échecs **consécutifs sur le même niveau** (clé =
+  /// `"$mountainId#$levelIndex"`).
+  ///
+  /// Distinct de [consecutiveFailures] (qui est global et sert au
+  /// trigger des interstitielles). Ici on suit niveau par niveau pour :
+  /// - décider si la réponse doit être révélée gratuitement (≥ 3 échecs
+  ///   consécutifs sur le même niveau, anti-blocage en zone T3+) ;
+  /// - reset à la victoire de **ce** niveau précis.
+  ///
+  /// Niveaux jamais ratés absents de la map.
+  final Map<String, int> failsByLevel;
+
+  /// Compteur de jours consécutifs où le joueur a réussi le défi du jour.
+  /// Distinct de [dailyStreak] (qui suit l'ouverture d'app, gérée par
+  /// `DailyStreakService`). Reset à 0 sur échec ou skip d'un jour.
+  final int dailyChallengeStreak;
+
+  /// Jour calendaire local (heures à 0) du dernier daily challenge joué.
+  /// Sert à :
+  /// - détecter si le défi du jour a déjà été tenté aujourd'hui
+  ///   (1 essai/jour) ;
+  /// - détecter un day-skip (lastDate < today - 1 jour ⇒ streak cassé).
+  /// Null tant que le joueur n'a jamais joué de daily.
+  final DateTime? lastDailyChallengeDate;
+
+  /// Nombre de **freeze tokens** en stock — chaque token consomme
+  /// automatiquement un day-skip détecté (cf. `DailyChallengeService.
+  /// maxFreezeTokens` pour le plafond). Achetable contre cauris
+  /// (`DailyChallengeService.freezeTokenCost`). Sink économique majeur
+  /// + valeur perçue très forte pour les joueurs assidus.
+  final int freezeTokens;
+
+  /// Jour calendaire local du dernier freeze token consommé. Sert au
+  /// badge UI « ❄️ Série sauvée par freeze ». Null tant qu'aucun freeze
+  /// n'a été appliqué.
+  final DateTime? lastFreezeUsedDate;
+
   /// True quand l'utilisateur a déjà choisi son pack gratuit (gating
   /// d'onboarding).
   bool get hasChosenFreePack => freePackChosen != null;
@@ -205,6 +258,14 @@ class PlayerProgress extends Equatable {
     if (freePackChosen != null) 'free_pack_chosen': freePackChosen,
     'pack_mix': activePackMix.toJson(),
     if (starsByLevel.isNotEmpty) 'stars_by_level': starsByLevel,
+    if (failsByLevel.isNotEmpty) 'fails_by_level': failsByLevel,
+    if (dailyChallengeStreak > 0)
+      'daily_challenge_streak': dailyChallengeStreak,
+    if (lastDailyChallengeDate != null)
+      'last_daily_challenge_date': lastDailyChallengeDate!.toIso8601String(),
+    if (freezeTokens > 0) 'freeze_tokens': freezeTokens,
+    if (lastFreezeUsedDate != null)
+      'last_freeze_used_date': lastFreezeUsedDate!.toIso8601String(),
   };
 
   /// Combien de niveaux complétés sur cette montagne.
@@ -214,6 +275,20 @@ class PlayerProgress extends Equatable {
   int starsOnLevel({required String mountainId, required int levelIndex}) {
     return starsByLevel['$mountainId#$levelIndex'] ?? 0;
   }
+
+  /// Compteur d'échecs consécutifs sur ce niveau précis (0 si jamais raté
+  /// ou si déjà gagné depuis le dernier échec). Reset à 0 dans
+  /// `PlayerProgressNotifier.recordWin`.
+  int failsOnLevel({required String mountainId, required int levelIndex}) {
+    return failsByLevel['$mountainId#$levelIndex'] ?? 0;
+  }
+
+  /// Somme des étoiles obtenues sur **tous** les niveaux joués. Dérivé à
+  /// la volée depuis [starsByLevel] (pas de persistance dédiée — évite la
+  /// désynchro avec le détail). Sert au système star-gate (cf.
+  /// `StarGate.computeUnlockedTier`).
+  int get totalStars =>
+      starsByLevel.values.fold<int>(0, (sum, s) => sum + s);
 
   PlayerProgress copyWith({
     int? cauris,
@@ -231,6 +306,11 @@ class PlayerProgress extends Equatable {
     String? freePackChosen,
     PackMix? activePackMix,
     Map<String, int>? starsByLevel,
+    int? dailyChallengeStreak,
+    DateTime? lastDailyChallengeDate,
+    Map<String, int>? failsByLevel,
+    int? freezeTokens,
+    DateTime? lastFreezeUsedDate,
   }) {
     return PlayerProgress(
       cauris: cauris ?? this.cauris,
@@ -250,6 +330,14 @@ class PlayerProgress extends Equatable {
       freePackChosen: freePackChosen ?? this.freePackChosen,
       activePackMix: activePackMix ?? this.activePackMix,
       starsByLevel: starsByLevel ?? this.starsByLevel,
+      failsByLevel: failsByLevel ?? this.failsByLevel,
+      dailyChallengeStreak:
+          dailyChallengeStreak ?? this.dailyChallengeStreak,
+      lastDailyChallengeDate:
+          lastDailyChallengeDate ?? this.lastDailyChallengeDate,
+      freezeTokens: freezeTokens ?? this.freezeTokens,
+      lastFreezeUsedDate:
+          lastFreezeUsedDate ?? this.lastFreezeUsedDate,
     );
   }
 
@@ -270,5 +358,10 @@ class PlayerProgress extends Equatable {
     freePackChosen,
     activePackMix,
     starsByLevel,
+    failsByLevel,
+    dailyChallengeStreak,
+    lastDailyChallengeDate,
+    freezeTokens,
+    lastFreezeUsedDate,
   ];
 }

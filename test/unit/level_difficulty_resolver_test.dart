@@ -22,7 +22,7 @@ Mountain _make({
 
 void main() {
   group('LevelDifficultyResolver — palier de difficulté par altitude', () {
-    test('palier 1 pour moins de 500 m (Red Rocks Gambie ~53 m)', () {
+    test('palier 1 pour moins de 700 m (Red Rocks Gambie ~53 m)', () {
       final config = LevelDifficultyResolver.resolve(
         mountain: _make(id: 'gm', altitude: 53),
         levelIndex: 1,
@@ -30,6 +30,41 @@ void main() {
       expect(config.difficultyTier, 1);
       expect(config.wordLengthBucket, 1);
       expect(config.caurisMultiplier, 1.0);
+    });
+
+    test('palier 1 inclut la zone 500–699 m (Sambadougou 648 m, '
+        'Sokbaro 658 m) — onboarding étendu', () {
+      // Avant l'extension du seuil tier 1, ces montagnes étaient tier 2
+      // (5 lettres, multiplier 1.3). Elles servent désormais de zone
+      // d'apprentissage prolongée pour atteindre 10 niveaux d'onboarding
+      // au total (Red Rocks 2 + Sambadougou 4 + Sokbaro 4).
+      for (final alt in <int>[500, 648, 658, 699]) {
+        final config = LevelDifficultyResolver.resolve(
+          mountain: _make(id: 'low-$alt', altitude: alt),
+          levelIndex: 1,
+        );
+        expect(
+          config.difficultyTier,
+          1,
+          reason: 'altitude $alt m doit être tier 1 (seuil exclusif 700 m)',
+        );
+      }
+    });
+
+    test('palier 2 commence exactement à 700 m (borne exclusive) — '
+        'Tena Kourou 749 m amorce la rampe', () {
+      final boundary = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 'boundary', altitude: 700),
+        levelIndex: 1,
+      );
+      expect(boundary.difficultyTier, 2);
+      expect(boundary.caurisMultiplier, 1.3);
+
+      final tenaKourou = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 'bf_tena_kourou', altitude: 749),
+        levelIndex: 1,
+      );
+      expect(tenaKourou.difficultyTier, 2);
     });
 
     test('palier 3 pour 1500–2999 m (Mt Nimba 1752 m)', () {
@@ -275,6 +310,54 @@ void main() {
       expect(tier3.distractorCount, 1);
       expect(tier4.distractorCount, 2);
       expect(tier5.distractorCount, 3);
+    });
+  });
+
+  group('LevelDifficultyResolver — tierForAltitude (API publique)', () {
+    test('mappage cohérent avec resolve() pour chaque tier', () {
+      expect(LevelDifficultyResolver.tierForAltitude(0), 1);
+      expect(LevelDifficultyResolver.tierForAltitude(699), 1);
+      expect(LevelDifficultyResolver.tierForAltitude(700), 2);
+      expect(LevelDifficultyResolver.tierForAltitude(1499), 2);
+      expect(LevelDifficultyResolver.tierForAltitude(1500), 3);
+      expect(LevelDifficultyResolver.tierForAltitude(2999), 3);
+      expect(LevelDifficultyResolver.tierForAltitude(3000), 4);
+      expect(LevelDifficultyResolver.tierForAltitude(4499), 4);
+      expect(LevelDifficultyResolver.tierForAltitude(4500), 5);
+      expect(LevelDifficultyResolver.tierForAltitude(8848), 5);
+    });
+  });
+
+  group('LevelDifficultyResolver — revealsAnswerOnFailure', () {
+    test('tier 1-2 (zone tutoriel) révèle la réponse gratuitement', () {
+      final t1 = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 't1', altitude: 100),
+        levelIndex: 1,
+      );
+      final t2 = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 't2', altitude: 1000),
+        levelIndex: 1,
+      );
+      expect(t1.revealsAnswerOnFailure, isTrue);
+      expect(t2.revealsAnswerOnFailure, isTrue);
+    });
+
+    test('tier 3+ masque la réponse par défaut (sink économique)', () {
+      final t3 = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 't3', altitude: 2000),
+        levelIndex: 1,
+      );
+      final t4 = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 't4', altitude: 3500),
+        levelIndex: 1,
+      );
+      final t5 = LevelDifficultyResolver.resolve(
+        mountain: _make(id: 't5', altitude: 5000),
+        levelIndex: 1,
+      );
+      expect(t3.revealsAnswerOnFailure, isFalse);
+      expect(t4.revealsAnswerOnFailure, isFalse);
+      expect(t5.revealsAnswerOnFailure, isFalse);
     });
   });
 

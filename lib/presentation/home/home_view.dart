@@ -8,6 +8,7 @@ import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/continue_ascent_card.dart';
+import 'package:defi_kilimandjaro/presentation/home/widgets/daily_challenge_card.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/daily_streak_dialog.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/duels_carousel.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/home_header.dart';
@@ -86,6 +87,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                 children: const [
                   WelcomeCard(),
+                  SizedBox(height: 22),
+                  DailyChallengeCard(),
                   SizedBox(height: 22),
                   ContinueAscentCard(),
                   SizedBox(height: 22),

@@ -5,6 +5,7 @@ import 'package:defi_kilimandjaro/domain/entities/game_economy_config.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
+import 'package:defi_kilimandjaro/domain/services/daily_challenge_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -117,6 +118,18 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
         levelIndex == null ||
         levelIndex > (state.completedLevelsByMountain[mountainId] ?? 0);
 
+    // Reset du compteur d'échecs consécutifs **sur ce niveau** : on a
+    // gagné, donc on efface l'historique de blocage. La map n'est
+    // recopiée que si une entrée existait pour cette clé — évite des
+    // copies inutiles à chaque victoire.
+    var fails = state.failsByLevel;
+    if (mountainId != null && levelIndex != null) {
+      final key = '$mountainId#$levelIndex';
+      if (fails.containsKey(key)) {
+        fails = Map<String, int>.from(fails)..remove(key);
+      }
+    }
+
     final newState = state.copyWith(
       cauris: state.cauris + caurisAwarded,
       completedLevelsByMountain: levels,
@@ -125,6 +138,7 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
       lastPlayDate: DateTime.now(),
       consecutiveFailures: 0,
       starsByLevel: stars,
+      failsByLevel: fails,
     );
     state = newState;
     await _repo.save(newState);
@@ -138,6 +152,45 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     state = newState;
     await _repo.save(newState);
     return newCount;
+  }
+
+  /// Incrémente le compteur d'échecs consécutifs **sur ce niveau précis**
+  /// et retourne le nouveau total.
+  ///
+  /// Distinct de [recordFailure] (compteur global pour les interstitielles).
+  /// Sert au filet anti-blocage du reveal : quand ce compteur atteint 3,
+  /// `GameView` révèle la réponse gratuitement même en zone T3+.
+  ///
+  /// Reset à 0 dans [recordWin] dès que ce niveau précis est gagné.
+  Future<int> recordLevelFailure({
+    required String mountainId,
+    required int levelIndex,
+  }) async {
+    final key = '$mountainId#$levelIndex';
+    final current = state.failsByLevel[key] ?? 0;
+    final newCount = current + 1;
+    final fails = Map<String, int>.from(state.failsByLevel)
+      ..[key] = newCount;
+    final newState = state.copyWith(failsByLevel: fails);
+    state = newState;
+    await _repo.save(newState);
+    return newCount;
+  }
+
+  /// Déduit le coût d'un reveal payant et retourne true si la dépense a
+  /// eu lieu. Retourne false (sans toucher au solde) si solde insuffisant.
+  ///
+  /// Sémantique alignée sur [spendOnHint] — les deux opérations sont des
+  /// "spend cauris" mais préservées séparément pour faciliter le tracking
+  /// analytique distinct (Phase 4) : hint vs reveal n'ont pas la même
+  /// valeur économique ni la même intention joueur.
+  Future<bool> purchaseReveal(int cost) async {
+    if (cost <= 0) return true;
+    if (state.cauris < cost) return false;
+    final newState = state.copyWith(cauris: state.cauris - cost);
+    state = newState;
+    await _repo.save(newState);
+    return true;
   }
 
   /// Marque l'achat "No-Ads" comme accordé. Idempotent.
@@ -175,6 +228,97 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
   Future<bool> spendOnHint(int cost) async {
     if (state.cauris < cost) return false;
     final newState = state.copyWith(cauris: state.cauris - cost);
+    state = newState;
+    await _repo.save(newState);
+    return true;
+  }
+
+  /// Enregistre le résultat du défi du jour (daily challenge).
+  ///
+  /// Logique :
+  /// - **Succès** : streak += 1 (ou +1 depuis 0 si premier défi),
+  ///   octroi `DailyChallengeService.rewardCauris` (100) + éventuel
+  ///   bonus de palier (cf. `DailyChallengeService.bonusForStreak`).
+  /// - **Échec** : streak reset à 0, aucun cauris.
+  /// - **Day-skip détecté** (gap ≥ 2 jours avec le dernier daily) :
+  ///   - Si le joueur a au moins un **freeze token** ET le résultat du
+  ///     jour est un succès → on **préserve** le streak (gain +1 comme
+  ///     une continuité), décrémente le compteur de tokens, marque
+  ///     `lastFreezeUsedDate = date`.
+  ///   - Sinon (pas de token, ou résultat = échec) : streak reset à 0
+  ///     puis on applique la logique normale.
+  ///
+  /// Le freeze est **automatique conditionnel** : il ne se consomme
+  /// jamais sur un échec du jour (sinon le streak partirait à 0 quand
+  /// même, gaspillage). Validation PO mai 2026.
+  ///
+  /// `date` est le jour calendaire local du défi (heures à 0 idéalement
+  /// mais on tolère une DateTime quelconque — la comparaison se fait au
+  /// jour). Retourne le **total** de cauris octroyés (base + bonus
+  /// éventuel, 0 si échec).
+  Future<int> recordDailyChallengeResult({
+    required DateTime date,
+    required bool success,
+  }) async {
+    final last = state.lastDailyChallengeDate;
+    var baseStreak = state.dailyChallengeStreak;
+    var freezeTokens = state.freezeTokens;
+    var lastFreezeUsedDate = state.lastFreezeUsedDate;
+
+    if (last != null) {
+      final lastDay = DateTime(last.year, last.month, last.day);
+      final today = DateTime(date.year, date.month, date.day);
+      final delta = today.difference(lastDay).inDays;
+      if (delta >= 2) {
+        // Day-skip détecté. On tente un freeze automatique :
+        // seulement si success ET tokens disponibles.
+        if (success && freezeTokens > 0) {
+          freezeTokens -= 1;
+          lastFreezeUsedDate = date;
+          // baseStreak inchangé → continuité préservée.
+        } else {
+          baseStreak = 0; // skip ⇒ streak perdu avant calcul
+        }
+      }
+    }
+
+    final newStreak = success ? baseStreak + 1 : 0;
+    // Bonus de palier — octroyé **une seule fois** quand le streak
+    // bascule sur 3, 7 ou 30 jours exactement (cf. service domain).
+    // Zéro en cas d'échec puisque newStreak = 0.
+    final bonus =
+        success ? DailyChallengeService.bonusForStreak(newStreak) : 0;
+    final awarded = success ? DailyChallengeService.rewardCauris + bonus : 0;
+
+    final newState = state.copyWith(
+      cauris: state.cauris + awarded,
+      dailyChallengeStreak: newStreak,
+      lastDailyChallengeDate: date,
+      freezeTokens: freezeTokens,
+      lastFreezeUsedDate: lastFreezeUsedDate,
+    );
+    state = newState;
+    await _repo.save(newState);
+    return awarded;
+  }
+
+  /// Achète un **freeze token** au prix `DailyChallengeService.
+  /// freezeTokenCost` (150 🐚). Refuse l'achat si :
+  /// - le solde est insuffisant ;
+  /// - le stock max (`DailyChallengeService.maxFreezeTokens` = 3) est
+  ///   déjà atteint (évite le farming abusif).
+  ///
+  /// Retourne `true` si l'achat a réussi.
+  Future<bool> purchaseFreezeToken() async {
+    if (state.freezeTokens >= DailyChallengeService.maxFreezeTokens) {
+      return false;
+    }
+    const cost = DailyChallengeService.freezeTokenCost;
+    if (state.cauris < cost) return false;
+    final newState = state.copyWith(
+      cauris: state.cauris - cost,
+      freezeTokens: state.freezeTokens + 1,
+    );
     state = newState;
     await _repo.save(newState);
     return true;

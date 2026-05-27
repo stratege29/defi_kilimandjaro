@@ -43,7 +43,11 @@
     "failure": {
       "answer_was": "La réponse était {answer}",
       "retry": "RÉESSAYER 🔁",
-      "consolation": "Retente ta chance ! 🎯"
+      "consolation": "Retente ta chance ! 🎯",
+      "answer_hidden_title": "Mot caché",
+      "answer_hidden_hint": "La sagesse se mérite — réessaie ou révèle la réponse.",
+      "reveal_button": "Voir la réponse — {cost} 🐚",
+      "reveal_insufficient": "Solde insuffisant ({cost} 🐚 requis)"
     }
   },
   "hub": {
@@ -62,7 +66,30 @@
     "title": "SOMMETS D'AFRIQUE",
     "subtitle": "Du plus modeste sommet au toit du continent",
     "locked": "Bientôt disponible — termine la précédente",
+    "locked_progression_cta": "TERMINE LE SOMMET PRÉCÉDENT",
+    "locked_stargate_cta": "BARRIÈRE ★ : {stars} ÉTOILES MANQUANTES",
+    "locked_stargate_snackbar": "Il te manque {stars} ★ pour franchir cette barrière. Rejoue tes niveaux à 1 ★ pour les améliorer.",
     "level_locked": "Termine le niveau {previous} pour débloquer"
+  },
+  "daily": {
+    "title": "DÉFI DU JOUR",
+    "subtitle": "Un mot, une chance — chaque jour",
+    "cta_available": "JOUER LE DÉFI",
+    "cta_done": "DÉFI TERMINÉ ✓",
+    "reward_caption": "Récompense : {cauris} 🐚",
+    "streak": "Série : {count} jours",
+    "streak_broken": "Série perdue — recommence aujourd'hui",
+    "streak_zero": "Démarre ta série de victoires !",
+    "pool_empty": "Aucune devinette disponible dans ton pack",
+    "result_success": "+{cauris} 🐚 — Série {streak} jours",
+    "result_failure": "Série perdue — réessaie demain",
+    "streak_bonus_banner": "🎉 +{cauris} 🐚 BONUS SÉRIE {days} JOURS",
+    "next_milestone_hint": "Prochain palier : {target} jours (+{bonus} 🐚)",
+    "freeze_tokens_count": "❄️ {count}/{max}",
+    "freeze_buy_cta": "Acheter ❄️ — {cost} 🐚",
+    "freeze_buy_full": "Stock max atteint ({max})",
+    "freeze_buy_insufficient": "Solde insuffisant ({cost} 🐚 requis)",
+    "freeze_saved_banner": "❄️ Série sauvée par freeze !"
   },
   "profile": {
     "default_name": "Joueur",

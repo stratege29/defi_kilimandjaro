@@ -68,12 +68,27 @@ abstract final class LevelDifficultyResolver {
   /// — on tombe sur la config fallback la plus douce.
   static LevelDifficultyConfig fallback() => LevelDifficultyConfig.fallback;
 
+  /// Renvoie le tier de difficulté (1–5) pour une altitude donnée. Exposé
+  /// pour les services qui doivent raisonner sur le tier sans passer par
+  /// la config complète (ex. `StarGate` pour gating l'accès aux mondes).
+  ///
+  /// Source de vérité unique pour les seuils — toute modification ici se
+  /// propage à `resolve()`, `StarGate.computeUnlockedTier()`, et aux tests.
+  static int tierForAltitude(int altitudeMeters) =>
+      _tierForAltitude(altitudeMeters);
+
   // ---------------------------------------------------------------------------
   // Mapping primitives
   // ---------------------------------------------------------------------------
 
   static int _tierForAltitude(int altitudeMeters) {
-    if (altitudeMeters < 500) return 1;
+    // Tier 1 étendu à < 700 m (vs < 500 m initial) pour donner une vraie
+    // zone d'onboarding : 3 premières montagnes (Red Rocks, Sambadougou,
+    // Sokbaro) = 10 niveaux à 4 lettres / 29 s / 0 distracteur avant le
+    // premier saut de difficulté. Tena Kourou (749 m) bascule en Tier 2
+    // pour amorcer la rampe. La borne haute (700 m) reste **strictement**
+    // exclusive : 700 m exact = Tier 2 (cf. tests).
+    if (altitudeMeters < 700) return 1;
     if (altitudeMeters < 1500) return 2;
     if (altitudeMeters < 3000) return 3;
     if (altitudeMeters < 4500) return 4;
@@ -202,9 +217,11 @@ abstract final class LevelDifficultyResolver {
     // (drumbeat, ice, etc.).
     //
     // Pourquoi pas tier 1-2 : ces paliers servent de zone tutoriel
-    // implicite (apprentissage du gameplay de base). Le 2e niveau du
-    // jeu — boss Red Rocks — doit rester un boss "soft" sans inversion
-    // cognitive pour ne pas effrayer le joueur dès la sortie du splash.
+    // implicite (apprentissage du gameplay de base). Les 10 premiers
+    // niveaux (3 premières montagnes Tier 1, alt < 700 m) doivent rester
+    // "soft" sans inversion cognitive — le joueur découvre la grille
+    // circulaire, la barre de timer et le système d'indices sur des mots
+    // courts (4 lettres). Tier 2 prolonge la rampe jusqu'à ~1500 m.
     if (isBoss && tier >= 3 && modifiers.length <= 1) {
       // Si on n'a que `shuffle` (ajouté juste au-dessus), on ajoute reverse
       // pour le double-pic boss. La condition `length <= 1` couvre les

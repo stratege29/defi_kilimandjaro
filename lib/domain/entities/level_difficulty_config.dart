@@ -72,6 +72,16 @@ class LevelDifficultyConfig extends Equatable {
   /// Raccourci : vrai si le modifier `thinAir` est actif (timer ×0.8).
   bool get hasThinAir => modifiers.contains(LevelModifier.thinAir);
 
+  /// Vrai pour les niveaux où l'écran d'échec révèle gratuitement la
+  /// réponse — c'est le comportement historique en zone tutoriel (T1–T2,
+  /// niveaux 1 à ~58 dans la progression standard). À partir du Tier 3,
+  /// la réponse est masquée par défaut : le joueur doit soit acheter le
+  /// reveal (50 cauris), soit échouer 3 fois consécutivement (filet
+  /// anti-blocage géré côté `GameView`). Ce choix crée un sink économique
+  /// pour les cauris et préserve la tension cognitive sur les niveaux
+  /// avancés.
+  bool get revealsAnswerOnFailure => difficultyTier <= 2;
+
   LevelDifficultyConfig copyWith({
     int? difficultyTier,
     int? wordLengthBucket,

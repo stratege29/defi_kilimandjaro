@@ -139,6 +139,19 @@ class _GameViewState extends ConsumerState<GameView>
       if (next.phase == GamePhase.won &&
           (previous == null || previous.phase != GamePhase.won)) {
         _overlayShown = true;
+        // En mode défi du jour, on persiste le résultat via le flow
+        // dédié AVANT d'afficher la victoire (l'overlay affiche le solde
+        // mis à jour). Le controller a déjà skippé recordWin standard.
+        if (widget.args.isDailyChallenge) {
+          unawaited(
+            ref
+                .read(playerProgressProvider.notifier)
+                .recordDailyChallengeResult(
+                  date: widget.args.dailyDate!,
+                  success: true,
+                ),
+          );
+        }
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
           _showVictoryOverlay(
@@ -565,24 +578,96 @@ class _GameViewState extends ConsumerState<GameView>
     }
   }
 
+  /// Coût en cauris pour révéler la réponse à l'écran d'échec en zone
+  /// T3+. Choisi pour rester accessible (~1 victoire T3 = 1 reveal) mais
+  /// créer un vrai sink économique. Constante locale ici parce que ce
+  /// levier d'équilibrage économique ne vit que dans le flow d'échec —
+  /// à promouvoir vers Remote Config si on veut le tweaker à chaud.
+  static const int _revealCostCauris = 50;
+
+  /// Seuil d'échecs consécutifs sur **un même niveau** au-delà duquel la
+  /// réponse est révélée gratuitement (filet anti-blocage). Combiné au
+  /// reveal payant : le joueur peut soit payer plus tôt, soit insister
+  /// 3 fois pour obtenir le reveal gratuit.
+  static const int _autoRevealFailThreshold = 3;
+
   Future<void> _showFailureOverlay(
     BuildContext ctx,
     GameController controller,
   ) async {
-    // Échec : on incrémente seulement le compteur (utilisé pour stats /
-    // titres). L'interstitielle n'est plus déclenchée par les échecs
-    // (Étape D Phase 4) — punir l'échec dégrade l'expérience. La pub
-    // arrive maintenant entre deux niveaux après une victoire normale.
-    if (!ref.read(playerProgressProvider).noAdsPurchased) {
-      await ref.read(playerProgressProvider.notifier).recordFailure();
+    // Mode défi du jour : on persiste le résultat via le flow dédié,
+    // **sans** toucher au compteur global `consecutiveFailures` (qui
+    // sert au throttling pub côté niveau standard).
+    if (widget.args.isDailyChallenge) {
+      await ref
+          .read(playerProgressProvider.notifier)
+          .recordDailyChallengeResult(
+            date: widget.args.dailyDate!,
+            success: false,
+          );
+    } else {
+      // Échec niveau standard : on incrémente seulement le compteur
+      // (utilisé pour stats / titres). L'interstitielle n'est plus
+      // déclenchée par les échecs (Étape D Phase 4) — punir l'échec
+      // dégrade l'expérience. La pub arrive maintenant entre deux
+      // niveaux après une victoire normale.
+      if (!ref.read(playerProgressProvider).noAdsPurchased) {
+        await ref.read(playerProgressProvider.notifier).recordFailure();
+      }
     }
+
+    // Logique de reveal (T3+ uniquement, et seulement en mode montagne
+    // — le Hub n'a pas de structure progression par niveau).
+    //
+    // Pour les niveaux T1-T2 OU le mode Hub : on garde le comportement
+    // historique (réponse révélée gratuitement à chaque échec).
+    //
+    // Pour T3+ avec mountainId/levelIndex : on incrémente le compteur
+    // par niveau et on calcule si la réponse doit être révélée d'office
+    // (filet anti-blocage à 3 échecs cumulés sur ce niveau précis).
+    final mountainId = widget.args.mountainId;
+    final levelIndex = widget.args.levelIndex;
+    final config = widget.args.config;
+    final canTrackLevel = mountainId != null && levelIndex != null;
+    final isPayWallActive = !config.revealsAnswerOnFailure && canTrackLevel;
+
+    var answerRevealed = true;
+    if (isPayWallActive) {
+      final newFailCount = await ref
+          .read(playerProgressProvider.notifier)
+          .recordLevelFailure(
+            mountainId: mountainId,
+            levelIndex: levelIndex,
+          );
+      answerRevealed = newFailCount >= _autoRevealFailThreshold;
+    }
+
     if (!ctx.mounted) return;
+    // Le `select` garantit que le `canAfford` lu reste cohérent avec
+    // l'état au moment d'ouvrir le dialog. Le `FailureView` re-évalue
+    // l'achat via `purchaseReveal` qui re-check le solde côté repo —
+    // donc même si le joueur dépense ailleurs entre-temps, l'achat
+    // est sécurisé serveur-style.
+    final canAffordReveal = ref.read(
+      playerProgressProvider.select((p) => p.cauris >= _revealCostCauris),
+    );
+
     await showDialog<void>(
       context: ctx,
       barrierDismissible: false,
       barrierColor: Colors.black.withValues(alpha: 0.92),
       builder: (_) => FailureView(
         devinette: widget.args.devinette,
+        answerRevealed: answerRevealed,
+        revealCost: isPayWallActive && !answerRevealed
+            ? _revealCostCauris
+            : null,
+        canAffordReveal: canAffordReveal,
+        onPurchaseReveal: isPayWallActive && !answerRevealed
+            ? () => ref
+                .read(playerProgressProvider.notifier)
+                .purchaseReveal(_revealCostCauris)
+            : null,
         onRetry: () {
           ctx.pop(); // closes dialog
           _overlayShown = false;

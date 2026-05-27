@@ -8,6 +8,7 @@ import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/domain/entities/game_economy_config.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_star_rating.dart';
+import 'package:defi_kilimandjaro/domain/services/daily_challenge_service.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -353,12 +354,22 @@ class GameController extends StateNotifier<GameState> {
     final formed = state.formedWord;
     if (formed == state.expectedAnswer) {
       _timer?.cancel();
-      // Récompense : (base + bonus vitesse × timeLeft) × multiplier
-      // de difficulté (1.0 → 2.5 selon le tier). Base et bonus pilotés
-      // par Remote Config (cf. `GameEconomyConfig`).
-      final raw =
-          _economy.winRewardBase + state.timeLeft * _economy.speedBonusPerSecond;
-      final caurisAwarded = (raw * _args.config.caurisMultiplier).round();
+      // Récompense :
+      // - **Mode standard** : (base + bonus vitesse × timeLeft) ×
+      //   multiplier de difficulté (1.0 → 2.5 selon le tier). Base et
+      //   bonus pilotés par Remote Config (cf. `GameEconomyConfig`).
+      // - **Mode défi du jour** : montant fixe = base daily (100). Le
+      //   bonus de palier (3/7/30 jours) est octroyé en plus par le
+      //   notifier daily, mais n'est PAS affiché ici (VictoryView reste
+      //   sur le montant base — feedback bonus géré côté hub).
+      final int caurisAwarded;
+      if (_args.isDailyChallenge) {
+        caurisAwarded = DailyChallengeService.rewardCauris;
+      } else {
+        final raw = _economy.winRewardBase +
+            state.timeLeft * _economy.speedBonusPerSecond;
+        caurisAwarded = (raw * _args.config.caurisMultiplier).round();
+      }
       // Étoiles : (1) victoire (2) sans indice (3) ≥ 50 % timer restant.
       final stars = LevelStarRating.computeStars(
         won: true,
@@ -373,16 +384,20 @@ class GameController extends StateNotifier<GameState> {
         starsEarned: stars,
         caurisAwarded: caurisAwarded,
       );
-      // Persiste la victoire (cauris + level mountain + total + lastPlay
-      // + meilleur score étoile pour ce niveau).
-      unawaited(
-        _progress.recordWin(
-          mountainId: _args.mountainId,
-          caurisAwarded: caurisAwarded,
-          levelIndex: _args.levelIndex,
-          starsEarned: stars,
-        ),
-      );
+      // Persiste la victoire — sauf en mode défi du jour qui a son
+      // propre flow (cf. `GameView` qui appelle
+      // `recordDailyChallengeResult` avec un montant fixe et n'utilise
+      // pas le compteur de niveaux montagne).
+      if (!_args.isDailyChallenge) {
+        unawaited(
+          _progress.recordWin(
+            mountainId: _args.mountainId,
+            caurisAwarded: caurisAwarded,
+            levelIndex: _args.levelIndex,
+            starsEarned: stars,
+          ),
+        );
+      }
       // Audio: balafon accord 5 notes puis fanfare griot (boss ou
       // standard). La fanfare boss est plus longue et débute par 2
       // frappes djembé graves — l'attaque haptique heavy est aussi

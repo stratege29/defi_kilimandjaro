@@ -87,5 +87,56 @@ void main() {
         2,
       );
     });
+
+    test('failsByLevel persistance round-trip', () {
+      final p = PlayerProgress.initial().copyWith(
+        failsByLevel: const <String, int>{
+          'ci_nimba#3': 2,
+          'tz_kilimanjaro#5': 1,
+        },
+      );
+      final back = PlayerProgress.fromJson(p.toJson());
+      expect(back.failsByLevel['ci_nimba#3'], 2);
+      expect(back.failsByLevel['tz_kilimanjaro#5'], 1);
+    });
+
+    test('failsByLevel absent du JSON quand vide (économie de bytes)', () {
+      final json = PlayerProgress.initial().toJson();
+      expect(json.containsKey('fails_by_level'), isFalse);
+    });
+
+    test('failsOnLevel retourne 0 par défaut', () {
+      final p = PlayerProgress.initial();
+      expect(
+        p.failsOnLevel(mountainId: 'ci_nimba', levelIndex: 1),
+        0,
+      );
+    });
+
+    test('failsOnLevel lit la valeur persistée', () {
+      final p = PlayerProgress.initial().copyWith(
+        failsByLevel: const <String, int>{'ci_nimba#3': 2},
+      );
+      expect(
+        p.failsOnLevel(mountainId: 'ci_nimba', levelIndex: 3),
+        2,
+      );
+    });
+
+    test('totalStars somme toutes les étoiles persistées', () {
+      final p = PlayerProgress.initial().copyWith(
+        starsByLevel: const <String, int>{
+          'gm_red_rocks#1': 3,
+          'gm_red_rocks#2': 2,
+          'sn_sambadougou#1': 1,
+          'sn_sambadougou#2': 3,
+        },
+      );
+      expect(p.totalStars, 9);
+    });
+
+    test('totalStars = 0 sur état initial', () {
+      expect(PlayerProgress.initial().totalStars, 0);
+    });
   });
 }
