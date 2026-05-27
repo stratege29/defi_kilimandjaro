@@ -382,6 +382,10 @@
     "crack_nouchi": {
       "name": "Crack Nouchi",
       "description": "Abidjan street slang, from gaou to boss"
+    },
+    "football_ci": {
+      "name": "Ivorian Football",
+      "description": "The Elephants, cult players and trophies of the green jersey"
     }
   },
   "pack_chooser": {
