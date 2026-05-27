@@ -42,10 +42,30 @@ class ProfileView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final progress = ref.watch(playerProgressProvider);
-    final asyncMountains = ref.watch(mountainsProvider);
+    // Defense au cold start (cf. HubView._Header) : si un provider throw
+    // pendant que les fournisseurs ne sont pas encore prets (sharedPreferences
+    // override pas encore applique, Firebase Auth en cours d'init), on tombe
+    // sur l'etat initial vide plutot que de propager l'exception et faire
+    // crasher tout le ProfileView (= ecran blanc en release).
+    PlayerProgress progress;
+    try {
+      progress = ref.watch(playerProgressProvider);
+    } on Object {
+      progress = PlayerProgress.initial();
+    }
+    AsyncValue<List<Mountain>> asyncMountains;
+    try {
+      asyncMountains = ref.watch(mountainsProvider);
+    } on Object {
+      asyncMountains = const AsyncValue<List<Mountain>>.loading();
+    }
     final audioState = ref.watch(audioControllerProvider);
-    final profileAsync = ref.watch(playerProfileStreamProvider);
+    AsyncValue<PlayerProfile> profileAsync;
+    try {
+      profileAsync = ref.watch(playerProfileStreamProvider);
+    } on Object {
+      profileAsync = const AsyncValue<PlayerProfile>.loading();
+    }
 
     final title = HonorificTitle.currentFor(progress.totalLevelsCompleted);
     final mountains = asyncMountains.value ?? const <Mountain>[];
@@ -403,7 +423,14 @@ class _AvatarBadge extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncProfile = ref.watch(playerProfileStreamProvider);
+    // Defense au cold start : si playerProfileStreamProvider throw (cf.
+    // ProfileView.build), on tombe sur asyncProfile=loading sans avatar.
+    AsyncValue<PlayerProfile> asyncProfile;
+    try {
+      asyncProfile = ref.watch(playerProfileStreamProvider);
+    } on Object {
+      asyncProfile = const AsyncValue<PlayerProfile>.loading();
+    }
     final avatar = AvatarCatalog.byId(asyncProfile.value?.avatarId);
 
     // Avatar SVG si défini, sinon mascotte griot PNG legacy.

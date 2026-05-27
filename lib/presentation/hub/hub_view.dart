@@ -181,10 +181,27 @@ class _Header extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final progress = ref.watch(playerProgressProvider);
-    final levelTier = 1 + (progress.totalLevelsCompleted ~/ 10);
-    final profileAsync = ref.watch(playerProfileStreamProvider);
-    final myElo = profileAsync.value?.elo ?? 1000;
+    // Defense au cold start : si playerProgressProvider throw (override
+    // sharedPreferences pas encore applique, ou autre), on tombe sur des
+    // valeurs initiales plutot que de propager l'exception et faire crasher
+    // tout le HubView (= ecran blanc). Idem pour le profil ELO.
+    var totalLevels = 0;
+    var cauris = 0;
+    try {
+      final progress = ref.watch(playerProgressProvider);
+      totalLevels = progress.totalLevelsCompleted;
+      cauris = progress.cauris;
+    } on Object {
+      // Valeurs initiales conservees.
+    }
+    final levelTier = 1 + (totalLevels ~/ 10);
+
+    var myElo = 1000;
+    try {
+      myElo = ref.watch(playerProfileStreamProvider).value?.elo ?? 1000;
+    } on Object {
+      // Fallback altitude 1000m conserve.
+    }
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
@@ -212,7 +229,7 @@ class _Header extends ConsumerWidget {
           const SizedBox(width: 12),
           _Chip(
             iconWidget: const CaurisIcon(size: 16),
-            value: '${progress.cauris}',
+            value: '$cauris',
             trailingPlus: true,
             onTap: () => context.push(AppRoutes.shop),
           ),
