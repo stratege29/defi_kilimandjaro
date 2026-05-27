@@ -330,16 +330,22 @@ class GameController extends StateNotifier<GameState> {
   /// de base, suivants multipliés.
   void useHint() {
     if (state.phase != GamePhase.playing) return;
-    final cost = nextHintCost;
-    if (state.cauris < cost) return;
     if (state.hintRevealedCount >= state.devinette.answer.length) return;
+    final cost = nextHintCost;
+
+    // **Priorité au freebie quotidien** : si un indice gratuit est
+    // dispo, on ne décrémente PAS le solde local — le repo le consomme
+    // côté `spendOnHint` sans toucher aux cauris. Garde le state UI
+    // synchrone avec la persistance.
+    final hasFreeHint = _progress.state.freeHintAvailable;
+    if (!hasFreeHint && state.cauris < cost) return;
 
     state = state.copyWith(
-      cauris: state.cauris - cost,
+      cauris: hasFreeHint ? state.cauris : state.cauris - cost,
       hintRevealedCount: state.hintRevealedCount + 1,
     );
 
-    // Persist deduction.
+    // Persist deduction (consomme d'abord le freebie, sinon débite).
     unawaited(_progress.spendOnHint(cost));
     // Audio: kora 2 notes douces descendantes.
     unawaited(_audio.playHintUsed());

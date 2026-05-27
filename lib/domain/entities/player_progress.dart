@@ -27,6 +27,8 @@ class PlayerProgress extends Equatable {
     this.lastDailyChallengeDate,
     this.freezeTokens = 0,
     this.lastFreezeUsedDate,
+    this.freeHintAvailable = false,
+    this.lastFreeHintGrantedDate,
   }) : activePackMix =
            activePackMix ?? _defaultPackMix(ownedPacks, freePackChosen);
 
@@ -100,6 +102,10 @@ class PlayerProgress extends Equatable {
       lastFreezeUsedDate: json['last_freeze_used_date'] == null
           ? null
           : DateTime.tryParse(json['last_freeze_used_date'] as String),
+      freeHintAvailable: (json['free_hint_available'] as bool?) ?? false,
+      lastFreeHintGrantedDate: json['last_free_hint_granted_date'] == null
+          ? null
+          : DateTime.tryParse(json['last_free_hint_granted_date'] as String),
     );
   }
 
@@ -237,6 +243,18 @@ class PlayerProgress extends Equatable {
   /// n'a été appliqué.
   final DateTime? lastFreezeUsedDate;
 
+  /// True quand un **indice gratuit** est dispo (octroyé au 1er accès
+  /// du jour calendaire local). Stack max 1 — un free hint non utilisé
+  /// est perdu au lendemain quand le nouveau cycle d'octroi tourne. Le
+  /// `PlayerProgressNotifier.spendOnHint` le consomme en priorité avant
+  /// de débiter les cauris.
+  final bool freeHintAvailable;
+
+  /// Jour calendaire local du dernier octroi d'indice gratuit. Sert au
+  /// gating idempotent du daily grant (cf. `claimFreeHintIfDue`). Null
+  /// tant qu'aucun octroi n'a eu lieu.
+  final DateTime? lastFreeHintGrantedDate;
+
   /// True quand l'utilisateur a déjà choisi son pack gratuit (gating
   /// d'onboarding).
   bool get hasChosenFreePack => freePackChosen != null;
@@ -266,6 +284,10 @@ class PlayerProgress extends Equatable {
     if (freezeTokens > 0) 'freeze_tokens': freezeTokens,
     if (lastFreezeUsedDate != null)
       'last_freeze_used_date': lastFreezeUsedDate!.toIso8601String(),
+    if (freeHintAvailable) 'free_hint_available': freeHintAvailable,
+    if (lastFreeHintGrantedDate != null)
+      'last_free_hint_granted_date':
+          lastFreeHintGrantedDate!.toIso8601String(),
   };
 
   /// Combien de niveaux complétés sur cette montagne.
@@ -311,6 +333,8 @@ class PlayerProgress extends Equatable {
     Map<String, int>? failsByLevel,
     int? freezeTokens,
     DateTime? lastFreezeUsedDate,
+    bool? freeHintAvailable,
+    DateTime? lastFreeHintGrantedDate,
   }) {
     return PlayerProgress(
       cauris: cauris ?? this.cauris,
@@ -338,6 +362,9 @@ class PlayerProgress extends Equatable {
       freezeTokens: freezeTokens ?? this.freezeTokens,
       lastFreezeUsedDate:
           lastFreezeUsedDate ?? this.lastFreezeUsedDate,
+      freeHintAvailable: freeHintAvailable ?? this.freeHintAvailable,
+      lastFreeHintGrantedDate:
+          lastFreeHintGrantedDate ?? this.lastFreeHintGrantedDate,
     );
   }
 
@@ -363,5 +390,7 @@ class PlayerProgress extends Equatable {
     lastDailyChallengeDate,
     freezeTokens,
     lastFreezeUsedDate,
+    freeHintAvailable,
+    lastFreeHintGrantedDate,
   ];
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -72,7 +74,21 @@ final dailyStreakServiceProvider = Provider<DailyStreakService>(
 /// L'appel à `registerOpen()` se fait au `build` du provider (donc à la
 /// 1ʳᵉ lecture de la session) : Riverpod garde l'état en cache, donc
 /// pas de double-tick pendant la session.
+///
+/// **Side-effect** : déclenche aussi l'octroi de l'indice gratuit
+/// quotidien (`claimFreeHintIfDue`). Greffé ici pour ne pas multiplier
+/// les cycles de vie « 1er accès du jour » — toute UI qui watche le
+/// streak récupère le freebie au bon moment sans hook dédié.
 final dailyStreakProvider = FutureProvider<int>((ref) async {
   final service = ref.watch(dailyStreakServiceProvider);
-  return service.registerOpen();
+  final streak = await service.registerOpen();
+  // Octroi idempotent de l'indice gratuit du jour. Le notifier
+  // garantit le no-op si déjà octroyé aujourd'hui — safe à appeler
+  // à chaque rebuild de provider.
+  unawaited(
+    ref
+        .read(playerProgressProvider.notifier)
+        .claimFreeHintIfDue(date: DateTime.now()),
+  );
+  return streak;
 });
