@@ -27,6 +27,7 @@ class GriotBriefingOverlay extends StatelessWidget {
     required this.modifiers,
     required this.isBoss,
     required this.onConfirm,
+    this.firstEncounter = const <LevelModifier>{},
     super.key,
   });
 
@@ -34,12 +35,20 @@ class GriotBriefingOverlay extends StatelessWidget {
   final bool isBoss;
   final VoidCallback onConfirm;
 
+  /// Sous-ensemble de [modifiers] que le joueur rencontre pour la 1ère fois.
+  /// Seules ces lignes afficheront la description complète ; les autres
+  /// (déjà connues) n'affichent que le nom. Par défaut vide = toutes en
+  /// version "rappel courte".
+  final Set<LevelModifier> firstEncounter;
+
   @override
   Widget build(BuildContext context) {
     final entries = <_BriefingEntry>[];
     for (final m in modifiers) {
       final entry = _entryFor(m);
-      if (entry != null) entries.add(entry);
+      if (entry != null) {
+        entries.add(entry.copyWith(showDescription: firstEncounter.contains(m)));
+      }
     }
 
     return Dialog(
@@ -216,7 +225,8 @@ class GriotBriefingOverlay extends StatelessWidget {
   }
 }
 
-/// Ligne d'un modifier dans le briefing — icône colorée + nom + description.
+/// Ligne d'un modifier dans le briefing — icône colorée + nom (+ description
+/// seulement à la première rencontre, contrôlée par `entry.showDescription`).
 class _BriefingRow extends StatelessWidget {
   const _BriefingRow({required this.entry});
 
@@ -226,7 +236,9 @@ class _BriefingRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final keyBase = 'game.briefing.modifier.${entry.i18nKey}';
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: entry.showDescription
+          ? CrossAxisAlignment.start
+          : CrossAxisAlignment.center,
       children: <Widget>[
         // Pastille icône — fond teinté assorti à la couleur du badge in-game,
         // pour qu'on relie visuellement briefing et partie.
@@ -257,14 +269,16 @@ class _BriefingRow extends StatelessWidget {
                   color: entry.color,
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                '$keyBase.desc'.tr(),
-                style: AppTypography.crimson(
-                  size: 13,
-                  color: AppColors.textePrimaire,
-                ).copyWith(height: 1.35),
-              ),
+              if (entry.showDescription) ...[
+                const SizedBox(height: 2),
+                Text(
+                  '$keyBase.desc'.tr(),
+                  style: AppTypography.crimson(
+                    size: 13,
+                    color: AppColors.textePrimaire,
+                  ).copyWith(height: 1.35),
+                ),
+              ],
             ],
           ),
         ),
@@ -279,6 +293,7 @@ class _BriefingEntry {
     required this.icon,
     required this.color,
     required this.i18nKey,
+    this.showDescription = true,
   });
 
   final IconData icon;
@@ -287,4 +302,16 @@ class _BriefingEntry {
   /// Suffixe utilisé pour reconstruire les clés
   /// `game.briefing.modifier.<i18nKey>.name` et `.desc`.
   final String i18nKey;
+
+  /// Affiche la description en plus du nom. Toggled à false aux rencontres
+  /// répétées : le joueur connaît déjà le modifier, on ne fait que rappeler
+  /// sa présence par l'icône et le nom.
+  final bool showDescription;
+
+  _BriefingEntry copyWith({bool? showDescription}) => _BriefingEntry(
+    icon: icon,
+    color: color,
+    i18nKey: i18nKey,
+    showDescription: showDescription ?? this.showDescription,
+  );
 }

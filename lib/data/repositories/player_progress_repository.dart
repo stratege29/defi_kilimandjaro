@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/domain/entities/game_economy_config.dart';
+import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
@@ -479,6 +480,24 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
   /// branche fallback de `randomFromPackExcluding` ne sera quasi-jamais
   /// déclenchée.
   static const int _recentDevinetteCacheSize = 5;
+
+  /// Marque ces modifiers comme « déjà rencontrés » par le joueur. Appelé
+  /// après le dismiss de l'overlay « Le Griot t'avertit » : aux prochaines
+  /// rencontres, le briefing affichera uniquement le nom du modifier
+  /// (pas la description longue).
+  ///
+  /// No-op si tous les modifiers passés sont déjà connus — pas de persist
+  /// inutile.
+  Future<void> recordModifiersEncounter(Set<LevelModifier> modifiers) async {
+    if (modifiers.isEmpty) return;
+    final current = state.encounteredModifiers;
+    final additions = modifiers.difference(current);
+    if (additions.isEmpty) return;
+    final updated = <LevelModifier>{...current, ...additions};
+    final newState = state.copyWith(encounteredModifiers: updated);
+    state = newState;
+    await _repo.save(newState);
+  }
 
   // ---------------------------------------------------------------------
   // Packs thématiques (Phase 2 — sprint contenu)

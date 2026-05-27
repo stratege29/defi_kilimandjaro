@@ -76,20 +76,41 @@ class _GameViewState extends ConsumerState<GameView>
 
   /// Affiche l'overlay de briefing modifiers/boss. Pause forcée du timer
   /// pendant l'affichage ; reprise au dismiss (tap CTA ou tap fond).
+  ///
+  /// Première rencontre : description longue affichée pour chaque modifier
+  /// nouveau. Rencontres suivantes : seul le nom apparaît (les modifiers
+  /// déjà connus du joueur restent dans `PlayerProgress.encounteredModifiers`).
+  /// La persistance n'est faite qu'au dismiss pour éviter de marquer comme
+  /// "vu" un modifier que le joueur n'aurait pas eu le temps de lire (ex.
+  /// crash app en pleine ouverture du dialog).
   Future<void> _showGriotBriefing() async {
     if (_briefingShown) return;
     _briefingShown = true;
+    final modifiers = widget.args.config.modifiers;
+    final encountered = ref
+        .read(playerProgressProvider.select((p) => p.encounteredModifiers));
+    final firstEncounter = modifiers.difference(encountered);
     _pauseForModal();
     await showDialog<void>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.78),
       builder: (dialogCtx) => GriotBriefingOverlay(
-        modifiers: widget.args.config.modifiers,
+        modifiers: modifiers,
         isBoss: widget.args.config.isBoss,
+        firstEncounter: firstEncounter,
         onConfirm: () => Navigator.of(dialogCtx).pop(),
       ),
     );
     if (!mounted) return;
+    // Mémorise les modifiers fraîchement rencontrés pour que les prochains
+    // briefings affichent une version courte (icône + nom seulement).
+    if (firstEncounter.isNotEmpty) {
+      unawaited(
+        ref
+            .read(playerProgressProvider.notifier)
+            .recordModifiersEncounter(firstEncounter),
+      );
+    }
     _resumeFromModal();
   }
 

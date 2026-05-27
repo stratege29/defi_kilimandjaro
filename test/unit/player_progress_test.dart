@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -137,6 +138,82 @@ void main() {
 
     test('totalStars = 0 sur état initial', () {
       expect(PlayerProgress.initial().totalStars, 0);
+    });
+
+    group('encounteredModifiers', () {
+      test('état initial = set vide', () {
+        expect(PlayerProgress.initial().encounteredModifiers, isEmpty);
+      });
+
+      test('round-trip toJson / fromJson conserve le set', () {
+        final p = PlayerProgress.initial().copyWith(
+          encounteredModifiers: const <LevelModifier>{
+            LevelModifier.reverse,
+            LevelModifier.wind,
+            LevelModifier.thinAir,
+          },
+        );
+        final back = PlayerProgress.fromJson(p.toJson());
+        expect(back.encounteredModifiers, <LevelModifier>{
+          LevelModifier.reverse,
+          LevelModifier.wind,
+          LevelModifier.thinAir,
+        });
+      });
+
+      test('absent du JSON quand set vide (économie de bytes)', () {
+        final json = PlayerProgress.initial().toJson();
+        expect(json.containsKey('encountered_modifiers'), isFalse);
+      });
+
+      test('fromJson tolère un nom inconnu (forward-compat enum)', () {
+        // Simule une persistance écrite par une version future qui aurait
+        // ajouté un modifier non-encore-déclaré dans l'enum local — le
+        // load doit drop la valeur inconnue sans crasher.
+        final back = PlayerProgress.fromJson(const <String, dynamic>{
+          'encountered_modifiers': <String>[
+            'reverse',
+            'newModifierFromFuture',
+            'wind',
+          ],
+        });
+        expect(back.encounteredModifiers, <LevelModifier>{
+          LevelModifier.reverse,
+          LevelModifier.wind,
+        });
+      });
+
+      test('fromJson ignore une valeur de type incorrect', () {
+        // raw n'est pas une liste → fallback set vide, pas de crash.
+        final back = PlayerProgress.fromJson(const <String, dynamic>{
+          'encountered_modifiers': 'not a list',
+        });
+        expect(back.encounteredModifiers, isEmpty);
+      });
+
+      test('copyWith préserve la valeur courante quand omis', () {
+        final p = PlayerProgress.initial().copyWith(
+          encounteredModifiers: const <LevelModifier>{LevelModifier.fog},
+        );
+        final updated = p.copyWith(cauris: 999);
+        expect(updated.encounteredModifiers, <LevelModifier>{LevelModifier.fog});
+      });
+
+      test('copyWith remplace par la valeur fournie', () {
+        final p = PlayerProgress.initial().copyWith(
+          encounteredModifiers: const <LevelModifier>{LevelModifier.fog},
+        );
+        final updated = p.copyWith(
+          encounteredModifiers: const <LevelModifier>{
+            LevelModifier.fog,
+            LevelModifier.earthquake,
+          },
+        );
+        expect(updated.encounteredModifiers, <LevelModifier>{
+          LevelModifier.fog,
+          LevelModifier.earthquake,
+        });
+      });
     });
   });
 }

@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:equatable/equatable.dart';
 
@@ -29,6 +30,7 @@ class PlayerProgress extends Equatable {
     this.lastFreezeUsedDate,
     this.freeHintAvailable = false,
     this.lastFreeHintGrantedDate,
+    this.encounteredModifiers = const <LevelModifier>{},
   }) : activePackMix =
            activePackMix ?? _defaultPackMix(ownedPacks, freePackChosen);
 
@@ -106,7 +108,30 @@ class PlayerProgress extends Equatable {
       lastFreeHintGrantedDate: json['last_free_hint_granted_date'] == null
           ? null
           : DateTime.tryParse(json['last_free_hint_granted_date'] as String),
+      encounteredModifiers: _parseEncounteredModifiers(
+        json['encountered_modifiers'],
+      ),
     );
+  }
+
+  /// Parse la liste persistée d'enum modifiers (en `name` String) vers le
+  /// Set typé. Tolère les noms inconnus (ex. retrait/renommage futur d'un
+  /// modifier dans l'enum) en les ignorant — la persistance ne doit pas
+  /// crasher si le schéma évolue.
+  static Set<LevelModifier> _parseEncounteredModifiers(dynamic raw) {
+    if (raw is! List) return const <LevelModifier>{};
+    final result = <LevelModifier>{};
+    for (final entry in raw) {
+      final name = entry?.toString();
+      if (name == null || name.isEmpty) continue;
+      for (final m in LevelModifier.values) {
+        if (m.name == name) {
+          result.add(m);
+          break;
+        }
+      }
+    }
+    return result;
   }
 
   /// Mix utilisé tant que l'onboarding n'a pas tranché — pointe sur un
@@ -255,6 +280,16 @@ class PlayerProgress extends Equatable {
   /// tant qu'aucun octroi n'a eu lieu.
   final DateTime? lastFreeHintGrantedDate;
 
+  /// Set des modifiers déjà rencontrés au moins une fois par le joueur.
+  /// Utilisé par l'overlay « Le Griot t'avertit » pour n'afficher la
+  /// description longue qu'à la première rencontre d'un modifier ; aux
+  /// rencontres suivantes seul le nom apparaît (friction maîtrisée).
+  ///
+  /// Persisté en JSON sous forme de liste de `name` enum. Mots inconnus
+  /// (modifier retiré ou renommé dans une future version) sont silencieusement
+  /// ignorés au load — cf. [_parseEncounteredModifiers].
+  final Set<LevelModifier> encounteredModifiers;
+
   /// True quand l'utilisateur a déjà choisi son pack gratuit (gating
   /// d'onboarding).
   bool get hasChosenFreePack => freePackChosen != null;
@@ -288,6 +323,9 @@ class PlayerProgress extends Equatable {
     if (lastFreeHintGrantedDate != null)
       'last_free_hint_granted_date':
           lastFreeHintGrantedDate!.toIso8601String(),
+    if (encounteredModifiers.isNotEmpty)
+      'encountered_modifiers':
+          encounteredModifiers.map((m) => m.name).toList(growable: false),
   };
 
   /// Combien de niveaux complétés sur cette montagne.
@@ -335,6 +373,7 @@ class PlayerProgress extends Equatable {
     DateTime? lastFreezeUsedDate,
     bool? freeHintAvailable,
     DateTime? lastFreeHintGrantedDate,
+    Set<LevelModifier>? encounteredModifiers,
   }) {
     return PlayerProgress(
       cauris: cauris ?? this.cauris,
@@ -365,6 +404,8 @@ class PlayerProgress extends Equatable {
       freeHintAvailable: freeHintAvailable ?? this.freeHintAvailable,
       lastFreeHintGrantedDate:
           lastFreeHintGrantedDate ?? this.lastFreeHintGrantedDate,
+      encounteredModifiers:
+          encounteredModifiers ?? this.encounteredModifiers,
     );
   }
 
@@ -392,5 +433,6 @@ class PlayerProgress extends Equatable {
     lastFreezeUsedDate,
     freeHintAvailable,
     lastFreeHintGrantedDate,
+    encounteredModifiers,
   ];
 }
