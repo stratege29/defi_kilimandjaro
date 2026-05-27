@@ -32,6 +32,7 @@
     "won": "Well done!",
     "lost": "Time's up",
     "hint_cost": "-20 cauris",
+    "hint_free_badge": "FREE",
     "level": "Level",
     "watch_ad_reward": "+50 🐚 watch an ad"
   },

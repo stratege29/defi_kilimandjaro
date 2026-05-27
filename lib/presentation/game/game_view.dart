@@ -368,14 +368,26 @@ class _GameViewState extends ConsumerState<GameView>
     final canRewardedFallback = ref.watch(canOfferRewardedProvider) &&
         !ref.watch(playerProgressProvider).noAdsPurchased;
 
+    // Indice gratuit du jour disponible ? Le drapeau a été crédité par
+    // `claimFreeHintIfDue` au boot du home. Override le subtitle du
+    // bouton pour signaler clairement la valeur "GRATUIT".
+    final hasFreeHint = ref.watch(
+      playerProgressProvider.select((p) => p.freeHintAvailable),
+    );
+
     return _ActionButtons(
-      hintCostLabel: '-$cost',
+      hintCostLabel:
+          hasFreeHint ? 'game.hint_free_badge'.tr() : '-$cost',
       onHint: () {
-        if (canAfford) {
+        // Le freebie quotidien est prioritaire sur le solde cauris.
+        // `controller.useHint` appelle `spendOnHint` côté repo qui
+        // consomme d'abord `freeHintAvailable` si présent.
+        if (hasFreeHint || canAfford) {
           controller.useHint();
           return;
         }
-        // Solde insuffisant — propose la rewarded sans forcer.
+        // Solde insuffisant et pas de freebie — propose la rewarded
+        // sans forcer.
         final amount = ref.read(gameEconomyConfigProvider).rewardedVideoBonus;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -392,7 +404,7 @@ class _GameViewState extends ConsumerState<GameView>
       onValidate: controller.validate,
       canHint: hasLettersLeft &&
           isPlaying &&
-          (canAfford || canRewardedFallback),
+          (hasFreeHint || canAfford || canRewardedFallback),
       canValidate:
           gameState.selectedIndices.isNotEmpty && isPlaying,
     );

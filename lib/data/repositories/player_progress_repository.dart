@@ -225,9 +225,46 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
   }
 
   /// Déduit le coût d'un indice. Retourne `false` si solde insuffisant.
+  ///
+  /// **Priorité freebie** : si [PlayerProgress.freeHintAvailable] est
+  /// `true`, l'indice est consommé du freebie quotidien (cauris
+  /// inchangés) et le drapeau passe à `false`. C'est la mécanique
+  /// « indice gratuit au 1er accès du jour » — la moindre dépense
+  /// d'indice de la session le consomme avant de toucher au solde.
   Future<bool> spendOnHint(int cost) async {
+    if (state.freeHintAvailable) {
+      final newState = state.copyWith(freeHintAvailable: false);
+      state = newState;
+      await _repo.save(newState);
+      return true;
+    }
     if (state.cauris < cost) return false;
     final newState = state.copyWith(cauris: state.cauris - cost);
+    state = newState;
+    await _repo.save(newState);
+    return true;
+  }
+
+  /// Octroie un **indice gratuit** si la dernière distribution remonte à
+  /// un jour calendaire antérieur à `date` (idempotent par jour). Aucun
+  /// effet si déjà accordé aujourd'hui — sûr à appeler à chaque boot du
+  /// home / chaque tick de session.
+  ///
+  /// Retourne `true` si un nouvel indice a été crédité, `false` si no-op.
+  /// Le drapeau `freeHintAvailable` peut rester `true` d'un jour à
+  /// l'autre si le joueur ne l'a pas consommé — l'octroi est idempotent
+  /// mais le freebie ne stack pas (un seul en réserve à tout moment).
+  Future<bool> claimFreeHintIfDue({required DateTime date}) async {
+    final last = state.lastFreeHintGrantedDate;
+    if (last != null) {
+      final lastDay = DateTime(last.year, last.month, last.day);
+      final today = DateTime(date.year, date.month, date.day);
+      if (!today.isAfter(lastDay)) return false; // déjà octroyé aujourd'hui
+    }
+    final newState = state.copyWith(
+      freeHintAvailable: true,
+      lastFreeHintGrantedDate: date,
+    );
     state = newState;
     await _repo.save(newState);
     return true;
