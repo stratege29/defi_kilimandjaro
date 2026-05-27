@@ -1,4 +1,4 @@
-package com.ultimesgriots.defi_kilimandjaro
+package com.ultimesgriots.kilimandjaro
 
 import io.flutter.embedding.android.FlutterActivity
 
