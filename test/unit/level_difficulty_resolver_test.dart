@@ -20,6 +20,23 @@ Mountain _make({
   );
 }
 
+/// Variante avec assez de niveaux pour atteindre la zone post-ramp-up
+/// (levelIndex ≥ 5) où les règles environnementales tier-based s'appliquent
+/// sans être écrasées par les overrides « tutoriel » et « ramp-up doux ».
+Mountain _makeLong({
+  required String id,
+  required int altitude,
+  String countryCode = 'ci',
+  int totalLevels = 10,
+}) {
+  return _make(
+    id: id,
+    altitude: altitude,
+    countryCode: countryCode,
+    totalLevels: totalLevels,
+  );
+}
+
 void main() {
   group('LevelDifficultyResolver — palier de difficulté par altitude', () {
     test('palier 1 pour moins de 700 m (Red Rocks Gambie ~53 m)', () {
@@ -103,13 +120,16 @@ void main() {
     });
 
     test('thinAir réduit le timer au-dessus de 4000 m', () {
+      // levelIndex ≥ 5 pour sortir des zones « tutoriel » (niv 1-2 = aucun
+      // modifier) et « ramp-up doux » (niv 3-4 = wind injecté, pas thinAir
+      // sur ces niveaux car la règle altitude est filtrée).
       final atFourThousand = LevelDifficultyResolver.resolve(
-        mountain: _make(id: 'a', altitude: 3999),
-        levelIndex: 1,
+        mountain: _makeLong(id: 'a', altitude: 3999),
+        levelIndex: 5,
       );
       final aboveFourThousand = LevelDifficultyResolver.resolve(
-        mountain: _make(id: 'b', altitude: 4000),
-        levelIndex: 1,
+        mountain: _makeLong(id: 'b', altitude: 4000),
+        levelIndex: 5,
       );
       // Même bucket de longueur, tier supérieur d'un cran, mais le
       // multiplicateur 0.8 doit faire baisser le timer absolu.
@@ -139,19 +159,21 @@ void main() {
       expect(anyReverse, isFalse);
     });
 
-    test('peut être attribué à partir du tier 3', () {
+    test('peut être attribué à partir du tier 3 (hors zone ramp-up)', () {
       // Cherche au moins un niveau avec reverse parmi plusieurs montagnes
       // de tier 3 — l'attribution est déterministe via hash, donc on en
       // teste plusieurs pour ne pas dépendre d'un cas particulier.
+      // On scrute uniquement levelIndex ≥ 5 : sur 1-2 (tutoriel) et 3-4
+      // (ramp-up doux), reverse est explicitement filtré.
       final candidates = <Mountain>[
-        _make(id: 'a', altitude: 1800),
-        _make(id: 'b', altitude: 2000),
-        _make(id: 'c', altitude: 2500),
-        _make(id: 'd', altitude: 2800),
+        _makeLong(id: 'a', altitude: 1800),
+        _makeLong(id: 'b', altitude: 2000),
+        _makeLong(id: 'c', altitude: 2500),
+        _makeLong(id: 'd', altitude: 2800),
       ];
       var foundReverse = false;
       for (final m in candidates) {
-        for (var lvl = 1; lvl < m.totalLevels; lvl++) {
+        for (var lvl = 5; lvl < m.totalLevels; lvl++) {
           final config = LevelDifficultyResolver.resolve(
             mountain: m,
             levelIndex: lvl,
@@ -166,15 +188,16 @@ void main() {
       expect(
         foundReverse,
         isTrue,
-        reason: 'au moins une montagne tier 3+ doit avoir un niveau reverse',
+        reason: 'au moins une montagne tier 3+ doit avoir un niveau reverse '
+            'hors zone ramp-up (levelIndex ≥ 5)',
       );
     });
 
     test('attribution déterministe : 2 résolutions du même niveau identiques',
         () {
-      final m = _make(id: 'stable', altitude: 3500);
-      final a = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 2);
-      final b = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 2);
+      final m = _makeLong(id: 'stable', altitude: 3500);
+      final a = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 6);
+      final b = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 6);
       expect(a, b);
     });
   });
@@ -194,19 +217,23 @@ void main() {
       expect(earlier.isBoss, isFalse);
     });
 
-    test('boss tier 1-2 reste "soft" : pas de reverse garanti (zone tutoriel)',
+    test('boss tier 1-2 reste "soft" : pas de modifier dur (zone ramp-up doux)',
         () {
-      // Red Rocks niveau 2 (tier 1, boss) ne doit PAS recevoir reverse —
-      // le joueur sort à peine du splash et n'a pas appris le gameplay.
+      // Red Rocks niveau 4 (tier 1, boss) doit recevoir un modifier doux
+      // garanti par la règle ramp-up niv 3-4 (wind). Pas de modifier "dur"
+      // (reverse cognitif, fog occultant, earthquake brutal, shuffle) car
+      // le joueur découvre encore la mécanique.
       final m = _make(id: 'boss-easy', altitude: 200);
       final boss = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 4);
       expect(boss.isBoss, isTrue);
       expect(boss.modifiers, isNot(contains(LevelModifier.reverse)));
-      expect(
-        boss.modifiers,
-        isEmpty,
-        reason: 'tier 1 + boss = aucun modifier (zone tutoriel)',
-      );
+      expect(boss.modifiers, isNot(contains(LevelModifier.fog)));
+      expect(boss.modifiers, isNot(contains(LevelModifier.earthquake)));
+      expect(boss.modifiers, isNot(contains(LevelModifier.shuffle)));
+      // Le ramp-up doux niv 3-4 garantit au moins un modifier doux (wind
+      // ou shuffle) pour casser la monotonie, même sur un boss tier 1.
+      // Ici on n'attend que wind car shuffle est filtré pour ce niveau.
+      expect(boss.modifiers, contains(LevelModifier.wind));
     });
 
     test('boss tier ≥ 3 reçoit toujours au moins un modifier signature', () {
@@ -232,27 +259,30 @@ void main() {
 
   group('LevelDifficultyResolver — modifiers exclusifs mouvement/masque', () {
     test('tectonique tier ≥ 3 ⇒ earthquake (pas wind, pas fog)', () {
-      // Mt Cameroun simulé : code CM, 4040 m, tier 4.
-      final m = _make(id: 'cm', altitude: 4040, countryCode: 'CM');
-      final c = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 1);
+      // Mt Cameroun simulé : code CM, 4040 m, tier 4. levelIndex = 5 pour
+      // sortir de la zone ramp-up qui filtre earthquake/fog.
+      final m = _makeLong(id: 'cm', altitude: 4040, countryCode: 'CM');
+      final c = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 5);
       expect(c.modifiers, contains(LevelModifier.earthquake));
       expect(c.modifiers, isNot(contains(LevelModifier.wind)));
       expect(c.modifiers, isNot(contains(LevelModifier.fog)));
     });
 
     test('non-tectonique altitude ≥ 3000 m ⇒ wind (pas earthquake)', () {
-      // Toubkal Maroc simulé : code MA, 4167 m.
-      final m = _make(id: 'ma', altitude: 4167, countryCode: 'MA');
-      final c = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 1);
+      // Toubkal Maroc simulé : code MA, 4167 m. levelIndex = 5 pour sortir
+      // de la zone ramp-up.
+      final m = _makeLong(id: 'ma', altitude: 4167, countryCode: 'MA');
+      final c = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 5);
       expect(c.modifiers, contains(LevelModifier.wind));
       expect(c.modifiers, isNot(contains(LevelModifier.earthquake)));
       expect(c.modifiers, isNot(contains(LevelModifier.fog)));
     });
 
     test('non-tectonique altitude 2000–3000 m ⇒ fog', () {
-      // Mt Sunzu Zambie simulé : code ZM, 2339 m.
-      final m = _make(id: 'zm', altitude: 2339, countryCode: 'ZM');
-      final c = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 1);
+      // Mt Sunzu Zambie simulé : code ZM, 2339 m. levelIndex = 5 pour
+      // sortir de la zone ramp-up (qui filtrerait fog).
+      final m = _makeLong(id: 'zm', altitude: 2339, countryCode: 'ZM');
+      final c = LevelDifficultyResolver.resolve(mountain: m, levelIndex: 5);
       expect(c.modifiers, contains(LevelModifier.fog));
       expect(c.modifiers, isNot(contains(LevelModifier.wind)));
       expect(c.modifiers, isNot(contains(LevelModifier.earthquake)));

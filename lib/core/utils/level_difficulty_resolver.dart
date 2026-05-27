@@ -159,16 +159,44 @@ abstract final class LevelDifficultyResolver {
   // Attribution des modifiers (algorithmique, déterministe)
   // ---------------------------------------------------------------------------
 
+  /// Garde le tutoriel des deux premiers niveaux **totalement pur** : aucun
+  /// modifier, même environnemental, pour que le joueur intériorise la
+  /// boucle de gameplay sans friction.
+  static const int _tutorialMaxLevel = 2;
+
+  /// Borne supérieure de la zone « ramp-up doux » : niveaux 3 et 4. Sur
+  /// cette plage on garantit **exactement un** modifier doux pour casser
+  /// la monotonie sans surprendre brutalement le joueur (jamais de fog
+  /// occultant, jamais d'earthquake déstabilisant, jamais de boss).
+  static const int _gentleRampMaxLevel = 4;
+
+  /// Modifiers considérés « doux » pour le ramp-up — pas de masquage,
+  /// pas de mouvement brutal, pas d'inversion cognitive imposée.
+  /// Utilisés pour le filtre des niveaux 3–4 et pour le fallback garanti.
+  static const Set<LevelModifier> _gentleModifiers = <LevelModifier>{
+    LevelModifier.wind,
+    LevelModifier.shuffle,
+  };
+
   static Set<LevelModifier> _attributeModifiers({
     required Mountain mountain,
     required int levelIndex,
     required int tier,
     required bool isBoss,
   }) {
+    // ----- Niveaux 1-2 : zone tutoriel stricte ---------------------------
+    // Aucun modifier (même thinAir/environmental). Le joueur apprend la
+    // grille, le drag, la validation sans aucune friction. Cette règle
+    // *écrase* toutes les règles tier-based qui suivraient.
+    if (levelIndex <= _tutorialMaxLevel) {
+      return const <LevelModifier>{};
+    }
+
     final modifiers = <LevelModifier>{};
 
     // thinAir : timer accéléré au-dessus de 4000 m (effet hypoxie).
-    // Passif (pas de modifier visuel) — cohabite avec tout.
+    // Passif (pas de modifier visuel) — cohabite avec tout. Réactivé à
+    // partir du niveau 3 (sortie de la zone tutoriel).
     if (mountain.altitude >= 4000) {
       modifiers.add(LevelModifier.thinAir);
     }
@@ -228,6 +256,33 @@ abstract final class LevelDifficultyResolver {
       // boss tier 3 avec uniquement shuffle (zones non-tectoniques,
       // < 2000 m donc pas fog/wind/earthquake/thinAir).
       modifiers.add(LevelModifier.reverse);
+    }
+
+    // ----- Niveaux 3-4 : ramp-up doux garanti ----------------------------
+    // Sur cette plage, on filtre les modifiers « durs » (fog occultant,
+    // earthquake brutal, reverse cognitif) qui ont pu être proposés par
+    // les règles tier-based ci-dessus pour les montagnes de haute
+    // altitude. Si après filtrage il ne reste aucun modifier doux, on
+    // injecte `wind` comme baseline universelle.
+    //
+    // Pourquoi ces filtres :
+    // - fog masque des lettres → trop punitif quand on découvre l'effet.
+    // - earthquake déplace 2 lettres brutalement → désoriente.
+    // - reverse impose une gymnastique cognitive → réservé aux niv. 5+.
+    // - shuffle (boss only) → un boss reste possible mais on retire shuffle.
+    if (levelIndex >= _tutorialMaxLevel + 1 &&
+        levelIndex <= _gentleRampMaxLevel) {
+      modifiers
+        ..remove(LevelModifier.fog)
+        ..remove(LevelModifier.earthquake)
+        ..remove(LevelModifier.reverse)
+        ..remove(LevelModifier.shuffle);
+      // Garantie : au moins un modifier doux pour briser la monotonie
+      // du tout-pur signalée par les joueurs. `wind` est le défaut sûr.
+      final hasGentle = modifiers.any(_gentleModifiers.contains);
+      if (!hasGentle) {
+        modifiers.add(LevelModifier.wind);
+      }
     }
 
     return modifiers;
