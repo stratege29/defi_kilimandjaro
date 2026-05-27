@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:defi_kilimandjaro/core/constants/loss_economy.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/domain/entities/game_economy_config.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
