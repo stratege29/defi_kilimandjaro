@@ -407,7 +407,14 @@ class _AppErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const isDebug = kDebugMode;
+    // En release, on affiche un short token (type d'exception + 1ere
+    // frame du stack) pour identifier rapidement la cause sans exposer
+    // de data sensible. En debug, on dump toute l'exception.
+    final exceptionType = details.exception.runtimeType.toString();
+    final library = details.library ?? '';
+    final firstFrame = _firstAppStackFrame(details.stack);
+    final shortInfo = '$exceptionType @ ${library.isEmpty ? "?" : library}'
+        '\n$firstFrame';
     return Material(
       color: const Color(0xFF0F2A14), // vertForet fallback (sans theme)
       child: SafeArea(
@@ -432,16 +439,34 @@ class _AppErrorWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                isDebug
-                    ? '${details.exception}'
-                    : "Reouvre l'app pour reessayer.\nL'erreur a ete signalee.",
+              const Text(
+                "Reouvre l'app pour reessayer.\nL'erreur a ete signalee.",
                 textAlign: TextAlign.center,
-                maxLines: isDebug ? 8 : 3,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Color(0xFFE6D7B8),
                   fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Diagnostic minimal (debug + release) : type d'exception +
+              // premiere frame dans le code app. Necessaire pour identifier
+              // la cause sans avoir a connecter Xcode console.
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  kDebugMode ? '${details.exception}\n$firstFrame' : shortInfo,
+                  textAlign: TextAlign.center,
+                  maxLines: 5,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFFB8A98C),
+                    fontSize: 11,
+                    fontFamily: 'Courier',
+                  ),
                 ),
               ),
             ],
@@ -449,5 +474,24 @@ class _AppErrorWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Extrait la 1ere frame du stack qui pointe vers le code app
+  /// (package:defi_kilimandjaro/...), pour identifier rapidement la source
+  /// de l'exception. Ignore les frames Flutter/Dart internes.
+  static String _firstAppStackFrame(StackTrace? stack) {
+    if (stack == null) return '(no stack)';
+    final lines = stack.toString().split('\n');
+    for (final line in lines) {
+      if (line.contains('package:defi_kilimandjaro/')) {
+        // ex: "#3 _AvatarBadge.build (package:defi_kilimandjaro/.../profile_view.dart:332:42)"
+        final trimmed = line.trim();
+        // Garde max 100 chars pour rester lisible.
+        return trimmed.length > 100
+            ? '${trimmed.substring(0, 100)}...'
+            : trimmed;
+      }
+    }
+    return lines.isNotEmpty ? lines.first.trim() : '(no app frame)';
   }
 }

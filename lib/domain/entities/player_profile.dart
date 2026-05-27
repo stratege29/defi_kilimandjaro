@@ -40,13 +40,35 @@ class PlayerProfile extends Equatable {
         wins: (json['wins'] as num?)?.toInt() ?? 0,
         losses: (json['losses'] as num?)?.toInt() ?? 0,
         displayName: json['display_name'] as String?,
-        displayNameUpdatedAt: json['display_name_updated_at'] == null
-            ? null
-            : DateTime.fromMillisecondsSinceEpoch(
-                (json['display_name_updated_at'] as num).toInt(),
-              ),
+        displayNameUpdatedAt: _parseTimestamp(json['display_name_updated_at']),
         avatarId: json['avatar_id'] as String?,
       );
+
+  /// Parse robuste pour les timestamps lus depuis Firestore.
+  ///
+  /// Le champ peut etre :
+  /// - `null` (jamais defini)
+  /// - un `int`/`num` (milliseconds since epoch, ecrit cote client)
+  /// - un `Timestamp` Firestore (ecrit via FieldValue.serverTimestamp()
+  ///   ou par le serveur Admin SDK)
+  ///
+  /// Le `Timestamp` Firestore n'est PAS un num — le cast `as num` throw
+  /// `_TypeError`. On lit defensivement via dynamic.millisecondsSinceEpoch
+  /// pour eviter d'importer cloud_firestore dans la couche domain.
+  static DateTime? _parseTimestamp(dynamic raw) {
+    if (raw == null) return null;
+    if (raw is num) {
+      return DateTime.fromMillisecondsSinceEpoch(raw.toInt());
+    }
+    try {
+      // Firestore Timestamp expose .millisecondsSinceEpoch via dynamic.
+      // ignore: avoid_dynamic_calls
+      final ms = (raw as dynamic).millisecondsSinceEpoch as int;
+      return DateTime.fromMillisecondsSinceEpoch(ms);
+    } on Object {
+      return null;
+    }
+  }
 
   /// ELO initial : 1000 m (altitude de départ symbolique).
   static const int eloInitial = 1000;

@@ -423,7 +423,14 @@ class _AvatarBadge extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncProfile = ref.watch(playerProfileStreamProvider);
+    // Defense au cold start : si playerProfileStreamProvider throw (cf.
+    // ProfileView.build), on tombe sur asyncProfile=loading sans avatar.
+    AsyncValue<PlayerProfile> asyncProfile;
+    try {
+      asyncProfile = ref.watch(playerProfileStreamProvider);
+    } on Object {
+      asyncProfile = const AsyncValue<PlayerProfile>.loading();
+    }
     final avatar = AvatarCatalog.byId(asyncProfile.value?.avatarId);
 
     // Avatar SVG si défini, sinon mascotte griot PNG legacy.
