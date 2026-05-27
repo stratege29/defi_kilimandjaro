@@ -42,7 +42,7 @@ const String _starterDir = 'assets/data/devinettes/starter';
 const String _otaDir = 'content/ota_packs';
 const String _outDir = 'build/seed_packs';
 const int _formatVersion = 3;
-const int _initialVersion = 1;
+const int _defaultVersion = 1;
 
 void main() async {
   final indexFile = File('$_starterDir/_index.json');
@@ -69,6 +69,12 @@ void main() async {
 
   for (final entry in packsIndex.entries) {
     final packId = entry.key;
+    final indexEntry = (entry.value as Map?)?.cast<String, dynamic>() ?? {};
+    // Version du pack — lue depuis _index.json (champ `current_version`), 1 par défaut
+    // pour rétrocompatibilité. Bumper ce champ quand on push une nouvelle version OTA.
+    final packVersion =
+        (indexEntry['current_version'] as num?)?.toInt() ?? _defaultVersion;
+
     final source = File('$_starterDir/$packId.json');
     if (!source.existsSync()) {
       print('  • $packId : fichier source absent — skip.');
@@ -89,7 +95,7 @@ void main() async {
     final packPayload = <String, dynamic>{
       'format_version': _formatVersion,
       'pack_id': packId,
-      'pack_version': _initialVersion,
+      'pack_version': packVersion,
       'langs': _detectLangs(list),
       'default_lang': 'fr',
       'min_app_version': '0.1.0',
@@ -110,14 +116,14 @@ void main() async {
     final gz = const GZipEncoder().encode(encodedFinal);
 
     final outFile =
-        File('$_outDir/$packId/$packId-v$_initialVersion.json.gz');
+        File('$_outDir/$packId/$packId-v$packVersion.json.gz');
     await outFile.parent.create(recursive: true);
     await outFile.writeAsBytes(gz);
 
-    final storagePath = 'packs/v2/$packId/$packId-v$_initialVersion.json.gz';
+    final storagePath = 'packs/v2/$packId/$packId-v$packVersion.json.gz';
     manifests[packId] = <String, dynamic>{
       'pack': packId,
-      'current_version': _initialVersion,
+      'current_version': packVersion,
       'format_version': _formatVersion,
       'hash_sha256': hashFinal,
       'size_bytes': gz.length,
@@ -133,7 +139,7 @@ void main() async {
 
     activePackIds.add(packId);
     print(
-      '  ✓ $packId : v$_initialVersion (${list.length} entrées, '
+      '  ✓ $packId : v$packVersion (${list.length} entrées, '
       '${gz.length} bytes gzip, hash $hashFinal)',
     );
   }
@@ -153,7 +159,7 @@ void main() async {
 
   print('');
   print('Fichiers produits dans $_outDir/ :');
-  print('  - <packId>/<packId>-v1.json.gz  → upload vers Cloud Storage');
+  print('  - <packId>/<packId>-v<N>.json.gz → upload vers Cloud Storage');
   print('  - manifests.json                 → un doc par pack dans `content_packs/`');
   print('  - content_index_global.json     → doc `content_index/global`');
 }

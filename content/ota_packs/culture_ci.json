@@ -1,0 +1,8229 @@
+[
+  {
+    "id": "culture_ci_221",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "COMOE",
+    "answer_normalized": "comoe",
+    "letters_pool": [
+      "C",
+      "O",
+      "M",
+      "O",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Du nord savanier au golfe, je serpente sur plus de mille kilomètres et donne mon nom au plus vaste parc du pays."
+    },
+    "explanation": {
+      "fr": "La Comoé est un fleuve long de 1160 km qui donne son nom au parc national de la Comoé, classé au patrimoine mondial de l'UNESCO."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "patrimoine",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_222",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SASSANDRA",
+    "answer_normalized": "sassandra",
+    "letters_pool": [
+      "S",
+      "A",
+      "S",
+      "S",
+      "A",
+      "N",
+      "D",
+      "R",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Né en Guinée et porteur de pirogues, je termine ma course dans une ville-port qui porte mon nom."
+    },
+    "explanation": {
+      "fr": "Le Sassandra est un fleuve de 650 km qui se jette dans le golfe de Guinée à la ville côtière éponyme, ancien comptoir colonial."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "cote",
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_223",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BANDAMA",
+    "answer_normalized": "bandama",
+    "letters_pool": [
+      "B",
+      "A",
+      "N",
+      "D",
+      "A",
+      "M",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Plus long fleuve du pays, je nourris un grand barrage qui éclaire les villes du centre."
+    },
+    "explanation": {
+      "fr": "Le Bandama est le plus long fleuve de Côte d'Ivoire avec 1050 km, alimentant le barrage hydroélectrique de Kossou."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "centre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_224",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CAVALLY",
+    "answer_normalized": "cavally",
+    "letters_pool": [
+      "C",
+      "A",
+      "V",
+      "A",
+      "L",
+      "L",
+      "Y"
+    ],
+    "riddle": {
+      "fr": "Frontière liquide à l'extrême ouest, mes eaux séparent deux peuples de la forêt voisine."
+    },
+    "explanation": {
+      "fr": "Le Cavally est un fleuve frontalier entre la Côte d'Ivoire et le Libéria, long d'environ 600 km."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "ouest",
+      "foret"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_225",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BAFING",
+    "answer_normalized": "bafing",
+    "letters_pool": [
+      "B",
+      "A",
+      "F",
+      "I",
+      "N",
+      "G"
+    ],
+    "riddle": {
+      "fr": "Venu du pays voisin au nord-ouest, je rejoindrai au loin un grand fleuve qui longe le désert."
+    },
+    "explanation": {
+      "fr": "Le Bafing est une rivière du nord-ouest ivoirien, affluent du fleuve Sénégal, qui prend sa source en Guinée."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "nord",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_226",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AGNEBY",
+    "answer_normalized": "agneby",
+    "letters_pool": [
+      "A",
+      "G",
+      "N",
+      "E",
+      "B",
+      "Y"
+    ],
+    "riddle": {
+      "fr": "Petit fleuve côtier qui meurt dans une grande lagune, je partage mon nom avec une région du sud."
+    },
+    "explanation": {
+      "fr": "L'Agnéby est un fleuve côtier qui se jette dans la lagune Ébrié et donne son nom à la région Agnéby-Tiassa."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "sud",
+      "region"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_227",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BAGOE",
+    "answer_normalized": "bagoe",
+    "letters_pool": [
+      "B",
+      "A",
+      "G",
+      "O",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cours d'eau du grand nord, je rejoindrai au loin le fleuve qui irrigue le Mali."
+    },
+    "explanation": {
+      "fr": "Le Bagoé est une rivière du nord ivoirien, affluent du Niger, traversant la région du pays sénoufo."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "nord",
+      "savane"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_228",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TANOE",
+    "answer_normalized": "tanoe",
+    "letters_pool": [
+      "T",
+      "A",
+      "N",
+      "O",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Frontière liquide à l'est, je longe les terres agni avant de mourir dans la lagune."
+    },
+    "explanation": {
+      "fr": "Le Tanoé est un fleuve frontalier entre la Côte d'Ivoire et le Ghana, traversant la région agni à l'est du pays."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_229",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TADIO",
+    "answer_normalized": "tadio",
+    "letters_pool": [
+      "T",
+      "A",
+      "D",
+      "I",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Étendue saumâtre près de Grand-Lahou, je nourris les pêcheurs depuis des siècles."
+    },
+    "explanation": {
+      "fr": "La lagune Tadio est un plan d'eau côtier de la région de Grand-Lahou, important écosystème pour la pêche traditionnelle."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lagune",
+      "sud",
+      "cote"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_230",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AGHIEN",
+    "answer_normalized": "aghien",
+    "letters_pool": [
+      "A",
+      "G",
+      "H",
+      "I",
+      "E",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Plan d'eau douce au nord-est de la grande métropole, je suis sa réserve à venir."
+    },
+    "explanation": {
+      "fr": "La lagune d'Aghien est un plan d'eau douce au nord-est d'Abidjan, pressentie comme future source d'eau potable de la ville."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lagune",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_231",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POTOU",
+    "answer_normalized": "potou",
+    "letters_pool": [
+      "P",
+      "O",
+      "T",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Reliée à la grande lagune par un goulet étroit, je borde les villages alladian du littoral."
+    },
+    "explanation": {
+      "fr": "La lagune Potou est une étendue d'eau du littoral ivoirien, reliée à la lagune Ébrié en pays alladian."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lagune",
+      "cote",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_232",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TAGBA",
+    "answer_normalized": "tagba",
+    "letters_pool": [
+      "T",
+      "A",
+      "G",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Petite étendue côtière du sud-ouest, je nourris les pirogues entre Sassandra et Grand-Lahou."
+    },
+    "explanation": {
+      "fr": "La lagune Tagba est une lagune côtière du sud-ouest ivoirien, dans la région de Grand-Lahou."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "lagune",
+      "cote",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_233",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AYAME",
+    "answer_normalized": "ayame",
+    "letters_pool": [
+      "A",
+      "Y",
+      "A",
+      "M",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Premier barrage du pays sur la Bia, mes turbines tournent depuis 1959."
+    },
+    "explanation": {
+      "fr": "Ayamé est le premier barrage hydroélectrique de Côte d'Ivoire, construit sur la Bia en 1959, pionnier de l'électrification du pays."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "sud",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_234",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOSSOU",
+    "answer_normalized": "kossou",
+    "letters_pool": [
+      "K",
+      "O",
+      "S",
+      "S",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Grand lac artificiel du centre, mes eaux retenues ont noyé bien des villages."
+    },
+    "explanation": {
+      "fr": "Le lac de Kossou est un lac de barrage hydroélectrique sur le Bandama, le plus grand lac artificiel du pays."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "centre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_235",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BUYO",
+    "answer_normalized": "buyo",
+    "letters_pool": [
+      "B",
+      "U",
+      "Y",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Barrage de l'ouest sur le grand fleuve, mes turbines complètent celles de Kossou."
+    },
+    "explanation": {
+      "fr": "Le barrage de Buyo est un ouvrage hydroélectrique sur le Sassandra, mis en service en 1980."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_236",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TAABO",
+    "answer_normalized": "taabo",
+    "letters_pool": [
+      "T",
+      "A",
+      "A",
+      "B",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Troisième barrage du pays, je règle le débit du Bandama en aval de Kossou."
+    },
+    "explanation": {
+      "fr": "Le barrage de Taabo est une centrale hydroélectrique sur le Bandama, mise en service en 1979 en aval de Kossou."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "centre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_237",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AZAGNY",
+    "answer_normalized": "azagny",
+    "letters_pool": [
+      "A",
+      "Z",
+      "A",
+      "G",
+      "N",
+      "Y"
+    ],
+    "riddle": {
+      "fr": "Parc des mangroves au bord de la lagune sud, j'abrite hippopotames et lamantins."
+    },
+    "explanation": {
+      "fr": "Le parc national d'Azagny est une aire protégée du sud ivoirien près de Grand-Lahou, célèbre pour ses mangroves et sa faune lagunaire."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "patrimoine",
+      "lagune",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_238",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MARAHOUE",
+    "answer_normalized": "marahoue",
+    "letters_pool": [
+      "M",
+      "A",
+      "R",
+      "A",
+      "H",
+      "O",
+      "U",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Parc et rivière du centre-ouest, je protège la forêt entre Bouaflé et Sinfra."
+    },
+    "explanation": {
+      "fr": "La Marahoué est un affluent du Bandama qui donne son nom au parc national de la Marahoué, dans le centre-ouest du pays."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "patrimoine",
+      "foret",
+      "centre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_239",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BANCO",
+    "answer_normalized": "banco",
+    "letters_pool": [
+      "B",
+      "A",
+      "N",
+      "C",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Forêt primaire enclavée dans la grande ville, je suis un poumon vert au cœur de la capitale économique."
+    },
+    "explanation": {
+      "fr": "Le parc national du Banco est une forêt primaire de 3000 hectares au cœur d'Abidjan, refuge écologique urbain rare en Afrique."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "patrimoine",
+      "foret",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_240",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TONKOUI",
+    "answer_normalized": "tonkoui",
+    "letters_pool": [
+      "T",
+      "O",
+      "N",
+      "K",
+      "O",
+      "U",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Géant de l'ouest à 1189 mètres, je domine les Dix-Huit Montagnes."
+    },
+    "explanation": {
+      "fr": "Le mont Tonkoui culmine à 1189 m dans la région de Man, deuxième plus haut sommet ivoirien."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "montagne",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_241",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SANGBE",
+    "answer_normalized": "sangbe",
+    "letters_pool": [
+      "S",
+      "A",
+      "N",
+      "G",
+      "B",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Parc des hauteurs de l'ouest, je protège chimpanzés et bongos dans la forêt d'altitude."
+    },
+    "explanation": {
+      "fr": "Le parc national du Mont Sangbé est une aire protégée de l'ouest ivoirien, dans la région de Biankouma."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "patrimoine",
+      "montagne",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_242",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ZANZAN",
+    "answer_normalized": "zanzan",
+    "letters_pool": [
+      "Z",
+      "A",
+      "N",
+      "Z",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Vaste district du nord-est aux portes du Sahel, j'abrite Koulango et Lobi."
+    },
+    "explanation": {
+      "fr": "Le Zanzan est un district administratif du nord-est de la Côte d'Ivoire, dont le chef-lieu est Bondoukou."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "region",
+      "nord",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_243",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DALOA",
+    "answer_normalized": "daloa",
+    "letters_pool": [
+      "D",
+      "A",
+      "L",
+      "O",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Capitale du Haut-Sassandra et grenier du cacao, mes marchés bourdonnent à l'aube."
+    },
+    "explanation": {
+      "fr": "Daloa est une grande ville du centre-ouest, capitale du Haut-Sassandra et important centre de commerce du cacao."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "centre",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_244",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ODIENNE",
+    "answer_normalized": "odienne",
+    "letters_pool": [
+      "O",
+      "D",
+      "I",
+      "E",
+      "N",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cité du grand nord-ouest, je suis terre malinké aux portes de la Guinée."
+    },
+    "explanation": {
+      "fr": "Odienné est la principale ville du nord-ouest ivoirien, chef-lieu du district du Denguélé, cœur du pays malinké."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "nord",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_245",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SOUBRE",
+    "answer_normalized": "soubre",
+    "letters_pool": [
+      "S",
+      "O",
+      "U",
+      "B",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Ville du sud-ouest sur le Sassandra, je tire du cacao et d'un grand barrage récent."
+    },
+    "explanation": {
+      "fr": "Soubré est une ville du sud-ouest ivoirien, zone majeure de cacao et site d'un grand barrage hydroélectrique inauguré en 2017."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "sud",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_246",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DIVO",
+    "answer_normalized": "divo",
+    "letters_pool": [
+      "D",
+      "I",
+      "V",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Cité du Lôh-Djiboua, mes plantations bordent la route côtière."
+    },
+    "explanation": {
+      "fr": "Divo est une ville du sud ivoirien, chef-lieu de la région du Lôh-Djiboua, importante zone agricole."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "sud",
+      "region"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_247",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DIMBOKRO",
+    "answer_normalized": "dimbokro",
+    "letters_pool": [
+      "D",
+      "I",
+      "M",
+      "B",
+      "O",
+      "K",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Ville du centre traversée par le N'Zi, j'ai connu la prospérité du rail colonial."
+    },
+    "explanation": {
+      "fr": "Dimbokro est une ville du centre-est ivoirien, ancien grand carrefour ferroviaire colonial, traversée par la rivière N'Zi."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "centre",
+      "histoire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_248",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GUIGLO",
+    "answer_normalized": "guiglo",
+    "letters_pool": [
+      "G",
+      "U",
+      "I",
+      "G",
+      "L",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Capitale du Cavally en pays wê, je veille sur la forêt du Mont Péko."
+    },
+    "explanation": {
+      "fr": "Guiglo est une ville de l'ouest ivoirien, chef-lieu de la région du Cavally, en pays wê."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "ouest",
+      "foret"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_249",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BONDOUKOU",
+    "answer_normalized": "bondoukou",
+    "letters_pool": [
+      "B",
+      "O",
+      "N",
+      "D",
+      "O",
+      "U",
+      "K",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Cité des sept mosquées au nord-est, je fus l'ancienne capitale d'un royaume."
+    },
+    "explanation": {
+      "fr": "Bondoukou est une ville du nord-est ivoirien, ancienne capitale du royaume abron, célèbre pour ses mosquées de style soudanais."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "nord",
+      "patrimoine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_250",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BOUNA",
+    "answer_normalized": "bouna",
+    "letters_pool": [
+      "B",
+      "O",
+      "U",
+      "N",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Cité du Bounkani aux portes du grand parc, je veille sur les éléphants de la savane."
+    },
+    "explanation": {
+      "fr": "Bouna est une ville du nord-est ivoirien, chef-lieu de la région du Bounkani, proche du parc national de la Comoé."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "nord",
+      "savane"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_251",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TOUBA",
+    "answer_normalized": "touba",
+    "letters_pool": [
+      "T",
+      "O",
+      "U",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Cité du Bafing dans les montagnes, je suis terre malinké entre forêt et savane."
+    },
+    "explanation": {
+      "fr": "Touba est une ville du nord-ouest ivoirien, chef-lieu de la région du Bafing, en pays malinké."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "nord",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_252",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SEGUELA",
+    "answer_normalized": "seguela",
+    "letters_pool": [
+      "S",
+      "E",
+      "G",
+      "U",
+      "E",
+      "L",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Ville du Worodougou au centre-nord, je cache mes gemmes sous la latérite rouge."
+    },
+    "explanation": {
+      "fr": "Séguéla est une ville du centre-nord ivoirien, chef-lieu de la région du Worodougou, connue pour ses gisements de diamants."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "nord",
+      "centre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_253",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KATIOLA",
+    "answer_normalized": "katiola",
+    "letters_pool": [
+      "K",
+      "A",
+      "T",
+      "I",
+      "O",
+      "L",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Cité des potières mangoro, mon argile chante sous les doigts experts."
+    },
+    "explanation": {
+      "fr": "Katiola est une ville du centre-nord ivoirien, célèbre pour ses potières mangoro qui perpétuent un savoir-faire ancestral."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "centre",
+      "artisanat"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_254",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BOUAFLE",
+    "answer_normalized": "bouafle",
+    "letters_pool": [
+      "B",
+      "O",
+      "U",
+      "A",
+      "F",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cité de la Marahoué au pays gouro, mes danses célèbrent l'igname et la chasse."
+    },
+    "explanation": {
+      "fr": "Bouaflé est une ville du centre-ouest ivoirien, chef-lieu de la région de la Marahoué, en pays gouro."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "centre",
+      "peuple"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_255",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SINFRA",
+    "answer_normalized": "sinfra",
+    "letters_pool": [
+      "S",
+      "I",
+      "N",
+      "F",
+      "R",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Carrefour du centre-ouest entre Bouaflé et Daloa, je vis du cacao et de l'igname."
+    },
+    "explanation": {
+      "fr": "Sinfra est une ville du centre-ouest ivoirien, importante zone de production agricole entre Bouaflé et Daloa."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "centre",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_256",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AGBOVILLE",
+    "answer_normalized": "agboville",
+    "letters_pool": [
+      "A",
+      "G",
+      "B",
+      "O",
+      "V",
+      "I",
+      "L",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cité de l'Agnéby au pays abbey, je suis terre de palmeraies et d'hévéas."
+    },
+    "explanation": {
+      "fr": "Agboville est une ville du sud-est ivoirien, chef-lieu de la région Agnéby-Tiassa, en pays abbey."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "sud",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_257",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DABOU",
+    "answer_normalized": "dabou",
+    "letters_pool": [
+      "D",
+      "A",
+      "B",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Cité des Adjoukrou sur la lagune, mes palmeraies nourrissent la capitale."
+    },
+    "explanation": {
+      "fr": "Dabou est une ville du sud ivoirien sur la lagune Ébrié, en pays adjoukrou, importante zone de palmiculture."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "sud",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_258",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TIASSALE",
+    "answer_normalized": "tiassale",
+    "letters_pool": [
+      "T",
+      "I",
+      "A",
+      "S",
+      "S",
+      "A",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Ville au pont sur le grand fleuve, je relie la métropole au cœur du pays."
+    },
+    "explanation": {
+      "fr": "Tiassalé est une ville du sud ivoirien sur le Bandama, étape majeure sur l'axe Abidjan-Yamoussoukro."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "sud",
+      "centre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_259",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ABENGOUROU",
+    "answer_normalized": "abengourou",
+    "letters_pool": [
+      "A",
+      "B",
+      "E",
+      "N",
+      "G",
+      "O",
+      "U",
+      "R",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Capitale royale du pays agni, je trône au cœur de l'Indénié-Djuablin."
+    },
+    "explanation": {
+      "fr": "Abengourou est une ville de l'est ivoirien, capitale traditionnelle du royaume agni de l'Indénié, chef-lieu régional."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "est",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_260",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ADZOPE",
+    "answer_normalized": "adzope",
+    "letters_pool": [
+      "A",
+      "D",
+      "Z",
+      "O",
+      "P",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cité de la Mé en pays attié, mes hévéas saignent jour et nuit."
+    },
+    "explanation": {
+      "fr": "Adzopé est une ville du sud-est ivoirien, chef-lieu de la région de la Mé, en pays attié, zone d'hévéaculture."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "sud",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_261",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ABOISSO",
+    "answer_normalized": "aboisso",
+    "letters_pool": [
+      "A",
+      "B",
+      "O",
+      "I",
+      "S",
+      "S",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Cité du Sud-Comoé au pays sanwi, ma terre boit l'or rouge du cacao."
+    },
+    "explanation": {
+      "fr": "Aboisso est une ville du sud-est ivoirien, chef-lieu de la région du Sud-Comoé, en pays agni du Sanwi."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "sud",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_262",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FRESCO",
+    "answer_normalized": "fresco",
+    "letters_pool": [
+      "F",
+      "R",
+      "E",
+      "S",
+      "C",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Bourgade côtière entre Sassandra et Grand-Lahou, mes plages restent confidentielles."
+    },
+    "explanation": {
+      "fr": "Fresco est une ville côtière du sud-ouest ivoirien située entre Sassandra et Grand-Lahou, en pays neyo."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "cote",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_263",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "JACQUEVILLE",
+    "answer_normalized": "jacqueville",
+    "letters_pool": [
+      "J",
+      "A",
+      "C",
+      "Q",
+      "U",
+      "E",
+      "V",
+      "I",
+      "L",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Île reliée par un pont récent, je suis station balnéaire des week-ends abidjanais."
+    },
+    "explanation": {
+      "fr": "Jacqueville est une ville côtière du sud reliée au continent par un pont depuis 2015, station balnéaire en pays alladian."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "cote",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_264",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "LAHOU",
+    "answer_normalized": "lahou",
+    "letters_pool": [
+      "L",
+      "A",
+      "H",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Ancien comptoir colonial englouti par les vagues, je renais sous le nom de Grand-cité."
+    },
+    "explanation": {
+      "fr": "Grand-Lahou est une ville côtière du sud ivoirien, ancien comptoir colonial dont la vieille ville a été engloutie par l'océan."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "cote",
+      "histoire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_265",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SANPEDRO",
+    "answer_normalized": "sanpedro",
+    "letters_pool": [
+      "S",
+      "A",
+      "N",
+      "P",
+      "E",
+      "D",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Deuxième port du pays au sud-ouest, je commerce cacao et bois précieux avec le monde."
+    },
+    "explanation": {
+      "fr": "San-Pédro est le deuxième port de Côte d'Ivoire, situé au sud-ouest, principal débouché du cacao et du bois."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "cote",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_266",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TABOU",
+    "answer_normalized": "tabou",
+    "letters_pool": [
+      "T",
+      "A",
+      "B",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Cité de la Nawa au bout du pays krou, je veille à la frontière du Libéria."
+    },
+    "explanation": {
+      "fr": "Tabou est une ville côtière du sud-ouest ivoirien à la frontière du Libéria, en pays krou."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "cote",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_267",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DUEKOUE",
+    "answer_normalized": "duekoue",
+    "letters_pool": [
+      "D",
+      "U",
+      "E",
+      "K",
+      "O",
+      "U",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Carrefour de l'ouest entre forêt et plantation, je suis terre d'accueil métissée."
+    },
+    "explanation": {
+      "fr": "Duékoué est une ville de l'ouest ivoirien, important carrefour entre Man et Daloa, située en zone forestière."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "ouest",
+      "foret"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_268",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TIEBISSOU",
+    "answer_normalized": "tiebissou",
+    "letters_pool": [
+      "T",
+      "I",
+      "E",
+      "B",
+      "I",
+      "S",
+      "S",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Bourg du Bélier sur la route royale, je suis terre baoulé entre Bouaké et la capitale politique."
+    },
+    "explanation": {
+      "fr": "Tiébissou est une ville du centre ivoirien sur l'axe Yamoussoukro-Bouaké, en pays baoulé, dans la région du Bélier."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "centre",
+      "region"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_269",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FERKE",
+    "answer_normalized": "ferke",
+    "letters_pool": [
+      "F",
+      "E",
+      "R",
+      "K",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cité sucrière du nord, mes champs de canne alimentent la sous-région."
+    },
+    "explanation": {
+      "fr": "Ferkessédougou (Ferké) est une ville du nord ivoirien, célèbre pour son complexe sucrier parmi les plus importants d'Afrique de l'Ouest."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "nord",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_270",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NIAKARA",
+    "answer_normalized": "niakara",
+    "letters_pool": [
+      "N",
+      "I",
+      "A",
+      "K",
+      "A",
+      "R",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Ville sénoufo au nord de Katiola, je vibre au son du balafon les jours de marché."
+    },
+    "explanation": {
+      "fr": "Niakaramandougou (Niakara) est une ville du nord ivoirien en pays sénoufo, dans la région du Hambol."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "nord",
+      "peuple"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_271",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "HOUPHOUET",
+    "answer_normalized": "houphouet",
+    "letters_pool": [
+      "H",
+      "O",
+      "U",
+      "P",
+      "H",
+      "O",
+      "U",
+      "E",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Vieux du village et père de la nation, mon nom orne avenues et stades aux quatre coins du pays."
+    },
+    "explanation": {
+      "fr": "Félix Houphouët-Boigny fut le premier président de la Côte d'Ivoire de 1960 à 1993, surnommé le Vieux ou le Sage de l'Afrique."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire",
+      "patrimoine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_272",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FELIX",
+    "answer_normalized": "felix",
+    "letters_pool": [
+      "F",
+      "E",
+      "L",
+      "I",
+      "X"
+    ],
+    "riddle": {
+      "fr": "Prénom latin du père fondateur, je veille toujours sur la nation depuis le marbre des écoles."
+    },
+    "explanation": {
+      "fr": "Félix est le prénom de Houphouët-Boigny, premier président de la Côte d'Ivoire, dont le nom orne écoles, stades et avenues."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire",
+      "langage"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_273",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BINGERVILLE",
+    "answer_normalized": "bingerville",
+    "letters_pool": [
+      "B",
+      "I",
+      "N",
+      "G",
+      "E",
+      "R",
+      "V",
+      "I",
+      "L",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Première capitale coloniale juchée sur sa colline, j'ai cédé la place à la grande ville lagunaire."
+    },
+    "explanation": {
+      "fr": "Bingerville fut la première capitale de la Côte d'Ivoire coloniale de 1900 à 1934, avant d'être supplantée par Abidjan."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire",
+      "ville",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_274",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BASSAM",
+    "answer_normalized": "bassam",
+    "letters_pool": [
+      "B",
+      "A",
+      "S",
+      "S",
+      "A",
+      "M"
+    ],
+    "riddle": {
+      "fr": "Ancienne capitale coloniale au bord de l'océan, mes vieilles bâtisses figurent au patrimoine mondial."
+    },
+    "explanation": {
+      "fr": "Bassam désigne Grand-Bassam, première capitale coloniale du pays de 1893 à 1900, ville historique classée à l'UNESCO en 2012."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire",
+      "patrimoine",
+      "cote"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_275",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BINGER",
+    "answer_normalized": "binger",
+    "letters_pool": [
+      "B",
+      "I",
+      "N",
+      "G",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Explorateur français du XIXe siècle, mon nom orne la colline d'une première capitale."
+    },
+    "explanation": {
+      "fr": "Louis-Gustave Binger fut un explorateur français qui parcourut la boucle du Niger et fut nommé premier gouverneur de la Côte d'Ivoire en 1893."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_276",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TREICH",
+    "answer_normalized": "treich",
+    "letters_pool": [
+      "T",
+      "R",
+      "E",
+      "I",
+      "C",
+      "H"
+    ],
+    "riddle": {
+      "fr": "Explorateur du XIXe siècle, je signais les traités avec les rois agni de l'est."
+    },
+    "explanation": {
+      "fr": "Marcel Treich-Laplène fut un explorateur français qui signa des traités de protectorat avec les chefs agni dès 1887."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_277",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "COMPTOIR",
+    "answer_normalized": "comptoir",
+    "letters_pool": [
+      "C",
+      "O",
+      "M",
+      "P",
+      "T",
+      "O",
+      "I",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Poste d'échange du temps des voiliers, sur la côte je troquais étoffes contre or et ivoire."
+    },
+    "explanation": {
+      "fr": "Les comptoirs commerciaux étaient des postes d'échange établis par les Européens sur le littoral ivoirien dès le XVe siècle."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire",
+      "cote"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_278",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TIRAILLEUR",
+    "answer_normalized": "tirailleur",
+    "letters_pool": [
+      "T",
+      "I",
+      "R",
+      "A",
+      "I",
+      "L",
+      "L",
+      "E",
+      "U",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Soldat d'Afrique mobilisé sous d'autres cieux, mes frères sont tombés en France lointaine."
+    },
+    "explanation": {
+      "fr": "Les tirailleurs sénégalais, dont de nombreux Ivoiriens, furent enrôlés dans l'armée coloniale française pendant les deux guerres mondiales."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_279",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "INDEPENDANCE",
+    "answer_normalized": "independance",
+    "letters_pool": [
+      "I",
+      "N",
+      "D",
+      "E",
+      "P",
+      "E",
+      "N",
+      "D",
+      "A",
+      "N",
+      "C",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Date sacrée du 7 août 1960, je suis l'aube nouvelle de la nation."
+    },
+    "explanation": {
+      "fr": "L'indépendance de la Côte d'Ivoire fut proclamée le 7 août 1960, mettant fin à la tutelle coloniale française."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire",
+      "fete"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_280",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ABIDJANAISE",
+    "answer_normalized": "abidjanaise",
+    "letters_pool": [
+      "A",
+      "B",
+      "I",
+      "D",
+      "J",
+      "A",
+      "N",
+      "A",
+      "I",
+      "S",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Chant adopté en 1960, mes paroles saluent une terre d'espérance."
+    },
+    "explanation": {
+      "fr": "L'Abidjanaise est l'hymne national de la Côte d'Ivoire, adopté en 1960, paroles de Pierre-Marie Coty et musique de Pierre Michel Pango."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire",
+      "musique"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_281",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DRAPEAU",
+    "answer_normalized": "drapeau",
+    "letters_pool": [
+      "D",
+      "R",
+      "A",
+      "P",
+      "E",
+      "A",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Trois bandes verticales : orange du nord, blanc de la paix, vert des forêts du sud."
+    },
+    "explanation": {
+      "fr": "Le drapeau ivoirien adopté en 1959 porte trois bandes verticales : orange (savane), blanc (paix) et vert (espérance et forêt)."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire",
+      "patrimoine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_282",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AMITIE",
+    "answer_normalized": "amitie",
+    "letters_pool": [
+      "A",
+      "M",
+      "I",
+      "T",
+      "I",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Grand bâtiment du Plateau qui abrita le parti unique, je symbolisais la fraternité nationale."
+    },
+    "explanation": {
+      "fr": "La Maison du Parti dite de l'Amitié à Abidjan fut le siège historique du PDCI-RDA, parti fondateur du pays."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire",
+      "patrimoine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_283",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "UNESCO",
+    "answer_normalized": "unesco",
+    "letters_pool": [
+      "U",
+      "N",
+      "E",
+      "S",
+      "C",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Organisation gardienne des merveilles du monde, je protège trois trésors ivoiriens."
+    },
+    "explanation": {
+      "fr": "L'UNESCO a classé en Côte d'Ivoire le parc de la Comoé, le parc du mont Nimba et la ville historique de Grand-Bassam au patrimoine mondial."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "patrimoine",
+      "histoire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_284",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BASILIQUE",
+    "answer_normalized": "basilique",
+    "letters_pool": [
+      "B",
+      "A",
+      "S",
+      "I",
+      "L",
+      "I",
+      "Q",
+      "U",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Dôme géant rivalisant avec Saint-Pierre, je veille sur la capitale politique du Vieux."
+    },
+    "explanation": {
+      "fr": "La basilique Notre-Dame-de-la-Paix de Yamoussoukro, consacrée en 1990, est l'un des plus grands édifices catholiques du monde."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "patrimoine",
+      "centre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_285",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CATHEDRALE",
+    "answer_normalized": "cathedrale",
+    "letters_pool": [
+      "C",
+      "A",
+      "T",
+      "H",
+      "E",
+      "D",
+      "R",
+      "A",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Forme audacieuse dressée sur le Plateau, mes contreforts inclinés évoquent une grande croix."
+    },
+    "explanation": {
+      "fr": "La cathédrale Saint-Paul d'Abidjan, conçue par Aldo Spirito et inaugurée en 1985, est un édifice moderne emblématique du Plateau."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "patrimoine",
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_286",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PYRAMIDE",
+    "answer_normalized": "pyramide",
+    "letters_pool": [
+      "P",
+      "Y",
+      "R",
+      "A",
+      "M",
+      "I",
+      "D",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Immeuble emblématique du Plateau aux faces géométriques, je perce le ciel depuis les années 70."
+    },
+    "explanation": {
+      "fr": "La Pyramide d'Abidjan, conçue par l'architecte italien Rinaldo Olivieri, est un immeuble emblématique du Plateau inauguré en 1973."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "patrimoine",
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_287",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "HOTELIVOIRE",
+    "answer_normalized": "hotelivoire",
+    "letters_pool": [
+      "H",
+      "O",
+      "T",
+      "E",
+      "L",
+      "I",
+      "V",
+      "O",
+      "I",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Tour de verre dominant la lagune, je suis le palace historique des sommets africains."
+    },
+    "explanation": {
+      "fr": "L'Hôtel Ivoire d'Abidjan, inauguré en 1962 et rénové en 2011, est un complexe hôtelier emblématique du Plateau et de la diplomatie ivoirienne."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "patrimoine",
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_288",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CASCADES",
+    "answer_normalized": "cascades",
+    "letters_pool": [
+      "C",
+      "A",
+      "S",
+      "C",
+      "A",
+      "D",
+      "E",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Chutes d'eau au cœur des Dix-Huit Montagnes, je suis fierté touristique du pays wê."
+    },
+    "explanation": {
+      "fr": "Les Cascades de Man sont un site naturel emblématique de l'ouest ivoirien, près de la ville de Man, en région montagneuse."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "montagne",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_289",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PLATEAU",
+    "answer_normalized": "plateau",
+    "letters_pool": [
+      "P",
+      "L",
+      "A",
+      "T",
+      "E",
+      "A",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Quartier des affaires et des ministères, mes gratte-ciels reflètent la lagune."
+    },
+    "explanation": {
+      "fr": "Le Plateau est le centre des affaires et de l'administration d'Abidjan, quartier historique des ministères et des sièges sociaux."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "patrimoine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_290",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "COCODY",
+    "answer_normalized": "cocody",
+    "letters_pool": [
+      "C",
+      "O",
+      "C",
+      "O",
+      "D",
+      "Y"
+    ],
+    "riddle": {
+      "fr": "Quartier résidentiel huppé de la métropole, on m'a chanté pour mes pluies tropicales."
+    },
+    "explanation": {
+      "fr": "Cocody est un quartier résidentiel d'Abidjan, célèbre pour ses ambassades et la chanson « Il pleut sur Cocody »."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "musique"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_291",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TREICHVILLE",
+    "answer_normalized": "treichville",
+    "letters_pool": [
+      "T",
+      "R",
+      "E",
+      "I",
+      "C",
+      "H",
+      "V",
+      "I",
+      "L",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Quartier populaire et joyeux du sud lagune, je vibre depuis toujours au son de l'orchestre."
+    },
+    "explanation": {
+      "fr": "Treichville est un quartier populaire d'Abidjan, célèbre pour son grand marché, ses nuits animées et son rôle dans la musique ivoirienne."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "musique"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_292",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "YOPOUGON",
+    "answer_normalized": "yopougon",
+    "letters_pool": [
+      "Y",
+      "O",
+      "P",
+      "O",
+      "U",
+      "G",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Plus grande commune de la capitale économique, je suis berceau du zouglou et de la débrouille."
+    },
+    "explanation": {
+      "fr": "Yopougon est la commune la plus peuplée d'Abidjan, popularisée par la BD « Aya de Yopougon », berceau de mouvements musicaux comme le zouglou."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "musique"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_293",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MARCORY",
+    "answer_normalized": "marcory",
+    "letters_pool": [
+      "M",
+      "A",
+      "R",
+      "C",
+      "O",
+      "R",
+      "Y"
+    ],
+    "riddle": {
+      "fr": "Quartier sud de la métropole, ma Zone 4 est écrin des nuits abidjanaises."
+    },
+    "explanation": {
+      "fr": "Marcory est une commune d'Abidjan, abritant la fameuse Zone 4 connue pour ses restaurants et sa vie nocturne."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_294",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ADJAME",
+    "answer_normalized": "adjame",
+    "letters_pool": [
+      "A",
+      "D",
+      "J",
+      "A",
+      "M",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Marché géant et nœud des bus, mon nom évoque la foule et le commerce."
+    },
+    "explanation": {
+      "fr": "Adjamé est une commune d'Abidjan célèbre pour son immense marché et sa gare routière, cœur du commerce informel."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_295",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOUMASSI",
+    "answer_normalized": "koumassi",
+    "letters_pool": [
+      "K",
+      "O",
+      "U",
+      "M",
+      "A",
+      "S",
+      "S",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Commune populaire à la sortie sud d'Abidjan, je vis au rythme des ateliers et des maquis."
+    },
+    "explanation": {
+      "fr": "Koumassi est une commune populaire d'Abidjan, connue pour ses zones industrielles et son cosmopolitisme."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_296",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ATTECOUBE",
+    "answer_normalized": "attecoube",
+    "letters_pool": [
+      "A",
+      "T",
+      "T",
+      "E",
+      "C",
+      "O",
+      "U",
+      "B",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Commune des hauteurs au bord de la lagune, mes pentes regardent les ponts de la métropole."
+    },
+    "explanation": {
+      "fr": "Attécoubé est une commune d'Abidjan située au bord de la lagune Ébrié, comprenant la forêt classée du Banco."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_297",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ABOBO",
+    "answer_normalized": "abobo",
+    "letters_pool": [
+      "A",
+      "B",
+      "O",
+      "B",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Vaste cité au nord d'Abidjan, je suis terre nourricière et populeuse de la métropole."
+    },
+    "explanation": {
+      "fr": "Abobo est l'une des plus grandes communes d'Abidjan, située au nord de la ville, fortement peuplée."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_298",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PORTBOUET",
+    "answer_normalized": "portbouet",
+    "letters_pool": [
+      "P",
+      "O",
+      "R",
+      "T",
+      "B",
+      "O",
+      "U",
+      "E",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Commune côtière des envols et arrivées, je touche l'océan et son canal."
+    },
+    "explanation": {
+      "fr": "Port-Bouët est une commune d'Abidjan où se trouvent l'aéroport international Félix Houphouët-Boigny et le canal de Vridi."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "cote"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_299",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "RIVIERA",
+    "answer_normalized": "riviera",
+    "letters_pool": [
+      "R",
+      "I",
+      "V",
+      "I",
+      "E",
+      "R",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Quartier moderne de Cocody, mes lotissements bordent le golf et la lagune."
+    },
+    "explanation": {
+      "fr": "La Riviera est une zone résidentielle moderne de Cocody, à Abidjan, abritant ambassades, golf et nouvelles cités huppées."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_300",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ANYAMA",
+    "answer_normalized": "anyama",
+    "letters_pool": [
+      "A",
+      "N",
+      "Y",
+      "A",
+      "M",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Bourg au nord d'Abidjan, mon marché de la kola brasse l'Afrique entière."
+    },
+    "explanation": {
+      "fr": "Anyama est une ville au nord d'Abidjan, célèbre pour son marché de la noix de kola, plaque tournante régionale."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "ville",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_301",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CACAO",
+    "answer_normalized": "cacao",
+    "letters_pool": [
+      "C",
+      "A",
+      "C",
+      "A",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Or brun du pays, mes fèves font fondre les chocolatiers du monde entier."
+    },
+    "explanation": {
+      "fr": "Le cacao est la première culture d'exportation de Côte d'Ivoire, premier producteur mondial avec environ 40% des récoltes globales."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "agriculture",
+      "patrimoine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_302",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CAFE",
+    "answer_normalized": "cafe",
+    "letters_pool": [
+      "C",
+      "A",
+      "F",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Grain noir torréfié, j'ai fait la richesse des plantations avant l'autre or brun."
+    },
+    "explanation": {
+      "fr": "Le café fut l'une des principales cultures d'exportation ivoiriennes, le pays restant un grand producteur africain de robusta."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "agriculture",
+      "boisson"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_303",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "HEVEA",
+    "answer_normalized": "hevea",
+    "letters_pool": [
+      "H",
+      "E",
+      "V",
+      "E",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Arbre saignant un lait blanc, mes coupes deviennent pneus et coussins."
+    },
+    "explanation": {
+      "fr": "L'hévéa est cultivé pour son latex qui produit le caoutchouc naturel, la Côte d'Ivoire étant premier producteur africain."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_304",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "COTON",
+    "answer_normalized": "coton",
+    "letters_pool": [
+      "C",
+      "O",
+      "T",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Or blanc du nord, mes flocons habillent les tisserands de Korhogo."
+    },
+    "explanation": {
+      "fr": "Le coton est la principale culture commerciale du nord ivoirien, base de l'industrie textile et du tissage sénoufo."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "agriculture",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_305",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ANANAS",
+    "answer_normalized": "ananas",
+    "letters_pool": [
+      "A",
+      "N",
+      "A",
+      "N",
+      "A",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Fruit couronné des plantations du sud, je m'exporte en avion vers les capitales européennes."
+    },
+    "explanation": {
+      "fr": "L'ananas est un fruit tropical largement cultivé dans le sud ivoirien, l'une des exportations agricoles emblématiques du pays."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "agriculture",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_306",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PALMIER",
+    "answer_normalized": "palmier",
+    "letters_pool": [
+      "P",
+      "A",
+      "L",
+      "M",
+      "I",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Arbre du sud aux régimes lourds, j'offre huile rouge, vin et palmiste."
+    },
+    "explanation": {
+      "fr": "Le palmier à huile est largement cultivé dans le sud ivoirien, fournissant huile rouge, vin de palme et palmiste."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "agriculture",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_307",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOLA",
+    "answer_normalized": "kola",
+    "letters_pool": [
+      "K",
+      "O",
+      "L",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Noix amère qui réveille les voyageurs, je voyage entre Lagos et Bamako."
+    },
+    "explanation": {
+      "fr": "La noix de kola est un fruit stimulant très consommé en Afrique de l'Ouest, dont le grand marché d'Anyama est plaque tournante."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "agriculture",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_308",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BANANE",
+    "answer_normalized": "banane",
+    "letters_pool": [
+      "B",
+      "A",
+      "N",
+      "A",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Fruit doré de la plantation côtière, je m'exporte en cartons vers l'Europe."
+    },
+    "explanation": {
+      "fr": "La banane est une culture d'exportation importante du sud ivoirien, principalement à destination du marché européen."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "agriculture",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_309",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ACAJOU",
+    "answer_normalized": "acajou",
+    "letters_pool": [
+      "A",
+      "C",
+      "A",
+      "J",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Pomme étrange portant sa noix au-dessous, mes amandes torréfiées partent vers l'Inde et le Vietnam."
+    },
+    "explanation": {
+      "fr": "L'anacardier ou acajou produit la noix de cajou, dont la Côte d'Ivoire est premier producteur mondial depuis les années 2010."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "agriculture",
+      "patrimoine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_310",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PIROGUE",
+    "answer_normalized": "pirogue",
+    "letters_pool": [
+      "P",
+      "I",
+      "R",
+      "O",
+      "G",
+      "U",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Long bois creusé qui glisse sur la lagune, je porte filet et pêcheur du matin."
+    },
+    "explanation": {
+      "fr": "La pirogue est l'embarcation traditionnelle des pêcheurs lagunaires et côtiers ivoiriens, taillée dans un tronc d'arbre."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "objets",
+      "lagune",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_311",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TONTINE",
+    "answer_normalized": "tontine",
+    "letters_pool": [
+      "T",
+      "O",
+      "N",
+      "T",
+      "I",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Caisse de confiance entre amis, chacun met sa part et tour à tour reçoit la grande."
+    },
+    "explanation": {
+      "fr": "La tontine est une caisse d'épargne collective traditionnelle, courante en Afrique de l'Ouest, fondée sur la rotation et la confiance."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "tradition",
+      "objets"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_312",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PLANTATION",
+    "answer_normalized": "plantation",
+    "letters_pool": [
+      "P",
+      "L",
+      "A",
+      "N",
+      "T",
+      "A",
+      "T",
+      "I",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Vaste étendue cultivée du sud, je nourris le pays et habille les exportations."
+    },
+    "explanation": {
+      "fr": "La plantation est le mode d'agriculture dominant dans le sud ivoirien, base de l'économie cacao-café-hévéa."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_313",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "COCOTERAIE",
+    "answer_normalized": "cocoteraie",
+    "letters_pool": [
+      "C",
+      "O",
+      "C",
+      "O",
+      "T",
+      "E",
+      "R",
+      "A",
+      "I",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Étendue plantée d'arbres élancés au bord de la mer, je donne fruit, lait et huile."
+    },
+    "explanation": {
+      "fr": "La cocoteraie est une plantation de cocotiers, abondante sur le littoral ivoirien notamment vers Assinie et Grand-Bassam."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "agriculture",
+      "cote"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_314",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MANGROVE",
+    "answer_normalized": "mangrove",
+    "letters_pool": [
+      "M",
+      "A",
+      "N",
+      "G",
+      "R",
+      "O",
+      "V",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Forêt amphibie aux racines aériennes, je suis berceau des crabes et des huîtres lagunaires."
+    },
+    "explanation": {
+      "fr": "La mangrove est une forêt côtière des zones saumâtres, présente dans le delta du Comoé et la lagune Ébrié."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "foret",
+      "lagune",
+      "cote"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_315",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "HARMATTAN",
+    "answer_normalized": "harmattan",
+    "letters_pool": [
+      "H",
+      "A",
+      "R",
+      "M",
+      "A",
+      "T",
+      "T",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Vent sec descendu du Sahara, je couvre les villes d'une poussière dorée chaque hiver."
+    },
+    "explanation": {
+      "fr": "L'harmattan est un vent sec et chaud venu du Sahara qui souffle sur la Côte d'Ivoire en saison sèche, de décembre à février."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "geographie",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_316",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BAOBAB",
+    "answer_normalized": "baobab",
+    "letters_pool": [
+      "B",
+      "A",
+      "O",
+      "B",
+      "A",
+      "B"
+    ],
+    "riddle": {
+      "fr": "Géant aux mille bras retournés vers le ciel, je suis l'arbre des palabres et de la mémoire."
+    },
+    "explanation": {
+      "fr": "Le baobab est un arbre emblématique de la savane ouest-africaine, présent dans le nord ivoirien, dont les feuilles et fruits sont consommés."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "savane",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_317",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ROBUSTA",
+    "answer_normalized": "robusta",
+    "letters_pool": [
+      "R",
+      "O",
+      "B",
+      "U",
+      "S",
+      "T",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Variété de café qui pousse en plaine tropicale, je tiens debout la production ivoirienne."
+    },
+    "explanation": {
+      "fr": "Le robusta est la variété de café majoritaire en Côte d'Ivoire, mieux adaptée au climat tropical que l'arabica."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "agriculture",
+      "boisson"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_318",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CARGO",
+    "answer_normalized": "cargo",
+    "letters_pool": [
+      "C",
+      "A",
+      "R",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Géant des mers qui accoste à Abidjan, je charge fèves et grumes pour les ports du monde."
+    },
+    "explanation": {
+      "fr": "Les navires cargo accostent au port autonome d'Abidjan, premier port d'Afrique de l'Ouest pour le cacao et le bois."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "objets",
+      "cote"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_319",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PALAIS",
+    "answer_normalized": "palais",
+    "letters_pool": [
+      "P",
+      "A",
+      "L",
+      "A",
+      "I",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Résidence présidentielle du Plateau, je veille sur la République depuis 1960."
+    },
+    "explanation": {
+      "fr": "Le Palais présidentiel d'Abidjan, situé au Plateau, est la résidence officielle du chef de l'État ivoirien."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire",
+      "patrimoine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_320",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ASSEMBLEE",
+    "answer_normalized": "assemblee",
+    "letters_pool": [
+      "A",
+      "S",
+      "S",
+      "E",
+      "M",
+      "B",
+      "L",
+      "E",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Hémicycle des députés à Abidjan, ma voix porte les lois de la nation."
+    },
+    "explanation": {
+      "fr": "L'Assemblée nationale est l'institution législative ivoirienne siégeant à Abidjan ; depuis 2016, un Sénat la complète à Yamoussoukro."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "histoire",
+      "patrimoine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_321",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ZAOULI",
+    "answer_normalized": "zaouli",
+    "letters_pool": [
+      "Z",
+      "A",
+      "O",
+      "U",
+      "L",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Masque rieur du peuple gouro, je danse en équilibre acrobatique sur les épaules des hommes."
+    },
+    "explanation": {
+      "fr": "Le Zaouli est un masque-danse traditionnel du peuple gouro, classé au patrimoine immatériel de l'UNESCO en 2017."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "masque",
+      "danse",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_322",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BOLOYE",
+    "answer_normalized": "boloye",
+    "letters_pool": [
+      "B",
+      "O",
+      "L",
+      "O",
+      "Y",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Danse des hommes-panthères sénoufo, mes pas vifs imitent le félin tacheté."
+    },
+    "explanation": {
+      "fr": "Le boloye est une danse traditionnelle sénoufo dite « danse des hommes-panthères », inspirée du félin et exécutée lors de cérémonies."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "danse",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_323",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KPAN",
+    "answer_normalized": "kpan",
+    "letters_pool": [
+      "K",
+      "P",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Visage idéalisé de femme noble, je suis masque-portrait du peuple baoulé."
+    },
+    "explanation": {
+      "fr": "Le Kpan est un type de masque baoulé représentant une femme idéale, sculpté en bois, utilisé dans les danses publiques."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "masque",
+      "tradition",
+      "centre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_324",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KPLEKPLE",
+    "answer_normalized": "kplekple",
+    "letters_pool": [
+      "K",
+      "P",
+      "L",
+      "E",
+      "K",
+      "P",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Masque rond du peuple baoulé, je suis premier à danser dans le cycle du Goli."
+    },
+    "explanation": {
+      "fr": "Le Kplékplé est un masque baoulé en forme de disque, premier à apparaître dans la séquence cérémonielle du Goli."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "masque",
+      "ceremonie",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_325",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GBEKRE",
+    "answer_normalized": "gbekre",
+    "letters_pool": [
+      "G",
+      "B",
+      "E",
+      "K",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Masque-singe redouté du peuple baoulé, je veille sur les jugements et les mauvaises gens."
+    },
+    "explanation": {
+      "fr": "Le Gbêkrê est un masque baoulé représentant un babouin, lié au culte des esprits et utilisé dans la justice traditionnelle."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "masque",
+      "tradition",
+      "spiritualite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_326",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MBLO",
+    "answer_normalized": "mblo",
+    "letters_pool": [
+      "M",
+      "B",
+      "L",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Portrait sculpté à la ressemblance d'un vivant, je danse pour célébrer ceux qu'on honore."
+    },
+    "explanation": {
+      "fr": "Le Mblo est un masque-portrait baoulé représentant une personne réelle, dansé en hommage lors de cérémonies de prestige."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "masque",
+      "tradition",
+      "ceremonie"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_327",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DEANGLE",
+    "answer_normalized": "deangle",
+    "letters_pool": [
+      "D",
+      "E",
+      "A",
+      "N",
+      "G",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Visage féminin gracieux du peuple dan, je guide les jeunes garçons en initiation."
+    },
+    "explanation": {
+      "fr": "Le Deangle est un masque dan féminin associé aux camps d'initiation des jeunes garçons, considéré comme bienveillant."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "masque",
+      "ceremonie",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_328",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ZAKPAI",
+    "answer_normalized": "zakpai",
+    "letters_pool": [
+      "Z",
+      "A",
+      "K",
+      "P",
+      "A",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Masque coureur du peuple dan, je traque le feu pendant la saison sèche."
+    },
+    "explanation": {
+      "fr": "Le Zakpaï est un masque dan associé à la prévention des incendies en saison sèche, dansé en courant à travers les villages."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "masque",
+      "tradition",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_329",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GUEZON",
+    "answer_normalized": "guezon",
+    "letters_pool": [
+      "G",
+      "U",
+      "E",
+      "Z",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Grand masque dan aux pouvoirs redoutés, je règle les conflits et garantis la paix."
+    },
+    "explanation": {
+      "fr": "Le Guezon est un grand masque dan d'autorité, gardien de l'ordre social et arbitre des conflits dans la tradition."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "masque",
+      "tradition",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_330",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KPONIOUGO",
+    "answer_normalized": "kponiougo",
+    "letters_pool": [
+      "K",
+      "P",
+      "O",
+      "N",
+      "I",
+      "O",
+      "U",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Masque cracheur de feu sénoufo, mes crocs et cornes effraient les forces hostiles."
+    },
+    "explanation": {
+      "fr": "Le Kpèliyê ou Kponiougo est un masque sénoufo composite, associé aux funérailles et à la protection contre les forces maléfiques."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "masque",
+      "ceremonie",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_331",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PORO",
+    "answer_normalized": "poro",
+    "letters_pool": [
+      "P",
+      "O",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Société initiatique des hommes sénoufo, ma forêt sacrée garde mes secrets."
+    },
+    "explanation": {
+      "fr": "Le Poro est la société initiatique masculine sénoufo, structurant l'apprentissage et la transmission du savoir sur plusieurs années."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "ceremonie",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_332",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SANDOGO",
+    "answer_normalized": "sandogo",
+    "letters_pool": [
+      "S",
+      "A",
+      "N",
+      "D",
+      "O",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Société des femmes sénoufo, mes initiées divinent par les cauris."
+    },
+    "explanation": {
+      "fr": "Le Sandogo est la société féminine sénoufo, parallèle au Poro, dédiée à la divination et à la médecine traditionnelle."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "ceremonie",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_333",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DIPRI",
+    "answer_normalized": "dipri",
+    "letters_pool": [
+      "D",
+      "I",
+      "P",
+      "R",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Nuit sacrée du peuple abidji, mes initiés s'enduisent de kaolin sous la lune."
+    },
+    "explanation": {
+      "fr": "Le Dipri est un rite nocturne sacré du peuple abidji de Gomon, lors duquel les initiés entrent en transe et exécutent des actes spectaculaires."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "ceremonie",
+      "tradition",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_334",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOMIAN",
+    "answer_normalized": "komian",
+    "letters_pool": [
+      "K",
+      "O",
+      "M",
+      "I",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Prêtresse en transe du monde akan, je danse pour soigner et prédire."
+    },
+    "explanation": {
+      "fr": "La Komian est une prêtresse-médium chez les Akan-Agni de Côte d'Ivoire, intermédiaire entre les esprits et la communauté."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_335",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ADJANOU",
+    "answer_normalized": "adjanou",
+    "letters_pool": [
+      "A",
+      "D",
+      "J",
+      "A",
+      "N",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Danse des femmes akan en temps de guerre, mon chant raffermissait le courage des hommes au combat."
+    },
+    "explanation": {
+      "fr": "L'Adjanou est une danse traditionnelle des femmes akan exécutée en temps de guerre ou de deuil pour appeler la victoire ou la paix."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "danse",
+      "ceremonie",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_336",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "INITIATION",
+    "answer_normalized": "initiation",
+    "letters_pool": [
+      "I",
+      "N",
+      "I",
+      "T",
+      "I",
+      "A",
+      "T",
+      "I",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Passage du jeune au monde adulte, la forêt sacrée garde mes épreuves."
+    },
+    "explanation": {
+      "fr": "L'initiation est un rite de passage présent dans la plupart des sociétés ivoiriennes traditionnelles, marquant l'entrée à l'âge adulte."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "ceremonie",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_337",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CHEFFERIE",
+    "answer_normalized": "chefferie",
+    "letters_pool": [
+      "C",
+      "H",
+      "E",
+      "F",
+      "F",
+      "E",
+      "R",
+      "I",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Pouvoir hérité du village, je règne sur les palabres et les coutumes."
+    },
+    "explanation": {
+      "fr": "La chefferie traditionnelle est l'institution communautaire à la tête du village ou du canton, garante des coutumes et de la médiation."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "village",
+      "histoire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_338",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DOZO",
+    "answer_normalized": "dozo",
+    "letters_pool": [
+      "D",
+      "O",
+      "Z",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Confrérie de chasseurs mandés, je porte tunique brune et amulettes au cou."
+    },
+    "explanation": {
+      "fr": "Le Dozo est un chasseur traditionnel mandé, membre d'une confrérie ancienne aux savoirs spirituels et thérapeutiques, présente au nord ivoirien."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "nord",
+      "spiritualite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_339",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CONTE",
+    "answer_normalized": "conte",
+    "letters_pool": [
+      "C",
+      "O",
+      "N",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Récit du soir au pied du grand arbre, je commence toujours quand la lune se lève."
+    },
+    "explanation": {
+      "fr": "Le conte est un genre oral central en Afrique de l'Ouest, transmis le soir par les anciens pour éduquer et divertir."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_340",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CONTEUR",
+    "answer_normalized": "conteur",
+    "letters_pool": [
+      "C",
+      "O",
+      "N",
+      "T",
+      "E",
+      "U",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Maître du verbe sous la nuit étoilée, je tisse récits, devinettes et chants."
+    },
+    "explanation": {
+      "fr": "Le conteur est gardien de la tradition orale ouest-africaine, transmettant histoires et sagesse de génération en génération."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_341",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GRIOTTE",
+    "answer_normalized": "griotte",
+    "letters_pool": [
+      "G",
+      "R",
+      "I",
+      "O",
+      "T",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Voix féminine de la mémoire, je chante les louanges aux mariages et aux naissances."
+    },
+    "explanation": {
+      "fr": "La griotte est la dépositaire féminine de la tradition orale dans les sociétés ouest-africaines, présente aux célébrations familiales."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "musique",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_342",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FABLE",
+    "answer_normalized": "fable",
+    "letters_pool": [
+      "F",
+      "A",
+      "B",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Court récit où parlent les bêtes, je cache une leçon sous une carapace de tortue."
+    },
+    "explanation": {
+      "fr": "La fable est un genre oral universel, particulièrement vivant en Afrique, mettant en scène animaux pour transmettre une morale."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_343",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "LEGENDE",
+    "answer_normalized": "legende",
+    "letters_pool": [
+      "L",
+      "E",
+      "G",
+      "E",
+      "N",
+      "D",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Récit d'autrefois mêlant héros et merveilles, je perpétue la mémoire d'une reine sacrifiant son fils."
+    },
+    "explanation": {
+      "fr": "Les légendes ouest-africaines mêlent histoire et merveilleux, comme celle d'Abla Pokou qui aurait sacrifié son fils pour sauver son peuple."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "histoire",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_344",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PROVERBE",
+    "answer_normalized": "proverbe",
+    "letters_pool": [
+      "P",
+      "R",
+      "O",
+      "V",
+      "E",
+      "R",
+      "B",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Parole courte et profonde, je résume en deux mots la sagesse de mille ans."
+    },
+    "explanation": {
+      "fr": "Le proverbe est un genre oral majeur en Afrique, support de la sagesse populaire et de l'argumentation lors des palabres."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "langage",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_345",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DEVINETTE",
+    "answer_normalized": "devinette",
+    "letters_pool": [
+      "D",
+      "E",
+      "V",
+      "I",
+      "N",
+      "E",
+      "T",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Jeu d'esprit du conteur, je teste l'agilité de ton intelligence."
+    },
+    "explanation": {
+      "fr": "La devinette est une forme orale traditionnelle pratiquée en veillée pour aiguiser l'esprit et amuser auditeurs jeunes et anciens."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "langage"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_346",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "LIEVRE",
+    "answer_normalized": "lievre",
+    "letters_pool": [
+      "L",
+      "I",
+      "E",
+      "V",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Petit mais rusé dans les contes, je trompe l'éléphant par mon intelligence."
+    },
+    "explanation": {
+      "fr": "Le lièvre est le personnage trickster récurrent des contes ouest-africains, symbole de la ruse triomphant de la force."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "faune",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_347",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TORTUE",
+    "answer_normalized": "tortue",
+    "letters_pool": [
+      "T",
+      "O",
+      "R",
+      "T",
+      "U",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Lente mais sage, mes plus belles histoires apprennent la patience aux enfants."
+    },
+    "explanation": {
+      "fr": "La tortue est un personnage emblématique des contes ouest-africains, symbole de patience et parfois de sagesse rusée."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "faune",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_348",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "HYENE",
+    "answer_normalized": "hyene",
+    "letters_pool": [
+      "H",
+      "Y",
+      "E",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Goinfre et naïve dans les récits, je suis la dupe favorite du lièvre."
+    },
+    "explanation": {
+      "fr": "L'hyène est dans les contes ouest-africains le personnage cupide et lourdaud, souvent ridiculisée par le lièvre rusé."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "faune",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_349",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ANANSE",
+    "answer_normalized": "ananse",
+    "letters_pool": [
+      "A",
+      "N",
+      "A",
+      "N",
+      "S",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Araignée maligne venue du pays akan, je tisse à la fois ma toile et mes ruses."
+    },
+    "explanation": {
+      "fr": "Anansé est l'araignée trickster des contes akan, héritage culturel partagé entre Ghana et Côte d'Ivoire, devenu héros caribéen."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "tradition",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_350",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ARAIGNEE",
+    "answer_normalized": "araignee",
+    "letters_pool": [
+      "A",
+      "R",
+      "A",
+      "I",
+      "G",
+      "N",
+      "E",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Filandière au plafond du village, je suis souvent personnage rusé des contes akan."
+    },
+    "explanation": {
+      "fr": "L'araignée est un personnage central des contes akan sous le nom d'Anansé, modèle de ruse et d'inventivité."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "faune",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_351",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ATTOUNGBLAN",
+    "answer_normalized": "attoungblan",
+    "letters_pool": [
+      "A",
+      "T",
+      "T",
+      "O",
+      "U",
+      "N",
+      "G",
+      "B",
+      "L",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Tambour parlant des cours royales akan, je suis la voix des rois absents."
+    },
+    "explanation": {
+      "fr": "L'Attoungblan est un ensemble de tambours royaux akan utilisé pour annoncer les décisions des rois et accompagner les cérémonies."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "musique",
+      "tradition",
+      "ceremonie"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_352",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DOUNDOUN",
+    "answer_normalized": "doundoun",
+    "letters_pool": [
+      "D",
+      "O",
+      "U",
+      "N",
+      "D",
+      "O",
+      "U",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Grand tambour grave porté en bandoulière, je donne la mesure aux djembés."
+    },
+    "explanation": {
+      "fr": "Le doundoun est un grand tambour basse mandingue, percuté avec un bâton, qui structure les rythmes des ensembles ouest-africains."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "musique",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_353",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GBOFE",
+    "answer_normalized": "gbofe",
+    "letters_pool": [
+      "G",
+      "B",
+      "O",
+      "F",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Orchestre de trompes en bois et ivoire, le peuple tagbana m'a inscrit au patrimoine de l'humanité."
+    },
+    "explanation": {
+      "fr": "Le Gbofe d'Afounkaha est un ensemble traditionnel de trompes traversières du peuple tagbana, inscrit en 2008 au patrimoine immatériel de l'UNESCO."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "musique",
+      "patrimoine",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_354",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AHOKO",
+    "answer_normalized": "ahoko",
+    "letters_pool": [
+      "A",
+      "H",
+      "O",
+      "K",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Noix de palmiste enfilées et frottées d'une tige, je donne le rythme des fêtes attié."
+    },
+    "explanation": {
+      "fr": "L'ahoko est un instrument rythmique traditionnel attié et akan, formé de noix de palmiste assemblées, frotté avec une tige."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "musique",
+      "tradition",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_355",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TAMBOUR",
+    "answer_normalized": "tambour",
+    "letters_pool": [
+      "T",
+      "A",
+      "M",
+      "B",
+      "O",
+      "U",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Caisse de bois tendue de peau, je porte au loin les nouvelles du village."
+    },
+    "explanation": {
+      "fr": "Le tambour est l'instrument cérémoniel central de nombreuses sociétés ivoiriennes, support de communication et de danse."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "musique",
+      "tradition",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_356",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CALEBASSE",
+    "answer_normalized": "calebasse",
+    "letters_pool": [
+      "C",
+      "A",
+      "L",
+      "E",
+      "B",
+      "A",
+      "S",
+      "S",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cucurbitacée séchée et évidée, je deviens tour à tour louche, gourde ou caisse à musique."
+    },
+    "explanation": {
+      "fr": "La calebasse est un fruit séché transformé en récipient ou en instrument de musique, omniprésente dans la vie quotidienne et rituelle."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "objets",
+      "tradition",
+      "artisanat"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_357",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DIDIGA",
+    "answer_normalized": "didiga",
+    "letters_pool": [
+      "D",
+      "I",
+      "D",
+      "I",
+      "G",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Art total mêlant conte, mime, danse et masque, un poète bété m'a théorisé sur scène."
+    },
+    "explanation": {
+      "fr": "Le didiga est une forme théâtrale traditionnelle bété revisitée par l'écrivain Bernard Zadi Zaourou, mêlant conte, musique et performance."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "danse",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_358",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MAPOUKA",
+    "answer_normalized": "mapouka",
+    "letters_pool": [
+      "M",
+      "A",
+      "P",
+      "O",
+      "U",
+      "K",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Danse à pas serrés du peuple aïzi, je devins phénomène populaire bien au-delà des villages."
+    },
+    "explanation": {
+      "fr": "Le mapouka est une danse traditionnelle des Aïzi du sud-est ivoirien, devenue dans les années 1990 un phénomène musical international."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "danse",
+      "musique",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_359",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ZIGLIBITHY",
+    "answer_normalized": "ziglibithy",
+    "letters_pool": [
+      "Z",
+      "I",
+      "G",
+      "L",
+      "I",
+      "B",
+      "I",
+      "T",
+      "H",
+      "Y"
+    ],
+    "riddle": {
+      "fr": "Style musical lancé dans les années 80, je suis pulsation moderne aux racines bété."
+    },
+    "explanation": {
+      "fr": "Le ziglibithy est un genre musical ivoirien créé par Ernesto Djédjé dans les années 1980, inspiré du folklore bété."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "musique",
+      "danse"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_360",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ZOUGLOU",
+    "answer_normalized": "zouglou",
+    "letters_pool": [
+      "Z",
+      "O",
+      "U",
+      "G",
+      "L",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Né dans les cités universitaires de Yopougon, ma musique chante la débrouille avec humour."
+    },
+    "explanation": {
+      "fr": "Le zouglou est un genre musical ivoirien né à la fin des années 1980 dans les cités universitaires d'Abidjan, mêlant percussions et textes engagés."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "musique",
+      "danse"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_361",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "COUPEDECALE",
+    "answer_normalized": "coupedecale",
+    "letters_pool": [
+      "C",
+      "O",
+      "U",
+      "P",
+      "E",
+      "D",
+      "E",
+      "C",
+      "A",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Mouvement musical des années 2000, je secoue les pieds avec billets et gestes excentriques."
+    },
+    "explanation": {
+      "fr": "Le coupé-décalé est un genre musical ivoirien né dans les années 2000 dans la diaspora parisienne, popularisé par Douk Saga et Molare."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "musique",
+      "danse"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_362",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ALLOUKOU",
+    "answer_normalized": "alloukou",
+    "letters_pool": [
+      "A",
+      "L",
+      "L",
+      "O",
+      "U",
+      "K",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Danse de réjouissance du sud-est, je chauffe les fêtes attié et akan."
+    },
+    "explanation": {
+      "fr": "L'alloukou est une danse traditionnelle attié et akan de Côte d'Ivoire, exécutée lors des fêtes et réjouissances populaires."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "danse",
+      "tradition",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_363",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FUNERAILLES",
+    "answer_normalized": "funerailles",
+    "letters_pool": [
+      "F",
+      "U",
+      "N",
+      "E",
+      "R",
+      "A",
+      "I",
+      "L",
+      "L",
+      "E",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Adieu cérémoniel rendu au défunt, je rassemble la famille élargie pendant des jours entiers."
+    },
+    "explanation": {
+      "fr": "Les funérailles ouest-africaines sont des cérémonies prolongées qui mobilisent toute la communauté pour honorer le défunt."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "ceremonie",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_364",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DOTE",
+    "answer_normalized": "dote",
+    "letters_pool": [
+      "D",
+      "O",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Présents apportés à la belle-famille, je scelle l'union de deux maisons."
+    },
+    "explanation": {
+      "fr": "La dot est l'ensemble de présents traditionnels remis par la famille du marié à celle de la mariée, scellant l'alliance des deux lignages."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "ceremonie",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_365",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MARIAGE",
+    "answer_normalized": "mariage",
+    "letters_pool": [
+      "M",
+      "A",
+      "R",
+      "I",
+      "A",
+      "G",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Union scellée par la dot et les festivités, je rassemble deux familles en une."
+    },
+    "explanation": {
+      "fr": "Le mariage traditionnel ivoirien comprend la demande, la dot et les festivités scellant l'alliance des lignages bien au-delà des seuls époux."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "ceremonie",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_366",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BAPTEME",
+    "answer_normalized": "bapteme",
+    "letters_pool": [
+      "B",
+      "A",
+      "P",
+      "T",
+      "E",
+      "M",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Huit jours après la naissance, je donne nom et place dans le lignage."
+    },
+    "explanation": {
+      "fr": "Le baptême traditionnel ouest-africain a généralement lieu sept ou huit jours après la naissance et marque l'entrée de l'enfant dans la communauté."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "ceremonie",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_367",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CHANT",
+    "answer_normalized": "chant",
+    "letters_pool": [
+      "C",
+      "H",
+      "A",
+      "N",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Voix portée par la communauté, je rythme le pilon et accompagne les rites."
+    },
+    "explanation": {
+      "fr": "Le chant traditionnel accompagne tous les moments importants de la vie ouest-africaine : travail, fête, deuil et rite."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "musique",
+      "oralite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_368",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "VEILLEE",
+    "answer_normalized": "veillee",
+    "letters_pool": [
+      "V",
+      "E",
+      "I",
+      "L",
+      "L",
+      "E",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Nuit autour du feu et des récits, je rassemble les générations sous la lune."
+    },
+    "explanation": {
+      "fr": "La veillée est un moment social majeur du village ouest-africain, espace de transmission orale des contes, proverbes et chants."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "oralite",
+      "tradition",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_369",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SACRIFICE",
+    "answer_normalized": "sacrifice",
+    "letters_pool": [
+      "S",
+      "A",
+      "C",
+      "R",
+      "I",
+      "F",
+      "I",
+      "C",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Offrande versée à l'autel des ancêtres, je sollicite leur bienveillance avant les grandes entreprises."
+    },
+    "explanation": {
+      "fr": "Le sacrifice rituel est un acte fondateur des religions traditionnelles ouest-africaines, offrande aux ancêtres ou aux divinités pour obtenir leur faveur."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "ceremonie",
+      "spiritualite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_370",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ALLIANCE",
+    "answer_normalized": "alliance",
+    "letters_pool": [
+      "A",
+      "L",
+      "L",
+      "I",
+      "A",
+      "N",
+      "C",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Pacte sacré entre deux clans ou peuples, je s'établit par le sang ou la plaisanterie."
+    },
+    "explanation": {
+      "fr": "L'alliance, dont la fameuse parenté à plaisanterie, lie traditionnellement clans, familles ou peuples ouest-africains par des engagements ritualisés."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "ceremonie",
+      "tradition",
+      "langage"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_371",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FOUFOU",
+    "answer_normalized": "foufou",
+    "letters_pool": [
+      "F",
+      "O",
+      "U",
+      "F",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Pâte tendre de plantain bien mûr, je suis cousin du foutou mais d'une seule racine."
+    },
+    "explanation": {
+      "fr": "Le foufou est une pâte molle obtenue à partir de banane plantain bouillie et pilée, distincte du foutou qui mélange igname et plantain."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_372",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AKPESSI",
+    "answer_normalized": "akpessi",
+    "letters_pool": [
+      "A",
+      "K",
+      "P",
+      "E",
+      "S",
+      "S",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Igname doucement bouillie, je m'accompagne d'une sauce rouge tirée du palmier."
+    },
+    "explanation": {
+      "fr": "L'akpèssi est un plat traditionnel ivoirien d'igname bouillie servie avec de la sauce graine, parfois enrichie de viande ou de poisson."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_373",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SAUCEGRAINE",
+    "answer_normalized": "saucegraine",
+    "letters_pool": [
+      "S",
+      "A",
+      "U",
+      "C",
+      "E",
+      "G",
+      "R",
+      "A",
+      "I",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Bouillon rouge tiré des fruits du palmier à huile, je nappe igname et plantain."
+    },
+    "explanation": {
+      "fr": "La sauce graine est une sauce épaisse à base de noix de palme bouillies et pressées, accompagnée de viande, poisson ou crabe."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "sauce",
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_374",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SAUCEKOPE",
+    "answer_normalized": "saucekope",
+    "letters_pool": [
+      "S",
+      "A",
+      "U",
+      "C",
+      "E",
+      "K",
+      "O",
+      "P",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Crème onctueuse du sud-ouest aux fruits du palmier, je suis cousine de la sauce graine en pays krou."
+    },
+    "explanation": {
+      "fr": "La sauce kopé est une sauce traditionnelle du sud-ouest ivoirien à base de noix de palme, particulièrement appréciée en pays bété."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "sauce",
+      "cuisine",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_375",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SAUCECLAIRE",
+    "answer_normalized": "sauceclaire",
+    "letters_pool": [
+      "S",
+      "A",
+      "U",
+      "C",
+      "E",
+      "C",
+      "L",
+      "A",
+      "I",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Bouillon léger d'aubergines et de poisson, je rafraîchis les midis chauds."
+    },
+    "explanation": {
+      "fr": "La sauce claire est une sauce ivoirienne légère à base d'aubergines, tomates et poisson fumé, accompagnant le foutou ou le riz."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "sauce",
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_376",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SAUCEFEUILLE",
+    "answer_normalized": "saucefeuille",
+    "letters_pool": [
+      "S",
+      "A",
+      "U",
+      "C",
+      "E",
+      "F",
+      "E",
+      "U",
+      "I",
+      "L",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Verdure broyée du jardin, je m'accommode des herbes sauvages et des feuilles de patate."
+    },
+    "explanation": {
+      "fr": "La sauce feuille désigne une famille de sauces à base de légumes-feuilles (gnetum, manioc, patate douce), pilier de la cuisine du sud."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "sauce",
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_377",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "RIZGRAS",
+    "answer_normalized": "rizgras",
+    "letters_pool": [
+      "R",
+      "I",
+      "Z",
+      "G",
+      "R",
+      "A",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Grains parfumés cuits dans le bouillon rouge, mes plats communs nourrissent les fêtes de famille."
+    },
+    "explanation": {
+      "fr": "Le riz gras est un plat festif ouest-africain où le riz cuit directement dans une sauce tomate épicée avec viande et légumes."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "fete",
+      "cereale"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_378",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AKPLE",
+    "answer_normalized": "akple",
+    "letters_pool": [
+      "A",
+      "K",
+      "P",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Boulette de farine de maïs et manioc, je viens du grand voisin de l'est mais nourris aussi nos villages."
+    },
+    "explanation": {
+      "fr": "L'akplé est une boulette de farine fermentée à base de maïs et manioc, populaire en Côte d'Ivoire et au Ghana, servie avec sauce."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_379",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CHOUKOUYA",
+    "answer_normalized": "choukouya",
+    "letters_pool": [
+      "C",
+      "H",
+      "O",
+      "U",
+      "K",
+      "O",
+      "U",
+      "Y",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Viande finement coupée et grillée aux épices, je suis spécialité brûlante du nord."
+    },
+    "explanation": {
+      "fr": "Le choukouya est une grillade de viande très épicée, spécialité culinaire du nord ivoirien et du Sahel, vendue en bord de route."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "nord",
+      "street-food"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_380",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BARABARA",
+    "answer_normalized": "barabara",
+    "letters_pool": [
+      "B",
+      "A",
+      "R",
+      "A",
+      "B",
+      "A",
+      "R",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Brochettes des nuits abidjanaises, je grésille au charbon au bord du trottoir."
+    },
+    "explanation": {
+      "fr": "Les barabara sont des brochettes de viande grillée et épicée, omniprésentes dans les rues abidjanaises au crépuscule."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "street-food",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_381",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MONI",
+    "answer_normalized": "moni",
+    "letters_pool": [
+      "M",
+      "O",
+      "N",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Bouillie sucrée de mil ou de maïs, je réveille les matins du nord."
+    },
+    "explanation": {
+      "fr": "Le moni est une bouillie de mil ou de maïs sucrée, consommée au petit-déjeuner notamment dans le nord ivoirien."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "cereale",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_382",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CAPITAINE",
+    "answer_normalized": "capitaine",
+    "letters_pool": [
+      "C",
+      "A",
+      "P",
+      "I",
+      "T",
+      "A",
+      "I",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Géant de la lagune et des fleuves, mon nom évoque un grade et ma chair fait les beaux jours des maquis."
+    },
+    "explanation": {
+      "fr": "Le capitaine est un poisson d'eau douce et saumâtre très prisé en Côte d'Ivoire, vedette des maquis braisé entier ou en sauce."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "faune",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_383",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AGOUTI",
+    "answer_normalized": "agouti",
+    "letters_pool": [
+      "A",
+      "G",
+      "O",
+      "U",
+      "T",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Rongeur de la brousse au poil brun, ma chair savoureuse fait les délices des villages."
+    },
+    "explanation": {
+      "fr": "L'agouti désigne en Côte d'Ivoire l'aulacode, gros rongeur de brousse dont la viande est très appréciée, désormais élevée en ferme."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "faune",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_384",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AULACODE",
+    "answer_normalized": "aulacode",
+    "letters_pool": [
+      "A",
+      "U",
+      "L",
+      "A",
+      "C",
+      "O",
+      "D",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Rongeur d'élevage à la chair rose, je suis l'agouti à l'état domestique."
+    },
+    "explanation": {
+      "fr": "L'aulacode est le grand rongeur des marécages ouest-africains, dont l'élevage s'est développé pour préserver les populations sauvages."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "faune",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_385",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BICHE",
+    "answer_normalized": "biche",
+    "letters_pool": [
+      "B",
+      "I",
+      "C",
+      "H",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Petite antilope de la forêt classée, ma chair tendre garnit les marmites des fêtes."
+    },
+    "explanation": {
+      "fr": "La biche désigne en Côte d'Ivoire le céphalophe, petite antilope forestière dont la chasse traditionnelle reste réglementée."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "faune",
+      "foret",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_386",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ADJUEVAN",
+    "answer_normalized": "adjuevan",
+    "letters_pool": [
+      "A",
+      "D",
+      "J",
+      "U",
+      "E",
+      "V",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Poisson fumé du sud, ma chair noircie parfume les sauces des grandes occasions."
+    },
+    "explanation": {
+      "fr": "L'adjuevan est un poisson fumé traditionnel des peuples lagunaires ivoiriens, utilisé pour rehausser sauces et bouillons."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_387",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BANDA",
+    "answer_normalized": "banda",
+    "letters_pool": [
+      "B",
+      "A",
+      "N",
+      "D",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Filet de viande séchée puis fumée, je dure longtemps et donne du goût aux sauces."
+    },
+    "explanation": {
+      "fr": "Le banda est une viande boucanée traditionnelle ouest-africaine, qui se conserve longtemps et parfume sauces et plats mijotés."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_388",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SAKASAKA",
+    "answer_normalized": "sakasaka",
+    "letters_pool": [
+      "S",
+      "A",
+      "K",
+      "A",
+      "S",
+      "A",
+      "K",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Feuilles de manioc longuement pilées, je nourris les villages d'un vert profond."
+    },
+    "explanation": {
+      "fr": "Le sakasaka est un plat de feuilles de manioc pilées et cuites longuement, courant en Afrique centrale et de l'Ouest."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "legume",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_389",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MAFFE",
+    "answer_normalized": "maffe",
+    "letters_pool": [
+      "M",
+      "A",
+      "F",
+      "F",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Sauce épaisse au beurre de cacahuète, je viens du voisin mandingue mais nourris aussi nos plantations."
+    },
+    "explanation": {
+      "fr": "Le mafé est une sauce ouest-africaine à base de pâte d'arachide, d'origine mandingue, servie sur riz ou tubercules."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "sauce",
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_390",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GARI",
+    "answer_normalized": "gari",
+    "letters_pool": [
+      "G",
+      "A",
+      "R",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Semoule fermentée du manioc, je gonfle dans l'eau pour rassasier sans cuisson."
+    },
+    "explanation": {
+      "fr": "Le gari est une semoule de manioc fermentée et grillée, aliment de base ouest-africain consommé en bouillie ou avec sauce."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_391",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TAPIOCA",
+    "answer_normalized": "tapioca",
+    "letters_pool": [
+      "T",
+      "A",
+      "P",
+      "I",
+      "O",
+      "C",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Petites perles tirées du manioc râpé, je fais le délice des bouillies."
+    },
+    "explanation": {
+      "fr": "Le tapioca est la fécule de manioc transformée en petites perles, ingrédient des bouillies et desserts ivoiriens."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_392",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KLUCLU",
+    "answer_normalized": "kluclu",
+    "letters_pool": [
+      "K",
+      "L",
+      "U",
+      "C",
+      "L",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Galette frite au goûter des enfants, je suis croquant aux mille recettes."
+    },
+    "explanation": {
+      "fr": "Le kluiklui désigne en Côte d'Ivoire des galettes ou beignets traditionnels, à base de banane, d'arachide ou de mil selon les régions."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "street-food",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_393",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BROCHETTE",
+    "answer_normalized": "brochette",
+    "letters_pool": [
+      "B",
+      "R",
+      "O",
+      "C",
+      "H",
+      "E",
+      "T",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Bâtonnet de bois piqué de viande grillée, je suis reine des fins de journée."
+    },
+    "explanation": {
+      "fr": "La brochette grillée est une street-food incontournable des soirées ivoiriennes, déclinaison locale du shashlik sahélien."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "street-food",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_394",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DOLO",
+    "answer_normalized": "dolo",
+    "letters_pool": [
+      "D",
+      "O",
+      "L",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Bière de mil ambrée du nord, je circule dans la calebasse aux jours de marché."
+    },
+    "explanation": {
+      "fr": "Le dolo est une bière artisanale de mil ou sorgho fermenté, brassée dans le nord ivoirien et toute la zone soudano-sahélienne."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "boisson",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_395",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TCHAPALO",
+    "answer_normalized": "tchapalo",
+    "letters_pool": [
+      "T",
+      "C",
+      "H",
+      "A",
+      "P",
+      "A",
+      "L",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Bière de mil au goût acidulé, je rassemble les hommes autour de la jarre."
+    },
+    "explanation": {
+      "fr": "Le tchapalo est une bière artisanale ivoirienne à base de mil fermenté, principalement brassée au centre et au nord."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "boisson",
+      "tradition",
+      "centre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_396",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BISSAP",
+    "answer_normalized": "bissap",
+    "letters_pool": [
+      "B",
+      "I",
+      "S",
+      "S",
+      "A",
+      "P"
+    ],
+    "riddle": {
+      "fr": "Boisson rouge tirée des fleurs séchées d'hibiscus, je désaltère les après-midis brûlants."
+    },
+    "explanation": {
+      "fr": "Le bissap est une infusion glacée à base de fleurs d'hibiscus, sucrée ou aromatisée à la menthe, populaire dans toute l'Afrique de l'Ouest."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "boisson",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_397",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GNAMAKOUDJI",
+    "answer_normalized": "gnamakoudji",
+    "letters_pool": [
+      "G",
+      "N",
+      "A",
+      "M",
+      "A",
+      "K",
+      "O",
+      "U",
+      "D",
+      "J",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Jus piquant tiré de la racine épicée, je réveille les bouches même à jeun."
+    },
+    "explanation": {
+      "fr": "Le gnamakoudji est un jus traditionnel ouest-africain à base de gingembre frais, citron et sucre, parfois aromatisé à l'ananas."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "boisson",
+      "tradition",
+      "condiment"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_398",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DEGUE",
+    "answer_normalized": "degue",
+    "letters_pool": [
+      "D",
+      "E",
+      "G",
+      "U",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Mélange sucré de petites boules cuites et lait caillé, je rafraîchis comme un dessert liquide."
+    },
+    "explanation": {
+      "fr": "Le dégué est une préparation à base de petites boules de mil ou couscous, lait caillé et sucre, servie glacée."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "boisson",
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_399",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TAMARIN",
+    "answer_normalized": "tamarin",
+    "letters_pool": [
+      "T",
+      "A",
+      "M",
+      "A",
+      "R",
+      "I",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Gousse acidulée d'un grand arbre du Sahel, je donne un jus qui pince agréablement la langue."
+    },
+    "explanation": {
+      "fr": "Le tamarin est le fruit aigre d'un arbre tropical dont la pulpe sert à préparer jus et sauces dans toute l'Afrique de l'Ouest."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "boisson",
+      "condiment",
+      "savane"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_400",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "VINPALME",
+    "answer_normalized": "vinpalme",
+    "letters_pool": [
+      "V",
+      "I",
+      "N",
+      "P",
+      "A",
+      "L",
+      "M",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Sève laiteuse récoltée à la tombée du jour, je fermente vite et se boit frais."
+    },
+    "explanation": {
+      "fr": "Le vin de palme est un jus laiteux issu de la sève du palmier, recueilli quotidiennement et consommé jeune avant qu'il ne devienne alcool fort."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "boisson",
+      "tradition",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_401",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CORROSOL",
+    "answer_normalized": "corrosol",
+    "letters_pool": [
+      "C",
+      "O",
+      "R",
+      "R",
+      "O",
+      "S",
+      "O",
+      "L"
+    ],
+    "riddle": {
+      "fr": "Fruit vert épineux à la chair blanche, mon jus rafraîchit comme une promesse de pluie."
+    },
+    "explanation": {
+      "fr": "Le corossol est un fruit tropical à la pulpe blanche et acidulée, dont on tire un jus très apprécié en Côte d'Ivoire."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "boisson",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_402",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AKPI",
+    "answer_normalized": "akpi",
+    "letters_pool": [
+      "A",
+      "K",
+      "P",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Petit grain séché d'un fruit forestier, mes amandes pilées épaississent les sauces."
+    },
+    "explanation": {
+      "fr": "L'akpi désigne les graines de djansang ou d'autres condiments forestiers ivoiriens, pilées pour parfumer et lier les sauces."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "condiment",
+      "foret",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_403",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DJANSANG",
+    "answer_normalized": "djansang",
+    "letters_pool": [
+      "D",
+      "J",
+      "A",
+      "N",
+      "S",
+      "A",
+      "N",
+      "G"
+    ],
+    "riddle": {
+      "fr": "Graine forestière grillée et pilée, je parfume les ragoûts du sud."
+    },
+    "explanation": {
+      "fr": "Le djansang est une graine d'arbre forestier ouest-africain, dont les amandes pilées servent de condiment épaississant pour les sauces."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "condiment",
+      "foret",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_404",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PIMENT",
+    "answer_normalized": "piment",
+    "letters_pool": [
+      "P",
+      "I",
+      "M",
+      "E",
+      "N",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Petit feu rouge ou jaune posé dans la marmite, je réveille les langues paresseuses."
+    },
+    "explanation": {
+      "fr": "Le piment est un condiment incontournable de la cuisine ivoirienne, présent sous diverses variétés (oiseau, antillais, doux) dans presque tous les plats."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "condiment",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_405",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POIVRE",
+    "answer_normalized": "poivre",
+    "letters_pool": [
+      "P",
+      "O",
+      "I",
+      "V",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Petite baie séchée, je suis aussi cueilli des lianes de Guinée."
+    },
+    "explanation": {
+      "fr": "Le poivre, importé ou local (poivre de Guinée), est un condiment central de la cuisine ivoirienne pour relever sauces et grillades."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "condiment",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_406",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KANWA",
+    "answer_normalized": "kanwa",
+    "letters_pool": [
+      "K",
+      "A",
+      "N",
+      "W",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Roche minérale du nord broyée fin, j'attendris haricots et viandes coriaces."
+    },
+    "explanation": {
+      "fr": "Le kanwa est une potasse minérale traditionnelle utilisée dans toute l'Afrique de l'Ouest pour attendrir les aliments et alcaliniser les sauces."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "condiment",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_407",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NETOU",
+    "answer_normalized": "netou",
+    "letters_pool": [
+      "N",
+      "E",
+      "T",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Grains du néré fermentés et bruns, mon arôme puissant signe les meilleures sauces du nord."
+    },
+    "explanation": {
+      "fr": "Le nétou est la graine fermentée du néré, condiment-clé de la cuisine ouest-africaine connu aussi sous les noms de soumbala ou dawadawa."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "condiment",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_408",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DAWADAWA",
+    "answer_normalized": "dawadawa",
+    "letters_pool": [
+      "D",
+      "A",
+      "W",
+      "A",
+      "D",
+      "A",
+      "W",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Boules brunes au parfum prononcé, je fermente avant de relever les sauces."
+    },
+    "explanation": {
+      "fr": "Le dawadawa est le nom haoussa du condiment fermenté à base de graines de néré, équivalent du nétou et du soumbala."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "condiment",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_409",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ZOMI",
+    "answer_normalized": "zomi",
+    "letters_pool": [
+      "Z",
+      "O",
+      "M",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Huile rouge clarifiée du palmier, mon parfum signe les sauces du sud."
+    },
+    "explanation": {
+      "fr": "Le zomi est une huile de palme rouge clarifiée par chauffage avec ail et oignons, ingrédient signature de la cuisine ivoirienne."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "condiment",
+      "cuisine",
+      "sud"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_410",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PALMISTE",
+    "answer_normalized": "palmiste",
+    "letters_pool": [
+      "P",
+      "A",
+      "L",
+      "M",
+      "I",
+      "S",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Noyau brun caché dans la noix de palme, mon huile blanche cuit les fritures."
+    },
+    "explanation": {
+      "fr": "Le palmiste est le noyau dur de la noix du palmier à huile, dont on extrait une huile blanche utilisée en cuisine et cosmétique."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "agriculture",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_411",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CITRON",
+    "answer_normalized": "citron",
+    "letters_pool": [
+      "C",
+      "I",
+      "T",
+      "R",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Petit fruit jaune ou vert à la peau parfumée, je pince la langue et conserve les sauces."
+    },
+    "explanation": {
+      "fr": "Le citron, omniprésent dans la cuisine ivoirienne, sert à mariner viandes et poissons et à parfumer jus et sauces."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "condiment",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_412",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GINGEMBRE",
+    "answer_normalized": "gingembre",
+    "letters_pool": [
+      "G",
+      "I",
+      "N",
+      "G",
+      "E",
+      "M",
+      "B",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Racine noueuse au feu intérieur, je deviens jus, sauce ou tisane médicinale."
+    },
+    "explanation": {
+      "fr": "Le gingembre est une racine épicée largement utilisée dans la cuisine et la médecine traditionnelle ivoiriennes, base du gnamakoudji."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "condiment",
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_413",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NIEBE",
+    "answer_normalized": "niebe",
+    "letters_pool": [
+      "N",
+      "I",
+      "E",
+      "B",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Petit pois clair à œil noir, je nourris mille recettes du grenier au gâteau."
+    },
+    "explanation": {
+      "fr": "Le niébé est le haricot à œil noir, légumineuse de base en Afrique de l'Ouest, transformée en accras, ragoûts ou farine."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "legume",
+      "cuisine",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_414",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "WAGASHI",
+    "answer_normalized": "wagashi",
+    "letters_pool": [
+      "W",
+      "A",
+      "G",
+      "A",
+      "S",
+      "H",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Fromage caillé au lait de zébu, je viens du nord peul et se déguste frit."
+    },
+    "explanation": {
+      "fr": "Le wagashi est un fromage frais traditionnel peul à base de lait caillé, consommé frit ou poêlé, populaire dans le nord ivoirien."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "cuisine",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_415",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CRABE",
+    "answer_normalized": "crabe",
+    "letters_pool": [
+      "C",
+      "R",
+      "A",
+      "B",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Petit pinceur de la mangrove, je relève la sauce graine des grands jours."
+    },
+    "explanation": {
+      "fr": "Le crabe lagunaire est un ingrédient noble de la cuisine ivoirienne, particulièrement apprécié dans la sauce graine des cérémonies."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "faune",
+      "cuisine",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_416",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CREVETTE",
+    "answer_normalized": "crevette",
+    "letters_pool": [
+      "C",
+      "R",
+      "E",
+      "V",
+      "E",
+      "T",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Petit fruit de mer rose, je rehausse riz, sauces et brochettes."
+    },
+    "explanation": {
+      "fr": "La crevette, pêchée dans les eaux côtières et les lagunes, est très utilisée dans la cuisine ivoirienne, fraîche, séchée ou en sauce."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "faune",
+      "cuisine",
+      "cote"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_417",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TILAPIA",
+    "answer_normalized": "tilapia",
+    "letters_pool": [
+      "T",
+      "I",
+      "L",
+      "A",
+      "P",
+      "I",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Poisson lacustre à la chair ferme, je remplis les paniers des pêcheurs de Kossou."
+    },
+    "explanation": {
+      "fr": "Le tilapia est un poisson d'eau douce élevé et pêché dans les lacs et fleuves ivoiriens, base de nombreux plats braisés."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "faune",
+      "cuisine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_418",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SARDINE",
+    "answer_normalized": "sardine",
+    "letters_pool": [
+      "S",
+      "A",
+      "R",
+      "D",
+      "I",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Petit poisson argenté souvent en boîte, je garnis sandwichs et sauces économiques."
+    },
+    "explanation": {
+      "fr": "La sardine, fraîche ou en conserve, est un poisson courant dans la cuisine populaire ivoirienne, économique et largement consommé."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "faune",
+      "cuisine",
+      "cote"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_419",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POULPE",
+    "answer_normalized": "poulpe",
+    "letters_pool": [
+      "P",
+      "O",
+      "U",
+      "L",
+      "P",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Mollusque à huit bras des fonds marins, je s'attendris dans la sauce kopé ou au four."
+    },
+    "explanation": {
+      "fr": "Le poulpe est un fruit de mer apprécié dans la cuisine côtière ivoirienne, mijoté lentement pour rester tendre."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "faune",
+      "cuisine",
+      "cote"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_420",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ESCARGOT",
+    "answer_normalized": "escargot",
+    "letters_pool": [
+      "E",
+      "S",
+      "C",
+      "A",
+      "R",
+      "G",
+      "O",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Gros gastéropode de la forêt humide, ma chair grillée régale les amateurs."
+    },
+    "explanation": {
+      "fr": "L'escargot géant africain est un gastéropode forestier consommé grillé ou en sauce dans le sud ivoirien, mets très apprécié."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "faune",
+      "cuisine",
+      "foret"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_421",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POTERIE",
+    "answer_normalized": "poterie",
+    "letters_pool": [
+      "P",
+      "O",
+      "T",
+      "E",
+      "R",
+      "I",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Vase modelé à la main et cuit au feu de bois, je porte l'eau et conserve les sauces."
+    },
+    "explanation": {
+      "fr": "La poterie traditionnelle ivoirienne, notamment celle des femmes mangoro de Katiola, façonne jarres, canaris et marmites par modelage à la main."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition",
+      "objets"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_422",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POTIER",
+    "answer_normalized": "potier",
+    "letters_pool": [
+      "P",
+      "O",
+      "T",
+      "I",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Artisan modelant l'argile humide, je façonne le canari sans la roue."
+    },
+    "explanation": {
+      "fr": "Le potier ivoirien, souvent une femme dans les traditions du nord, travaille l'argile par modelage et battage sans recourir au tour."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_423",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ARGILE",
+    "answer_normalized": "argile",
+    "letters_pool": [
+      "A",
+      "R",
+      "G",
+      "I",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Terre rouge ou grise façonnée par les mains expertes, je deviens canari, masque ou jarre."
+    },
+    "explanation": {
+      "fr": "L'argile est la matière première de la poterie traditionnelle ivoirienne, extraite en bordure de rivière puis modelée à la main."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_424",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TISSAGE",
+    "answer_normalized": "tissage",
+    "letters_pool": [
+      "T",
+      "I",
+      "S",
+      "S",
+      "A",
+      "G",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Croisement patient des fils sur le métier étroit, je deviens pagne et boubou."
+    },
+    "explanation": {
+      "fr": "Le tissage traditionnel ivoirien, pratiqué sur métier étroit chez les Sénoufo et les Baoulé, produit pagnes, couvertures et boubous."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_425",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TISSERAND",
+    "answer_normalized": "tisserand",
+    "letters_pool": [
+      "T",
+      "I",
+      "S",
+      "S",
+      "E",
+      "R",
+      "A",
+      "N",
+      "D"
+    ],
+    "riddle": {
+      "fr": "Maître du métier étroit, mes pieds rythment l'aller-retour de la navette."
+    },
+    "explanation": {
+      "fr": "Le tisserand traditionnel travaille sur un métier à bandes étroites, technique répandue dans tout l'ouest africain notamment chez les Mandé."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_426",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "VANNERIE",
+    "answer_normalized": "vannerie",
+    "letters_pool": [
+      "V",
+      "A",
+      "N",
+      "N",
+      "E",
+      "R",
+      "I",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Tressage patient de fibres souples, je deviens nasse, panier ou natte."
+    },
+    "explanation": {
+      "fr": "La vannerie regroupe les techniques de tressage de fibres végétales (raphia, rotin, bambou) pour fabriquer paniers, nasses et nattes."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition",
+      "objets"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_427",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PERLE",
+    "answer_normalized": "perle",
+    "letters_pool": [
+      "P",
+      "E",
+      "R",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Petit objet de verre ou de pierre enfilé sur le fil, je deviens parure et signe de rang."
+    },
+    "explanation": {
+      "fr": "Les perles, importées ou locales, sont des éléments centraux des parures traditionnelles ivoiriennes, indiquant statut, beauté et appartenance."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition",
+      "objets"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_428",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "COLLIER",
+    "answer_normalized": "collier",
+    "letters_pool": [
+      "C",
+      "O",
+      "L",
+      "L",
+      "I",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Parure portée au cou aux fêtes et aux deuils, je dis le statut de qui me porte."
+    },
+    "explanation": {
+      "fr": "Le collier traditionnel ivoirien, en perles, dents, coquillages ou métal, est un objet de parure et de distinction sociale."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "objets",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_429",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BRACELET",
+    "answer_normalized": "bracelet",
+    "letters_pool": [
+      "B",
+      "R",
+      "A",
+      "C",
+      "E",
+      "L",
+      "E",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Anneau passé autour du poignet, je tinte au rythme des mouvements de la danseuse."
+    },
+    "explanation": {
+      "fr": "Le bracelet en laiton, en perles ou en ivoire est une parure traditionnelle masculine et féminine, parfois signe d'initiation."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "objets",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_430",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BIJOU",
+    "answer_normalized": "bijou",
+    "letters_pool": [
+      "B",
+      "I",
+      "J",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Objet précieux porté en parure, j'orne cou, poignet et oreille des grandes occasions."
+    },
+    "explanation": {
+      "fr": "Les bijoux traditionnels ivoiriens, en or, laiton ou perles, marquent les cérémonies importantes et le statut social."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "objets",
+      "ceremonie"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_431",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ORFEVRE",
+    "answer_normalized": "orfevre",
+    "letters_pool": [
+      "O",
+      "R",
+      "F",
+      "E",
+      "V",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Maître du métal précieux, mes ouvrages d'or honorent les rois akan."
+    },
+    "explanation": {
+      "fr": "L'orfèvre akan, héritier d'une longue tradition, travaille l'or à la cire perdue pour les bijoux et insignes royaux."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_432",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "LAITON",
+    "answer_normalized": "laiton",
+    "letters_pool": [
+      "L",
+      "A",
+      "I",
+      "T",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Alliage jaune coulé à la cire perdue, je deviens bijou, poids ou statuette."
+    },
+    "explanation": {
+      "fr": "Le laiton, alliage de cuivre et zinc, est utilisé en Afrique de l'Ouest pour la fabrication de bijoux, poids à peser l'or et figurines."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_433",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BRONZE",
+    "answer_normalized": "bronze",
+    "letters_pool": [
+      "B",
+      "R",
+      "O",
+      "N",
+      "Z",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Alliage ancien des coulées royales, je porte la mémoire des rois akan."
+    },
+    "explanation": {
+      "fr": "Le bronze, alliage de cuivre et étain, est utilisé chez les Akan pour les figurines de cire perdue et les poids à peser la poudre d'or."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "histoire",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_434",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SCULPTURE",
+    "answer_normalized": "sculpture",
+    "letters_pool": [
+      "S",
+      "C",
+      "U",
+      "L",
+      "P",
+      "T",
+      "U",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Art de tailler le bois ou la pierre, mes masques témoignent du génie des peuples."
+    },
+    "explanation": {
+      "fr": "La sculpture sur bois est un art majeur en Côte d'Ivoire, produisant masques, statuettes et objets rituels chez Sénoufo, Baoulé, Dan et Gouro."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition",
+      "masque"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_435",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SCULPTEUR",
+    "answer_normalized": "sculpteur",
+    "letters_pool": [
+      "S",
+      "C",
+      "U",
+      "L",
+      "P",
+      "T",
+      "E",
+      "U",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Artisan taillant le bois d'iroko ou de kapokier, je donne forme aux masques sacrés."
+    },
+    "explanation": {
+      "fr": "Le sculpteur traditionnel ivoirien, héritier d'une tradition initiatique, travaille bois durs et tendres pour créer masques et statues rituelles."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition",
+      "masque"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_436",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "INDIGO",
+    "answer_normalized": "indigo",
+    "letters_pool": [
+      "I",
+      "N",
+      "D",
+      "I",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Plante des teinturiers du Sahel, mes feuilles donnent au pagne sa couleur d'orage."
+    },
+    "explanation": {
+      "fr": "L'indigo est une plante teintoriale utilisée en Afrique de l'Ouest pour colorer en bleu profond les tissus, notamment chez les Mandé."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_437",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "COTONNADE",
+    "answer_normalized": "cotonnade",
+    "letters_pool": [
+      "C",
+      "O",
+      "T",
+      "O",
+      "N",
+      "N",
+      "A",
+      "D",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Étoffe rustique tissée du coton du nord, je sers de pagne et de couverture."
+    },
+    "explanation": {
+      "fr": "La cotonnade traditionnelle ivoirienne, tissée sur métier étroit puis assemblée, sert de pagne, couverture ou tenture quotidienne."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_438",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BOGOLAN",
+    "answer_normalized": "bogolan",
+    "letters_pool": [
+      "B",
+      "O",
+      "G",
+      "O",
+      "L",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Tissu teint à la boue fermentée, mes motifs viennent du grand voisin du nord."
+    },
+    "explanation": {
+      "fr": "Le bogolan, originaire du Mali voisin, est un tissu teint à la boue fermentée et largement adopté dans la mode ivoirienne contemporaine."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_439",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PANIER",
+    "answer_normalized": "panier",
+    "letters_pool": [
+      "P",
+      "A",
+      "N",
+      "I",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Tressage de fibres souples, je porte les achats du marché et la récolte du champ."
+    },
+    "explanation": {
+      "fr": "Le panier en vannerie, tressé en raphia ou rotin, est l'objet utilitaire universel des marchés et villages ivoiriens."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "objets",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_440",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "RAPHIA",
+    "answer_normalized": "raphia",
+    "letters_pool": [
+      "R",
+      "A",
+      "P",
+      "H",
+      "I",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Fibre tirée des palmes séchées, je deviens chapeau, panier ou pagne de deuil."
+    },
+    "explanation": {
+      "fr": "Le raphia est une fibre végétale issue d'un palmier, utilisée en Afrique de l'Ouest pour la vannerie, le tissage et les pagnes traditionnels."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "artisanat",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_441",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GUERISSEUR",
+    "answer_normalized": "guerisseur",
+    "letters_pool": [
+      "G",
+      "U",
+      "E",
+      "R",
+      "I",
+      "S",
+      "S",
+      "E",
+      "U",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Connaisseur des plantes et des esprits, je soigne sans diplôme avec la sagesse des anciens."
+    },
+    "explanation": {
+      "fr": "Le guérisseur traditionnel ivoirien est un thérapeute communautaire qui mobilise plantes médicinales, rituels et connaissances héritées."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "spiritualite",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_442",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ECORCE",
+    "answer_normalized": "ecorce",
+    "letters_pool": [
+      "E",
+      "C",
+      "O",
+      "R",
+      "C",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Couche externe de l'arbre récoltée en saison, je deviens décoction pour soigner la fièvre."
+    },
+    "explanation": {
+      "fr": "Les écorces d'arbres comme le quinquéliba ou le kinkéliba sont largement utilisées en médecine traditionnelle ivoirienne en décoction."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "foret"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_443",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "RACINE",
+    "answer_normalized": "racine",
+    "letters_pool": [
+      "R",
+      "A",
+      "C",
+      "I",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Partie souterraine de la plante déterrée à la lune, je soigne maux de ventre et d'âme."
+    },
+    "explanation": {
+      "fr": "Les racines de plantes médicinales, déterrées selon des protocoles précis, sont la base de nombreux remèdes traditionnels ouest-africains."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "spiritualite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_444",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FEUILLE",
+    "answer_normalized": "feuille",
+    "letters_pool": [
+      "F",
+      "E",
+      "U",
+      "I",
+      "L",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Vert plat cueilli au matin, je deviens cataplasme, tisane ou bain de vapeur."
+    },
+    "explanation": {
+      "fr": "Les feuilles de nombreuses plantes (corossol, papayer, neem) servent en médecine traditionnelle ivoirienne en infusion ou cataplasme."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "foret"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_445",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MORINGA",
+    "answer_normalized": "moringa",
+    "letters_pool": [
+      "M",
+      "O",
+      "R",
+      "I",
+      "N",
+      "G",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Arbre aux feuilles miraculeuses, mes vertus médicinales se découvrent au monde entier."
+    },
+    "explanation": {
+      "fr": "Le moringa est un arbre dont feuilles, graines et racines sont reconnues pour leur richesse nutritionnelle et leurs usages médicinaux."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_446",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NEEM",
+    "answer_normalized": "neem",
+    "letters_pool": [
+      "N",
+      "E",
+      "E",
+      "M"
+    ],
+    "riddle": {
+      "fr": "Arbre indien acclimaté au pays, mes feuilles amères chassent fièvres et insectes."
+    },
+    "explanation": {
+      "fr": "Le neem, ou margousier, est un arbre médicinal d'origine indienne aux multiples vertus, largement planté en Afrique de l'Ouest."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_447",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KINKELIBA",
+    "answer_normalized": "kinkeliba",
+    "letters_pool": [
+      "K",
+      "I",
+      "N",
+      "K",
+      "E",
+      "L",
+      "I",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Liane des savanes du nord, mes feuilles en tisane purifient le foie."
+    },
+    "explanation": {
+      "fr": "Le kinkéliba est une liane de savane dont les feuilles, en décoction, sont une boisson médicinale traditionnelle ouest-africaine."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "savane",
+      "boisson"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_448",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "QUASSIA",
+    "answer_normalized": "quassia",
+    "letters_pool": [
+      "Q",
+      "U",
+      "A",
+      "S",
+      "S",
+      "I",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Bois amer venu d'Amérique, je soigne paludisme et parasites."
+    },
+    "explanation": {
+      "fr": "Le quassia amara est un arbuste tropical introduit en Afrique de l'Ouest, dont l'écorce amère sert en pharmacopée traditionnelle."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_449",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "VOACANGA",
+    "answer_normalized": "voacanga",
+    "letters_pool": [
+      "V",
+      "O",
+      "A",
+      "C",
+      "A",
+      "N",
+      "G",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Arbuste à fleurs blanches, mes graines fournissent des alcaloïdes étudiés par la pharmacie."
+    },
+    "explanation": {
+      "fr": "Le voacanga est un arbuste tropical ivoirien dont les graines, riches en alcaloïdes, intéressent l'industrie pharmaceutique moderne."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "foret"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_450",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MOABI",
+    "answer_normalized": "moabi",
+    "letters_pool": [
+      "M",
+      "O",
+      "A",
+      "B",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Géant de la forêt humide, mon huile prend soin de la peau bien avant le karité."
+    },
+    "explanation": {
+      "fr": "Le moabi est un grand arbre de la forêt équatoriale dont les graines fournissent une huile cosmétique et médicinale précieuse."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "foret"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_451",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "CITRONELLE",
+    "answer_normalized": "citronelle",
+    "letters_pool": [
+      "C",
+      "I",
+      "T",
+      "R",
+      "O",
+      "N",
+      "E",
+      "L",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Herbe parfumée du jardin, mes feuilles infusées calment et éloignent les moustiques."
+    },
+    "explanation": {
+      "fr": "La citronnelle est une herbe aromatique cultivée dans les jardins ivoiriens, utilisée en infusion pour ses vertus apaisantes et répulsives."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "agriculture",
+      "boisson"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_452",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MENTHE",
+    "answer_normalized": "menthe",
+    "letters_pool": [
+      "M",
+      "E",
+      "N",
+      "T",
+      "H",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Herbe rafraîchissante du jardin, je calme le ventre et parfume le thé."
+    },
+    "explanation": {
+      "fr": "La menthe est une herbe aromatique commune en Côte d'Ivoire, consommée en infusion pour ses vertus digestives et apaisantes."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "boisson"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_453",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PAPAYE",
+    "answer_normalized": "papaye",
+    "letters_pool": [
+      "P",
+      "A",
+      "P",
+      "A",
+      "Y",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Fruit jaune et tendre, mes feuilles soignent la fièvre et mes graines aident à guérir."
+    },
+    "explanation": {
+      "fr": "Le papayer fournit un fruit consommé mûr ou vert, et ses feuilles comme ses graines entrent en pharmacopée traditionnelle ivoirienne."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_454",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ARTEMISIA",
+    "answer_normalized": "artemisia",
+    "letters_pool": [
+      "A",
+      "R",
+      "T",
+      "E",
+      "M",
+      "I",
+      "S",
+      "I",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Plante aux feuilles découpées, mes décoctions luttent contre le paludisme depuis la Chine."
+    },
+    "explanation": {
+      "fr": "L'armoise (Artemisia annua) est une plante médicinale d'origine chinoise désormais cultivée en Afrique, utilisée contre le paludisme."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "tradition",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_455",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AVOCAT",
+    "answer_normalized": "avocat",
+    "letters_pool": [
+      "A",
+      "V",
+      "O",
+      "C",
+      "A",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Fruit à la peau verte et chair onctueuse, mon noyau sert aussi en pharmacopée."
+    },
+    "explanation": {
+      "fr": "L'avocatier est un arbre largement cultivé en Côte d'Ivoire, dont fruits, feuilles et noyaux entrent dans la pharmacopée traditionnelle."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "agriculture",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_456",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FETICHE",
+    "answer_normalized": "fetiche",
+    "letters_pool": [
+      "F",
+      "E",
+      "T",
+      "I",
+      "C",
+      "H",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Objet sacré gardé sous l'arbre du village, je suis intermédiaire avec les forces invisibles."
+    },
+    "explanation": {
+      "fr": "Le fétiche est un objet rituel chargé symboliquement, utilisé en religion traditionnelle ouest-africaine comme médiateur avec les puissances."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition",
+      "objets"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_457",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GRIGRI",
+    "answer_normalized": "grigri",
+    "letters_pool": [
+      "G",
+      "R",
+      "I",
+      "G",
+      "R",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Petit talisman attaché au cuir, je protège son porteur des mauvais sorts."
+    },
+    "explanation": {
+      "fr": "Le grigri est une amulette traditionnelle ouest-africaine, souvent contenant des écrits ou des herbes, portée en protection contre le mal."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition",
+      "objets"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_458",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TALISMAN",
+    "answer_normalized": "talisman",
+    "letters_pool": [
+      "T",
+      "A",
+      "L",
+      "I",
+      "S",
+      "M",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Objet chargé de pouvoir gardé sur soi, je protège des mauvaises ondes et des blessures."
+    },
+    "explanation": {
+      "fr": "Le talisman, en peau, métal ou tissu, est un objet protecteur traditionnel, supposé conférer chance, force ou immunité à son porteur."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition",
+      "objets"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_459",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AMULETTE",
+    "answer_normalized": "amulette",
+    "letters_pool": [
+      "A",
+      "M",
+      "U",
+      "L",
+      "E",
+      "T",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Petit objet porté au cou, je suis bénédiction et bouclier discret."
+    },
+    "explanation": {
+      "fr": "L'amulette est un objet protecteur traditionnel, porté autour du cou ou attaché au corps, chargé symboliquement par un initié."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition",
+      "objets"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_460",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "LIBATION",
+    "answer_normalized": "libation",
+    "letters_pool": [
+      "L",
+      "I",
+      "B",
+      "A",
+      "T",
+      "I",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Geste rituel de verser sur la terre, je nourris les ancêtres avant les vivants."
+    },
+    "explanation": {
+      "fr": "La libation est le rituel ouest-africain consistant à verser une boisson sur la terre pour honorer ancêtres et divinités avant la consommation."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "ceremonie",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_461",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "AUTEL",
+    "answer_normalized": "autel",
+    "letters_pool": [
+      "A",
+      "U",
+      "T",
+      "E",
+      "L"
+    ],
+    "riddle": {
+      "fr": "Lieu sacré du sacrifice et de l'offrande, je suis le seuil entre vivants et invisibles."
+    },
+    "explanation": {
+      "fr": "L'autel domestique ou communautaire est le point central des rituels d'offrande dans les religions traditionnelles ouest-africaines."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_462",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DEVIN",
+    "answer_normalized": "devin",
+    "letters_pool": [
+      "D",
+      "E",
+      "V",
+      "I",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Lecteur des signes et des cauris, je prédis pour qui sait écouter."
+    },
+    "explanation": {
+      "fr": "Le devin est, dans les sociétés ouest-africaines, le spécialiste de la divination par cauris, sable, noix de cola ou autres médiations."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_463",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ORACLE",
+    "answer_normalized": "oracle",
+    "letters_pool": [
+      "O",
+      "R",
+      "A",
+      "C",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Parole sacrée tirée du jet des cauris, je guide les décisions du village."
+    },
+    "explanation": {
+      "fr": "L'oracle désigne la pratique divinatoire et son résultat, consulté avant grandes entreprises, mariages ou décisions communautaires."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition",
+      "village"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_464",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BOSSON",
+    "answer_normalized": "bosson",
+    "letters_pool": [
+      "B",
+      "O",
+      "S",
+      "S",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Divinité akan de la rivière ou de la forêt, je veille sur les vivants depuis l'eau et le bois."
+    },
+    "explanation": {
+      "fr": "Les Bosson sont les divinités intermédiaires du panthéon akan, esprits de la nature (rivières, forêts) honorés par sacrifices."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_465",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NYAMIEN",
+    "answer_normalized": "nyamien",
+    "letters_pool": [
+      "N",
+      "Y",
+      "A",
+      "M",
+      "I",
+      "E",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Grand Dieu du ciel chez les Akan, je suis créateur lointain et silencieux."
+    },
+    "explanation": {
+      "fr": "Nyamien est le nom du Dieu créateur chez les Akan-Baoulé, divinité suprême distante à laquelle on s'adresse via les ancêtres et Bosson."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_466",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "MAMIWATA",
+    "answer_normalized": "mamiwata",
+    "letters_pool": [
+      "M",
+      "A",
+      "M",
+      "I",
+      "W",
+      "A",
+      "T",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Esprit féminin des eaux profondes, je séduis ou récompense les pêcheurs téméraires."
+    },
+    "explanation": {
+      "fr": "Mami Wata est une divinité aquatique féminine vénérée sur tout le golfe de Guinée, esprit ambivalent de richesse et de séduction."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition",
+      "cote"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_467",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ESPRIT",
+    "answer_normalized": "esprit",
+    "letters_pool": [
+      "E",
+      "S",
+      "P",
+      "R",
+      "I",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Présence invisible des ancêtres et des forces, je veille sur le village depuis l'autre monde."
+    },
+    "explanation": {
+      "fr": "Les esprits, ancêtres et puissances de la nature occupent une place centrale dans les religions traditionnelles ouest-africaines."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_468",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SACRE",
+    "answer_normalized": "sacre",
+    "letters_pool": [
+      "S",
+      "A",
+      "C",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Qualité de ce qui est mis à part, je marque la forêt du Poro et l'autel du village."
+    },
+    "explanation": {
+      "fr": "Le sacré désigne l'ensemble des lieux, objets et personnes mis à part dans la cosmologie traditionnelle ouest-africaine."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_469",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "RITUEL",
+    "answer_normalized": "rituel",
+    "letters_pool": [
+      "R",
+      "I",
+      "T",
+      "U",
+      "E",
+      "L"
+    ],
+    "riddle": {
+      "fr": "Ensemble de gestes ordonnés répétés à date fixe, je relie les vivants à leurs ancêtres."
+    },
+    "explanation": {
+      "fr": "Le rituel est l'acte cérémoniel codifié qui structure les religions traditionnelles, des naissances aux funérailles."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "ceremonie",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_470",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PRIERE",
+    "answer_normalized": "priere",
+    "letters_pool": [
+      "P",
+      "R",
+      "I",
+      "E",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Parole adressée aux ancêtres ou au Dieu lointain, je s'élève à l'aube et au crépuscule."
+    },
+    "explanation": {
+      "fr": "La prière, accompagnée de libations ou d'offrandes, est l'acte religieux quotidien dans la spiritualité traditionnelle comme dans les religions monothéistes pratiquées en Côte d'Ivoire."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "spiritualite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_471",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOULANGO",
+    "answer_normalized": "koulango",
+    "letters_pool": [
+      "K",
+      "O",
+      "U",
+      "L",
+      "A",
+      "N",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Peuple agriculteur du Bounkani, je veille sur la frontière du Ghana et du Burkina."
+    },
+    "explanation": {
+      "fr": "Les Koulango sont un peuple voltaïque du nord-est ivoirien, agriculteurs sédentaires établis dans la région du Bounkani autour de Bouna."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "peuple",
+      "nord",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_472",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BIRIFOR",
+    "answer_normalized": "birifor",
+    "letters_pool": [
+      "B",
+      "I",
+      "R",
+      "I",
+      "F",
+      "O",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Peuple voltaïque du nord-est, je cousine les Dagara et parle une langue gur."
+    },
+    "explanation": {
+      "fr": "Les Birifor sont un petit peuple voltaïque du nord-est ivoirien et du Burkina Faso, apparenté aux Dagara, principalement agriculteurs."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "peuple",
+      "nord",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_473",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "DJIMINI",
+    "answer_normalized": "djimini",
+    "letters_pool": [
+      "D",
+      "J",
+      "I",
+      "M",
+      "I",
+      "N",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Sous-groupe sénoufo du centre-nord, je gravite autour de Dabakala."
+    },
+    "explanation": {
+      "fr": "Les Djimini sont un sous-groupe sénoufo établi autour de Dabakala dans le centre-nord ivoirien, agriculteurs et artisans."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "peuple",
+      "nord",
+      "centre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_474",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TAGBANA",
+    "answer_normalized": "tagbana",
+    "letters_pool": [
+      "T",
+      "A",
+      "G",
+      "B",
+      "A",
+      "N",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Sous-groupe sénoufo de Niakaramandougou, mes trompes traversières chantent au patrimoine de l'humanité."
+    },
+    "explanation": {
+      "fr": "Les Tagbana sont un sous-groupe sénoufo du centre-nord ivoirien, célèbres pour leur orchestre de trompes Gbofé d'Afounkaha inscrit à l'UNESCO."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "peuple",
+      "nord",
+      "patrimoine"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_475",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NEYO",
+    "answer_normalized": "neyo",
+    "letters_pool": [
+      "N",
+      "E",
+      "Y",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Peuple krou de la côte ouest, mes pirogues longent les plages de Fresco et Sassandra."
+    },
+    "explanation": {
+      "fr": "Les Neyo sont un petit peuple krou de la côte sud-ouest ivoirienne, traditionnellement pêcheurs maritimes entre Fresco et Sassandra."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "peuple",
+      "cote",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_476",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NZIMA",
+    "answer_normalized": "nzima",
+    "letters_pool": [
+      "N",
+      "Z",
+      "I",
+      "M",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Peuple akan partagé avec le voisin de l'est, mes villages bordent le lac d'Aby."
+    },
+    "explanation": {
+      "fr": "Les Nzima sont un peuple akan vivant à cheval entre l'est ivoirien et le sud-ouest ghanéen, autour de la lagune Aby et de Tendo."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "peuple",
+      "est",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_477",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "WOBE",
+    "answer_normalized": "wobe",
+    "letters_pool": [
+      "W",
+      "O",
+      "B",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Sous-groupe wê de la région des montagnes, mes masques aux dents pointues fascinent les ethnographes."
+    },
+    "explanation": {
+      "fr": "Les Wobé sont un sous-groupe wê de l'ouest ivoirien, connus pour leurs masques de guerre aux traits anguleux et aux dents apparentes."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "peuple",
+      "ouest",
+      "masque"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_478",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ALADIAN",
+    "answer_normalized": "aladian",
+    "letters_pool": [
+      "A",
+      "L",
+      "A",
+      "D",
+      "I",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Peuple lagunaire entre Jacqueville et Grand-Lahou, mes pirogues glissent sous les cocotiers."
+    },
+    "explanation": {
+      "fr": "Les Aladian sont un peuple akan-lagunaire du sud ivoirien, établi sur le littoral entre Jacqueville et Grand-Lahou, pêcheurs et palmiculteurs."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "peuple",
+      "sud",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_479",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ABBEY",
+    "answer_normalized": "abbey",
+    "letters_pool": [
+      "A",
+      "B",
+      "B",
+      "E",
+      "Y"
+    ],
+    "riddle": {
+      "fr": "Peuple akan du pays Agboville, mes plantations d'hévéas saignent jour et nuit."
+    },
+    "explanation": {
+      "fr": "Les Abbey sont un peuple akan du sud-est ivoirien, établi autour d'Agboville, dans la région Agnéby-Tiassa."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "peuple",
+      "sud",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_480",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "EHOTILE",
+    "answer_normalized": "ehotile",
+    "letters_pool": [
+      "E",
+      "H",
+      "O",
+      "T",
+      "I",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Peuple lagunaire de la frontière de l'est, mon roi règne sur sept villages."
+    },
+    "explanation": {
+      "fr": "Les Éhotilé (ou Béti) sont un petit peuple akan-lagunaire installé autour de la lagune Aby, dans la région d'Adiaké."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "peuple",
+      "est",
+      "lagune"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_481",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NAFANA",
+    "answer_normalized": "nafana",
+    "letters_pool": [
+      "N",
+      "A",
+      "F",
+      "A",
+      "N",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Peuple gur à la frontière du Ghana, mes initiations Boloi gardent encore leurs secrets."
+    },
+    "explanation": {
+      "fr": "Les Nafana sont un petit peuple voltaïque vivant à cheval sur la frontière entre la Côte d'Ivoire et le Ghana, en région de Bondoukou."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "peuple",
+      "est",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_482",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "HUELA",
+    "answer_normalized": "huela",
+    "letters_pool": [
+      "H",
+      "U",
+      "E",
+      "L",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Petit peuple manding du nord, mes villages se rangent autour de Worofla."
+    },
+    "explanation": {
+      "fr": "Les Huéla (ou Vouéla) sont un petit peuple mandé du nord ivoirien, traditionnellement agriculteurs et chasseurs."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "peuple",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_483",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KOMO",
+    "answer_normalized": "komo",
+    "letters_pool": [
+      "K",
+      "O",
+      "M",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Société secrète mandingue des hommes initiés, ma forêt sacrée garde ses masques aux dents de fer."
+    },
+    "explanation": {
+      "fr": "Le Komo est une société initiatique mandingue à laquelle accèdent les hommes initiés, présente au nord ivoirien et dans toute la zone mandé."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "ceremonie",
+      "tradition",
+      "nord"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_484",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KORE",
+    "answer_normalized": "kore",
+    "letters_pool": [
+      "K",
+      "O",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Septième et dernier degré de l'initiation mandingue, mes secrets s'apprennent toute une vie."
+    },
+    "explanation": {
+      "fr": "Le Koré est, dans l'initiation traditionnelle mandé, le plus haut degré de la connaissance ésotérique, réservé aux anciens initiés."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "ceremonie",
+      "tradition",
+      "spiritualite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_485",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NAMA",
+    "answer_normalized": "nama",
+    "letters_pool": [
+      "N",
+      "A",
+      "M",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Société masculine du monde mandé, je règle les comportements et combats les sorciers."
+    },
+    "explanation": {
+      "fr": "La Nama est une société d'initiation mandé chargée traditionnellement de la lutte contre la sorcellerie et de la régulation sociale."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "ceremonie",
+      "tradition",
+      "spiritualite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_486",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KAFO",
+    "answer_normalized": "kafo",
+    "letters_pool": [
+      "K",
+      "A",
+      "F",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Unité territoriale du monde mandé, je fédère plusieurs villages sous une même autorité."
+    },
+    "explanation": {
+      "fr": "Le Kafo est, dans le monde mandé, une circonscription politique traditionnelle fédérant un ensemble de villages sous une autorité commune."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "tradition",
+      "village",
+      "histoire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_487",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TCHIWARA",
+    "answer_normalized": "tchiwara",
+    "letters_pool": [
+      "T",
+      "C",
+      "H",
+      "I",
+      "W",
+      "A",
+      "R",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Antilope stylisée du monde mandé, ma coiffe-masque s'élève au-dessus des champs."
+    },
+    "explanation": {
+      "fr": "Le Tchiwara est un masque-cimier mandingue représentant une antilope mythique, porté lors des rites agraires pour célébrer la fertilité."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "masque",
+      "ceremonie",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_488",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "POKOU",
+    "answer_normalized": "pokou",
+    "letters_pool": [
+      "P",
+      "O",
+      "K",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Reine baoulé d'autrefois, j'aurais sacrifié mon fils unique pour sauver mon peuple traversant le fleuve."
+    },
+    "explanation": {
+      "fr": "Abla Pokou est la reine légendaire qui aurait conduit son peuple baoulé hors de l'empire ashanti au XVIIIe siècle, sacrifiant son fils pour franchir le Comoé."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "histoire",
+      "oralite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_489",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SAMORI",
+    "answer_normalized": "samori",
+    "letters_pool": [
+      "S",
+      "A",
+      "M",
+      "O",
+      "R",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Conquérant malinké du XIXe siècle, je résistai aux Français jusqu'à ma capture à Guélémou."
+    },
+    "explanation": {
+      "fr": "Samori Touré, fondateur du Wassoulou, conquérant et résistant à la colonisation française, fut capturé en 1898 à Guélémou en Côte d'Ivoire."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "histoire",
+      "nord",
+      "ouest"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_490",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "TIEBA",
+    "answer_normalized": "tieba",
+    "letters_pool": [
+      "T",
+      "I",
+      "E",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Roi sénoufo du XIXe siècle, ma capitale Sikasso résistait aux assauts de Samori."
+    },
+    "explanation": {
+      "fr": "Tieba Traoré fut roi du Kénédougou sénoufo de 1877 à 1893, depuis sa capitale Sikasso, résistant à Samori Touré."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "histoire",
+      "nord",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_491",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "BABEMBA",
+    "answer_normalized": "babemba",
+    "letters_pool": [
+      "B",
+      "A",
+      "B",
+      "E",
+      "M",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Successeur de Tieba sur le trône sénoufo, je préférai la mort à la reddition en 1898."
+    },
+    "explanation": {
+      "fr": "Babemba Traoré, roi du Kénédougou de 1893 à 1898, choisit de mourir plutôt que de se rendre lors de la prise de Sikasso par les Français."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "histoire",
+      "nord",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_492",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KENEDOUGOU",
+    "answer_normalized": "kenedougou",
+    "letters_pool": [
+      "K",
+      "E",
+      "N",
+      "E",
+      "D",
+      "O",
+      "U",
+      "G",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Royaume sénoufo entre Mali actuel et nord ivoirien, ma capitale Sikasso fut une citadelle redoutée."
+    },
+    "explanation": {
+      "fr": "Le Kénédougou fut un royaume sénoufo du XIXe siècle s'étendant sur l'actuel sud du Mali et le nord ivoirien, avec Sikasso pour capitale."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "histoire",
+      "nord",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_493",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ALMAMI",
+    "answer_normalized": "almami",
+    "letters_pool": [
+      "A",
+      "L",
+      "M",
+      "A",
+      "M",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Titre du chef religieux musulman, je conduis la prière et parfois aussi l'armée."
+    },
+    "explanation": {
+      "fr": "L'almami (de l'arabe al-imam) est le titre du chef religieux et politique musulman dans plusieurs sociétés sahéliennes, porté notamment par Samori Touré."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "histoire",
+      "spiritualite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_494",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KPLE",
+    "answer_normalized": "kple",
+    "letters_pool": [
+      "K",
+      "P",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Musique baoulé jouée au cor en bois, j'accompagne les danses du Goli."
+    },
+    "explanation": {
+      "fr": "Le Kplé est un genre musical baoulé impliquant cors traversiers et tambours, associé aux danses cérémonielles dont le Goli."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "musique",
+      "tradition",
+      "centre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_495",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SODABI",
+    "answer_normalized": "sodabi",
+    "letters_pool": [
+      "S",
+      "O",
+      "D",
+      "A",
+      "B",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Eau de feu distillée du palmier dans l'estuaire du voisin de l'est, mes vapeurs montent à la tête."
+    },
+    "explanation": {
+      "fr": "Le sodabi est un alcool fort distillé à partir du vin de palme, populaire au Bénin et au Togo, présent à l'est ivoirien."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "boisson",
+      "tradition",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_496",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NIANGON",
+    "answer_normalized": "niangon",
+    "letters_pool": [
+      "N",
+      "I",
+      "A",
+      "N",
+      "G",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Bois rouge précieux de la forêt humide, mes grumes voguent vers les ports du monde."
+    },
+    "explanation": {
+      "fr": "Le niangon est un arbre de la forêt tropicale ivoirienne dont le bois rouge précieux est exploité pour l'ébénisterie et l'exportation."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "foret",
+      "agriculture"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_497",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "PALABRE",
+    "answer_normalized": "palabre",
+    "letters_pool": [
+      "P",
+      "A",
+      "L",
+      "A",
+      "B",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Assemblée tenue à l'ombre du grand arbre, mes paroles tranchent les conflits sans tribunal."
+    },
+    "explanation": {
+      "fr": "La palabre est l'institution communautaire ouest-africaine de règlement des conflits par la parole, sous l'arbre à palabres au cœur du village."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "tradition",
+      "village",
+      "oralite"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_498",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ASIE",
+    "answer_normalized": "asie",
+    "letters_pool": [
+      "A",
+      "S",
+      "I",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Déesse-terre du panthéon akan, je porte la vie et reçois la libation du paysan."
+    },
+    "explanation": {
+      "fr": "Asié Yaa (ou Asase Yaa) est la déesse-terre du panthéon akan, vénérée comme principe de fertilité et reposoir des ancêtres."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "spiritualite",
+      "tradition"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_499",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "KRINDJABO",
+    "answer_normalized": "krindjabo",
+    "letters_pool": [
+      "K",
+      "R",
+      "I",
+      "N",
+      "D",
+      "J",
+      "A",
+      "B",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Capitale historique du royaume Sanwi, mon trône d'or veille encore sur les Agni du sud-est."
+    },
+    "explanation": {
+      "fr": "Krindjabo est la capitale traditionnelle du royaume Agni du Sanwi, dans le sud-est ivoirien, siège de la dynastie royale et conservatoire des regalia."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "histoire",
+      "tradition",
+      "est"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_500",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "SAKASSOU",
+    "answer_normalized": "sakassou",
+    "letters_pool": [
+      "S",
+      "A",
+      "K",
+      "A",
+      "S",
+      "S",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Village historique baoulé du Bélier, mes rois descendent du peuple traversant le Comoé."
+    },
+    "explanation": {
+      "fr": "Sakassou est un village historique baoulé du centre ivoirien, considéré comme la capitale traditionnelle des Walèbo et siège de la chefferie ancestrale."
+    },
+    "difficulty": 4,
+    "estimated_time_s": 45,
+    "tags": [
+      "histoire",
+      "tradition",
+      "centre"
+    ],
+    "format_version": 3
+  }
+]
