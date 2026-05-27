@@ -2,8 +2,8 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
+import 'package:defi_kilimandjaro/data/repositories/composite_daily_challenge_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
-import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
 import 'package:defi_kilimandjaro/domain/services/daily_challenge_service.dart';
@@ -302,20 +302,29 @@ class DailyChallengeCard extends ConsumerWidget {
         levelIndex: 1,
       );
 
-      // Seed déterministe : hash FNV-1a du jour (réutilise l'helper du
-      // service). Tous les joueurs avec le même pack actif et la même
-      // date verront la même devinette.
-      final seed = _seedForDate(today);
+      // **Pool curated cross-joueurs** : on lit le mot du jour via le
+      // repo composite (Firestore d'abord, fallback bundle si offline /
+      // doc absent). Tous les joueurs voient le même mot le même jour —
+      // c'est l'élément de viralité / conversation sociale.
+      final devinette = await ref
+          .read(dailyChallengeRepositoryProvider)
+          .fetchDevinetteForDate(today);
 
-      final progress = ref.read(playerProgressProvider);
-      final devinette =
-          await ref.read(devinetteSelectionServiceProvider).nextDevinette(
-                mix: progress.activePackMix,
-                targetDifficulty: config.difficultyTier,
-                wordLengthBucket: config.wordLengthBucket,
-                excludeIds: const <String>{},
-                seed: seed,
-              );
+      if (devinette == null) {
+        // Cas pathologique : ni Firestore ni bundle n'ont pu servir.
+        // Affichage d'une erreur et retry possible.
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'daily.pool_empty'.tr(),
+              style: AppTypography.bebas(),
+            ),
+            backgroundColor: AppColors.rouge,
+          ),
+        );
+        return;
+      }
 
       if (!context.mounted) return;
       await context.push<void>(
@@ -338,20 +347,6 @@ class DailyChallengeCard extends ConsumerWidget {
         ),
       );
     }
-  }
-
-  /// Hash FNV-1a 32-bit du yyyy-MM-dd → seed reproductible pour le
-  /// service de sélection. Bit-identique cross-platform.
-  static int _seedForDate(DateTime date) {
-    final key = DailyChallengeService.dailyKeyForDate(date);
-    const fnvOffset = 0x811c9dc5;
-    const fnvPrime = 0x01000193;
-    var hash = fnvOffset;
-    for (final code in key.codeUnits) {
-      hash ^= code;
-      hash = (hash * fnvPrime) & 0xFFFFFFFF;
-    }
-    return hash;
   }
 }
 
