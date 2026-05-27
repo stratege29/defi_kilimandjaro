@@ -145,14 +145,25 @@ class _MountainListViewState extends ConsumerState<MountainListView>
 
   Future<void> _onMountainTap(Mountain m) async {
     if (!m.unlocked) {
+      // Distingue les deux causes possibles de verrou : star-gate (étoiles
+      // manquantes) vs progression normale (sommet précédent). Le message
+      // doit aider le joueur à comprendre ce qu'il doit faire ensuite —
+      // rejouer ses niveaux à 1 ★ ou terminer le sommet courant.
+      final String label;
+      if (m.isStarGated) {
+        label = 'mountains.locked_stargate_snackbar'.tr(
+          namedArgs: <String, String>{
+            'stars': (m.starsRequiredToUnlock ?? 0).toString(),
+          },
+        );
+      } else {
+        label = 'Termine le sommet précédent pour débloquer celui-ci';
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Termine le sommet précédent pour débloquer celui-ci',
-            style: AppTypography.bebas(),
-          ),
+          content: Text(label, style: AppTypography.bebas()),
           backgroundColor: AppColors.boisFonce,
-          duration: const Duration(milliseconds: 1800),
+          duration: const Duration(milliseconds: 2400),
         ),
       );
       return;
@@ -529,6 +540,7 @@ class _ProgressFooter extends StatelessWidget {
           _CtaButton(
             unlocked: unlocked,
             isCompleted: isCompleted,
+            starsRequiredToUnlock: mountain.starsRequiredToUnlock,
             onTap: onTap,
           ),
         ],
@@ -566,11 +578,18 @@ class _CtaButton extends StatelessWidget {
     required this.unlocked,
     required this.isCompleted,
     required this.onTap,
+    this.starsRequiredToUnlock,
   });
 
   final bool unlocked;
   final bool isCompleted;
   final VoidCallback onTap;
+
+  /// Étoiles manquantes pour franchir la star-gate. Non-null **uniquement**
+  /// quand la cause du verrou est la barrière étoiles (et non la
+  /// progression normale). Quand renseigné, le label change pour orienter
+  /// le joueur vers le replay des niveaux à 1 ★.
+  final int? starsRequiredToUnlock;
 
   @override
   Widget build(BuildContext context) {
@@ -581,7 +600,12 @@ class _CtaButton extends StatelessWidget {
     if (!unlocked) {
       bgColor = AppColors.boisFonce.withValues(alpha: 0.6);
       textColor = AppColors.texteTertiaire;
-      label = 'TERMINE LE SOMMET PRÉCÉDENT';
+      final stars = starsRequiredToUnlock ?? 0;
+      label = stars > 0
+          ? 'mountains.locked_stargate_cta'.tr(
+              namedArgs: <String, String>{'stars': stars.toString()},
+            )
+          : 'mountains.locked_progression_cta'.tr();
     } else if (isCompleted) {
       bgColor = AppColors.vertClair.withValues(alpha: 0.25);
       textColor = AppColors.vertClair;

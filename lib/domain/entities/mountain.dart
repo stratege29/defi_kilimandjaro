@@ -17,6 +17,7 @@ class Mountain extends Equatable {
     this.shape = MountainShape.cone,
     this.completedLevels = 0,
     this.unlocked = false,
+    this.starsRequiredToUnlock,
   });
 
   factory Mountain.fromJson(Map<String, dynamic> json) {
@@ -58,6 +59,20 @@ class Mountain extends Equatable {
   final int completedLevels;
   final bool unlocked;
 
+  /// Nombre d'étoiles cumulées que le joueur doit encore obtenir pour
+  /// débloquer cette montagne **via la porte star-gate**. Null si la
+  /// star-gate n'est pas active pour ce sommet (déjà débloqué ou bloqué
+  /// par la progression normale). Quand > 0, cette montagne reste
+  /// verrouillée même si la précédente est 100 % complétée — l'UX doit
+  /// afficher « il te manque N ★ » plutôt que « termine le sommet
+  /// précédent ».
+  final int? starsRequiredToUnlock;
+
+  /// Vrai si la cause du verrou est la star-gate (et non la progression
+  /// normale). Permet à l'UI de choisir le bon message.
+  bool get isStarGated =>
+      !unlocked && (starsRequiredToUnlock ?? 0) > 0;
+
   double get progress =>
       totalLevels == 0 ? 0 : completedLevels / totalLevels;
 
@@ -65,6 +80,7 @@ class Mountain extends Equatable {
     int? completedLevels,
     bool? unlocked,
     MountainShape? shape,
+    int? starsRequiredToUnlock,
   }) {
     return Mountain(
       id: id,
@@ -77,6 +93,8 @@ class Mountain extends Equatable {
       shape: shape ?? this.shape,
       completedLevels: completedLevels ?? this.completedLevels,
       unlocked: unlocked ?? this.unlocked,
+      starsRequiredToUnlock:
+          starsRequiredToUnlock ?? this.starsRequiredToUnlock,
     );
   }
 
@@ -92,5 +110,6 @@ class Mountain extends Equatable {
         shape,
         completedLevels,
         unlocked,
+        starsRequiredToUnlock,
       ];
 }
