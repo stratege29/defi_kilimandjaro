@@ -17,6 +17,8 @@
     "logs": "firebase functions:log",
     "seed:devinettes": "node scripts/seed_devinettes.js",
     "seed:devinettes:dry": "node scripts/seed_devinettes.js --dry-run",
+    "seed:daily": "node scripts/seed_daily_challenges.js",
+    "seed:daily:dry": "node scripts/seed_daily_challenges.js --dry-run",
     "test": "jest"
   },
   "dependencies": {
