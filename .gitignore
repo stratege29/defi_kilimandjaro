@@ -65,6 +65,10 @@ ui-debug.log
 flutter_*.log
 **/*-firebase-adminsdk-*.json
 serviceAccountKey.json
+# Admin service account utilisé par functions/scripts/seed_*.js
+# (généré depuis Firebase Console → Comptes de service). À NE JAMAIS committer.
+service-account.json
+**/service-account.json
 
 # Signing
 **/key.properties
