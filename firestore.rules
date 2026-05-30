@@ -64,6 +64,14 @@ service cloud.firestore {
                'display_name', 'display_name_updated_at',
                'avatar_id', 'avatar_updated_at'
              ]);
+
+      // Duel history subcollection — read-only by owner.
+      // Written only by Cloud Function endMatch (Admin SDK).
+      match /duel_history/{matchId} {
+        allow read: if request.auth != null
+          && request.auth.uid == uid;
+        allow write: if false;
+      }
     }
 
     // -------------------------------------------------------------------------

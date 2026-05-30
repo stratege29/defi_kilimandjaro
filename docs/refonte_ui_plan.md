@@ -108,8 +108,26 @@ en assets (éviter la dépendance réseau au 1er lancement).
       **Données réelles** : ELO/profil (Firestore `playerProfileStreamProvider`),
       challenge entrant (RTDB `pending_challenges/{uid}`).
       `dart analyze` → **No issues found**.
-      **TODO(presence)** : compteur "N en ligne" — pas de noeud RTDB `/lobby/stats/online` exposé.
-      **TODO(history)** : historique duels — pas de collection Firestore `duel_history`.
+
+### 5c — Présence en ligne & historique duels (PR additionnel)
+- [x] **Feature 1 — Présence "N grimpeurs en ligne"** :
+      - Compteur centralisé `/lobby/stats/online` en Realtime DB (incrément/décrement via CF `requestMatch` + `onDisconnect`).
+      - Client-side : `PresenceRepository.registerPresence()` appelé au lancement du hub (configurable ultérieurement).
+      - Provider Riverpod : `onlinePlayersCountProvider` (StreamProvider<int>) exposé et wired dans `_OnlineHeroCard`.
+      - Chip affichage : `AppChip(tone: success)` montrant "N grimpeur(s)" si > 0, caché si 0 ou non chargé.
+      - Sécurité RTDB : `/lobby/stats/online` lecture seule côté client, écriture CF uniquement.
+      `dart analyze` → **No issues found**.
+
+- [x] **Feature 2 — Historique des duels** :
+      - Persistence : Firestore subcollection `profiles/{uid}/duel_history/{matchId}` (écrit par CF `endMatch` pour les 2 joueurs).
+      - Entity : `DuelHistoryEntry` (opponent_uid/name, did_win, elo_delta, finished_at) avec méthodes utilitaires.
+      - Repository : `DuelHistoryRepository.watchRecentDuels()` (limit 5, ordered desc).
+      - Provider : `recentDuelsProvider` (StreamProvider<List<DuelHistoryEntry>>) exposé et wired dans `_RecentDuelsSection`.
+      - UI : `_DuelHistoryRow` affiche V/D badge, nom adversaire, timestamp relatif ("Il y a 2 h"), ±ELO delta (couleurs success/error).
+      - Empty state : honnête pour nouveaux joueurs ; loading/error gracefully handled.
+      - Cloud Function `endMatch` : 2 écritures batch pour créer les entrées duel_history côté server (intégrité).
+      - Sécurité Firestore : subcollection `duel_history` lecture seule par owner, écriture CF uniquement.
+      `dart analyze` → **No issues found**.
 
 ## Phase 6 — Popups / overlays
 - [x] **Mascottes griot réelles** : `victory_view` utilise déjà `griotVictory`,
@@ -175,10 +193,51 @@ en assets (éviter la dépendance réseau au 1er lancement).
 
 ---
 
+## Phase 5c — Déploiement (Présence + Historique)
+
+### Fichiers modifiés
+**Dart :**
+- `lib/domain/entities/duel_history_entry.dart` (nouveau)
+- `lib/data/repositories/duel_history_repository.dart` (nouveau)
+- `lib/data/repositories/presence_repository.dart` (nouveau)
+- `lib/presentation/duel/duel_hub_view.dart` (2 providers filés, UI)
+
+**Cloud Functions v2 (TypeScript) :**
+- `functions/src/matchmaking/endMatch.ts` (duel_history subcollection writes)
+- `functions/src/matchmaking/requestMatch.ts` (online counter increment/onDisconnect)
+
+**Security Rules :**
+- `database.rules.json` (`/lobby/stats/online` + `/presence/{uid}`)
+- `firestore.rules` (subcollection `duel_history` read-only by owner)
+
+**Documentation :**
+- `docs/refonte_ui_plan.md` (Phase 5c complete)
+
+### Deploy commands
+```bash
+# 1. Deploy Firestore rules + Realtime DB rules
+firebase deploy --only database,firestore:rules
+
+# 2. Deploy Cloud Functions v2 (endMatch + requestMatch + autres)
+firebase deploy --only functions
+
+# 3. Rebuild Flutter (ensure new Dart files compile)
+flutter pub get && flutter analyze
+```
+
+### Tradeoffs & notes
+- **Presence counter** : incrément côté CF `requestMatch`, onDisconnect décrémente. Léger délai de 30–60s si déconnexion brutale (délai RTDB standard). Acceptable pour un "environ N joueurs".
+- **Duel history** : écrit côté serveur (CF) pour intégrité. Chaque joueur a sa propre subcollection pour isolation.
+- **Graceful degradation** : chip présence cache si 0 ou loading ; section histoire affiche empty state si pas de duels.
+- **Pas de migration** : nouvelles collections créées on-demand lors du premier write.
+
+---
+
 ## Séquencement
-`0 → 1 → 3 → 2 → 4 → 5 → 6 → 7 → 8 → 9`
+`0 → 1 → 3 → 2 → 4 → 5 → 6 → 7 → 8 → 9 → 5c`
 
 ## Délégation agents
 - Phases 0–1 : `flutter-architect`.
 - Écrans/anim : `flutter-ui-expert`.
 - Défi temps réel : `firebase-multiplayer`.
+- Phases 5c (Présence + Histoire) : `firebase-multiplayer`.

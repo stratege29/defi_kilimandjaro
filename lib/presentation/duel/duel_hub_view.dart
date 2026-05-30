@@ -2,12 +2,16 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/data/repositories/duel_history_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/matchmaking_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/presence_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
+import 'package:defi_kilimandjaro/domain/entities/duel_history_entry.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/app_chip.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/mountain_hero_image.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/section_label.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -235,6 +239,9 @@ class _OnlineHeroCard extends ConsumerWidget {
     final elo = profile?.elo ?? 1000;
     final totalDuels = profile?.totalDuels ?? 0;
 
+    final onlineAsync = ref.watch(onlinePlayersCountProvider);
+    final onlineCount = onlineAsync.value ?? 0;
+
     // Rang approximatif basé sur l'ELO local (pas de classement global ici).
     // TODO(ranking): lire le rang depuis le leaderboard Firestore.
     final rankLabel = totalDuels == 0 ? 'Novice' : 'Classé';
@@ -280,16 +287,25 @@ class _OnlineHeroCard extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Label "EN LIGNE · CLASSÉ"
-                // TODO(presence): quand le compteur RTDB est disponible,
-                // remplacer le label statique par "N en ligne".
-                Text(
-                  'EN LIGNE · CLASSÉ',
-                  style: AppTypography.labelSm.copyWith(
-                    color: AppColors.orJour,
-                    letterSpacing: 1.4,
-                    fontSize: 11,
-                  ),
+                // Label "EN LIGNE · CLASSÉ" with optional online count chip
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'EN LIGNE · CLASSÉ',
+                      style: AppTypography.labelSm.copyWith(
+                        color: AppColors.orJour,
+                        letterSpacing: 1.4,
+                        fontSize: 11,
+                      ),
+                    ),
+                    // Show online count chip if available and > 0
+                    if (onlineAsync.hasValue && onlineCount > 0)
+                      AppChip(
+                        label: '$onlineCount grimpeur${onlineCount != 1 ? 's' : ''}',
+                        tone: AppChipTone.success,
+                      ),
+                  ],
                 ),
                 AppSpacing.gapSm,
                 // Altitude ELO + rang.
@@ -575,59 +591,218 @@ class _ActionCard extends StatelessWidget {
 
 /// Section historique des derniers duels.
 ///
-/// TODO(history): wirer sur un StreamProvider issu de
-/// `profiles/{uid}/duel_history` (Firestore, écrit par la CF `endMatch`).
-/// Pour l'instant, l'état vide est affiché avec un message honnête.
-class _RecentDuelsSection extends StatelessWidget {
+/// Wired to `recentDuelsProvider` (Firestore subcollection
+/// `profiles/{uid}/duel_history`, written by Cloud Function `endMatch`).
+/// Shows last 5 duels with result badge, opponent name, and ELO delta.
+/// Displays honest empty state for new players.
+class _RecentDuelsSection extends ConsumerWidget {
   const _RecentDuelsSection();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final duelsAsync = ref.watch(recentDuelsProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionLabel('Derniers duels'),
         AppSpacing.gapSm,
-        // TODO(history): remplacer par la liste réelle quand le stream existe.
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(
-            vertical: AppSpacing.lg,
-            horizontal: AppSpacing.md,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceContainer,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            border: Border.all(color: AppColors.hairline),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.show_chart_rounded,
-                size: 28,
-                color: AppColors.texteDisabled,
+        duelsAsync.when(
+          loading: () => Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSpacing.md,
+              horizontal: AppSpacing.md,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainer,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              border: Border.all(color: AppColors.hairline),
+            ),
+            child: const SizedBox(
+              height: 60,
+              child: Center(
+                child: CircularProgressIndicator(),
               ),
-              AppSpacing.gapSm,
-              Text(
-                'Aucun duel récent',
-                style: AppTypography.bodyMd.copyWith(
-                  color: AppColors.texteSecondaire,
-                  fontWeight: FontWeight.w600,
+            ),
+          ),
+          error: (err, st) => Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSpacing.lg,
+              horizontal: AppSpacing.md,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainer,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              border: Border.all(color: AppColors.hairline),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.error_outline_rounded,
+                  size: 28,
+                  color: AppColors.texteDisabled,
                 ),
-              ),
-              AppSpacing.gapXs,
-              Text(
-                'Lance ton premier défi pour voir tes résultats ici.',
-                textAlign: TextAlign.center,
-                style: AppTypography.bodySm.copyWith(
-                  color: AppColors.texteTertiaire,
+                AppSpacing.gapSm,
+                Text(
+                  'Erreur de chargement',
+                  style: AppTypography.bodyMd.copyWith(
+                    color: AppColors.texteSecondaire,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          data: (duels) {
+            if (duels.isEmpty) {
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.lg,
+                  horizontal: AppSpacing.md,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainer,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                  border: Border.all(color: AppColors.hairline),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.show_chart_rounded,
+                      size: 28,
+                      color: AppColors.texteDisabled,
+                    ),
+                    AppSpacing.gapSm,
+                    Text(
+                      'Aucun duel récent',
+                      style: AppTypography.bodyMd.copyWith(
+                        color: AppColors.texteSecondaire,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    AppSpacing.gapXs,
+                    Text(
+                      'Lance ton premier défi pour voir tes résultats ici.',
+                      textAlign: TextAlign.center,
+                      style: AppTypography.bodySm.copyWith(
+                        color: AppColors.texteTertiaire,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return Column(
+              children: [
+                for (final duel in duels) ...[
+                  _DuelHistoryRow(duel: duel),
+                  if (duel != duels.last) AppSpacing.gapXs,
+                ],
+              ],
+            );
+          },
         ),
       ],
     );
+  }
+}
+
+/// Single duel history row widget.
+class _DuelHistoryRow extends StatelessWidget {
+  const _DuelHistoryRow({required this.duel});
+
+  final DuelHistoryEntry duel;
+
+  @override
+  Widget build(BuildContext context) {
+    final resultColor = duel.didWin ? AppColors.successSoft : AppColors.errorSoft;
+    final deltaColor = duel.eloDelta >= 0 ? AppColors.success : AppColors.error;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(color: AppColors.hairline),
+      ),
+      child: Row(
+        children: [
+          // Result badge (V/D)
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: resultColor,
+              borderRadius: BorderRadius.circular(AppSpacing.sm),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              duel.resultBadge,
+              style: AppTypography.headingSm.copyWith(
+                color: duel.didWin ? AppColors.success : AppColors.error,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          AppSpacing.hGapSm,
+          // Opponent name + timestamp
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  duel.displayOpponentName,
+                  style: AppTypography.bodyMd.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (duel.finishedAt != null)
+                  Text(
+                    _formatDuelTime(duel.finishedAt!),
+                    style: AppTypography.bodySm.copyWith(
+                      color: AppColors.texteTertiaire,
+                      fontSize: 12,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          AppSpacing.hGapSm,
+          // ELO delta
+          Text(
+            duel.eloDeltaLabel,
+            style: AppTypography.labelSm.copyWith(
+              color: deltaColor,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Format time since duel for display (e.g., "Il y a 2 heures").
+  static String _formatDuelTime(DateTime finishedAt) {
+    final now = DateTime.now();
+    final diff = now.difference(finishedAt);
+
+    if (diff.inMinutes < 1) return "À l'instant";
+    if (diff.inMinutes < 60) return 'Il y a ${diff.inMinutes} min';
+    if (diff.inHours < 24) return 'Il y a ${diff.inHours} h';
+    if (diff.inDays < 7) return 'Il y a ${diff.inDays} j';
+    if (diff.inDays < 30) return 'Il y a ${diff.inDays ~/ 7} sem';
+    return 'Il y a ${diff.inDays ~/ 30} mois';
   }
 }

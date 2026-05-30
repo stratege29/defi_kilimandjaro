@@ -1,6 +1,20 @@
 {
   "rules": {
     "lobby": {
+      ".read": "auth != null",
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid === $uid"
+      },
+      "stats": {
+        ".read": "auth != null",
+        "online": {
+          ".read": "auth != null",
+          ".write": "false"
+        }
+      }
+    },
+    "presence": {
       "$uid": {
         ".read": "auth != null",
         ".write": "auth != null && auth.uid === $uid"
