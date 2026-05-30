@@ -235,6 +235,30 @@ flutter pub get && flutter analyze
 
 ---
 
+## ⚙️ Bootstrap worktree & déploiement Firebase (gotchas)
+
+Un worktree neuf ne contient pas les fichiers gitignored (générés/secrets/node_modules). Avant :
+
+- **`flutter run`** : `dart run build_runner build --delete-conflicting-outputs` + copier
+  `lib/firebase_options.dart` (+ `ios/Runner/GoogleService-Info.plist` / `android/app/google-services.json`)
+  depuis le repo principal. *(cf. `MEMORY/worktree_bootstrap.md`)*
+- **`firebase deploy --only functions`** : **`cd functions && npm install`** d'abord —
+  `functions/node_modules` est gitignored ; sans lui, le predeploy `tsc` échoue avec ~120 erreurs
+  *"Cannot find module …"* (toutes les fonctions, pas seulement les modifiées → ce n'est pas le code).
+  Le `eslint: command not found` du script lint est non bloquant (`|| true`).
+
+**⚠️ Caveat fonctions admin** : `origin/main` a `functions/src/admin/` (publishPack, rollbackPack,
+upsertDevinette, bulkImportDevinettes, validatePackDraft, curateSubmission) que **cette branche refonte
+n'a pas** (divergence avant l'ajout du pipeline admin). Déployer les functions **depuis ce worktree**
+fait proposer à Firebase de **supprimer ces 6 fonctions de prod** → **répondre `N` (No)**. Fix propre :
+déployer les functions depuis `main`, ou merger `main` dans la branche avant deploy.
+
+**Déploiement effectué** (2026-05-30, projet `kilimandjaro-dev`) : règles RTDB+Firestore + functions
+duel (`requestMatch` présence, `endMatch` historique) déployées avec succès ; 6 fonctions admin
+préservées (répondu N).
+
+---
+
 ## Séquencement
 `0 → 1 → 3 → 2 → 4 → 5 → 6 → 7 → 8 → 9 → 5c`
 
