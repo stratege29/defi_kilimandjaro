@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 
 /// Barre de minuterie tam-tam (cf. plan.md §2 Phase 1.2).
 ///
-/// - Vert normal
-/// - Orange si timeLeft < 15 s
-/// - Rouge avec shimmer si timeLeft < 8 s
+/// Refonte 2026 :
+/// - Or (accent principal) en temps normal
+/// - Ambré (warning) si timeLeft < 12 s
+/// - Kola avec shimmer si timeLeft < 5 s
 class TimerBar extends StatefulWidget {
   const TimerBar({required this.timeLeft, required this.totalTime, super.key});
 
@@ -45,9 +46,9 @@ class _TimerBarState extends State<TimerBar>
   }
 
   Color _barColor() {
-    if (widget.timeLeft < 8) return AppColors.rouge;
-    if (widget.timeLeft < 15) return AppColors.orChaud;
-    return AppColors.vertClair;
+    if (widget.timeLeft < 5) return AppColors.kola;
+    if (widget.timeLeft < 12) return AppColors.warning;
+    return AppColors.orJour;
   }
 
   @override
@@ -56,7 +57,7 @@ class _TimerBarState extends State<TimerBar>
         ? 0.0
         : widget.timeLeft / widget.totalTime;
     final barColor = _barColor();
-    final isDanger = widget.timeLeft < 8;
+    final isDanger = widget.timeLeft < 5;
 
     return RepaintBoundary(
       child: Padding(

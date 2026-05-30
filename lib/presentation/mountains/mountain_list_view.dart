@@ -10,6 +10,8 @@ import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/altimeter_rail.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/atmosphere_layer.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/mountain_hero_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
@@ -381,9 +383,10 @@ class _MountainPage extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Silhouette FG — stripped SVG (transparent au-dessus de la
-        // montagne) qui laisse passer AtmosphereLayer + nuages parallax.
-        // Ancrée au bas de l'écran avec un haut réservé au HUD.
+        // Peinture réelle du sommet (hero PNG) au premier plan, transparente
+        // au-dessus de l'AtmosphereLayer + nuages parallax. Repli : silhouette
+        // vectorielle pour les sommets sans visuel généré. Le halo pulsé
+        // signale le sommet courant à conquérir (indépendant du PNG/vecteur).
         Positioned(
           left: 0,
           right: 0,
@@ -391,13 +394,43 @@ class _MountainPage extends StatelessWidget {
           top: size.height * 0.18,
           child: AnimatedBuilder(
             animation: pulseAnim,
-            builder: (context, _) {
-              return MountainSilhouetteVector(
-                mountain: mountain,
-                hasPulse: isCurrentTarget && !_isCompleted,
-                pulseValue: pulseAnim.value,
+            builder: (context, child) {
+              final showPulse = isCurrentTarget && !_isCompleted;
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  if (showPulse)
+                    Center(
+                      child: Transform.scale(
+                        scale: 0.92 + 0.14 * pulseAnim.value,
+                        child: SizedBox(
+                          width: 240,
+                          height: 240,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  AppColors.orJour.withValues(
+                                    alpha: 0.18 * pulseAnim.value,
+                                  ),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  child!,
+                ],
               );
             },
+            child: MountainHeroImage(
+              mountainId: mountain.id,
+              alignment: Alignment.bottomCenter,
+              fallback: MountainSilhouetteVector(mountain: mountain),
+            ),
           ),
         ),
 
@@ -441,7 +474,7 @@ class _NameHeader extends StatelessWidget {
       opacity: opacity,
       child: Row(
         children: [
-          Text(mountain.flagEmoji, style: const TextStyle(fontSize: 20)),
+          FlagRoundel(countryCode: mountain.countryCode, size: 26),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -612,7 +645,7 @@ class _CtaButton extends StatelessWidget {
       label = 'GRAVIR À NOUVEAU';
     } else {
       bgColor = AppColors.orSoleil;
-      textColor = AppColors.boisFonce;
+      textColor = AppColors.surface;
       label = 'GRAVIR';
     }
 

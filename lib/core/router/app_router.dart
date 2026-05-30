@@ -5,6 +5,7 @@ import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_create_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_deep_link_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_entry_view.dart';
+import 'package:defi_kilimandjaro/presentation/duel/duel_hub_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_play_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_result_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_scan_view.dart';
@@ -12,7 +13,6 @@ import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_view.dart';
 import 'package:defi_kilimandjaro/presentation/home/home_view.dart';
-import 'package:defi_kilimandjaro/presentation/hub/hub_view.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_confirm_view.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_scan_view.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_view.dart';
@@ -107,7 +107,7 @@ class _RouterNotifier extends ChangeNotifier {
 /// Provider du [GoRouter] configuré avec le gate "hasChosenFreePack".
 ///
 /// Exposé comme provider pour que le notifier ait accès au [Ref] Riverpod.
-/// Consommé dans [KilimandjaroApp] via `ref.watch(appRouterProvider)`.
+/// Consommé dans `KilimandjaroApp` via `ref.watch(appRouterProvider)`.
 final appRouterProvider = Provider<GoRouter>((ref) {
   final notifier = _RouterNotifier(ref);
   return GoRouter(
@@ -166,7 +166,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     GoRoute(
       path: AppRoutes.hub,
       name: 'hub',
-      builder: (_, __) => const HubView(),
+      // Phase 5b: Défi tab now lands on the new DuelHubView (Vert Nuit redesign).
+      builder: (_, __) => const DuelHubView(),
     ),
     GoRoute(
       path: AppRoutes.game,

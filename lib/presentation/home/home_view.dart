@@ -17,7 +17,6 @@ import 'package:defi_kilimandjaro/presentation/home/widgets/packs_section.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/recommended_match_banner.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/stats_row.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/sticky_cta_bar.dart';
-import 'package:defi_kilimandjaro/presentation/home/widgets/welcome_card.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,8 +27,7 @@ import 'package:go_router/go_router.dart';
 /// Page d'atterrissage par défaut au lancement de l'app. Composition de
 /// blocs world-class :
 /// - [HomeHeader] : streak pulsé · KILIMANDJARO · cauris · altitude (Hero)
-/// - [WelcomeCard] : griot animé + salutation + bulle parchemin proverbe
-/// - [ContinueAscentCard] : HERO sommet en cours, silhouette + Fraunces XL
+/// - [ContinueAscentCard] : HERO sommet en cours, peinture du sommet + Fraunces XL
 /// - [DuelsCarousel] : 3 cards défis horizontales
 /// - [RecommendedMatchBanner] : stub conditionnel
 /// - [PacksSection] : carrousel packs possédés + SYNC
@@ -86,21 +84,22 @@ class _HomeViewState extends ConsumerState<HomeView> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                 children: const [
-                  WelcomeCard(),
-                  SizedBox(height: 22),
-                  DailyChallengeCard(),
-                  SizedBox(height: 22),
+                  // Zone 1 — HÉROS : continuer l'ascension (peinture du sommet).
                   ContinueAscentCard(),
-                  SizedBox(height: 22),
+                  SizedBox(height: 20),
+                  // Zone 2 — boucles du jour : défi quotidien + duels.
+                  DailyChallengeCard(),
+                  SizedBox(height: 20),
                   DuelsCarousel(),
-                  SizedBox(height: 22),
+                  SizedBox(height: 20),
                   RecommendedMatchBanner(),
                   // RecommendedMatchBanner se réduit à SizedBox.shrink quand
                   // aucune reco n'est dispo — pas besoin de SizedBox conditionnel.
+                  // Zone 3 — découverte : packs, actus, stats (monétisation).
                   PacksSection(),
-                  SizedBox(height: 22),
+                  SizedBox(height: 20),
                   NewsCarousel(),
-                  SizedBox(height: 22),
+                  SizedBox(height: 20),
                   StatsRow(),
                   SizedBox(height: 16),
                 ],

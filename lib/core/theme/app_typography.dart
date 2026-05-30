@@ -2,41 +2,28 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Typographie officielle Kilimandjaro — refonte 2026.
+/// Typographie officielle Kilimandjaro — **refonte 2026 (2 familles)**.
 ///
-/// Triade :
-/// - **Fraunces** (variable, axes `wght/SOFT/WONK`) — display didone moderne
-///   pour les écrans d'accomplissement, mots-réponses, altitudes. Remplace
-///   Playfair Display (datée DTP-2015).
-/// - **Barlow Condensed** (variable, axe `wght` 100-900) — grotesque
-///   condensée pour titres, boutons, chips, navigation. Remplace Bebas Neue
-///   (devenue le "Comic Sans du sport mobile 2018-2022").
-/// - **Crimson Pro** (variable, axe `wght`) — serif littéraire à grande
-///   x-height pour le corps de texte : proverbes, devinettes, explications.
-///   Conservée (la meilleure des trois originales).
+/// Duo :
+/// - **Fraunces** (variable, axes `wght/SOFT/opsz`) — didone moderne à l'âme
+///   éditoriale. Réservée aux moments forts : logo, mots-réponses, altitudes,
+///   proverbes. C'est la signature culturelle.
+/// - **Hanken Grotesk** (variable, `wght` 100-900) — grotesque humaniste
+///   propre et premium pour TOUTE l'UI : titres, boutons, labels, navigation,
+///   corps. Remplace Barlow Condensed (daté "mobile game") ET Crimson Pro.
+///
+/// Le passage condensé → grotesk humaniste est le levier n°1 du "ça fait pro".
 ///
 /// ## Deux APIs cohabitent
-///
-/// 1. **Tokens 2026** (recommandé) — `display{Xl,Lg,Md,Sm}`,
-///    `heading{Xl,Lg,Md,Sm}`, `body{Lg,Md,Sm}`, `label{Sm,Xs}`.
-///    Tailles, poids, line-height et couleur sémantiques pré-réglés.
-///    Override via `.copyWith(color: ...)` si besoin.
-///
-/// 2. **Helpers legacy** — `bebas()`, `playfair()`, `crimson()`,
-///    `taglineItalic()`. Conservés pour compat ; **reroutés** vers les
-///    nouvelles fontes (Barlow/Fraunces) pour aligner globalement le
-///    visuel sans refacto par site.
+/// 1. **Tokens 2026** (recommandé) — `display/heading/body/label`.
+/// 2. **Helpers legacy** (`bebas/playfair/crimson/...`) — noms conservés pour
+///    compat, **reroutés** vers Hanken/Fraunces.
 abstract final class AppTypography {
   // ============================================================
-  // TOKENS 2026 — type scale tokenisée (13 styles)
-  //
-  // Usage : `AppTypography.headingMd` puis `.copyWith(color: ...)` si
-  // une couleur sémantique différente est nécessaire.
+  // DISPLAY (Fraunces) — accomplissements, moments solennels.
   // ============================================================
 
-  // ---- DISPLAY (Fraunces) — écrans d'accomplissement, moments solennels.
-
-  /// Logo splash uniquement — 64pt Fraunces w900.
+  /// Logo splash — 64pt Fraunces w900.
   static TextStyle get displayXl => GoogleFonts.fraunces(
     fontSize: 64,
     fontWeight: FontWeight.w900,
@@ -55,7 +42,6 @@ abstract final class AppTypography {
   );
 
   /// Mot-réponse VictoryView — 40pt Fraunces w700.
-  /// Moment éditorial fort : la fonte la plus noble du design system.
   static TextStyle get displayMd => GoogleFonts.fraunces(
     fontSize: 40,
     fontWeight: FontWeight.w700,
@@ -72,116 +58,119 @@ abstract final class AppTypography {
     color: AppColors.orJour,
   );
 
-  // ---- HEADING (Barlow Condensed) — titres sections, AppBars, CTA.
+  // ============================================================
+  // HEADING (Hanken Grotesk) — titres sections, AppBars, CTA.
+  // Letter-spacing quasi nul : un grotesk n'a pas besoin d'aération.
+  // ============================================================
 
-  /// Titres écrans, sections — 28pt Barlow Cond w700.
-  static TextStyle get headingXl => GoogleFonts.barlowCondensed(
+  /// Titres écrans, sections — 28pt Hanken w800.
+  static TextStyle get headingXl => GoogleFonts.hankenGrotesk(
     fontSize: 28,
+    fontWeight: FontWeight.w800,
+    letterSpacing: -0.4,
+    height: 1.15,
+    color: AppColors.textePrimaire,
+  );
+
+  /// AppBar titles, section headers — 22pt Hanken w700.
+  static TextStyle get headingLg => GoogleFonts.hankenGrotesk(
+    fontSize: 22,
     fontWeight: FontWeight.w700,
-    letterSpacing: 0.5,
+    letterSpacing: -0.2,
     height: 1.2,
     color: AppColors.textePrimaire,
   );
 
-  /// AppBar titles, section headers — 22pt Barlow Cond w700.
-  static TextStyle get headingLg => GoogleFonts.barlowCondensed(
-    fontSize: 22,
+  /// Boutons primaires, CTA — 17pt Hanken w700.
+  static TextStyle get headingMd => GoogleFonts.hankenGrotesk(
+    fontSize: 17,
     fontWeight: FontWeight.w700,
-    letterSpacing: 1,
+    letterSpacing: 0.2,
     height: 1.25,
     color: AppColors.textePrimaire,
   );
 
-  /// Boutons primaires, CTA principaux — 18pt Barlow Cond w600.
-  static TextStyle get headingMd => GoogleFonts.barlowCondensed(
-    fontSize: 18,
+  /// Boutons secondaires, actions — 15pt Hanken w600.
+  static TextStyle get headingSm => GoogleFonts.hankenGrotesk(
+    fontSize: 15,
     fontWeight: FontWeight.w600,
-    letterSpacing: 1,
+    letterSpacing: 0.2,
     height: 1.3,
     color: AppColors.textePrimaire,
   );
 
-  /// Boutons secondaires, action buttons — 15pt Barlow Cond w600.
-  static TextStyle get headingSm => GoogleFonts.barlowCondensed(
-    fontSize: 15,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0.5,
-    height: 1.35,
-    color: AppColors.textePrimaire,
-  );
+  // ============================================================
+  // BODY — proverbes en Fraunces (chaleur), reste en Hanken (lisibilité).
+  // ============================================================
 
-  // ---- BODY (Crimson Pro) — lectures longues, proverbes.
-
-  /// Proverbes, citations principales — 18pt Crimson w400, italic.
-  static TextStyle get bodyLg => GoogleFonts.crimsonPro(
+  /// Proverbes, citations — 18pt Fraunces italic w400. Le moment serif.
+  static TextStyle get bodyLg => GoogleFonts.fraunces(
     fontSize: 18,
     fontWeight: FontWeight.w400,
-    height: 1.6,
-    color: AppColors.textePrimaire,
-  );
-
-  /// Devinettes (RiddleCard), corps explicatif — 15pt Crimson w400.
-  static TextStyle get bodyMd => GoogleFonts.crimsonPro(
-    fontSize: 15,
-    fontWeight: FontWeight.w400,
+    fontStyle: FontStyle.italic,
     height: 1.55,
     color: AppColors.textePrimaire,
   );
 
-  /// Descriptions, captions, métadonnées — 13pt Crimson w400.
-  static TextStyle get bodySm => GoogleFonts.crimsonPro(
-    fontSize: 13,
+  /// Devinettes, corps explicatif — 15pt Hanken w400.
+  static TextStyle get bodyMd => GoogleFonts.hankenGrotesk(
+    fontSize: 15,
     fontWeight: FontWeight.w400,
     height: 1.5,
-    color: AppColors.texteSecondaire,
-  );
-
-  // ---- LABEL (Barlow Condensed) — navigation, chips, tags.
-
-  /// Navigation labels, chips principaux — 12pt Barlow Cond w500.
-  static TextStyle get labelSm => GoogleFonts.barlowCondensed(
-    fontSize: 12,
-    fontWeight: FontWeight.w500,
-    letterSpacing: 0.3,
-    height: 1.4,
     color: AppColors.textePrimaire,
   );
 
-  /// Graduations, badges miniatures — 10pt Barlow Cond w500.
-  static TextStyle get labelXs => GoogleFonts.barlowCondensed(
-    fontSize: 10,
-    fontWeight: FontWeight.w500,
+  /// Descriptions, captions, métadonnées — 13pt Hanken w400.
+  static TextStyle get bodySm => GoogleFonts.hankenGrotesk(
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+    height: 1.45,
+    color: AppColors.texteSecondaire,
+  );
+
+  // ============================================================
+  // LABEL (Hanken Grotesk) — navigation, chips, tags.
+  // ============================================================
+
+  /// Navigation labels, chips — 12pt Hanken w600.
+  static TextStyle get labelSm => GoogleFonts.hankenGrotesk(
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 0.2,
+    height: 1.35,
+    color: AppColors.textePrimaire,
+  );
+
+  /// Graduations, badges miniatures — 10.5pt Hanken w600.
+  static TextStyle get labelXs => GoogleFonts.hankenGrotesk(
+    fontSize: 10.5,
+    fontWeight: FontWeight.w600,
     letterSpacing: 0.3,
-    height: 1.4,
+    height: 1.35,
     color: AppColors.texteSecondaire,
   );
 
   // ============================================================
   // HELPERS LEGACY — reroutés vers les nouvelles fontes.
-  //
-  // Le nom historique (`bebas`, `playfair`) est conservé pour ne pas
-  // casser les call sites existants ; le RENDU est désormais aligné
-  // avec le design system 2026. Migrer vers les tokens ci-dessus au
-  // fil des refactos de composants.
   // ============================================================
 
-  /// **Reroute vers Barlow Condensed.** Le nom `bebas` est conservé
-  /// pour compat ; les call sites existants rendent désormais en
-  /// Barlow w600 (au lieu de Bebas Neue).
+  /// **Reroute vers Hanken Grotesk.** Nom `bebas` conservé pour compat ;
+  /// rendu désormais en grotesk humaniste w700 (au lieu de Barlow Condensed).
+  /// Le `letterSpacing` historique est neutralisé (un grotesk n'en a pas
+  /// besoin) pour éviter le tracking exagéré hérité du condensé.
   static TextStyle bebas({
     double size = 16,
     Color color = AppColors.ivoire,
     double letterSpacing = 1,
-    FontWeight weight = FontWeight.w600,
-  }) => GoogleFonts.barlowCondensed(
+    FontWeight weight = FontWeight.w700,
+  }) => GoogleFonts.hankenGrotesk(
     fontSize: size,
     color: color,
-    letterSpacing: letterSpacing,
+    letterSpacing: (letterSpacing - 1).clamp(-0.5, 0.5),
     fontWeight: weight,
   );
 
-  /// **Reroute vers Fraunces.** Le nom `playfair` est conservé pour
-  /// compat ; rendu désormais en Fraunces (didone optique variable).
+  /// **Reroute vers Fraunces.** Nom `playfair` conservé pour compat.
   static TextStyle playfair({
     double size = 28,
     Color color = AppColors.orSoleil,
@@ -194,21 +183,23 @@ abstract final class AppTypography {
     fontStyle: style,
   );
 
-  /// Crimson Pro variable (inchangé — la meilleure des trois originales).
+  /// **Reroute vers Fraunces.** Nom `crimson` conservé pour compat : tout ce
+  /// qui était serif littéraire (proverbes, citations, libellés italiques)
+  /// reste serif, en Fraunces (optical text). L'UI neuve utilise [bodyMd].
   static TextStyle crimson({
     double size = 16,
     Color color = AppColors.ivoire,
     FontStyle? style,
-  }) => GoogleFonts.crimsonPro(fontSize: size, color: color, fontStyle: style);
+  }) => GoogleFonts.fraunces(fontSize: size, color: color, fontStyle: style);
 
-  /// Tagline italique bois clair (splash screen).
-  static TextStyle taglineItalic({double size = 14}) => GoogleFonts.crimsonPro(
+  /// Tagline italique (splash) — Fraunces italic crème chaude.
+  static TextStyle taglineItalic({double size = 14}) => GoogleFonts.fraunces(
     fontSize: size,
     color: AppColors.tagline,
     fontStyle: FontStyle.italic,
   );
 
-  /// Logo "K" géant du splash — désormais Fraunces w900.
+  /// Logo "K" géant du splash — Fraunces w900.
   static TextStyle logoK = GoogleFonts.fraunces(
     fontSize: 96,
     color: AppColors.orJour,
@@ -216,8 +207,8 @@ abstract final class AppTypography {
     height: 1,
   );
 
-  /// Titre KILIMANDJARO sous le logo — désormais Barlow Condensed w700.
-  static TextStyle logoTitle = GoogleFonts.barlowCondensed(
+  /// Titre KILIMANDJARO sous le logo — Hanken Grotesk w700, tracking large.
+  static TextStyle logoTitle = GoogleFonts.hankenGrotesk(
     fontSize: 18,
     color: AppColors.textePrimaire,
     letterSpacing: 4,

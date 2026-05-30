@@ -210,7 +210,6 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                             textAlign: TextAlign.center,
                             style: AppTypography.crimson(
                               size: 14,
-                              color: AppColors.textePrimaire,
                               style: FontStyle.italic,
                             ),
                           ),
@@ -269,14 +268,14 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                 child: ElevatedButton(
                   onPressed: () => context.go(AppRoutes.hub),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.vertClair,
+                    backgroundColor: AppColors.orJour,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   child: Text(
                     'RETOUR AU HUB',
                     style: AppTypography.bebas(
                       size: 18,
-                      color: AppColors.vertForet,
+                      color: AppColors.surface,
                     ),
                   ),
                 ),
@@ -289,18 +288,18 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                     onPressed: _onRematch,
                     icon: const Icon(
                       Icons.replay,
-                      color: AppColors.vertClair,
+                      color: AppColors.kola,
                       size: 20,
                     ),
                     label: Text(
                       'REMATCH',
                       style: AppTypography.bebas(
                         size: 18,
-                        color: AppColors.vertClair,
+                        color: AppColors.kola,
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.vertClair),
+                      side: const BorderSide(color: AppColors.kola),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),

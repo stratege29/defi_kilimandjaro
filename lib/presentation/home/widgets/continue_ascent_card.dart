@@ -6,6 +6,8 @@ import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/home/home_view.dart' show launchNextLevel;
 import 'package:defi_kilimandjaro/presentation/home/providers/current_mountain_provider.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/mountain_hero_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -104,16 +106,23 @@ class _AscentCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Silhouette de la montagne en background, alignée bas.
+                // Peinture réelle du sommet en cours, alignée en bas à droite
+                // (repli : silhouette vectorielle pour les sommets sans hero).
                 Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  height: 140,
-                  child: Opacity(
-                    opacity: 0.42,
-                    child: MountainSilhouetteVector(
-                      mountain: mountain,
+                  right: -8,
+                  bottom: -6,
+                  top: 8,
+                  width: 184,
+                  child: MountainHeroImage(
+                    mountainId: mountain.id,
+                    alignment: Alignment.bottomRight,
+                    opacity: 0.5,
+                    fallback: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Opacity(
+                        opacity: 0.42,
+                        child: MountainSilhouetteVector(mountain: mountain),
+                      ),
                     ),
                   ),
                 ),
@@ -150,9 +159,9 @@ class _AscentCard extends StatelessWidget {
                                 const SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    Text(
-                                      mountain.flagEmoji,
-                                      style: const TextStyle(fontSize: 18),
+                                    FlagRoundel(
+                                      countryCode: mountain.countryCode,
+                                      size: 22,
                                     ),
                                     const SizedBox(width: 6),
                                     Flexible(

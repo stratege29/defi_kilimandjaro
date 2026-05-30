@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
@@ -128,8 +129,8 @@ class _DuelIntroOverlayState extends ConsumerState<DuelIntroOverlay>
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Fond dégradé savane sombre.
-          const _SavannahBackground(),
+          // Fond VERSUS — split diagonal (or vs indigo) + seam + vignette.
+          const Positioned.fill(child: _VersusBackdrop()),
 
           // Flash blanc au croisement des portraits.
           AnimatedBuilder(
@@ -156,6 +157,7 @@ class _DuelIntroOverlayState extends ConsumerState<DuelIntroOverlay>
                         roundsWon: self?.roundsWon ?? 0,
                         alignment: Alignment.centerRight,
                         showElo: widget.session.isRanked,
+                        accent: AppColors.orJour,
                       ),
                     ),
                   ),
@@ -174,6 +176,7 @@ class _DuelIntroOverlayState extends ConsumerState<DuelIntroOverlay>
                         roundsWon: opponent?.roundsWon ?? 0,
                         alignment: Alignment.centerLeft,
                         showElo: widget.session.isRanked,
+                        accent: AppColors.cielHauteur,
                       ),
                     ),
                   ),
@@ -221,26 +224,120 @@ class _DuelIntroOverlayState extends ConsumerState<DuelIntroOverlay>
 // Sous-widgets privés
 // ---------------------------------------------------------------------------
 
-class _SavannahBackground extends StatelessWidget {
-  const _SavannahBackground();
+/// Fond « écran VERSUS » façon jeu de combat : split diagonal teinté
+/// (or côté joueur, indigo côté adversaire), lame dorée au centre, montagne
+/// silhouettée en bas et vignette. Aucun `MaskFilter.blur` (perf iOS 26).
+class _VersusBackdrop extends StatelessWidget {
+  const _VersusBackdrop();
 
   @override
   Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.boisFonce,
-            AppColors.vertForet,
-            Colors.black,
-          ],
-          stops: [0, 0.45, 1],
-        ),
-      ),
+    return CustomPaint(
+      painter: _VersusBackdropPainter(),
+      size: Size.infinite,
     );
   }
+}
+
+class _VersusBackdropPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final rect = Offset.zero & size;
+
+    // Base sombre.
+    canvas.drawRect(rect, Paint()..color = AppColors.surface);
+
+    // Diagonale : 60 % en haut → 40 % en bas.
+    final topX = w * 0.60;
+    final botX = w * 0.40;
+
+    // Camp joueur (gauche, or/kola).
+    final leftPath = Path()
+      ..moveTo(0, 0)
+      ..lineTo(topX, 0)
+      ..lineTo(botX, h)
+      ..lineTo(0, h)
+      ..close();
+    canvas.drawPath(
+      leftPath,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.kola.withValues(alpha: 0.26),
+            AppColors.orJour.withValues(alpha: 0.12),
+            AppColors.surface.withValues(alpha: 0),
+          ],
+        ).createShader(rect),
+    );
+
+    // Camp adversaire (droite, indigo).
+    final rightPath = Path()
+      ..moveTo(topX, 0)
+      ..lineTo(w, 0)
+      ..lineTo(w, h)
+      ..lineTo(botX, h)
+      ..close();
+    canvas.drawPath(
+      rightPath,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            AppColors.info.withValues(alpha: 0.30),
+            AppColors.cielHauteur.withValues(alpha: 0.12),
+            AppColors.surface.withValues(alpha: 0),
+          ],
+        ).createShader(rect),
+    );
+
+    // Montagne silhouettée (on s'affronte pour le sommet).
+    final mtn = Path()
+      ..moveTo(0, h)
+      ..lineTo(w * 0.14, h * 0.74)
+      ..lineTo(w * 0.30, h * 0.82)
+      ..lineTo(w * 0.50, h * 0.62)
+      ..lineTo(w * 0.72, h * 0.80)
+      ..lineTo(w * 0.88, h * 0.70)
+      ..lineTo(w, h * 0.80)
+      ..lineTo(w, h)
+      ..close();
+    canvas
+      ..drawPath(
+        mtn,
+        Paint()..color = Colors.black.withValues(alpha: 0.45),
+      )
+      // Vignette.
+      ..drawRect(
+        rect,
+        Paint()
+          ..shader = RadialGradient(
+            center: const Alignment(0, -0.1),
+            radius: 1,
+            colors: [
+              Colors.transparent,
+              Colors.black.withValues(alpha: 0.6),
+            ],
+            stops: const [0.42, 1],
+          ).createShader(rect),
+      )
+      // Lame dorée centrale.
+      ..drawLine(
+        Offset(topX, -h * 0.05),
+        Offset(botX, h * 1.05),
+        Paint()
+          ..color = AppColors.orJour
+          ..strokeWidth = 2.5
+          ..strokeCap = StrokeCap.round,
+      );
+  }
+
+  @override
+  bool shouldRepaint(_VersusBackdropPainter oldDelegate) => false;
 }
 
 /// Portrait d'un joueur — branché sur [playerProfileProvider] pour afficher :
@@ -258,6 +355,7 @@ class _PlayerPortrait extends ConsumerWidget {
     required this.roundsWon,
     required this.alignment,
     required this.showElo,
+    required this.accent,
   });
 
   final String label;
@@ -265,6 +363,10 @@ class _PlayerPortrait extends ConsumerWidget {
   final int roundsWon;
   final Alignment alignment;
   final bool showElo;
+
+  /// Couleur de camp (or côté joueur, indigo côté adversaire) — anneau
+  /// d'avatar, halo et plaque de nom.
+  final Color accent;
 
   static const String _fallbackPseudo = 'Joueur';
 
@@ -301,30 +403,18 @@ class _PlayerPortrait extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Étiquette "Moi" / "Adversaire" en petit au-dessus.
-              Text(
-                label,
-                style: AppTypography.labelSm.copyWith(
-                  color: AppColors.orJour,
-                  letterSpacing: 1.2,
-                ),
-              ),
-              const SizedBox(height: 6),
-              // Avatar circulaire (SVG ou initiale).
+              // Avatar circulaire (SVG ou initiale), anneau couleur de camp.
               Container(
-                width: 80,
-                height: 80,
+                width: 88,
+                height: 88,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: AppColors.surfaceContainer,
-                  border: Border.all(
-                    color: AppColors.orJour,
-                    width: 3,
-                  ),
+                  border: Border.all(color: accent, width: 3),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.orJour.withValues(alpha: 0.4),
-                      blurRadius: 16,
+                      color: accent.withValues(alpha: 0.5),
+                      blurRadius: 22,
                       spreadRadius: 2,
                     ),
                   ],
@@ -339,25 +429,61 @@ class _PlayerPortrait extends ConsumerWidget {
                       )
                     : _InitialBadge(initial: initial),
               ),
-              const SizedBox(height: 10),
-              // Pseudo.
-              Text(
-                pseudo,
-                style: AppTypography.headingMd,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-              if (eloLabel != null) ...[
-                const SizedBox(height: 2),
-                Text(
-                  eloLabel,
-                  style: AppTypography.bebas(
-                    size: 12,
-                    color: AppColors.texteSecondaire,
+              const SizedBox(height: 12),
+              // Plaque de nom inclinée façon HUD de combat.
+              Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.skewX(-0.12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 7,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    border: Border.all(color: accent.withValues(alpha: 0.6)),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        accent.withValues(alpha: 0.20),
+                        AppColors.surface.withValues(alpha: 0.78),
+                      ],
+                    ),
+                  ),
+                  child: Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.skewX(0.12),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          label.toUpperCase(),
+                          style: AppTypography.labelXs.copyWith(
+                            color: accent,
+                            letterSpacing: 1.4,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          pseudo,
+                          style: AppTypography.headingSm,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                        if (eloLabel != null)
+                          Text(
+                            eloLabel,
+                            style: AppTypography.labelXs.copyWith(
+                              color: AppColors.texteSecondaire,
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
+              ),
             ],
           ),
         ),
@@ -382,40 +508,84 @@ class _InitialBadge extends StatelessWidget {
   }
 }
 
+/// VS « métallique » façon jeu de combat : éclat de rayons doré + lettrage
+/// Fraunces italique en relief (double ombre bronze + halo).
 class _VsBadge extends StatelessWidget {
   const _VsBadge();
 
   @override
   Widget build(BuildContext context) {
+    final vsStyle = AppTypography.playfair(
+      size: 96,
+      color: Color.lerp(AppColors.orJour, AppColors.textePrimaire, 0.30)!,
+      weight: FontWeight.w900,
+      style: FontStyle.italic,
+    ).copyWith(
+      shadows: [
+        const Shadow(color: AppColors.orCrepuscule, offset: Offset(3, 4)),
+        Shadow(
+          color: Colors.black.withValues(alpha: 0.6),
+          offset: const Offset(5, 7),
+          blurRadius: 14,
+        ),
+        Shadow(
+          color: AppColors.orJour.withValues(alpha: 0.6),
+          blurRadius: 30,
+        ),
+      ],
+    );
+
     return Semantics(
       label: 'VS',
-      child: Container(
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: AppColors.orJour,
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.orJour.withValues(alpha: 0.7),
-              blurRadius: 24,
-              spreadRadius: 6,
+      child: SizedBox(
+        width: 200,
+        height: 200,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            CustomPaint(
+              size: const Size(200, 200),
+              painter: _BurstPainter(),
+            ),
+            Transform.rotate(
+              angle: -0.14,
+              child: Text('VS', style: vsStyle),
             ),
           ],
-        ),
-        child: Center(
-          child: Text(
-            'VS',
-            style: AppTypography.bebas(
-              size: 24,
-              color: AppColors.vertForet,
-              letterSpacing: 2,
-            ),
-          ),
         ),
       ),
     );
   }
+}
+
+/// Éclat de rayons dorés rayonnant du centre (énergie du choc).
+class _BurstPainter extends CustomPainter {
+  static const int _rays = 16;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final outer = size.width * 0.5;
+    final paint = Paint()..color = AppColors.orJour.withValues(alpha: 0.16);
+    for (var i = 0; i < _rays; i++) {
+      final a = (i / _rays) * 2 * math.pi;
+      const half = math.pi / _rays * 0.5;
+      final tip = center + Offset(math.cos(a), math.sin(a)) * outer;
+      final b1 = center + Offset(math.cos(a - half), math.sin(a - half)) * (outer * 0.22);
+      final b2 = center + Offset(math.cos(a + half), math.sin(a + half)) * (outer * 0.22);
+      canvas.drawPath(
+        Path()
+          ..moveTo(b1.dx, b1.dy)
+          ..lineTo(tip.dx, tip.dy)
+          ..lineTo(b2.dx, b2.dy)
+          ..close(),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_BurstPainter oldDelegate) => false;
 }
 
 class _RoundLabel extends StatelessWidget {
