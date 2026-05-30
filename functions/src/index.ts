@@ -55,3 +55,6 @@ export { validateIapReceipt } from "./iap/validateIapReceipt";
 // --- Backoffice admin (Phase 1) — cf docs/backoffice_schema.md ---
 export { validatePackDraft } from "./admin/validatePackDraft";
 export { publishPack } from "./admin/publishPack";
+export { rollbackPack } from "./admin/rollbackPack";
+export { upsertDevinette } from "./admin/upsertDevinette";
+export { bulkImportDevinettes } from "./admin/bulkImportDevinettes";

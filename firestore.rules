@@ -22,7 +22,20 @@ service cloud.firestore {
 
     function isModerator() {
       return isSignedIn()
-        && request.auth.token.role == 'moderator';
+        && (request.auth.token.role == 'moderator'
+            || request.auth.token.role == 'admin');
+    }
+
+    // Backoffice content roles (Phase 1) — cf docs/backoffice_schema.md §6
+    function isEditor() {
+      return isSignedIn()
+        && (request.auth.token.role == 'editor'
+            || request.auth.token.role == 'admin');
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && request.auth.token.role == 'admin';
     }
 
     // -------------------------------------------------------------------------
@@ -183,6 +196,63 @@ service cloud.firestore {
 
     match /ip_quota/{ipHash} {
       allow read, write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Backoffice — catalog & packs (Phase 1)
+    // -------------------------------------------------------------------------
+    // Toutes les écritures passent par les CFs admin (functions/src/admin/).
+    // Les règles ci-dessous décrivent uniquement les lectures autorisées :
+    //   - catalog/* : lecture publique (cf RemoteCatalogRepository Phase 3)
+    //   - packs/*   : lecture editor / moderator (UI backoffice)
+    //   - audit/*   : lecture admin uniquement (RGPD-friendly)
+    //
+    // Aucune règle d'écriture client — admin SDK bypass via CFs uniquement.
+    // Cf docs/backoffice_schema.md §6 pour la matrice complète.
+
+    match /catalog/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /packs/{packId} {
+      allow read: if isEditor() || isModerator();
+      allow write: if false;
+
+      match /meta/{metaId} {
+        allow read: if isEditor() || isModerator();
+        allow write: if false;
+      }
+
+      match /i18n/{lang} {
+        allow read: if isEditor();
+        allow write: if false;
+      }
+
+      match /devinettes/{deviId} {
+        allow read: if isEditor();
+        allow write: if false;
+      }
+
+      match /versions/{versionN} {
+        allow read: if isEditor();
+        allow write: if false;
+      }
+
+      match /audit/{logId} {
+        allow read: if isAdmin();
+        allow write: if false;
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Users inventory (Phase 4 — monétisation cauris-only)
+    // -------------------------------------------------------------------------
+    // Le user lit son propre inventaire (cauris balance, owned_packs).
+    // Écriture exclusivement via CFs unlockPack + validateCaurisPurchase.
+    match /users/{uid}/inventory/{docId} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if false;
     }
 
     // -------------------------------------------------------------------------
