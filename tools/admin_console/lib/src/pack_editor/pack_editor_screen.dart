@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kilimandjaro_admin/src/app/router.dart';
 import 'package:kilimandjaro_admin/src/catalog/catalog_providers.dart';
+import 'package:kilimandjaro_admin/src/pack_editor/bulk_import_dialog.dart';
 import 'package:kilimandjaro_admin/src/pack_editor/pack_editor_providers.dart';
+import 'package:kilimandjaro_admin/src/pack_editor/publish_dialog.dart';
 import 'package:kilimandjaro_admin/src/pack_editor/tabs/devinettes_tab.dart';
 import 'package:kilimandjaro_admin/src/pack_editor/tabs/metadata_tab.dart';
 import 'package:kilimandjaro_admin/src/pack_editor/tabs/versions_tab.dart';
@@ -72,25 +74,14 @@ class PackEditorScreen extends ConsumerWidget {
             OutlinedButton.icon(
               icon: const Icon(Icons.upload_file, size: 18),
               label: const Text('Import JSON'),
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('BulkImportDialog — Phase 2.6'),
-                  ),
-                );
-              },
+              onPressed: () =>
+                  BulkImportDialog.show(context, packId: packId),
             ),
             const SizedBox(width: 8),
             FilledButton.icon(
               icon: const Icon(Icons.publish, size: 18),
               label: const Text('Publier'),
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('PublishDialog — Phase 2.6'),
-                  ),
-                );
-              },
+              onPressed: () => PublishDialog.show(context, packId: packId),
             ),
             const SizedBox(width: 16),
           ],

@@ -96,10 +96,10 @@ class AdminFunctionsService {
 
   Future<T> _call<T>(String name, Map<String, dynamic> data) async {
     try {
-      final result = await _functions.httpsCallable(name).call(data);
+      final result = await _functions.httpsCallable(name).call<dynamic>(data);
       final raw = result.data;
       if (raw is T) return raw;
-      if (raw is Map) {
+      if (raw is Map<dynamic, dynamic>) {
         return Map<String, dynamic>.from(raw) as T;
       }
       throw AdminFunctionException(
@@ -151,7 +151,7 @@ class AdminFunctionException implements Exception {
     final raw = details?['validationErrors'];
     if (raw is! List) return const [];
     return raw
-        .whereType<Map>()
+        .whereType<Map<dynamic, dynamic>>()
         .map((m) => ValidationIssue.fromMap(Map<String, dynamic>.from(m)))
         .toList();
   }
@@ -197,13 +197,13 @@ class ValidatePackDraftResult {
       valid: m['valid'] as bool? ?? false,
       total: (m['total'] as num?)?.toInt() ?? 0,
       errors: (m['errors'] as List<dynamic>?)
-              ?.whereType<Map>()
+              ?.whereType<Map<dynamic, dynamic>>()
               .map((e) => ValidationIssue.fromMap(
                   Map<String, dynamic>.from(e)))
               .toList() ??
           const [],
       warnings: (m['warnings'] as List<dynamic>?)
-              ?.whereType<Map>()
+              ?.whereType<Map<dynamic, dynamic>>()
               .map((e) => ValidationIssue.fromMap(
                   Map<String, dynamic>.from(e)))
               .toList() ??
@@ -318,7 +318,7 @@ class BulkImportResult {
       mode: m['mode'] as String,
       accepted: (m['accepted'] as num).toInt(),
       rejected: (m['rejected'] as List<dynamic>?)
-              ?.whereType<Map>()
+              ?.whereType<Map<dynamic, dynamic>>()
               .map((r) => BulkImportRejection.fromMap(
                   Map<String, dynamic>.from(r)))
               .toList() ??

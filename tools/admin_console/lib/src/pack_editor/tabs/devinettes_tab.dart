@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kilimandjaro_admin/src/models/devinette.dart';
+import 'package:kilimandjaro_admin/src/pack_editor/devinette_form_screen.dart';
 import 'package:kilimandjaro_admin/src/pack_editor/pack_editor_providers.dart';
 
 /// Tableau filtrable des devinettes d'un pack.
@@ -46,13 +47,10 @@ class _DevinettesTabState extends ConsumerState<DevinettesTab> {
               onSearch: (v) => setState(() => _search = v),
               onDifficulty: (v) => setState(() => _difficultyFilter = v),
               onStatus: (v) => setState(() => _statusFilter = v),
-              onAdd: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Création devinette — Phase 2.5'),
-                  ),
-                );
-              },
+              onAdd: () => DevinetteFormScreen.show(
+                context,
+                packId: widget.packId,
+              ),
             ),
             Expanded(
               child: filtered.isEmpty
@@ -193,15 +191,11 @@ class _DevinettesTable extends StatelessWidget {
               ],
               rows: devinettes.map((d) {
                 return DataRow(
-                  onSelectChanged: (_) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Éditer ${d.id} — DevinetteForm (Phase 2.5)',
-                        ),
-                      ),
-                    );
-                  },
+                  onSelectChanged: (_) => DevinetteFormScreen.show(
+                    context,
+                    packId: packId,
+                    deviId: d.id,
+                  ),
                   cells: [
                     DataCell(Text(
                       d.id,
@@ -262,15 +256,11 @@ class _DevinettesTable extends StatelessWidget {
                     DataCell(
                       IconButton(
                         icon: const Icon(Icons.edit_outlined, size: 18),
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Éditer ${d.id} — DevinetteForm (Phase 2.5)',
-                              ),
-                            ),
-                          );
-                        },
+                        onPressed: () => DevinetteFormScreen.show(
+                          context,
+                          packId: packId,
+                          deviId: d.id,
+                        ),
                       ),
                     ),
                   ],
