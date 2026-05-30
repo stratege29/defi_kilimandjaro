@@ -1,12 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 /// Écran de sign-in (public, monté quand le user n'est pas authentifié).
 ///
-/// Logique extraite de l'ancien `AuthGate._SignInScreen` pour s'intégrer au
-/// routeur déclaratif. L'auth gate est désormais gérée par le `redirect` du
-/// `GoRouter` (cf `lib/src/app/router.dart`).
+/// Sur Web, on utilise `FirebaseAuth.signInWithPopup(GoogleAuthProvider())`
+/// nativement — pas besoin du plugin `google_sign_in` ni de meta tag
+/// `google-signin-client_id` dans index.html. C'est l'API recommandée par
+/// Firebase pour les SPAs.
+///
+/// Note : si on porte un jour cette console en desktop/mobile, basculer sur
+/// `GoogleSignIn().signIn()` + credentials, cf historique git.
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -24,20 +28,24 @@ class _SignInScreenState extends State<SignInScreen> {
       _error = null;
     });
     try {
-      final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        setState(() => _signingIn = false);
-        return;
+      final provider = GoogleAuthProvider()
+        ..addScope('email')
+        ..addScope('profile');
+      if (kIsWeb) {
+        await FirebaseAuth.instance.signInWithPopup(provider);
+      } else {
+        // Fallback non-web (desktop/mobile) — non utilisé en pratique.
+        await FirebaseAuth.instance.signInWithProvider(provider);
       }
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-        accessToken: googleAuth.accessToken,
-      );
-      await FirebaseAuth.instance.signInWithCredential(credential);
       // Le router redirect prendra le relais.
     } on FirebaseAuthException catch (e) {
-      setState(() => _error = e.message ?? 'Erreur d\'authentification.');
+      // popup-closed-by-user = annulation utilisateur, pas une erreur à afficher
+      if (e.code == 'popup-closed-by-user' ||
+          e.code == 'cancelled-popup-request') {
+        // Silencieux
+      } else {
+        setState(() => _error = e.message ?? 'Erreur d\'authentification.');
+      }
     } catch (e) {
       setState(() => _error = e.toString());
     } finally {
