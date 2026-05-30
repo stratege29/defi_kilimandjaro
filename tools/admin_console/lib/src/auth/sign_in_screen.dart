@@ -1,4 +1,7 @@
+import 'dart:developer' as developer;
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
@@ -27,29 +30,87 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   bool _signingIn = false;
   String? _error;
+  String? _errorDetail;
+  bool _useRedirect = true; // toggle pour fallback popup en cas de souci
+
+  String _firebaseDiagnostic() {
+    try {
+      final app = Firebase.app();
+      final opts = app.options;
+      final key = opts.apiKey;
+      final maskedKey = key.length > 8
+          ? '${key.substring(0, 4)}…${key.substring(key.length - 4)}'
+          : '(stub)';
+      return 'project=${opts.projectId} apiKey=$maskedKey';
+    } catch (e) {
+      return 'Firebase non initialisé : $e';
+    }
+  }
 
   Future<void> _signIn() async {
     setState(() {
       _signingIn = true;
       _error = null;
+      _errorDetail = null;
     });
+    developer.log(
+      '[SIGN-IN] start (kIsWeb=$kIsWeb, useRedirect=$_useRedirect)',
+      name: 'admin.signin',
+    );
+    developer.log('[SIGN-IN] ${_firebaseDiagnostic()}', name: 'admin.signin');
+
     try {
       final provider = GoogleAuthProvider()
         ..addScope('email')
         ..addScope('profile');
       if (kIsWeb) {
-        // Redirige la page entière vers Google → retour via Firebase auth
-        // handler → page reload → main() appelle getRedirectResult().
-        await FirebaseAuth.instance.signInWithRedirect(provider);
-        // Pas de code après ici : la page est en train de naviguer.
+        if (_useRedirect) {
+          developer.log(
+            '[SIGN-IN] calling signInWithRedirect…',
+            name: 'admin.signin',
+          );
+          await FirebaseAuth.instance.signInWithRedirect(provider);
+          developer.log(
+            '[SIGN-IN] signInWithRedirect returned (shouldnt — page should navigate)',
+            name: 'admin.signin',
+          );
+        } else {
+          developer.log(
+            '[SIGN-IN] calling signInWithPopup (fallback)…',
+            name: 'admin.signin',
+          );
+          final cred =
+              await FirebaseAuth.instance.signInWithPopup(provider);
+          developer.log(
+            '[SIGN-IN] popup OK uid=${cred.user?.uid}',
+            name: 'admin.signin',
+          );
+        }
       } else {
-        // Fallback non-web (desktop/mobile) — non utilisé en pratique.
         await FirebaseAuth.instance.signInWithProvider(provider);
       }
-    } on FirebaseAuthException catch (e) {
-      setState(() => _error = e.message ?? 'Erreur d\'authentification.');
-    } catch (e) {
-      setState(() => _error = e.toString());
+    } on FirebaseAuthException catch (e, st) {
+      developer.log(
+        '[SIGN-IN] FirebaseAuthException code=${e.code} msg=${e.message}',
+        name: 'admin.signin',
+        error: e,
+        stackTrace: st,
+      );
+      setState(() {
+        _error = 'Erreur Firebase: ${e.code}';
+        _errorDetail = e.message ?? '(pas de message)';
+      });
+    } catch (e, st) {
+      developer.log(
+        '[SIGN-IN] Exception type=${e.runtimeType} : $e',
+        name: 'admin.signin',
+        error: e,
+        stackTrace: st,
+      );
+      setState(() {
+        _error = '${e.runtimeType}';
+        _errorDetail = e.toString();
+      });
     } finally {
       if (mounted) setState(() => _signingIn = false);
     }
@@ -110,12 +171,68 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
               if (_error != null) ...[
                 const SizedBox(height: 16),
-                Text(
-                  _error!,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .errorContainer
+                          .withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (_errorDetail != null) ...[
+                          const SizedBox(height: 6),
+                          SelectableText(
+                            _errorDetail!,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 8),
+                        Text(
+                          _firebaseDiagnostic(),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontFamily: 'monospace',
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _useRedirect = !_useRedirect;
+                      _error = null;
+                      _errorDetail = null;
+                    });
+                  },
+                  child: Text(
+                    _useRedirect
+                        ? 'Essayer en mode popup (fallback)'
+                        : 'Revenir au mode redirect',
+                    style: const TextStyle(fontSize: 12),
+                  ),
                 ),
               ],
             ],
