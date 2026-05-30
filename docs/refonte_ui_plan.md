@@ -49,11 +49,13 @@ en assets (éviter la dépendance réseau au 1er lancement).
       espacements uniformisés (20pt), 3 zones logiques (héros · boucles du jour · découverte).
 - [x] `MountainHeroImage` : ajout d'un `fallback` + `alignment`.
 - [x] `dart analyze` accueil → 0 issue introduite (1 `info` préexistant).
-- [ ] **À décider (produit/nav)** : relocaliser packs/news/stats vers des onglets dédiés.
-      Conservés sur l'accueil pour l'instant — ce sont des **surfaces de monétisation/engagement**,
-      les retirer sans onglet de remplacement nuirait à la découverte. Décision nav requise.
+- [x] **Relocalisation packs/news/stats** (décision : *icône Boutique dans le header*, 4 onglets conservés) :
+      nouvel écran **`DiscoverView`** (`/discover`) hébergeant `PacksSection` + `NewsCarousel`, ouvert
+      via une **icône Boutique** dans le header d'accueil (distincte du chip cauris → `/shop`).
+      `StatsRow` retiré de l'accueil (les stats vivent déjà dans le Profil). Accueil = héros · boucles
+      du jour · reco — vraiment minimal. `dart analyze` (nav) → clean.
 
-**✅ Phase 2 (cœur) terminée** (commit à faire). Reste : décision de relocalisation des blocs secondaires.
+**✅ Phase 2 terminée** (commit à faire).
 
 ## Phase 3 — Jeu
 - [x] `game_view.dart` : carte devinette à **accent gauche or** (ClipRRect + filet 3pt, ombre).

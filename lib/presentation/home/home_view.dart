@@ -12,10 +12,7 @@ import 'package:defi_kilimandjaro/presentation/home/widgets/daily_challenge_card
 import 'package:defi_kilimandjaro/presentation/home/widgets/daily_streak_dialog.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/duels_carousel.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/home_header.dart';
-import 'package:defi_kilimandjaro/presentation/home/widgets/news_carousel.dart';
-import 'package:defi_kilimandjaro/presentation/home/widgets/packs_section.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/recommended_match_banner.dart';
-import 'package:defi_kilimandjaro/presentation/home/widgets/stats_row.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/sticky_cta_bar.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
@@ -24,15 +21,15 @@ import 'package:go_router/go_router.dart';
 
 /// Écran 00 — Hub d'Accueil.
 ///
-/// Page d'atterrissage par défaut au lancement de l'app. Composition de
-/// blocs world-class :
-/// - [HomeHeader] : streak pulsé · KILIMANDJARO · cauris · altitude (Hero)
+/// Page d'atterrissage par défaut au lancement de l'app. **Retenue radicale** :
+/// l'accueil reste centré sur l'ascension. Packs/promos vivent désormais dans
+/// l'écran « Découvrir » (icône Boutique du header), les stats dans le Profil.
+/// Composition :
+/// - [HomeHeader] : streak · KILIMANDJARO · Boutique · cauris · altitude (Hero)
 /// - [ContinueAscentCard] : HERO sommet en cours, peinture du sommet + Fraunces XL
-/// - [DuelsCarousel] : 3 cards défis horizontales
+/// - [DailyChallengeCard] : défi du jour
+/// - [DuelsCarousel] : cards défis horizontales
 /// - [RecommendedMatchBanner] : stub conditionnel
-/// - [PacksSection] : carrousel packs possédés + SYNC
-/// - [NewsCarousel] : promos packs payants + UGC + classement
-/// - [StatsRow] : 3 carrés stats premium Fraunces
 /// - [StickyCtaBar] : GRIMPER (shimmer) + DÉFIER (outline)
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -92,16 +89,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   SizedBox(height: 20),
                   DuelsCarousel(),
                   SizedBox(height: 20),
+                  // Reco duel conditionnelle (SizedBox.shrink si aucune).
                   RecommendedMatchBanner(),
-                  // RecommendedMatchBanner se réduit à SizedBox.shrink quand
-                  // aucune reco n'est dispo — pas besoin de SizedBox conditionnel.
-                  // Zone 3 — découverte : packs, actus, stats (monétisation).
-                  PacksSection(),
-                  SizedBox(height: 20),
-                  NewsCarousel(),
-                  SizedBox(height: 20),
-                  StatsRow(),
                   SizedBox(height: 16),
+                  // Packs/news → écran « Découvrir » (icône Boutique du header).
+                  // Stats → écran Profil. Accueil = retenue radicale.
                 ],
               ),
             ),

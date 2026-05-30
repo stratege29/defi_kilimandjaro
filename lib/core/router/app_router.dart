@@ -2,6 +2,7 @@ import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.d
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
+import 'package:defi_kilimandjaro/presentation/discover/discover_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_create_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_deep_link_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_entry_view.dart';
@@ -49,6 +50,10 @@ abstract final class AppRoutes {
   static const profile = '/profile';
   static const avatarPicker = '/profile/avatar';
   static const shop = '/shop';
+
+  /// Écran « Découvrir » — packs de contenu, promos & actualités
+  /// (relocalisés hors de l'accueil). Distinct de [shop] (recharge cauris).
+  static const discover = '/discover';
   static const duel = '/duel';
   static const duelCreate = '/duel/create';
   static const duelScan = '/duel/scan';
@@ -208,6 +213,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       path: AppRoutes.shop,
       name: 'shop',
       builder: (_, __) => const ShopView(),
+    ),
+    GoRoute(
+      path: AppRoutes.discover,
+      name: 'discover',
+      builder: (_, __) => const DiscoverView(),
     ),
     GoRoute(
       path: AppRoutes.duel,

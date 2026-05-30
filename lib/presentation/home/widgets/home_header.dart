@@ -60,7 +60,19 @@ class HomeHeader extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
+          // Icône Boutique → écran « Découvrir » (packs de contenu + promos),
+          // distinct de la recharge de cauris (chip ci-dessous → /shop).
+          IconButton(
+            icon: const Icon(Icons.storefront_outlined, size: 20),
+            color: AppColors.orSoleil,
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            tooltip: 'Découvrir',
+            onPressed: () => context.push(AppRoutes.discover),
+          ),
+          const SizedBox(width: 4),
           _HeaderChip(
             iconWidget: const CaurisIcon(size: 16),
             value: '${progress.cauris}',
