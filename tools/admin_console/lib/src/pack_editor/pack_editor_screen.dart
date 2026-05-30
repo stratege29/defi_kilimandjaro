@@ -3,13 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kilimandjaro_admin/src/app/router.dart';
 import 'package:kilimandjaro_admin/src/catalog/catalog_providers.dart';
+import 'package:kilimandjaro_admin/src/pack_editor/pack_editor_providers.dart';
+import 'package:kilimandjaro_admin/src/pack_editor/tabs/devinettes_tab.dart';
+import 'package:kilimandjaro_admin/src/pack_editor/tabs/metadata_tab.dart';
+import 'package:kilimandjaro_admin/src/pack_editor/tabs/versions_tab.dart';
 
-/// Éditeur d'un pack — squelette Phase 2.1.
+/// Éditeur d'un pack — 3 onglets fonctionnels.
 ///
-/// Onglets prévus (à implémenter dans les phases suivantes) :
-///   - 1. Métadonnées (i18n FR/EN, prix cauris, theme color, ordering)
-///   - 2. Devinettes  (DataTable filtrable + édition unitaire — Phase 2.4)
-///   - 3. Versions   (historique versions/{N} + bouton rollback — Phase 2.4)
+///   - Métadonnées : catalog + meta + i18n (read-only Phase 2.4, édition 2.5)
+///   - Devinettes  : DataTable filtrable
+///   - Versions    : historique + bouton rollback (via CF rollbackPack)
+///
+/// AppBar : back vers /catalog, theme color + version chip, boutons
+/// Import JSON et Publier (à câbler en Phase 2.6).
 class PackEditorScreen extends ConsumerWidget {
   const PackEditorScreen({required this.packId, super.key});
 
@@ -18,6 +24,9 @@ class PackEditorScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final entry = ref.watch(catalogEntryProvider(packId));
+    final meta = ref.watch(packMetaProvider(packId)).valueOrNull;
+    final pendingChanges = meta?.pendingChanges ?? 0;
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -46,6 +55,17 @@ class PackEditorScreen extends ConsumerWidget {
                   label: Text('v${entry.currentVersion}'),
                   visualDensity: VisualDensity.compact,
                 ),
+              if (pendingChanges > 0) ...[
+                const SizedBox(width: 8),
+                Chip(
+                  avatar: const Icon(Icons.fiber_manual_record,
+                      size: 12, color: Colors.orange),
+                  label: Text('$pendingChanges en attente'),
+                  visualDensity: VisualDensity.compact,
+                  backgroundColor: Colors.orange.withOpacity(0.15),
+                  labelStyle: const TextStyle(color: Colors.orange),
+                ),
+              ],
             ],
           ),
           actions: [
@@ -55,7 +75,7 @@ class PackEditorScreen extends ConsumerWidget {
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Bulk import — à venir Phase 2.6'),
+                    content: Text('BulkImportDialog — Phase 2.6'),
                   ),
                 );
               },
@@ -67,7 +87,7 @@ class PackEditorScreen extends ConsumerWidget {
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('PublishDialog — à venir Phase 2.6'),
+                    content: Text('PublishDialog — Phase 2.6'),
                   ),
                 );
               },
@@ -84,86 +104,11 @@ class PackEditorScreen extends ConsumerWidget {
         ),
         body: TabBarView(
           children: [
-            _MetadataPlaceholder(packId: packId),
-            _DevinettesPlaceholder(packId: packId),
-            _VersionsPlaceholder(packId: packId),
+            MetadataTab(packId: packId),
+            DevinettesTab(packId: packId),
+            VersionsTab(packId: packId),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _MetadataPlaceholder extends StatelessWidget {
-  const _MetadataPlaceholder({required this.packId});
-  final String packId;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.construction, size: 60),
-          const SizedBox(height: 12),
-          Text('Métadonnées de $packId'),
-          const SizedBox(height: 8),
-          const Text(
-            'i18n FR/EN, prix cauris, theme color, ordering\n'
-            'À implémenter en Phase 2.4',
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DevinettesPlaceholder extends StatelessWidget {
-  const _DevinettesPlaceholder({required this.packId});
-  final String packId;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.construction, size: 60),
-          const SizedBox(height: 12),
-          Text('Devinettes de $packId'),
-          const SizedBox(height: 8),
-          const Text(
-            'DataTable filtrable + édition unitaire\n'
-            'À implémenter en Phase 2.4 / 2.5',
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _VersionsPlaceholder extends StatelessWidget {
-  const _VersionsPlaceholder({required this.packId});
-  final String packId;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.construction, size: 60),
-          const SizedBox(height: 12),
-          Text('Versions de $packId'),
-          const SizedBox(height: 8),
-          const Text(
-            'Historique + rollback\n'
-            'À implémenter en Phase 2.4',
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }
