@@ -94,10 +94,12 @@ class _MountainConquestViewState extends State<MountainConquestView>
       child: Stack(
         children: [
           Positioned.fill(
-            child: AnimatedBuilder(
-              animation: _particleCtrl,
-              builder: (_, __) => CustomPaint(
-                painter: _StarBurstPainter(progress: _particleCtrl.value),
+            child: RepaintBoundary(
+              child: AnimatedBuilder(
+                animation: _particleCtrl,
+                builder: (_, __) => CustomPaint(
+                  painter: _StarBurstPainter(progress: _particleCtrl.value),
+                ),
               ),
             ),
           ),

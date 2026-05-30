@@ -213,12 +213,15 @@ class _VictoryViewState extends ConsumerState<VictoryView>
       type: MaterialType.transparency,
       child: Stack(
         children: <Widget>[
-          // 1. Particules en éventail (derrière la card).
+          // 1. Particules en éventail (derrière la card). RepaintBoundary :
+          // isole le repaint de l'animation des particules de la card.
           Positioned.fill(
-            child: AnimatedBuilder(
-              animation: _particleCtrl,
-              builder: (context, _) => CustomPaint(
-                painter: _ParticlePainter(progress: _particleCtrl.value),
+            child: RepaintBoundary(
+              child: AnimatedBuilder(
+                animation: _particleCtrl,
+                builder: (context, _) => CustomPaint(
+                  painter: _ParticlePainter(progress: _particleCtrl.value),
+                ),
               ),
             ),
           ),

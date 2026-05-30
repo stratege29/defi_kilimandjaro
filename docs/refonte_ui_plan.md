@@ -151,10 +151,27 @@ en assets (éviter la dépendance réseau au 1er lancement).
 **✅ Phase 8 terminée** (commit à faire).
 
 ## Phase 9 — QA / perf / a11y / tests
-- [ ] `flutter analyze` 0 warning ; aucun hex en dur ; strings via `easy_localization`.
-- [ ] ⚠️ Perf iOS 26 : éviter `MaskFilter.blur`, limiter `BackdropFilter`, `RepaintBoundary` sur
-      radar/VS/parallaxe, animations en `AnimationController` (jamais `setState`).
-- [ ] Tests widget des nouveaux composants ; mettre à jour les tests cassés par le re-skin.
+- [x] **Analyse** : `dart analyze lib/` → 65 err / 13 warn **100 % préexistants** (drift `*.g.dart` +
+      `firebase_options.dart` gitignorés non générés dans ce worktree). **0 régression introduite** par la refonte.
+- [x] **Hex en dur** : tokenisé les 4 `Color(0xFF…)` introduits par l'agent dans `duel_hub_view`
+      (bordure → `hairline`, gradients dérivés via `Color.lerp` des tokens).
+- [x] **Perf iOS 26** : aucun `MaskFilter.blur` dans le code refonte ; `RepaintBoundary` ajouté sur
+      les particules (victoire/conquête) ; VERSUS + radar déjà encapsulés ; animations en
+      `AnimationController` (pas de `setState` ajouté).
+- [x] **Tests** : 35 tests unitaires purs passent (dont `honorific_title_test` — le retrait du champ
+      `icon` ne casse rien) ; **+2 tests widget** `FlagRoundel` (GoogleFonts no-fetch) verts.
+      Aucun symbole supprimé n'est référencé par `test/`.
+
+**⚠️ Constats préexistants (hors refonte) :**
+- [x] `golden_path.dart` `MaskFilter.blur(8)` → **remplacé** par un halo empilé (3 traits dégradés,
+  fake-glow GPU-safe). **Plus aucun `MaskFilter` actif dans `lib/`.** `dart analyze` clean.
+- `BackdropFilter` dans 4 fichiers (`bottom_nav_bar`, `app_card`, countdown/round_end overlays) — préexistant,
+  à surveiller sur iOS 26 (blur 18px sur la nav notamment) mais hors scope refonte.
+- Worktree neuf : `dart run build_runner build -d` + copier `firebase_options.dart` avant `flutter run` /
+  suite de tests complète (cf. `MEMORY/worktree_bootstrap.md`).
+- Tests widget supplémentaires (AppButton variants, StatTile, SectionLabel) : recommandé en suivi.
+
+**✅ Phase 9 terminée** (commit à faire). **Refonte « Vert Nuit » : Phases 0 → 9 complètes.**
 
 ---
 

@@ -243,19 +243,17 @@ class _OnlineHeroCard extends ConsumerWidget {
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl - 2),
-        border: Border.all(
-          color: const Color(0xFF3a4a4a),
-        ),
-        // Dégradé ciel nocturne → vert nuit (mimique .duelhero du mockup).
-        gradient: const LinearGradient(
+        border: Border.all(color: AppColors.hairline),
+        // Dégradé ciel nocturne → vert nuit (dérivé des tokens, pas de hex).
+        gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF24344e),
-            Color(0xFF162420),
+            Color.lerp(AppColors.info, AppColors.surface, 0.42)!,
+            AppColors.surfaceVariant,
             AppColors.surface,
           ],
-          stops: [0, 0.72, 1],
+          stops: const [0, 0.72, 1],
         ),
       ),
       child: Stack(
@@ -376,9 +374,20 @@ class _InviteBanner extends ConsumerWidget {
               height: 38,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const RadialGradient(
-                  center: Alignment(-0.3, -0.35),
-                  colors: [Color(0xFF9aa3c8), Color(0xFF4a5378)],
+                gradient: RadialGradient(
+                  center: const Alignment(-0.3, -0.35),
+                  colors: [
+                    Color.lerp(
+                      AppColors.cielHauteur,
+                      AppColors.textePrimaire,
+                      0.3,
+                    )!,
+                    Color.lerp(
+                      AppColors.cielHauteur,
+                      AppColors.surface,
+                      0.5,
+                    )!,
+                  ],
                 ),
                 border: Border.all(color: AppColors.cielHauteur, width: 2),
               ),
