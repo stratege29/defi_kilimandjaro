@@ -54,3 +54,4 @@ export { validateIapReceipt } from "./iap/validateIapReceipt";
 
 // --- Backoffice admin (Phase 1) — cf docs/backoffice_schema.md ---
 export { validatePackDraft } from "./admin/validatePackDraft";
+export { publishPack } from "./admin/publishPack";
