@@ -4,13 +4,19 @@ import 'package:flutter/material.dart';
 
 /// Écran de sign-in (public, monté quand le user n'est pas authentifié).
 ///
-/// Sur Web, on utilise `FirebaseAuth.signInWithPopup(GoogleAuthProvider())`
-/// nativement — pas besoin du plugin `google_sign_in` ni de meta tag
-/// `google-signin-client_id` dans index.html. C'est l'API recommandée par
-/// Firebase pour les SPAs.
+/// Sur Web, on utilise `signInWithRedirect` plutôt que `signInWithPopup` :
 ///
-/// Note : si on porte un jour cette console en desktop/mobile, basculer sur
-/// `GoogleSignIn().signIn()` + credentials, cf historique git.
+///   - signInWithPopup échoue sur localhost à cause de Cross-Origin-Opener-Policy
+///     (COOP) qui empêche la fenêtre popup OAuth de communiquer le résultat à
+///     la fenêtre parent. Symptôme : la popup s'ouvre, fait l'OAuth, puis se
+///     referme avec un "Error" générique sans connecter l'utilisateur.
+///
+///   - signInWithRedirect redirige la page entière → pas de cross-window
+///     communication → pas de problème COOP. Au retour, `getRedirectResult()`
+///     dans main() récupère le user.
+///
+/// La récupération du résultat est dans `main.dart` (cf `getRedirectResult`
+/// avant `runApp`). Le router redirect prend ensuite le relais.
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -32,20 +38,16 @@ class _SignInScreenState extends State<SignInScreen> {
         ..addScope('email')
         ..addScope('profile');
       if (kIsWeb) {
-        await FirebaseAuth.instance.signInWithPopup(provider);
+        // Redirige la page entière vers Google → retour via Firebase auth
+        // handler → page reload → main() appelle getRedirectResult().
+        await FirebaseAuth.instance.signInWithRedirect(provider);
+        // Pas de code après ici : la page est en train de naviguer.
       } else {
         // Fallback non-web (desktop/mobile) — non utilisé en pratique.
         await FirebaseAuth.instance.signInWithProvider(provider);
       }
-      // Le router redirect prendra le relais.
     } on FirebaseAuthException catch (e) {
-      // popup-closed-by-user = annulation utilisateur, pas une erreur à afficher
-      if (e.code == 'popup-closed-by-user' ||
-          e.code == 'cancelled-popup-request') {
-        // Silencieux
-      } else {
-        setState(() => _error = e.message ?? 'Erreur d\'authentification.');
-      }
+      setState(() => _error = e.message ?? 'Erreur d\'authentification.');
     } catch (e) {
       setState(() => _error = e.toString());
     } finally {
