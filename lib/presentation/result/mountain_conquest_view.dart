@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
@@ -12,8 +11,8 @@ import 'package:vector_graphics/vector_graphics.dart';
 /// Overlay « TU AS CONQUIS ce sommet » — affiché juste après la victoire du
 /// dernier niveau d'une montagne, avant la transition vers la suivante.
 ///
-/// Mis en scène façon victoire : particules en éventail, halo pulsant
-/// derrière l'emoji drapeau, gros chiffre d'altitude.
+/// Mis en scène façon victoire : particules dorées peintes en éventail, halo
+/// pulsant derrière la silhouette du sommet, gros chiffre d'altitude.
 class MountainConquestView extends StatefulWidget {
   const MountainConquestView({
     required this.mountain,
@@ -269,42 +268,72 @@ class _ConquestCard extends StatelessWidget {
   }
 }
 
-/// 16 emojis en éventail + traînée — plus grand que VictoryView.
+/// 16 particules dorées PEINTES en éventail (étincelles + cauris + poussière).
+/// Plus large que VictoryView. Remplace les emoji ✨🌟⭐🏔️ par du vectoriel
+/// crisp, sans dépendance asset (rendu identique sur tous les OS).
 class _StarBurstPainter extends CustomPainter {
   _StarBurstPainter({required this.progress});
 
   final double progress;
 
-  static const _emojis = <String>['✨', '🌟', '⭐', '🏔️'];
+  static const int _count = 16;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final centre = Offset(size.width / 2, size.height / 2);
-    const count = 16;
+    final centre = size.center(Offset.zero);
     final maxRadius = size.shortestSide * 0.65;
+    final t = 1 - math.pow(1 - progress, 3).toDouble();
+    final opacity = progress < 0.75 ? 1.0 : (1.0 - (progress - 0.75) / 0.25);
+    if (opacity <= 0) return;
 
-    for (var i = 0; i < count; i++) {
-      final angle = (2 * math.pi / count) * i;
-      final t = 1 - math.pow(1 - progress, 3).toDouble();
-      final radius = maxRadius * t;
-      final dx = centre.dx + radius * math.cos(angle);
-      final dy = centre.dy + radius * math.sin(angle);
-      final opacity = (progress < 0.75)
-          ? 1.0
-          : (1.0 - (progress - 0.75) / 0.25);
+    for (var i = 0; i < _count; i++) {
+      final angle = (2 * math.pi / _count) * i + (i.isEven ? 0 : 0.2);
+      final radius = maxRadius * t * (0.82 + (i % 3) * 0.09);
+      final p = centre + Offset(math.cos(angle), math.sin(angle)) * radius;
 
-      final tp = TextPainter(
-        text: TextSpan(
-          text: _emojis[i % _emojis.length],
-          style: TextStyle(
-            fontSize: 22,
-            color: Colors.white.withValues(alpha: opacity),
-          ),
-        ),
-        textDirection: ui.TextDirection.ltr,
-      )..layout();
-      tp.paint(canvas, Offset(dx - tp.width / 2, dy - tp.height / 2));
+      switch (i % 3) {
+        case 0:
+          _sparkle(
+            canvas,
+            p,
+            8 * t + 2,
+            AppColors.orJour.withValues(alpha: opacity),
+            angle,
+          );
+        case 1:
+          canvas.drawCircle(
+            p,
+            4,
+            Paint()..color = AppColors.orJour.withValues(alpha: opacity),
+          );
+        default:
+          canvas.drawCircle(
+            p,
+            2.5,
+            Paint()
+              ..color =
+                  AppColors.textePrimaire.withValues(alpha: opacity * 0.85),
+          );
+      }
     }
+  }
+
+  /// Étincelle 4 branches concave centrée en [c].
+  void _sparkle(Canvas canvas, Offset c, double r, Color color, double rot) {
+    final path = Path();
+    const tips = 4;
+    for (var k = 0; k < tips * 2; k++) {
+      final rr = k.isEven ? r : r * 0.32;
+      final a = rot + (math.pi / tips) * k;
+      final pt = c + Offset(math.cos(a), math.sin(a)) * rr;
+      if (k == 0) {
+        path.moveTo(pt.dx, pt.dy);
+      } else {
+        path.lineTo(pt.dx, pt.dy);
+      }
+    }
+    path.close();
+    canvas.drawPath(path, Paint()..color = color);
   }
 
   @override

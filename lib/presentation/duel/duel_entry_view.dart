@@ -74,7 +74,7 @@ class DuelEntryView extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               Text(
-                '🌍 Internet requis pour la synchronisation temps réel.',
+                'Internet requis pour la synchronisation temps réel.',
                 textAlign: TextAlign.center,
                 style: AppTypography.crimson(
                   size: 12,

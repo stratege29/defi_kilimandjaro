@@ -12,6 +12,7 @@ import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -223,7 +224,7 @@ class _Header extends StatelessWidget {
             onPressed: () => context.pop(),
             tooltip: 'Retour',
           ),
-          Text(mountain.flagEmoji, style: const TextStyle(fontSize: 22)),
+          FlagRoundel(countryCode: mountain.countryCode, size: 28),
           const SizedBox(width: 8),
           Expanded(
             child: Column(

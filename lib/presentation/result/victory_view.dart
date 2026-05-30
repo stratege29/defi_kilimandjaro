@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
@@ -559,51 +558,75 @@ class _CaurisRewardChip extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Particle system — 12 emojis projetés en éventail depuis le centre
+// Particules dorées PEINTES (étincelles 4 branches + cauris + poussière crème)
+// projetées en éventail. Remplace les emoji ✨🌟🪙 (rendu OS-dépendant) par
+// du vectoriel crisp, sans dépendance asset.
 // ---------------------------------------------------------------------------
-
-const List<String> _kParticleEmojis = <String>['✨', '🌟', '🪙'];
 
 class _ParticlePainter extends CustomPainter {
   _ParticlePainter({required this.progress});
 
   final double progress;
 
+  static const int _count = 14;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final centre = Offset(size.width / 2, size.height / 2);
-    const particleCount = 12;
+    final centre = size.center(Offset.zero);
     final maxRadius = size.shortestSide * 0.55;
+    // easeOutCubic + fade-out sur les 30 derniers %.
+    final t = 1 - math.pow(1 - progress, 3).toDouble();
+    final opacity = progress < 0.7 ? 1.0 : (1.0 - (progress - 0.7) / 0.3);
+    if (opacity <= 0) return;
 
-    for (var i = 0; i < particleCount; i++) {
-      final angle = (2 * math.pi / particleCount) * i;
+    for (var i = 0; i < _count; i++) {
+      final angle = (2 * math.pi / _count) * i + (i.isEven ? 0 : 0.22);
+      final radius = maxRadius * t * (0.85 + (i % 3) * 0.08);
+      final p = centre + Offset(math.cos(angle), math.sin(angle)) * radius;
 
-      // easeOutCubic curve.
-      final t = 1 - math.pow(1 - progress, 3).toDouble();
-      final radius = maxRadius * t;
-
-      final dx = centre.dx + radius * math.cos(angle);
-      final dy = centre.dy + radius * math.sin(angle);
-
-      // Fade out in last 30 % of animation.
-      final opacity = (progress < 0.7) ? 1.0 : (1.0 - (progress - 0.7) / 0.3);
-
-      final textPainter = TextPainter(
-        text: TextSpan(
-          text: _kParticleEmojis[i % _kParticleEmojis.length],
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.white.withValues(alpha: opacity),
-          ),
-        ),
-        textDirection: ui.TextDirection.ltr,
-      )..layout();
-
-      textPainter.paint(
-        canvas,
-        Offset(dx - textPainter.width / 2, dy - textPainter.height / 2),
-      );
+      switch (i % 3) {
+        case 0:
+          canvas.drawCircle(
+            p,
+            4,
+            Paint()..color = AppColors.orJour.withValues(alpha: opacity),
+          );
+        case 1:
+          _sparkle(
+            canvas,
+            p,
+            7 * t + 2,
+            AppColors.orJour.withValues(alpha: opacity),
+            angle,
+          );
+        default:
+          canvas.drawCircle(
+            p,
+            2.5,
+            Paint()
+              ..color =
+                  AppColors.textePrimaire.withValues(alpha: opacity * 0.85),
+          );
+      }
     }
+  }
+
+  /// Dessine une étincelle 4 branches concave centrée en [c].
+  void _sparkle(Canvas canvas, Offset c, double r, Color color, double rot) {
+    final path = Path();
+    const tips = 4;
+    for (var k = 0; k < tips * 2; k++) {
+      final rr = k.isEven ? r : r * 0.32;
+      final a = rot + (math.pi / tips) * k;
+      final pt = c + Offset(math.cos(a), math.sin(a)) * rr;
+      if (k == 0) {
+        path.moveTo(pt.dx, pt.dy);
+      } else {
+        path.lineTo(pt.dx, pt.dy);
+      }
+    }
+    path.close();
+    canvas.drawPath(path, Paint()..color = color);
   }
 
   @override

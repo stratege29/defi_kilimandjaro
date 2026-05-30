@@ -16,6 +16,7 @@ import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart'
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/widgets/display_name_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -522,7 +523,7 @@ class _CurrentTitleChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(title.icon, style: const TextStyle(fontSize: 14)),
+          Image.asset(title.badgeAsset, width: 18, height: 18),
           const SizedBox(width: 6),
           Text(
             title.name,
@@ -1083,7 +1084,7 @@ class _MountainCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(mountain.flagEmoji, style: const TextStyle(fontSize: 26)),
+          FlagRoundel(countryCode: mountain.countryCode, size: 30),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

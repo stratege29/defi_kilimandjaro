@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -203,7 +204,7 @@ class _HoverLabel extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(mountain.flagEmoji, style: const TextStyle(fontSize: 14)),
+            FlagRoundel(countryCode: mountain.countryCode, size: 18),
             const SizedBox(width: 6),
             Text(
               mountain.name.toUpperCase(),

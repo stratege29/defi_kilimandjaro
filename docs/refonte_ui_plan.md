@@ -112,18 +112,43 @@ en assets (éviter la dépendance réseau au 1er lancement).
       **TODO(history)** : historique duels — pas de collection Firestore `duel_history`.
 
 ## Phase 6 — Popups / overlays
-- [ ] `result/victory_view.dart`, `failure_view.dart`, `mountain_conquest_view.dart`,
-      `home/widgets/daily_streak_dialog.dart` : cartes restylées.
-- [ ] **Vraies mascottes griot** (`griot_victory`/`griot_sad`) au lieu de placeholders.
-- [ ] Particules emoji → `fx/particle_gold`, `confetti_kente`.
+- [x] **Mascottes griot réelles** : `victory_view` utilise déjà `griotVictory`,
+      `failure_view` déjà `griotSad` — confirmé en place (pas de placeholder).
+- [x] **Particules emoji → vectorielles peintes** (`victory_view._ParticlePainter`,
+      `mountain_conquest_view._StarBurstPainter`) : étincelles 4 branches + cauris + poussière crème,
+      dorées, animées en éventail. ⚠️ `assets/images/fx/` est **vide** (`.gitkeep` seul) — les PNG
+      `particle_gold`/`confetti_kente` n'existent pas → painted vector retenu (mieux : 0 dépendance
+      asset, rendu identique tous OS, crisp). Imports `dart:ui` retirés.
+- [x] `failure_view.dart` / `daily_streak_dialog.dart` : déjà conformes (AppButton, tokens,
+      icônes Material, zéro emoji) — reskin auto, aucun changement requis.
+- [x] `dart analyze` (4 popups) → **No issues found**.
+
+**✅ Phase 6 terminée** (commit à faire).
 
 ## Phase 7 — Boutique / Classement / Profil
-- [ ] `shop_view.dart` : **vraies illustrations** (`coins_s..mega`, `no_ads`) en grille + offre bienvenue.
-- [ ] `leaderboard_view.dart` : onglets + mon rang + lignes.
+- [x] `shop_view.dart` : **utilise déjà** les vraies illustrations (`shopPackSheet`, `shopCauris S/M/L/XL/Mega`
+      scalées par montant, `shopNoAds`) — reskin auto via tokens, aucun changement requis.
+      *(Note : `✓` ligne 523 = glyphe texte monochrome, pas un emoji couleur → OK. `:315` lint info préexistant.)*
+- [x] `profile_view.dart` : **emoji drapeau → `FlagRoundel`** (cartes montagnes). `dart analyze` → clean.
+- [x] `leaderboard_view.dart` : aucun emoji, reskin auto via tokens (or/ELO/lignes).
+
+**✅ Phase 7 terminée** (commit à faire).
 - [ ] `profile_view.dart` : hero + altitude ELO + grille stats + sections.
 
 ## Phase 8 — Chasse aux emoji
-- [ ] `grep` global emoji dans `lib/` ; drapeaux, 🥁 lobby, 🌍 duel entry, particules → vecteurs/assets.
+- [x] Audit `grep` global `lib/`. Emoji UI résiduels supprimés :
+  - **Icônes titres honorifiques** 👂📖🔥🌿 (`honorific_title.dart`) : champ `icon` retiré de l'enum,
+    rendu profil basculé sur **badge PNG** (`title.badgeAsset` 18px) — les badges existent déjà.
+  - **flagEmoji → `FlagRoundel`** : `mountain_detail_view`, `altimeter_rail` (label flottant).
+  - **🌍** retiré (`duel_entry_view`).
+  - *(Déjà faits phases précédentes : 🥁 lobby, particules ✨🌟🪙 victoire/conquête,
+    drapeaux game/sommets/profil/accueil.)*
+- [x] `dart analyze` (5 fichiers) → clean (1 `info` préexistant non lié).
+- **Résiduels acceptables** (non-UI ou glyphe texte mono) : `🛡️` dans un **log** Firebase
+  (`app_check_setup`), `✓` dingbat texte dans le label « Déjà acheté » (shop), `★` glyphe data
+  (daily challenge). Aucun **emoji couleur OS-dépendant** ne subsiste dans l'UI rendue.
+
+**✅ Phase 8 terminée** (commit à faire).
 
 ## Phase 9 — QA / perf / a11y / tests
 - [ ] `flutter analyze` 0 warning ; aucun hex en dur ; strings via `easy_localization`.
