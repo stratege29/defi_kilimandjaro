@@ -31,7 +31,14 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _signingIn = false;
   String? _error;
   String? _errorDetail;
-  bool _useRedirect = true; // toggle pour fallback popup en cas de souci
+  // Popup par défaut : signInWithRedirect a un bug connu sur Flutter Web où
+  // getRedirectResult() retourne null silencieusement après le retour de
+  // Google → l'user repart sur l'écran sign-in (cf flutterfire issue #9601).
+  // Popup marche avec les headers COOP correctement set côté serveur dev :
+  //   flutter run -d chrome \
+  //     --web-header="Cross-Origin-Opener-Policy=same-origin-allow-popups" \
+  //     --web-header="Cross-Origin-Embedder-Policy=unsafe-none"
+  bool _useRedirect = false;
 
   String _firebaseDiagnostic() {
     try {
