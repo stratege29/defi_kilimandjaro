@@ -89,19 +89,40 @@ class _AscentCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(22),
             child: Stack(
               children: [
-                // Background gradient diurne (ciel ocre → vert forêt).
+                // Fond dark vert nuit (calme) — le héros visuel reste la
+                // peinture du sommet + le numéro de niveau en or.
                 Positioned.fill(
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                         colors: [
-                          AppColors.orSoleil.withValues(alpha: 0.32),
-                          AppColors.orChaud.withValues(alpha: 0.20),
-                          AppColors.vertForet,
+                          Color.lerp(
+                            AppColors.surfaceVariant,
+                            AppColors.success,
+                            0.16,
+                          )!,
+                          AppColors.surfaceContainer,
+                          AppColors.surface,
                         ],
-                        stops: const [0, 0.45, 1],
+                        stops: const [0, 0.55, 1],
+                      ),
+                    ),
+                  ),
+                ),
+                // Halo doré subtil en haut à droite (signature maquette).
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        center: const Alignment(0.85, -0.7),
+                        radius: 1.1,
+                        colors: [
+                          AppColors.orJour.withValues(alpha: 0.20),
+                          AppColors.orJour.withValues(alpha: 0),
+                        ],
+                        stops: const [0, 0.55],
                       ),
                     ),
                   ),
@@ -116,7 +137,7 @@ class _AscentCard extends StatelessWidget {
                   child: MountainHeroImage(
                     mountainId: mountain.id,
                     alignment: Alignment.bottomRight,
-                    opacity: 0.5,
+                    opacity: 0.72,
                     fallback: Align(
                       alignment: Alignment.bottomCenter,
                       child: Opacity(
@@ -132,8 +153,7 @@ class _AscentCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(22),
                       border: Border.all(
-                        color: AppColors.orSoleil.withValues(alpha: 0.55),
-                        width: 1.5,
+                        color: AppColors.orSoleil.withValues(alpha: 0.30),
                       ),
                     ),
                   ),
@@ -336,17 +356,17 @@ class _AscentAllDone extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                AppColors.orSoleil.withValues(alpha: 0.18),
-                AppColors.bois.withValues(alpha: 0.16),
+                AppColors.surfaceContainer,
+                AppColors.surface,
               ],
             ),
             borderRadius: BorderRadius.circular(22),
             border: Border.all(
-              color: AppColors.orSoleil.withValues(alpha: 0.55),
+              color: AppColors.orSoleil.withValues(alpha: 0.30),
             ),
           ),
           child: Column(

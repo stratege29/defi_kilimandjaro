@@ -70,17 +70,17 @@
   },
   "result": {
     "victory": {
-      "cauris_earned": "+{cauris} 🐚 Wisdom Cauris",
+      "cauris_earned": "+{cauris} Wisdom Cauris",
       "next": "NEXT →"
     },
     "failure": {
       "answer_was": "The answer was {answer}",
-      "retry": "TRY AGAIN 🔁",
-      "consolation": "Give it another shot! 🎯",
+      "retry": "TRY AGAIN",
+      "consolation": "Give it another shot!",
       "answer_hidden_title": "Hidden word",
       "answer_hidden_hint": "Wisdom is earned — try again or reveal the answer.",
-      "reveal_button": "Reveal answer — {cost} 🐚",
-      "reveal_insufficient": "Not enough cauris ({cost} 🐚 needed)"
+      "reveal_button": "Reveal answer — {cost}",
+      "reveal_insufficient": "Not enough cauris ({cost} needed)"
     }
   },
   "hub": {
@@ -100,29 +100,29 @@
     "subtitle": "From humble peaks to the roof of the continent",
     "locked": "Coming soon — finish the previous one",
     "locked_progression_cta": "FINISH THE PREVIOUS PEAK",
-    "locked_stargate_cta": "★ GATE: {stars} STARS MISSING",
-    "locked_stargate_snackbar": "You need {stars} more ★ to cross this gate. Replay your 1-star levels to improve them.",
+    "locked_stargate_cta": "GATE: {stars} STARS MISSING",
+    "locked_stargate_snackbar": "You need {stars} more to cross this gate. Replay your 1-star levels to improve them.",
     "level_locked": "Finish level {previous} to unlock"
   },
   "daily": {
     "title": "DAILY CHALLENGE",
     "subtitle": "One word, one shot — every day",
     "cta_available": "PLAY TODAY'S CHALLENGE",
-    "cta_done": "CHALLENGE COMPLETE ✓",
-    "reward_caption": "Reward: {cauris} 🐚",
+    "cta_done": "CHALLENGE COMPLETE",
+    "reward_caption": "Reward: {cauris}",
     "streak": "Streak: {count} days",
     "streak_broken": "Streak lost — start fresh today",
     "streak_zero": "Start your winning streak!",
     "pool_empty": "No riddles available in your pack",
-    "result_success": "+{cauris} 🐚 — {streak}-day streak",
+    "result_success": "+{cauris} — {streak}-day streak",
     "result_failure": "Streak lost — try again tomorrow",
-    "streak_bonus_banner": "🎉 +{cauris} 🐚 {days}-DAY STREAK BONUS",
-    "next_milestone_hint": "Next milestone: {target} days (+{bonus} 🐚)",
-    "freeze_tokens_count": "❄️ {count}/{max}",
-    "freeze_buy_cta": "Buy ❄️ — {cost} 🐚",
+    "streak_bonus_banner": "+{cauris} {days}-DAY STREAK BONUS",
+    "next_milestone_hint": "Next milestone: {target} days (+{bonus} )",
+    "freeze_tokens_count": "{count}/{max}",
+    "freeze_buy_cta": "Buy — {cost}",
     "freeze_buy_full": "Stock full ({max})",
-    "freeze_buy_insufficient": "Not enough cauris ({cost} 🐚 needed)",
-    "freeze_saved_banner": "❄️ Streak saved by freeze!"
+    "freeze_buy_insufficient": "Not enough cauris ({cost} needed)",
+    "freeze_saved_banner": "Streak saved by freeze!"
   },
   "profile": {
     "default_name": "Player",
@@ -208,7 +208,7 @@
     "soon": "Coming soon",
     "no_ads": {
       "title": "Remove ads",
-      "purchased": "✓ Already purchased — thank you!",
+      "purchased": "Already purchased — thank you!",
       "description": "No more interstitials. One-time purchase."
     },
     "restore": "Restore my purchases",
@@ -222,7 +222,7 @@
     "create_desc": "Generate a QR code to show your friend",
     "join": "JOIN VIA QR",
     "join_desc": "Scan a friend's QR to join their game",
-    "internet_hint": "🌍 Internet required for real-time synchronization.",
+    "internet_hint": "Internet required for real-time synchronization.",
     "create_title": "WAITING FOR A FRIEND",
     "show_qr": "Show this QR to your friend",
     "show_qr_sub": "They scan with \"Join via QR\".",

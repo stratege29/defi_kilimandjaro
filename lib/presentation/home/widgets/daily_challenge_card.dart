@@ -55,18 +55,17 @@ class DailyChallengeCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: <Color>[
-            AppColors.bois.withValues(alpha: 0.85),
-            AppColors.boisFonce.withValues(alpha: 0.95),
+            AppColors.surfaceContainer,
+            AppColors.surfaceVariant,
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.orSoleil.withValues(alpha: 0.45),
-          width: 1.2,
+          color: AppColors.orSoleil.withValues(alpha: 0.30),
         ),
         boxShadow: <BoxShadow>[
           BoxShadow(
