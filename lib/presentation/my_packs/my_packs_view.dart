@@ -1,27 +1,34 @@
 import 'dart:async';
 
+import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/composite_devinette_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/composite_pack_catalog_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
-import 'package:defi_kilimandjaro/presentation/my_packs/widgets/unlock_pack_dialog.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/sync/sync_state.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
+import 'package:defi_kilimandjaro/presentation/my_packs/widgets/unlock_pack_dialog.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/pack_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-/// Écran "Mes packs" — gestion du mix de pondération + vue catalogue.
+/// Critère de tri du catalogue de packs.
+enum PackSort { recent, price, alpha }
+
+/// Écran "Mes packs" — gestion du mix de pondération + catalogue.
 ///
-/// Entry point : icône en haut à droite de [MountainListView] (action bar)
-/// et depuis [ProfileView] (section Paramètres).
+/// Entry point : icône en haut à droite de [MountainListView] (action bar),
+/// la carte « Découvrir » de l'accueil, et [ProfileView].
 ///
-/// - 1 pack possédé → vue simplifiée (pack courant + section "débloquer").
-/// - 2+ packs possédés → sliders de pondération avec rebalance automatique.
+/// - 1 pack possédé → vue simplifiée (pack courant + catalogue à débloquer).
+/// - 2+ packs possédés → sliders de pondération + catalogue.
 class MyPacksView extends ConsumerStatefulWidget {
   const MyPacksView({super.key});
 
@@ -36,6 +43,12 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
 
   /// Timer de debounce pour éviter spam I/O sur chaque pixel de drag.
   Timer? _debounce;
+
+  /// Recherche texte courante sur le catalogue.
+  String _query = '';
+
+  /// Tri courant du catalogue.
+  PackSort _sort = PackSort.recent;
 
   @override
   void dispose() {
@@ -107,17 +120,6 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
       await ref.read(playerProgressProvider.notifier).setPackMix(mix);
     } on Exception {
       // Owned-pack validation failure — defensive, UI pre-validates.
-    }
-  }
-
-  String _emojiFor(String packId) {
-    switch (packId) {
-      case 'culture_ci':
-        return '\u{1F33E}';
-      case 'crack_nouchi':
-        return '\u{1F525}';
-      default:
-        return '\u{1F4DA}';
     }
   }
 
@@ -202,6 +204,7 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
         leading: const BackButton(color: AppColors.orJour),
         title: Text('my_packs.title'.tr(), style: AppTypography.headingLg),
         actions: [
+          const _CaurisBalanceChip(),
           IconButton(
             tooltip: 'my_packs.sync_button'.tr(),
             icon: const Icon(Icons.refresh, color: AppColors.orJour),
@@ -216,8 +219,7 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
                         .read(manifestSyncStateProvider.notifier)
                         .startRefresh());
                     try {
-                      await ref
-                          .read(refreshRemoteCatalogProvider.future);
+                      await ref.read(refreshRemoteCatalogProvider.future);
                     } catch (e) {
                       // Échec catalog n'est pas bloquant — l'app continue
                       // de fonctionner sur le bundle. Juste un toast discret.
@@ -253,23 +255,76 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
                     catalog.where((p) => ownedPacks.contains(p.id)).toList();
                 final notOwned =
                     catalog.where((p) => !ownedPacks.contains(p.id)).toList();
+                final catalogSection = _CatalogSection(
+                  notOwned: notOwned,
+                  query: _query,
+                  sort: _sort,
+                  onQueryChanged: (q) => setState(() => _query = q),
+                  onSortChanged: (s) => setState(() => _sort = s),
+                );
                 return owned.length >= 2
                     ? _MixView(
                         owned: owned,
-                        notOwned: notOwned,
                         localWeights: _localWeights ?? {},
-                        emojiFor: _emojiFor,
                         onSliderChanged: _onSliderChanged,
+                        catalogSection: catalogSection,
                       )
                     : _SinglePackView(
                         ownedPack: owned.isEmpty ? null : owned.first,
-                        notOwned: notOwned,
-                        emojiFor: _emojiFor,
+                        catalogSection: catalogSection,
                       );
               },
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Pastille de solde de cauris dans l'AppBar — miroir du header d'accueil.
+/// Tap → écran de recharge (shop).
+class _CaurisBalanceChip extends ConsumerWidget {
+  const _CaurisBalanceChip();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cauris = ref.watch(playerProgressProvider).cauris;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push(AppRoutes.shop),
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainer.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(20),
+              border:
+                  Border.all(color: AppColors.orSoleil.withValues(alpha: 0.45)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CaurisIcon(size: 16),
+                const SizedBox(width: 4),
+                Text(
+                  '$cauris',
+                  style:
+                      AppTypography.bebas(size: 14, color: AppColors.orSoleil),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.add_circle,
+                  size: 16,
+                  color: AppColors.orSoleil.withValues(alpha: 0.85),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -322,17 +377,15 @@ class _SyncBanner extends StatelessWidget {
 class _MixView extends StatelessWidget {
   const _MixView({
     required this.owned,
-    required this.notOwned,
     required this.localWeights,
-    required this.emojiFor,
     required this.onSliderChanged,
+    required this.catalogSection,
   });
 
   final List<Pack> owned;
-  final List<Pack> notOwned;
   final Map<String, double> localWeights;
-  final String Function(String) emojiFor;
   final void Function(String packId, double value) onSliderChanged;
+  final Widget catalogSection;
 
   @override
   Widget build(BuildContext context) {
@@ -354,19 +407,14 @@ class _MixView extends StatelessWidget {
         ...owned.map(
           (pack) => _PackSlider(
             pack: pack,
-            emoji: emojiFor(pack.id),
             percent: localWeights[pack.id] ?? 0,
             onChanged: (v) => onSliderChanged(pack.id, v),
           ),
         ),
         AppSpacing.gapMd,
         _TotalIndicator(totalPercent: totalPercent, totalOk: totalOk),
-        if (notOwned.isNotEmpty) ...[
-          AppSpacing.gapXl,
-          const _SectionDivider(labelKey: 'my_packs.available_section'),
-          AppSpacing.gapMd,
-          ...notOwned.map((pack) => _LockedPackCard(pack: pack, emoji: emojiFor(pack.id))),
-        ],
+        AppSpacing.gapXl,
+        catalogSection,
       ],
     );
   }
@@ -379,13 +427,11 @@ class _MixView extends StatelessWidget {
 class _SinglePackView extends StatelessWidget {
   const _SinglePackView({
     required this.ownedPack,
-    required this.notOwned,
-    required this.emojiFor,
+    required this.catalogSection,
   });
 
   final Pack? ownedPack;
-  final List<Pack> notOwned;
-  final String Function(String) emojiFor;
+  final Widget catalogSection;
 
   @override
   Widget build(BuildContext context) {
@@ -394,20 +440,209 @@ class _SinglePackView extends StatelessWidget {
       children: [
         AppSpacing.gapMd,
         if (ownedPack != null) ...[
-          _CurrentPackTile(
-            pack: ownedPack!,
-            emoji: emojiFor(ownedPack!.id),
-          ),
+          _CurrentPackTile(pack: ownedPack!),
           AppSpacing.gapXl,
         ],
-        if (notOwned.isNotEmpty) ...[
-          const _SectionDivider(labelKey: 'my_packs.unlock_section'),
-          AppSpacing.gapMd,
-          ...notOwned.map(
-            (pack) => _LockedPackCard(pack: pack, emoji: emojiFor(pack.id)),
-          ),
-        ],
+        catalogSection,
       ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Catalogue (packs à débloquer) — recherche + tri + liste
+// ---------------------------------------------------------------------------
+
+class _CatalogSection extends StatelessWidget {
+  const _CatalogSection({
+    required this.notOwned,
+    required this.query,
+    required this.sort,
+    required this.onQueryChanged,
+    required this.onSortChanged,
+  });
+
+  final List<Pack> notOwned;
+  final String query;
+  final PackSort sort;
+  final ValueChanged<String> onQueryChanged;
+  final ValueChanged<PackSort> onSortChanged;
+
+  int _cost(Pack p) => p.unlockCostCauris ?? p.priceCauris;
+
+  List<Pack> get _processed {
+    final q = query.trim().toLowerCase();
+    final list = q.isEmpty
+        ? List<Pack>.of(notOwned)
+        : notOwned.where((p) {
+            final name = p.nameKey.tr().toLowerCase();
+            final desc = p.descriptionKey.tr().toLowerCase();
+            return name.contains(q) || desc.contains(q);
+          }).toList();
+
+    switch (sort) {
+      case PackSort.recent:
+        list.sort((a, b) {
+          final ad = a.availableFrom;
+          final bd = b.availableFrom;
+          if (ad != null && bd != null) {
+            final c = bd.compareTo(ad);
+            if (c != 0) return c;
+          } else if (ad != null) {
+            return -1;
+          } else if (bd != null) {
+            return 1;
+          }
+          return a.ordering.compareTo(b.ordering);
+        });
+      case PackSort.price:
+        list.sort((a, b) => _cost(a).compareTo(_cost(b)));
+      case PackSort.alpha:
+        list.sort((a, b) => a.nameKey.tr().compareTo(b.nameKey.tr()));
+    }
+    return list;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (notOwned.isEmpty) return const SizedBox.shrink();
+    final processed = _processed;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _SectionDivider(labelKey: 'my_packs.catalog_section'),
+        AppSpacing.gapMd,
+        _SearchField(value: query, onChanged: onQueryChanged),
+        AppSpacing.gapSm,
+        _SortBar(sort: sort, onChanged: onSortChanged),
+        AppSpacing.gapMd,
+        if (processed.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+            child: Center(
+              child: Text(
+                'my_packs.no_results'.tr(),
+                style: AppTypography.bodySm
+                    .copyWith(color: AppColors.texteTertiaire),
+              ),
+            ),
+          )
+        else
+          ...processed.map((pack) => _LockedPackCard(pack: pack)),
+      ],
+    );
+  }
+}
+
+class _SearchField extends StatelessWidget {
+  const _SearchField({required this.value, required this.onChanged});
+
+  final String value;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      onChanged: onChanged,
+      style: AppTypography.bodyMd.copyWith(color: AppColors.textePrimaire),
+      cursorColor: AppColors.orJour,
+      decoration: InputDecoration(
+        isDense: true,
+        filled: true,
+        fillColor: AppColors.surfaceVariant,
+        hintText: 'my_packs.search_hint'.tr(),
+        hintStyle:
+            AppTypography.bodySm.copyWith(color: AppColors.texteTertiaire),
+        prefixIcon:
+            const Icon(Icons.search, color: AppColors.texteSecondaire, size: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.hairline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.hairline),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.orJour),
+        ),
+      ),
+    );
+  }
+}
+
+class _SortBar extends StatelessWidget {
+  const _SortBar({required this.sort, required this.onChanged});
+
+  final PackSort sort;
+  final ValueChanged<PackSort> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _SortChip(
+          label: 'my_packs.sort_recent'.tr(),
+          selected: sort == PackSort.recent,
+          onTap: () => onChanged(PackSort.recent),
+        ),
+        const SizedBox(width: 8),
+        _SortChip(
+          label: 'my_packs.sort_price'.tr(),
+          selected: sort == PackSort.price,
+          onTap: () => onChanged(PackSort.price),
+        ),
+        const SizedBox(width: 8),
+        _SortChip(
+          label: 'my_packs.sort_alpha'.tr(),
+          selected: sort == PackSort.alpha,
+          onTap: () => onChanged(PackSort.alpha),
+        ),
+      ],
+    );
+  }
+}
+
+class _SortChip extends StatelessWidget {
+  const _SortChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: selected
+                ? AppColors.orJour.withValues(alpha: 0.16)
+                : AppColors.surfaceVariant,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: selected ? AppColors.orJour : AppColors.hairline,
+            ),
+          ),
+          child: Text(
+            label,
+            style: AppTypography.labelSm.copyWith(
+              color: selected ? AppColors.orJour : AppColors.texteSecondaire,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -419,13 +654,11 @@ class _SinglePackView extends StatelessWidget {
 class _PackSlider extends StatelessWidget {
   const _PackSlider({
     required this.pack,
-    required this.emoji,
     required this.percent,
     required this.onChanged,
   });
 
   final Pack pack;
-  final String emoji;
   final double percent;
   final ValueChanged<double> onChanged;
 
@@ -441,7 +674,7 @@ class _PackSlider extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(emoji, style: const TextStyle(fontSize: 20)),
+                PackIcon(pack: pack, size: 28),
                 AppSpacing.hGapSm,
                 Expanded(
                   child: Text(
@@ -530,10 +763,9 @@ class _TotalIndicator extends StatelessWidget {
 }
 
 class _CurrentPackTile extends ConsumerWidget {
-  const _CurrentPackTile({required this.pack, required this.emoji});
+  const _CurrentPackTile({required this.pack});
 
   final Pack pack;
-  final String emoji;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -552,7 +784,7 @@ class _CurrentPackTile extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 28)),
+          PackIcon(pack: pack),
           AppSpacing.hGapSm,
           Expanded(
             child: Column(
@@ -574,11 +806,13 @@ class _CurrentPackTile extends ConsumerWidget {
   }
 }
 
+/// Carte d'un pack à débloquer. Toute la carte est cliquable et ouvre la
+/// confirmation d'achat ([UnlockPackDialog]). Le prix est affiché avec
+/// l'icône cauri. Les packs sans prix (`coming soon`) restent inertes.
 class _LockedPackCard extends StatelessWidget {
-  const _LockedPackCard({required this.pack, required this.emoji});
+  const _LockedPackCard({required this.pack});
 
   final Pack pack;
-  final String emoji;
 
   /// Coût d'unlock en cauris (Phase 3 catalog + Phase 4 wallet).
   /// 0 si pack non achetable (legacy "coming soon").
@@ -587,7 +821,7 @@ class _LockedPackCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final unlockable = _unlockCost > 0;
-    return Container(
+    final card = Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -597,13 +831,7 @@ class _LockedPackCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(
-            emoji,
-            style: const TextStyle(
-              fontSize: 28,
-              color: AppColors.texteDisabled,
-            ),
-          ),
+          PackIcon(pack: pack, dimmed: true),
           AppSpacing.hGapSm,
           Expanded(
             child: Column(
@@ -623,6 +851,13 @@ class _LockedPackCard extends StatelessWidget {
                     color: AppColors.texteTertiaire,
                   ),
                 ),
+                const SizedBox(height: 2),
+                Text(
+                  'my_packs.question_count'
+                      .tr(namedArgs: {'count': '${pack.questionCount}'}),
+                  style: AppTypography.labelXs
+                      .copyWith(color: AppColors.texteSecondaire),
+                ),
                 if (!unlockable)
                   Text(
                     'my_packs.coming_soon_sub'.tr(),
@@ -631,29 +866,55 @@ class _LockedPackCard extends StatelessWidget {
               ],
             ),
           ),
+          AppSpacing.hGapSm,
           if (unlockable)
-            Consumer(
-              builder: (context, ref, _) => OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.orJour,
-                  side: const BorderSide(color: AppColors.orJour),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                ),
-                onPressed: () =>
-                    UnlockPackDialog.show(context, pack: pack),
-                icon: const Icon(Icons.lock_open, size: 16),
-                label: Text('$_unlockCost ♦'),
-              ),
-            )
+            _PricePill(cost: _unlockCost)
           else
             const Icon(
               Icons.lock_outline,
               color: AppColors.texteDisabled,
               size: 20,
             ),
+        ],
+      ),
+    );
+
+    if (!unlockable) return card;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => UnlockPackDialog.show(context, pack: pack),
+        borderRadius: BorderRadius.circular(12),
+        child: card,
+      ),
+    );
+  }
+}
+
+/// Pastille de prix `coût + cauri` avec icône cauri.
+class _PricePill extends StatelessWidget {
+  const _PricePill({required this.cost});
+
+  final int cost;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.orJour.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.orJour.withValues(alpha: 0.55)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '$cost',
+            style: AppTypography.labelSm.copyWith(color: AppColors.orJour),
+          ),
+          const SizedBox(width: 4),
+          const CaurisIcon(size: 14),
         ],
       ),
     );
