@@ -143,7 +143,7 @@ class _GlobalTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncEntries = ref.watch(globalLeaderboardProvider);
     final myRankAsync = myUid != null
-        ? ref.watch(_myRankProvider(myUid!))
+        ? ref.watch(myRankProvider(myUid!))
         : null;
 
     return asyncEntries.when(
@@ -185,13 +185,6 @@ class _GlobalTab extends ConsumerWidget {
     );
   }
 }
-
-final _myRankProvider = FutureProvider.family<LeaderboardEntry?, String>((
-  ref,
-  uid,
-) {
-  return ref.watch(leaderboardRepositoryProvider).fetchMyRank(uid);
-});
 
 class _MyRankHeader extends ConsumerWidget {
   const _MyRankHeader({required this.myUid, required this.rankAsync});

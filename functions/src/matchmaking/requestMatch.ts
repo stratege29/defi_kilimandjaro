@@ -204,22 +204,14 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
     // --- Pas d'adversaire : ecrire / mettre a jour le lobby ---
     await lobbyRef.set({ mmr: myElo, ts: now, request_id });
 
-    // Increment online counter and setup onDisconnect hook to decrement.
-    // This is done here so the counter reflects active matchmaking players.
-    const onlineRef = rtdb.ref("lobby/stats/online");
-    const updateOnline: Record<string, unknown> = {
+    // Écriture de la présence : le client maintient cela via heartbeat,
+    // mais la CF peut aussi l'écrire pour garantir un timestamp frais.
+    // La prunePresence CF recalculera le compteur /lobby/stats/online
+    // automatiquement toutes les 1 minute.
+    const updatePresence: Record<string, unknown> = {
       [`presence/${uid}`]: { ts: ServerValue.TIMESTAMP },
     };
-    await rtdb.ref().update(updateOnline);
-
-    // Read current value and increment atomically
-    const currentSnap = await onlineRef.get();
-    const current = (currentSnap.val() as number) || 0;
-    await onlineRef.set(current + 1);
-
-    // Configure disconnect hook to decrement counter (will trigger when
-    // connection drops or lobby entry is removed).
-    await onlineRef.onDisconnect().set(Math.max(0, current));
+    await rtdb.ref().update(updatePresence);
 
     return { status: "waiting", lobbyEntry: { mmr: myElo, ts: now } };
   }

@@ -192,3 +192,11 @@ final friendsLeaderboardProvider =
       .watch(leaderboardRepositoryProvider)
       .watchFriendsLeaderboard(myUid);
 });
+
+/// Rang global approximatif du joueur (`null` si profil introuvable).
+final myRankProvider = FutureProvider.family<LeaderboardEntry?, String>((
+  ref,
+  uid,
+) {
+  return ref.watch(leaderboardRepositoryProvider).fetchMyRank(uid);
+});
