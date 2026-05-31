@@ -19,6 +19,12 @@ import 'dart:ui';
 /// | vShape     | >= 5               | Chevron / V         |
 /// | grid       | >= 8               | Grille rectangulaire|
 /// | star       | 10                 | Étoile 5 branches   |
+/// | cross      | 5, 9               | Croix `+`           |
+/// | xShape     | 5, 9               | Sautoir `X`         |
+/// | caret      | >= 5               | Accent `^`          |
+/// | lShape     | >= 5               | Équerre `L`         |
+/// | wave       | >= 5               | Sinusoïde           |
+/// | spiral     | >= 5               | Phyllotaxie (or)    |
 ///
 /// _Irréguliers procéduraux_ — différents à chaque partie (dépendent du
 /// `seed`), jamais deux dispositions identiques :
@@ -27,6 +33,10 @@ import 'dart:ui';
 /// | scatter    | >= 4               | Éparpillement type  |
 /// |            |                    | Poisson + relaxation|
 /// | jittered   | >= 4               | Cercle bruité borné |
+/// | clusters   | >= 6               | Amas / îlots        |
+///
+/// La plupart des formes curées non symétriques sont en plus retournées
+/// aléatoirement (flip H/V seedé, cf. [_orientable]) pour doubler la variété.
 ///
 /// Pour chaque count, plusieurs patterns sont éligibles
 /// ([compatiblePatterns]) — le tirage est uniforme. Le shuffle des LETTRES
@@ -56,8 +66,15 @@ enum GridPattern {
   vShape,
   grid,
   star,
+  cross,
+  xShape,
+  caret,
+  lShape,
+  wave,
+  spiral,
   scatter,
   jittered,
+  clusters,
 }
 
 class GridLayout {
@@ -90,10 +107,20 @@ List<GridPattern> compatiblePatterns(int count) {
       ..add(GridPattern.jittered)
       ..add(GridPattern.arc);
   }
-  if (count >= 5) list.add(GridPattern.vShape);
+  if (count >= 5) {
+    list
+      ..add(GridPattern.vShape)
+      ..add(GridPattern.caret)
+      ..add(GridPattern.lShape)
+      ..add(GridPattern.wave)
+      ..add(GridPattern.spiral);
+  }
   if (count == 5) list.add(GridPattern.diamond);
+  if (count == 5 || count == 9) list.add(GridPattern.cross);
+  if (count == 5 || count == 9) list.add(GridPattern.xShape);
   if (count == 6 || count == 7) list.add(GridPattern.twoRows);
   if (count >= 6 && count <= 8) list.add(GridPattern.zigzag);
+  if (count >= 6) list.add(GridPattern.clusters);
   if (count == 6 || count == 10) list.add(GridPattern.triangle);
   if (count == 7) list.add(GridPattern.hexagon);
   if (count >= 8) list.add(GridPattern.grid);
@@ -177,6 +204,36 @@ GridLayout computeLayout({
         tileSize: tileSize,
         padding: padding,
       ),
+    GridPattern.cross => _crossLayout(
+        count: count,
+        tileSize: tileSize,
+        padding: padding,
+      ),
+    GridPattern.xShape => _xShapeLayout(
+        count: count,
+        tileSize: tileSize,
+        padding: padding,
+      ),
+    GridPattern.caret => _caretLayout(
+        count: count,
+        tileSize: tileSize,
+        padding: padding,
+      ),
+    GridPattern.lShape => _lShapeLayout(
+        count: count,
+        tileSize: tileSize,
+        padding: padding,
+      ),
+    GridPattern.wave => _waveLayout(
+        count: count,
+        tileSize: tileSize,
+        padding: padding,
+      ),
+    GridPattern.spiral => _spiralLayout(
+        count: count,
+        tileSize: tileSize,
+        padding: padding,
+      ),
     GridPattern.scatter => _scatterLayout(
         count: count,
         available: available,
@@ -191,9 +248,74 @@ GridLayout computeLayout({
         padding: padding,
         seed: seed,
       ),
+    GridPattern.clusters => _clustersLayout(
+        count: count,
+        available: available,
+        tileSize: tileSize,
+        padding: padding,
+        seed: seed,
+      ),
   };
+  // Orientation aléatoire (flip H/V) pour les formes dont le sens n'est pas
+  // sémantique : double encore la variété perçue, sans casser la jouabilité
+  // (un flip préserve les distances).
+  final oriented = _orientable.contains(pattern)
+      ? _orient(raw, seed, tileSize, padding)
+      : raw;
   // Garantie « tout visible » : aucune forme ne dépasse le viewport.
-  return _ensureFits(raw, available, tileSize, padding);
+  return _ensureFits(oriented, available, tileSize, padding);
+}
+
+/// Patterns dont l'orientation (haut/bas, gauche/droite) n'est pas porteuse
+/// de sens : on peut les retourner aléatoirement pour varier le rendu.
+const Set<GridPattern> _orientable = <GridPattern>{
+  GridPattern.triangle,
+  GridPattern.arc,
+  GridPattern.vShape,
+  GridPattern.caret,
+  GridPattern.lShape,
+  GridPattern.wave,
+  GridPattern.zigzag,
+  GridPattern.twoRows,
+  GridPattern.grid,
+  GridPattern.cross,
+  GridPattern.xShape,
+};
+
+/// Retourne (flip H et/ou V, seedé) un layout autour du centre de sa bbox,
+/// puis le recadre. Préserve les distances → jouabilité intacte.
+GridLayout _orient(
+  GridLayout layout,
+  int seed,
+  double tileSize,
+  double padding,
+) {
+  if (layout.centers.isEmpty) return layout;
+  final rng = math.Random(seed ^ 0x5bd1e995);
+  final flipH = rng.nextBool();
+  final flipV = rng.nextBool();
+  if (!flipH && !flipV) return layout;
+
+  var minX = double.infinity;
+  var minY = double.infinity;
+  var maxX = -double.infinity;
+  var maxY = -double.infinity;
+  for (final p in layout.centers) {
+    if (p.dx < minX) minX = p.dx;
+    if (p.dy < minY) minY = p.dy;
+    if (p.dx > maxX) maxX = p.dx;
+    if (p.dy > maxY) maxY = p.dy;
+  }
+  final cx = (minX + maxX) / 2;
+  final cy = (minY + maxY) / 2;
+  final flipped = <Offset>[
+    for (final p in layout.centers)
+      Offset(
+        flipH ? 2 * cx - p.dx : p.dx,
+        flipV ? 2 * cy - p.dy : p.dy,
+      ),
+  ];
+  return _packCanvas(flipped, tileSize, padding, layout.smallHitIndices);
 }
 
 double _radiusFitFromAvailable(Size a, double tileSize, double padding) {
@@ -322,11 +444,15 @@ GridLayout _finalize(
   double padding, {
   double minDist = 0,
   bool detectTraps = false,
+  Set<int> traps = const <int>{},
 }) {
   final md = minDist <= 0 ? tileSize * 1.04 : minDist;
   _relaxOverlaps(pts, md);
-  final traps = detectTraps ? _detectTraps(pts, tileSize) : <int>{};
-  return _packCanvas(pts, tileSize, padding, traps);
+  final all = <int>{
+    ...traps,
+    if (detectTraps) ..._detectTraps(pts, tileSize),
+  };
+  return _packCanvas(pts, tileSize, padding, all);
 }
 
 /// Garantit que le layout TIENT dans [available] (« tout visible, jamais
@@ -667,6 +793,149 @@ GridLayout _starLayout({
   return _finalize(pts, tileSize, padding, minDist: tileSize * 1.06);
 }
 
+/// Croix (plus `+`) : tuile centrale + 4 bras orthogonaux de longueur égale.
+/// Pensée pour 5 (1+4) et 9 (1+8). La tuile centrale (index 0) est sur les
+/// lignes N↔S et E↔O → hit-radius réduit (`traps = {0}`).
+GridLayout _crossLayout({
+  required int count,
+  required double tileSize,
+  required double padding,
+}) {
+  final arm = (count - 1) ~/ 4; // tuiles par bras
+  final step = tileSize * 1.12;
+  final pts = <Offset>[Offset.zero];
+  for (var k = 1; k <= arm; k++) {
+    pts
+      ..add(Offset(0, -k * step))
+      ..add(Offset(0, k * step))
+      ..add(Offset(-k * step, 0))
+      ..add(Offset(k * step, 0));
+  }
+  while (pts.length < count) {
+    pts.add(Offset((pts.length - count) * step, (count + 1) * step));
+  }
+  return _finalize(
+    pts,
+    tileSize,
+    padding,
+    minDist: tileSize * 1.1,
+    traps: const <int>{0},
+  );
+}
+
+/// Sautoir (`X`) : tuile centrale + 4 bras en diagonale. Pensée pour 5 et 9.
+/// Centre piégé (sur les deux diagonales) → `traps = {0}`.
+GridLayout _xShapeLayout({
+  required int count,
+  required double tileSize,
+  required double padding,
+}) {
+  final arm = (count - 1) ~/ 4;
+  final step = tileSize * 0.82;
+  final pts = <Offset>[Offset.zero];
+  for (var k = 1; k <= arm; k++) {
+    pts
+      ..add(Offset(-k * step, -k * step))
+      ..add(Offset(k * step, -k * step))
+      ..add(Offset(-k * step, k * step))
+      ..add(Offset(k * step, k * step));
+  }
+  while (pts.length < count) {
+    pts.add(Offset((pts.length - count) * step, (arm + 2) * step));
+  }
+  return _finalize(
+    pts,
+    tileSize,
+    padding,
+    minDist: tileSize * 1.1,
+    traps: const <int>{0},
+  );
+}
+
+/// Accent circonflexe (`^`) : sommet en haut (index 0), deux bras qui
+/// descendent. Le bras gauche prend la tuile en plus pour les counts impairs.
+GridLayout _caretLayout({
+  required int count,
+  required double tileSize,
+  required double padding,
+}) {
+  final leftN = (count - 1 + 1) ~/ 2; // hors sommet, arrondi haut à gauche
+  final rightN = count - 1 - leftN;
+  final stepX = tileSize * 0.8;
+  final stepY = tileSize * 0.95;
+  final pts = <Offset>[Offset.zero]; // sommet
+  for (var k = 1; k <= leftN; k++) {
+    pts.add(Offset(-k * stepX, k * stepY));
+  }
+  for (var k = 1; k <= rightN; k++) {
+    pts.add(Offset(k * stepX, k * stepY));
+  }
+  return _finalize(pts, tileSize, padding);
+}
+
+/// Équerre (`L`) : un bras vertical montant + un bras horizontal partant du
+/// coin vers la droite. Le coin (index 0) est partagé par les deux bras.
+GridLayout _lShapeLayout({
+  required int count,
+  required double tileSize,
+  required double padding,
+}) {
+  final upN = (count + 1) ~/ 2; // coin compris
+  final rightN = count - upN;
+  final step = tileSize * 1.12;
+  final pts = <Offset>[
+    for (var k = 0; k < upN; k++) Offset(0, -k * step),
+  ];
+  for (var k = 1; k <= rightN; k++) {
+    pts.add(Offset(k * step, 0));
+  }
+  return _finalize(pts, tileSize, padding);
+}
+
+/// Vague (sinusoïde horizontale) : tuiles le long d'une sinus, ~1.5 période.
+/// Les `x` croissent strictement → pas de tuile piégée entre voisins.
+GridLayout _waveLayout({
+  required int count,
+  required double tileSize,
+  required double padding,
+}) {
+  final hStep = tileSize * 1.12;
+  final amp = tileSize * 0.75;
+  final pts = <Offset>[
+    for (var i = 0; i < count; i++)
+      Offset(
+        i * hStep,
+        amp * math.sin(i / (count - 1) * math.pi * 3),
+      ),
+  ];
+  return _finalize(pts, tileSize, padding);
+}
+
+/// Spirale phyllotaxique (angle d'or) : tuiles posées en escargot, espacement
+/// quasi uniforme façon graine de tournesol. Pièges auto-détectés.
+GridLayout _spiralLayout({
+  required int count,
+  required double tileSize,
+  required double padding,
+}) {
+  const golden = 2.39996323; // angle d'or en radians
+  final c = tileSize * 1.12;
+  final pts = <Offset>[
+    for (var i = 0; i < count; i++)
+      Offset(
+        c * math.sqrt(i + 0.5) * math.cos(i * golden),
+        c * math.sqrt(i + 0.5) * math.sin(i * golden),
+      ),
+  ];
+  return _finalize(
+    pts,
+    tileSize,
+    padding,
+    minDist: tileSize * 1.08,
+    detectTraps: true,
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Patterns irréguliers procéduraux (dépendent du seed)
 // ---------------------------------------------------------------------------
@@ -744,13 +1013,61 @@ GridLayout _jitteredLayout({
   final ideal = count * tileSize * 1.7 / (2 * math.pi);
   final r = ideal.clamp(minRadius, math.max(minRadius, fit));
   final minDist = tileSize * 1.08;
-  final jit = tileSize * 0.5;
+  // Amplitude de jitter elle-même bruitée par session : certaines parties
+  // sont presque-régulières, d'autres franchement chaotiques.
+  final jit = tileSize * (0.5 + rng.nextDouble() * 0.45);
   final pts = <Offset>[];
   for (var i = 0; i < count; i++) {
     final ang = -math.pi / 2 + 2 * math.pi * i / count;
     final jx = (rng.nextDouble() - 0.5) * 2 * jit;
     final jy = (rng.nextDouble() - 0.5) * 2 * jit;
     pts.add(Offset(r * math.cos(ang) + jx, r * math.sin(ang) + jy));
+  }
+  return _finalize(
+    pts,
+    tileSize,
+    padding,
+    minDist: minDist,
+    detectTraps: true,
+  );
+}
+
+/// Grappes : 2-3 amas de tuiles, chaque amas posé autour d'un centre tiré au
+/// hasard, les tuiles éparpillées en local. Donne un rendu « îlots » très
+/// différent du scatter homogène. Anti-chevauchement + pièges via `_finalize`.
+GridLayout _clustersLayout({
+  required int count,
+  required Size available,
+  required double tileSize,
+  required double padding,
+  required int seed,
+}) {
+  if (count == 0) {
+    final empty = tileSize + padding * 2;
+    return GridLayout(centers: const <Offset>[], size: Size.square(empty));
+  }
+  final rng = math.Random(seed);
+  final minDist = tileSize * 1.16;
+  final nClusters = count >= 8 ? 3 : 2;
+  final fit = _radiusFitFromAvailable(available, tileSize, padding);
+  final spread = (math.sqrt(count.toDouble()) * minDist * 0.75)
+      .clamp(minDist, math.max(minDist, fit));
+  final clusterR = tileSize * 1.05;
+
+  // Centres d'amas répartis sur un cercle, pour qu'ils ne se superposent pas.
+  final hubs = <Offset>[
+    for (var i = 0; i < nClusters; i++)
+      Offset(
+        spread * math.cos(2 * math.pi * i / nClusters + rng.nextDouble()),
+        spread * math.sin(2 * math.pi * i / nClusters + rng.nextDouble()),
+      ),
+  ];
+  final pts = <Offset>[];
+  for (var i = 0; i < count; i++) {
+    final hub = hubs[i % nClusters];
+    final a = rng.nextDouble() * 2 * math.pi;
+    final rad = clusterR * math.sqrt(rng.nextDouble());
+    pts.add(Offset(hub.dx + rad * math.cos(a), hub.dy + rad * math.sin(a)));
   }
   return _finalize(
     pts,
