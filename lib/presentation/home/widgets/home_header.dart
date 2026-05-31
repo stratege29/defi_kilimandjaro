@@ -3,87 +3,43 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
-import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
 import 'package:defi_kilimandjaro/data/services/daily_streak_service.dart';
-import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart'
-    show kAltitudeHeroTag;
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Header sticky world-class du Hub d'Accueil.
+/// Header épuré du Hub d'Accueil (maquette Vert Nuit).
 ///
-/// Layout 3 zones : streak pulsé à gauche · KILIMANDJARO centré ·
-/// cluster cauris/altitude à droite. Fond `surface` (vert plus sombre
-/// que le body) pour créer une 1ʳᵉ strate de profondeur, séparation par
-/// bande dorée fine + ombre subtile vers le bas.
+/// Deux pastilles seulement : série quotidienne à gauche · solde de cauris
+/// à droite (tap → recharge). Fond `surface` + séparation hairline discrète
+/// pour poser une 1ʳᵉ strate de profondeur sans surcharge.
 class HomeHeader extends ConsumerWidget {
   const HomeHeader({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final progress = ref.watch(playerProgressProvider);
-    final profileAsync = ref.watch(playerProfileStreamProvider);
     final streakAsync = ref.watch(dailyStreakProvider);
-    final myElo = profileAsync.value?.elo ?? 1000;
     final streak = streakAsync.value ?? 0;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(
-          bottom: BorderSide(
-            color: AppColors.orSoleil.withValues(alpha: 0.28),
-            width: 1.2,
-          ),
+          bottom: BorderSide(color: AppColors.hairline),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.20),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Row(
         children: [
           _StreakChip(days: streak),
-          const SizedBox(width: 12),
-          Expanded(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                'KILIMANDJARO',
-                style: AppTypography.bebas(size: 18, letterSpacing: 3),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          // Icône Boutique → écran « Découvrir » (packs de contenu + promos),
-          // distinct de la recharge de cauris (chip ci-dessous → /shop).
-          IconButton(
-            icon: const Icon(Icons.storefront_outlined, size: 20),
-            color: AppColors.orSoleil,
-            visualDensity: VisualDensity.compact,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            tooltip: 'Découvrir',
-            onPressed: () => context.push(AppRoutes.discover),
-          ),
-          const SizedBox(width: 4),
+          const Spacer(),
           _HeaderChip(
             iconWidget: const CaurisIcon(size: 16),
             value: '${progress.cauris}',
             trailingPlus: true,
             onTap: () => context.push(AppRoutes.shop),
-          ),
-          const SizedBox(width: 8),
-          // Hero partagé avec Hub Défi, Lobby et Profile.
-          Hero(
-            tag: kAltitudeHeroTag,
-            child: _AltitudeChip(elo: myElo),
           ),
         ],
       ),
@@ -160,42 +116,6 @@ class _StreakChipState extends State<_StreakChip>
           Text(
             '$days',
             style: AppTypography.bebas(size: 14, color: accent),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Chip altitude (Hero partagé) — fond bois subtil, bordure or.
-class _AltitudeChip extends StatelessWidget {
-  const _AltitudeChip({required this.elo});
-  final int elo;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.surfaceContainer.withValues(alpha: 0.70),
-            AppColors.surfaceContainer.withValues(alpha: 0.40),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.orSoleil.withValues(alpha: 0.45)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.terrain, size: 14, color: AppColors.orSoleil),
-          const SizedBox(width: 4),
-          Text(
-            '$elo m',
-            style: AppTypography.bebas(size: 14, color: AppColors.orSoleil),
           ),
         ],
       ),

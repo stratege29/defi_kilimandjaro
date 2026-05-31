@@ -174,17 +174,16 @@ class _FailureCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.error, width: 1.5),
+        borderRadius: BorderRadius.circular(24),
+        // Vert Nuit : bordure sémantique « échec » en hairline rouge teinté,
+        // pas de rouge plein ni de glow. Seule une ombre noire diffuse porte
+        // l'élévation.
+        border: Border.all(color: AppColors.error.withValues(alpha: 0.4)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.error.withValues(alpha: 0.18),
-            blurRadius: 28,
-          ),
-          BoxShadow(
             color: Colors.black.withValues(alpha: 0.55),
-            blurRadius: 32,
-            offset: const Offset(0, 12),
+            blurRadius: 60,
+            offset: const Offset(0, 24),
           ),
         ],
       ),

@@ -141,20 +141,17 @@ class _ConquestCard extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 440),
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
       decoration: BoxDecoration(
-        // Palette 2026 : surface opaque + border or fin + double shadow
-        // (halo subtil + profondeur). Aligné avec VictoryView refondu.
+        // Vert Nuit : surface opaque + bordure or en hairline (variante
+        // « conquête »). Le moment doré vient du halo pulsant derrière la
+        // silhouette, pas d'un glow de card. Une seule ombre noire diffuse.
         color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppColors.orJour, width: 1.5),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.orJour.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.orJour.withValues(alpha: 0.20),
-            blurRadius: 32,
-          ),
-          BoxShadow(
             color: Colors.black.withValues(alpha: 0.55),
-            blurRadius: 32,
-            offset: const Offset(0, 12),
+            blurRadius: 60,
+            offset: const Offset(0, 24),
           ),
         ],
       ),
@@ -240,9 +237,8 @@ class _ConquestCard extends StatelessWidget {
                 TextSpan(text: altitudeLabel, style: AppTypography.displayLg),
                 TextSpan(
                   text: ' m',
-                  style: AppTypography.displayLg.copyWith(
-                    fontSize: 22,
-                    color: AppColors.orJour.withValues(alpha: 0.7),
+                  style: AppTypography.bodyMd.copyWith(
+                    color: AppColors.texteSecondaire,
                   ),
                 ),
               ],

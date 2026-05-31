@@ -6,18 +6,20 @@ import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/home/home_view.dart' show launchNextLevel;
 import 'package:defi_kilimandjaro/presentation/home/providers/current_mountain_provider.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
-import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/mountain_hero_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Carte HERO « Continue ta montée » world-class.
+/// Carte HERO « Continuer l'ascension » — pièce maîtresse de l'accueil.
 ///
-/// Pièce maîtresse de l'accueil. Hauteur 200px, silhouette vectorielle
-/// de la montagne en background, niveau N/total en Fraunces 56pt à droite,
-/// progress bar épaisse avec gradient orChaud→orSoleil, glow doré autour
-/// de la carte pour l'élévation premium.
+/// Layout vertical façon maquette Vert Nuit : eyebrow doré, numéro de niveau
+/// en Fraunces XL, nom du sommet, méta (niveau / total · altitude), barre de
+/// progression pleine largeur, puis le CTA GRIMPER intégré dans la carte.
+/// La peinture du sommet déborde discrètement depuis le bord droit.
+/// Élévation par surface opaque + une seule ombre noire (pas de glow coloré),
+/// la chaleur dorée venant d'un radial subtil dans le fond.
 class ContinueAscentCard extends ConsumerWidget {
   const ContinueAscentCard({super.key});
 
@@ -57,283 +59,146 @@ class _AscentCard extends StatelessWidget {
   final int totalLevelsLifetime;
   final VoidCallback onTap;
 
+  /// Formate une altitude en mètres avec une espace fine comme séparateur
+  /// de milliers (1752 → « 1 752 »), façon maquette.
+  static String _formatAltitude(int alt) {
+    final s = alt.toString();
+    if (s.length <= 3) return s;
+    return '${s.substring(0, s.length - 3)} ${s.substring(s.length - 3)}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final nextLevel = mountain.completedLevels + 1;
     final progress = mountain.progress;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(22),
-        child: Container(
-          height: 200,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            // Glow doré subtil autour de la carte premium.
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.orSoleil.withValues(alpha: 0.22),
-                blurRadius: 24,
-                spreadRadius: 1,
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.35),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.hairline),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.45),
+            blurRadius: 40,
+            offset: const Offset(0, 18),
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: Stack(
-              children: [
-                // Fond dark vert nuit (calme) — le héros visuel reste la
-                // peinture du sommet + le numéro de niveau en or.
-                Positioned.fill(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color.lerp(
-                            AppColors.surfaceVariant,
-                            AppColors.success,
-                            0.16,
-                          )!,
-                          AppColors.surfaceContainer,
-                          AppColors.surface,
-                        ],
-                        stops: const [0, 0.55, 1],
-                      ),
-                    ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          children: [
+            // Radial doré discret en haut à droite (seule chaleur de la carte).
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: const Alignment(0.85, -0.9),
+                    radius: 1.05,
+                    colors: [
+                      AppColors.orJour.withValues(alpha: 0.18),
+                      AppColors.orJour.withValues(alpha: 0),
+                    ],
+                    stops: const [0, 0.55],
                   ),
                 ),
-                // Halo doré subtil en haut à droite (signature maquette).
-                Positioned.fill(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: RadialGradient(
-                        center: const Alignment(0.85, -0.7),
-                        radius: 1.1,
-                        colors: [
-                          AppColors.orJour.withValues(alpha: 0.20),
-                          AppColors.orJour.withValues(alpha: 0),
-                        ],
-                        stops: const [0, 0.55],
-                      ),
-                    ),
+              ),
+            ),
+            // Peinture du sommet en cours, débordant depuis le bord droit
+            // (repli : silhouette vectorielle pour les sommets sans hero).
+            Positioned(
+              right: -14,
+              top: 2,
+              height: 150,
+              width: 150,
+              child: MountainHeroImage(
+                mountainId: mountain.id,
+                alignment: Alignment.topRight,
+                opacity: 0.85,
+                fallback: Align(
+                  alignment: Alignment.topRight,
+                  child: Opacity(
+                    opacity: 0.42,
+                    child: MountainSilhouetteVector(mountain: mountain),
                   ),
                 ),
-                // Peinture réelle du sommet en cours, alignée en bas à droite
-                // (repli : silhouette vectorielle pour les sommets sans hero).
-                Positioned(
-                  right: -8,
-                  bottom: -6,
-                  top: 8,
-                  width: 184,
-                  child: MountainHeroImage(
-                    mountainId: mountain.id,
-                    alignment: Alignment.bottomRight,
-                    opacity: 0.72,
-                    fallback: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Opacity(
-                        opacity: 0.42,
-                        child: MountainSilhouetteVector(mountain: mountain),
-                      ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "CONTINUER L'ASCENSION",
+                    style: AppTypography.bebas(
+                      size: 12,
+                      color: AppColors.orJour,
+                      letterSpacing: 1.5,
                     ),
                   ),
-                ),
-                // Bordure or fine au-dessus du contenu.
-                Positioned.fill(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(22),
-                      border: Border.all(
-                        color: AppColors.orSoleil.withValues(alpha: 0.30),
-                      ),
+                  const SizedBox(height: 2),
+                  Text(
+                    nextLevel.toString().padLeft(2, '0'),
+                    style: AppTypography.displayLg.copyWith(
+                      color: AppColors.orJour,
+                      height: 1,
                     ),
                   ),
-                ),
-                // Contenu.
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Top : badge MONT + nom + flag.
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const _PillBadge(
-                                  text: 'CONTINUE TA MONTÉE',
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    FlagRoundel(
-                                      countryCode: mountain.countryCode,
-                                      size: 22,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Flexible(
-                                      child: Text(
-                                        'MONT ${mountain.name.toUpperCase()}',
-                                        style: AppTypography.bebas(
-                                          size: 18,
-                                          color: AppColors.orSoleil,
-                                          letterSpacing: 2,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  mountain.countryName,
-                                  style: AppTypography.crimson(
-                                    size: 12,
-                                    color: AppColors.texteSecondaire,
-                                    style: FontStyle.italic,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            // Bottom : altitude + lifetime.
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.terrain,
-                                  size: 14,
-                                  color: AppColors.orSoleil,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${mountain.altitude} m',
-                                  style: AppTypography.bebas(
-                                    size: 13,
-                                    color: AppColors.textePrimaire,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  '·  $totalLevelsLifetime niveaux',
-                                  style: AppTypography.crimson(
-                                    size: 12,
-                                    color: AppColors.texteSecondaire,
-                                    style: FontStyle.italic,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                  const SizedBox(height: 4),
+                  Text(
+                    'MONT ${mountain.name.toUpperCase()}',
+                    style: AppTypography.headingMd.copyWith(letterSpacing: 0.5),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Niveau $nextLevel / ${mountain.totalLevels}  ·  '
+                    '${_formatAltitude(mountain.altitude)} m',
+                    style: AppTypography.bodySm.copyWith(
+                      color: AppColors.texteSecondaire,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  // Barre de progression pleine largeur.
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: 7,
+                          color: Colors.black.withValues(alpha: 0.35),
                         ),
-                      ),
-                      // Niveau N en Fraunces très large à droite.
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            'NIVEAU',
-                            style: AppTypography.bebas(
-                              size: 11,
-                              color: AppColors.texteSecondaire,
-                              letterSpacing: 2,
-                            ),
-                          ),
-                          RichText(
-                            textAlign: TextAlign.right,
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: '$nextLevel',
-                                  style: AppTypography.playfair(size: 56),
-                                ),
-                                TextSpan(
-                                  text: ' / ${mountain.totalLevels}',
-                                  style: AppTypography.playfair(
-                                    size: 22,
-                                    color: AppColors.texteSecondaire,
-                                    weight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          // Progress bar arrondie épaisse.
-                          SizedBox(
-                            width: 120,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
-                              child: Stack(
-                                children: [
-                                  Container(
-                                    height: 8,
-                                    color: AppColors.boisFonce
-                                        .withValues(alpha: 0.55),
-                                  ),
-                                  FractionallySizedBox(
-                                    widthFactor: progress.clamp(0.0, 1.0),
-                                    child: Container(
-                                      height: 8,
-                                      decoration: const BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            AppColors.orChaud,
-                                            AppColors.orSoleil,
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                        FractionallySizedBox(
+                          widthFactor: progress.clamp(0.0, 1.0),
+                          child: Container(
+                            height: 7,
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.orChaud,
+                                  AppColors.orSoleil,
                                 ],
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  AppButton(
+                    label: 'GRIMPER',
+                    icon: Icons.terrain,
+                    fullWidth: true,
+                    onPressed: onTap,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Badge pill doré pour le label en haut de la carte HERO.
-class _PillBadge extends StatelessWidget {
-  const _PillBadge({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: AppColors.orSoleil,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        text,
-        style: AppTypography.bebas(
-          size: 10,
-          color: AppColors.vertForet,
-          letterSpacing: 2,
+          ],
         ),
       ),
     );

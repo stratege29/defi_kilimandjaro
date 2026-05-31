@@ -443,8 +443,6 @@ class _MountainPage extends StatelessWidget {
               children: [
                 const SizedBox(height: 16),
                 _NameHeader(mountain: mountain),
-                const SizedBox(height: 8),
-                _AltitudeDisplay(altitude: mountain.altitude),
                 const Spacer(),
                 _ProgressFooter(
                   mountain: mountain,
@@ -474,21 +472,43 @@ class _NameHeader extends StatelessWidget {
       opacity: opacity,
       child: Row(
         children: [
-          FlagRoundel(countryCode: mountain.countryCode, size: 26),
-          const SizedBox(width: 8),
+          FlagRoundel(countryCode: mountain.countryCode, size: 30),
+          const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              mountain.name.toUpperCase(),
-              style: AppTypography.bebas(size: 18, letterSpacing: 3),
-              overflow: TextOverflow.ellipsis,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  mountain.name.toUpperCase(),
+                  style: AppTypography.bebas(size: 14),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  mountain.countryName,
+                  style: AppTypography.crimson(
+                    size: 12,
+                    style: FontStyle.italic,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
-          Text(
-            mountain.countryName,
-            style: AppTypography.crimson(
-              size: 12,
-              color: AppColors.texteSecondaire,
-              style: FontStyle.italic,
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.surface.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: AppColors.hairline),
+            ),
+            child: Text(
+              'Niv. ${mountain.completedLevels}/${mountain.totalLevels}',
+              style: AppTypography.labelXs.copyWith(
+                color: AppColors.textePrimaire,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
@@ -509,13 +529,15 @@ class _AltitudeDisplay extends StatelessWidget {
         children: [
           TextSpan(
             text: formatted,
-            style: AppTypography.bebas(size: 56, color: AppColors.orSoleil),
+            style: AppTypography.displayLg.copyWith(
+              fontSize: 46,
+              color: AppColors.textePrimaire,
+            ),
           ),
           TextSpan(
             text: ' m',
-            style: AppTypography.bebas(
-              size: 24,
-              color: AppColors.orSoleil.withValues(alpha: 0.7),
+            style: AppTypography.bodyMd.copyWith(
+              color: AppColors.texteSecondaire,
             ),
           ),
         ],
@@ -560,16 +582,29 @@ class _ProgressFooter extends StatelessWidget {
             completed: mountain.completedLevels,
             total: mountain.totalLevels,
           ),
-          const SizedBox(height: 4),
-          Text(
-            '${mountain.completedLevels}/${mountain.totalLevels} niveaux conquis',
-            style: AppTypography.crimson(
-              size: 13,
-              color: AppColors.texteSecondaire,
-            ),
+          const SizedBox(height: 8),
+          // Altitude (Fraunces) + libellé de progression alignés en bas.
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _AltitudeDisplay(altitude: mountain.altitude),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 5),
+                  child: Text(
+                    '${mountain.completedLevels}/${mountain.totalLevels} niveaux conquis',
+                    style: AppTypography.bodySm.copyWith(
+                      color: AppColors.texteSecondaire,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 14),
-          // Bouton CTA.
+          const SizedBox(height: 12),
+          // Bouton CTA pleine largeur.
           _CtaButton(
             unlocked: unlocked,
             isCompleted: isCompleted,
@@ -630,9 +665,11 @@ class _CtaButton extends StatelessWidget {
     final Color textColor;
     final String label;
 
+    final Color borderColor;
     if (!unlocked) {
-      bgColor = AppColors.boisFonce.withValues(alpha: 0.6);
+      bgColor = AppColors.surface.withValues(alpha: 0.6);
       textColor = AppColors.texteTertiaire;
+      borderColor = AppColors.hairline;
       final stars = starsRequiredToUnlock ?? 0;
       label = stars > 0
           ? 'mountains.locked_stargate_cta'.tr(
@@ -640,12 +677,14 @@ class _CtaButton extends StatelessWidget {
             )
           : 'mountains.locked_progression_cta'.tr();
     } else if (isCompleted) {
-      bgColor = AppColors.vertClair.withValues(alpha: 0.25);
-      textColor = AppColors.vertClair;
+      bgColor = AppColors.surface;
+      textColor = AppColors.orJour;
+      borderColor = AppColors.orJour.withValues(alpha: 0.5);
       label = 'GRAVIR À NOUVEAU';
     } else {
-      bgColor = AppColors.orSoleil;
+      bgColor = AppColors.orJour;
       textColor = AppColors.surface;
+      borderColor = AppColors.orJour;
       label = 'GRAVIR';
     }
 
@@ -653,20 +692,17 @@ class _CtaButton extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+        width: double.infinity,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: unlocked
-                ? (isCompleted ? AppColors.vertClair : AppColors.orChaud)
-                : AppColors.boisFonce,
-            width: 1.5,
-          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor),
         ),
         child: Text(
           label,
-          style: AppTypography.bebas(size: 15, color: textColor),
+          style: AppTypography.headingMd.copyWith(color: textColor),
         ),
       ),
     );

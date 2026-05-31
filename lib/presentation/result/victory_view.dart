@@ -283,19 +283,20 @@ class _VictoryCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.orJour, width: 1.5),
+        borderRadius: BorderRadius.circular(24),
+        // Vert Nuit : bordure sémantique « victoire » (succès) en hairline
+        // teinté, pas d'or plein. La profondeur naît d'une seule ombre noire
+        // diffuse — aucun halo doré (retenue : « moins de glows »).
+        border: Border.all(
+          color: isBoss
+              ? AppColors.orJour.withValues(alpha: 0.5)
+              : AppColors.success.withValues(alpha: 0.4),
+        ),
         boxShadow: <BoxShadow>[
-          // Halo doré subtil (signature 2026).
-          BoxShadow(
-            color: AppColors.orJour.withValues(alpha: 0.18),
-            blurRadius: 28,
-          ),
-          // Profondeur sous la card.
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.55),
-            blurRadius: 32,
-            offset: const Offset(0, 12),
+            blurRadius: 60,
+            offset: const Offset(0, 24),
           ),
         ],
       ),

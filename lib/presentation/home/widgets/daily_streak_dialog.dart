@@ -36,8 +36,8 @@ class DailyStreakDialog extends ConsumerWidget {
     return Dialog(
       backgroundColor: AppColors.surfaceContainer,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: AppColors.orJour, width: 1.5),
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: AppColors.orJour.withValues(alpha: 0.5)),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
@@ -51,7 +51,7 @@ class DailyStreakDialog extends ConsumerWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'STREAK · JOUR $streakDay',
+              'SÉRIE · JOUR $streakDay',
               style: AppTypography.bebas(size: 18, color: AppColors.orJour)
                   .copyWith(letterSpacing: 2),
             ),

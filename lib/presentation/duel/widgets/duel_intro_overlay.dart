@@ -467,7 +467,9 @@ class _PlayerPortrait extends ConsumerWidget {
                         ),
                         Text(
                           pseudo,
-                          style: AppTypography.headingSm,
+                          style: AppTypography.headingMd.copyWith(
+                            letterSpacing: 0.8,
+                          ),
                           textAlign: TextAlign.center,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
@@ -522,15 +524,18 @@ class _VsBadge extends StatelessWidget {
       style: FontStyle.italic,
     ).copyWith(
       shadows: [
-        const Shadow(color: AppColors.orCrepuscule, offset: Offset(3, 4)),
+        // Relief « métal gravé » à 3 couches (cf. maquette .ds-vs2) :
+        // or profond → bronze sombre → profondeur noire, puis halo doré.
+        const Shadow(color: AppColors.orChaud, offset: Offset(3, 4)),
+        const Shadow(color: AppColors.orCrepuscule, offset: Offset(5, 7)),
         Shadow(
-          color: Colors.black.withValues(alpha: 0.6),
-          offset: const Offset(5, 7),
-          blurRadius: 14,
+          color: Colors.black.withValues(alpha: 0.7),
+          offset: const Offset(6, 9),
+          blurRadius: 16,
         ),
         Shadow(
-          color: AppColors.orJour.withValues(alpha: 0.6),
-          blurRadius: 30,
+          color: AppColors.orJour.withValues(alpha: 0.7),
+          blurRadius: 34,
         ),
       ],
     );
