@@ -582,8 +582,16 @@ class _GameViewState extends ConsumerState<GameView>
     // Célèbre la conquête, puis bascule vers la montagne suivante.
     await _showConquestOverlay(current);
     if (!mounted) return;
-    context.pop(); // /game → /mountain(courant)
-    if (!mounted) return;
+    // Remplace /game par /mountain(suivant) en UNE opération.
+    //
+    // On NE fait PAS de `pop()` préalable : la partie peut avoir été lancée
+    // directement depuis l'accueil (« continuer l'ascension ») ou le défi du
+    // jour, auquel cas /game est posée sur la racine /home sans /mountain en
+    // dessous. Un pop() consommerait alors cette racine, et le
+    // pushReplacement suivant laisserait la montagne suivante sans aucune
+    // route en dessous → bouton retour mort, joueur bloqué (seul recours :
+    // quitter l'app). pushReplacement échange uniquement la route courante et
+    // préserve toujours la base de la pile.
     context.pushReplacement(AppRoutes.mountain, extra: next);
   }
 
