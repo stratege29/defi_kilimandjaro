@@ -277,8 +277,17 @@ class _FailureCard extends StatelessWidget {
       ),
       const SizedBox(height: 6),
       Text(
-        devinette.answer,
-        style: AppTypography.displayMd.copyWith(color: AppColors.error),
+        devinette.answer.toUpperCase(),
+        style: AppTypography.displayMd.copyWith(
+          color: AppColors.error,
+          shadows: [
+            Shadow(
+              color: Colors.black.withValues(alpha: 0.5),
+              offset: const Offset(0, 2),
+              blurRadius: 4,
+            ),
+          ],
+        ),
         textAlign: TextAlign.center,
       ),
     ];

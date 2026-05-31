@@ -160,7 +160,7 @@ abstract final class AppTypography {
   /// besoin) pour éviter le tracking exagéré hérité du condensé.
   static TextStyle bebas({
     double size = 16,
-    Color color = AppColors.ivoire,
+    Color color = AppColors.textePrimaire,
     double letterSpacing = 1,
     FontWeight weight = FontWeight.w700,
   }) => GoogleFonts.hankenGrotesk(
@@ -173,7 +173,7 @@ abstract final class AppTypography {
   /// **Reroute vers Fraunces.** Nom `playfair` conservé pour compat.
   static TextStyle playfair({
     double size = 28,
-    Color color = AppColors.orSoleil,
+    Color color = AppColors.orJour,
     FontWeight weight = FontWeight.w700,
     FontStyle? style,
   }) => GoogleFonts.fraunces(
@@ -188,14 +188,14 @@ abstract final class AppTypography {
   /// reste serif, en Fraunces (optical text). L'UI neuve utilise [bodyMd].
   static TextStyle crimson({
     double size = 16,
-    Color color = AppColors.ivoire,
+    Color color = AppColors.textePrimaire,
     FontStyle? style,
   }) => GoogleFonts.fraunces(fontSize: size, color: color, fontStyle: style);
 
   /// Tagline italique (splash) — Fraunces italic crème chaude.
   static TextStyle taglineItalic({double size = 14}) => GoogleFonts.fraunces(
     fontSize: size,
-    color: AppColors.tagline,
+    color: AppColors.texteSecondaire,
     fontStyle: FontStyle.italic,
   );
 

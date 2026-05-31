@@ -128,10 +128,15 @@ class _AppButtonState extends State<AppButton>
           height: 56,
           radius: 12,
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          gradient: const LinearGradient(
+            colors: [AppColors.orJour, AppColors.orCrepuscule],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           shadow: [
             BoxShadow(
-              color: AppColors.orJour.withValues(alpha: 0.25),
-              blurRadius: 12,
+              color: AppColors.orCrepuscule.withValues(alpha: 0.35),
+              blurRadius: 16,
               offset: const Offset(0, 4),
             ),
           ],
@@ -144,7 +149,7 @@ class _AppButtonState extends State<AppButton>
           border: AppColors.orJour,
           borderWidth: 1.5,
           height: 52,
-          radius: 10,
+          radius: 12,
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md + 4),
           textStyle: AppTypography.headingSm,
         );
@@ -159,12 +164,12 @@ class _AppButtonState extends State<AppButton>
         );
       case AppButtonVariant.danger:
         return _ButtonStyle(
-          bg: AppColors.errorSoft,
+          bg: AppColors.errorSoft.withValues(alpha: 0.2),
           fg: AppColors.error,
-          border: AppColors.error,
+          border: AppColors.error.withValues(alpha: 0.5),
           borderWidth: 1,
           height: 52,
-          radius: 10,
+          radius: 12,
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md + 4),
           textStyle: AppTypography.headingSm,
         );
@@ -208,7 +213,8 @@ class _AppButtonState extends State<AppButton>
       width: widget.fullWidth ? double.infinity : null,
       padding: s.padding,
       decoration: BoxDecoration(
-        color: s.bg,
+        color: s.gradient != null ? null : s.bg,
+        gradient: s.gradient,
         borderRadius: BorderRadius.circular(s.radius),
         border: s.border == null
             ? null
@@ -242,7 +248,11 @@ class _AppButtonState extends State<AppButton>
                 Flexible(
                   child: Text(
                     widget.label,
-                    style: s.textStyle.copyWith(color: s.fg),
+                    style: s.textStyle.copyWith(
+                      color: s.fg,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -282,6 +292,7 @@ class _ButtonStyle {
     this.border,
     this.borderWidth,
     this.shadow,
+    this.gradient,
   });
 
   final Color bg;
@@ -293,4 +304,5 @@ class _ButtonStyle {
   final Color? border;
   final double? borderWidth;
   final List<BoxShadow>? shadow;
+  final Gradient? gradient;
 }

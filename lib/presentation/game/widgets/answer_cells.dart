@@ -157,10 +157,10 @@ class _FlipCell extends StatelessWidget {
           )
         : _CellFace(
             letter: letter,
-            bg: filled ? AppColors.orSoleil : Colors.transparent,
-            borderColor: AppColors.orSoleil,
-            textColor: AppColors.vertForet,
-            shadowColor: filled ? AppColors.orSoleil : null,
+            bg: filled ? AppColors.orJour : AppColors.surfaceVariant.withValues(alpha: 0.6),
+            borderColor: filled ? AppColors.orJour : AppColors.orJour.withValues(alpha: 0.35),
+            textColor: filled ? AppColors.surface : AppColors.textePrimaire,
+            shadowColor: filled ? AppColors.orJour : null,
             size: size,
           );
 

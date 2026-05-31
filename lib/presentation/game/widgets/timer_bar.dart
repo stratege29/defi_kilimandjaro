@@ -77,10 +77,8 @@ class _TimerBarState extends State<TimerBar>
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: progress,
-                      minHeight: 8,
-                      backgroundColor: AppColors.boisFonce.withValues(
-                        alpha: 0.5,
-                      ),
+                      minHeight: 6,
+                      backgroundColor: AppColors.surfaceVariant,
                       valueColor: AlwaysStoppedAnimation<Color>(
                         isDanger
                             ? barColor.withValues(alpha: _shimmerAnim.value)
