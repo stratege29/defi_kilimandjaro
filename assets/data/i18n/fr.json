@@ -127,6 +127,24 @@
   },
   "profile": {
     "default_name": "Joueur",
+    "account": {
+      "section": "COMPTE",
+      "anonymous_prompt": "Lie un compte pour sauvegarder ta progression et la retrouver sur tous tes appareils.",
+      "link_google": "Continuer avec Google",
+      "link_apple": "Continuer avec Apple",
+      "linked_via": "Connecté via {}",
+      "sign_out": "Se déconnecter",
+      "delete_account": "Supprimer le compte",
+      "linked_success": "Compte lié — ta progression est désormais sauvegardée.",
+      "switched_notice": "Connecté à un compte existant. La progression locale de cet appareil n'a pas été fusionnée.",
+      "link_error": "Échec de la connexion. Réessaie.",
+      "signout_error": "Échec de la déconnexion. Réessaie.",
+      "delete_error": "Échec de la suppression. Réessaie.",
+      "sign_out_confirm_title": "Se déconnecter ?",
+      "sign_out_confirm_body": "Tu reviendras en mode anonyme. Reconnecte-toi avec le même fournisseur pour retrouver ta progression.",
+      "delete_confirm_title": "Supprimer le compte ?",
+      "delete_confirm_body": "Ton profil, ta progression et tes achats seront définitivement supprimés. Action irréversible."
+    },
     "no_title_yet": "Encore aucun titre — joue 5 niveaux",
     "stats": {
       "levels": "Niveaux",

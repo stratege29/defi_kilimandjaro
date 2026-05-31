@@ -64,3 +64,6 @@ export { bootstrapWallet } from "./wallet/bootstrapWallet";
 export { unlockPack } from "./wallet/unlockPack";
 export { creditCauris } from "./wallet/creditCauris";
 export { syncWallet } from "./wallet/syncWallet";
+
+// --- Compte joueur (RGPD / suppression) ---
+export { deleteAccount } from "./account/deleteAccount";
