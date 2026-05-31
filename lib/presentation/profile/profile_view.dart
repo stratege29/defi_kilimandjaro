@@ -16,6 +16,7 @@ import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart'
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/widgets/display_name_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
+import 'package:defi_kilimandjaro/presentation/profile/widgets/account_section.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -158,6 +159,10 @@ class ProfileView extends ConsumerWidget {
               label: 'Mes soumissions',
               onTap: () => context.push(AppRoutes.ugcMine),
             ),
+            const SizedBox(height: 28),
+            _SectionHeader(title: 'profile.account.section'.tr()),
+            const SizedBox(height: 12),
+            const AccountSection(),
             const SizedBox(height: 28),
             const _SectionHeader(title: 'PARAMÈTRES'),
             const SizedBox(height: 12),

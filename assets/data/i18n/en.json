@@ -127,6 +127,24 @@
   },
   "profile": {
     "default_name": "Player",
+    "account": {
+      "section": "ACCOUNT",
+      "anonymous_prompt": "Link an account to back up your progress and access it on all your devices.",
+      "link_google": "Continue with Google",
+      "link_apple": "Continue with Apple",
+      "linked_via": "Signed in via {}",
+      "sign_out": "Sign out",
+      "delete_account": "Delete account",
+      "linked_success": "Account linked — your progress is now backed up.",
+      "switched_notice": "Signed in to an existing account. Local progress on this device was not merged.",
+      "link_error": "Sign-in failed. Please try again.",
+      "signout_error": "Sign-out failed. Please try again.",
+      "delete_error": "Deletion failed. Please try again.",
+      "sign_out_confirm_title": "Sign out?",
+      "sign_out_confirm_body": "You'll return to anonymous mode. Sign back in with the same provider to recover your progress.",
+      "delete_confirm_title": "Delete account?",
+      "delete_confirm_body": "Your profile, progress and purchases will be permanently deleted. This cannot be undone."
+    },
     "no_title_yet": "No title yet — play 5 levels",
     "stats": {
       "levels": "Levels",
