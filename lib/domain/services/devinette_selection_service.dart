@@ -26,7 +26,10 @@ import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 ///    de longueur cible (0, 1, 2, …).
 /// 4. Si le pack tiré est totalement vide après exclusions, on tire un
 ///    autre pack du mix (sans répéter les packs déjà tentés).
-/// 5. Si tous les packs du mix sont vides : [StateError] explicite.
+/// 5. Si tous les packs du mix sont vides mais que [nextDevinette] a reçu
+///    des `fallbackPackIds`, on retente le tirage sur ces packs de secours
+///    (utile quand le pack actif est vide en dev — contenu OTA absent).
+/// 6. Si même le secours est vide : [StateError] explicite.
 // ignore: one_member_abstracts
 abstract interface class DevinetteSelectionService {
   /// Tire la prochaine devinette compatible.
@@ -36,11 +39,16 @@ abstract interface class DevinetteSelectionService {
   ///   préféré (matching secondaire avec fallback ±1, ±2…). Cf.
   ///   `LevelDifficultyConfig.wordLengthBucket`. Quand `null`, comportement
   ///   historique : aucun filtrage par longueur.
+  /// - [fallbackPackIds] : packs de secours (typiquement
+  ///   `progress.ownedPacks`) tentés si tous les packs de [mix] sont vides.
+  ///   Évite l'erreur dure quand le pack actif n'a pas de contenu chargé
+  ///   (ex. pack OTA absent en dev). Vide par défaut = pas de secours.
   Future<Devinette> nextDevinette({
     required PackMix mix,
     required int targetDifficulty,
     required Set<String> excludeIds,
     int? wordLengthBucket,
     int? seed,
+    Set<String> fallbackPackIds = const <String>{},
   });
 }

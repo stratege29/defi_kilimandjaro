@@ -640,6 +640,7 @@ class _GameViewState extends ConsumerState<GameView>
         targetDifficulty: config.difficultyTier,
         wordLengthBucket: config.wordLengthBucket,
         excludeIds: progress.recentDevinetteIds.toSet(),
+        fallbackPackIds: progress.ownedPacks,
       );
       await ref
           .read(playerProgressProvider.notifier)

@@ -44,6 +44,7 @@ class WeightedDevinetteSelectionService implements DevinetteSelectionService {
     required Set<String> excludeIds,
     int? wordLengthBucket,
     int? seed,
+    Set<String> fallbackPackIds = const <String>{},
   }) async {
     if (mix.weights.isEmpty) {
       throw ArgumentError.value(mix, 'mix', 'PackMix is empty');
@@ -69,6 +70,52 @@ class WeightedDevinetteSelectionService implements DevinetteSelectionService {
       (_, __) => const <String>{},
     ];
 
+    final primary = await _runStrategies(
+      mix: mix,
+      targetDifficulty: targetDifficulty,
+      wordLengthBucket: wordLengthBucket,
+      rng: rng,
+      strategies: strategies,
+    );
+    if (primary != null) return primary;
+
+    // Le mix actif est vide (ex. pack OTA dont le contenu n'est pas chargé).
+    // On retente sur les packs de secours possédés, en écartant ceux déjà
+    // tentés via le mix principal pour ne pas reboucler à vide.
+    final secondaryPacks = fallbackPackIds.difference(mix.packIds);
+    if (secondaryPacks.isNotEmpty) {
+      final fallbackMix = PackMix.uniform(secondaryPacks);
+      final fallback = await _runStrategies(
+        mix: fallbackMix,
+        targetDifficulty: targetDifficulty,
+        wordLengthBucket: wordLengthBucket,
+        rng: rng,
+        strategies: strategies,
+      );
+      if (fallback != null) return fallback;
+    }
+
+    // Tous les paliers ont échoué, exclusions comprises, secours inclus :
+    // la seule cause possible est qu'aucun pack disponible ne contient la
+    // moindre devinette (config/bundle cassé), pas une sur-exclusion.
+    throw StateError(
+      'DevinetteSelectionService: aucun pack du mix '
+      '${mix.weights.keys.toList()} (ni secours '
+      '${secondaryPacks.toList()}) ne contient de devinette '
+      '(targetDifficulty=$targetDifficulty).',
+    );
+  }
+
+  /// Déroule les paliers de relâchement d'exclusion sur un `mix` donné.
+  /// Renvoie la première devinette trouvée, ou `null` si tous les packs du
+  /// mix sont épuisés même sans exclusion. Ne lève jamais.
+  Future<Devinette?> _runStrategies({
+    required PackMix mix,
+    required int targetDifficulty,
+    required int? wordLengthBucket,
+    required Random rng,
+    required List<Set<String> Function(String, List<Devinette>)> strategies,
+  }) async {
     for (final excludeFor in strategies) {
       final picked = await _scanPacks(
         mix: mix,
@@ -79,15 +126,7 @@ class WeightedDevinetteSelectionService implements DevinetteSelectionService {
       );
       if (picked != null) return picked;
     }
-
-    // Tous les paliers ont échoué, exclusions comprises : la seule cause
-    // possible est qu'aucun pack du mix ne contient la moindre devinette
-    // (config/bundle cassé), pas une simple sur-exclusion.
-    throw StateError(
-      'DevinetteSelectionService: aucun pack du mix '
-      '${mix.weights.keys.toList()} ne contient de devinette '
-      '(targetDifficulty=$targetDifficulty).',
-    );
+    return null;
   }
 
   /// Parcourt les packs du mix (pack tiré à la roue d'abord, puis les

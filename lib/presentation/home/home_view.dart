@@ -135,6 +135,7 @@ Future<void> launchNextLevel(
       targetDifficulty: config.difficultyTier,
       wordLengthBucket: config.wordLengthBucket,
       excludeIds: progress.recentDevinetteIds.toSet(),
+      fallbackPackIds: progress.ownedPacks,
     );
     await ref
         .read(playerProgressProvider.notifier)
