@@ -3,7 +3,8 @@
   "packs": {
     "culture_ci": {
       "file": "culture_ci.json",
-      "count": 70,
+      "count": 350,
+      "current_version": 2,
       "name_key": "pack.culture_ci.name",
       "description_key": "pack.culture_ci.description",
       "free_choice_eligible": true,
@@ -13,12 +14,23 @@
     "crack_nouchi": {
       "file": "crack_nouchi.json",
       "count": 38,
+      "current_version": 1,
       "name_key": "pack.crack_nouchi.name",
       "description_key": "pack.crack_nouchi.description",
       "free_choice_eligible": true,
       "price_eur": 2.99,
       "price_cauris": 2000
+    },
+    "football_ci": {
+      "file": "football_ci.json",
+      "count": 500,
+      "current_version": 1,
+      "name_key": "pack.football_ci.name",
+      "description_key": "pack.football_ci.description",
+      "free_choice_eligible": false,
+      "price_eur": 2.99,
+      "price_cauris": 2000
     }
   },
-  "total": 108
+  "total": 888
 }

@@ -382,6 +382,10 @@
     "crack_nouchi": {
       "name": "Crack Nouchi",
       "description": "L'argot d'Abidjan, du gaou au boss"
+    },
+    "football_ci": {
+      "name": "Football Ivoirien",
+      "description": "Éléphants, joueurs cultes et trophées des Verts"
     }
   },
   "pack_chooser": {
