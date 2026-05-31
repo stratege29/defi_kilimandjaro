@@ -272,7 +272,7 @@ class _RoundEndTitle extends StatelessWidget {
         else if (draw)
           const Icon(Icons.remove_circle_outline, size: 40, color: AppColors.texteSecondaire)
         else
-          const Icon(Icons.arrow_downward, size: 40, color: AppColors.laterite),
+          const Icon(Icons.terrain, size: 44, color: AppColors.laterite),
         const SizedBox(height: 8),
         Semantics(
           label: title,

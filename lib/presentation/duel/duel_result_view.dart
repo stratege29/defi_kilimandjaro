@@ -211,10 +211,10 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                                     height: 80,
                                   )
                                 else
-                                  Image.asset(
-                                    AppAssets.iconStreak,
-                                    width: 80,
-                                    height: 80,
+                                  const Icon(
+                                    Icons.terrain,
+                                    size: 80,
+                                    color: AppColors.error,
                                   ),
                                 const SizedBox(height: 10),
                                 // Eyebrow VICTOIRE / DÉFAITE (success / error).
