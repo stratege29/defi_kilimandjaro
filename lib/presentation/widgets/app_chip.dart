@@ -64,40 +64,40 @@ class AppChip extends StatelessWidget {
   _ChipTone _toneColors() {
     switch (tone) {
       case AppChipTone.primary:
-        return const _ChipTone(
+        return _ChipTone(
           fg: AppColors.orJour,
-          bg: AppColors.surfaceContainer,
-          border: AppColors.orJour,
+          bg: AppColors.surfaceVariant,
+          border: AppColors.orJour.withValues(alpha: 0.4),
         );
       case AppChipTone.secondary:
-        return const _ChipTone(
+        return _ChipTone(
           fg: AppColors.texteSecondaire,
           bg: AppColors.surfaceVariant,
-          border: AppColors.texteDisabled,
+          border: AppColors.texteDisabled.withValues(alpha: 0.3),
         );
       case AppChipTone.success:
-        return const _ChipTone(
+        return _ChipTone(
           fg: AppColors.success,
-          bg: AppColors.successSoft,
-          border: AppColors.success,
+          bg: AppColors.successSoft.withValues(alpha: 0.25),
+          border: AppColors.success.withValues(alpha: 0.35),
         );
       case AppChipTone.warning:
-        return const _ChipTone(
+        return _ChipTone(
           fg: AppColors.warning,
-          bg: AppColors.warningSoft,
-          border: AppColors.warning,
+          bg: AppColors.warningSoft.withValues(alpha: 0.25),
+          border: AppColors.warning.withValues(alpha: 0.35),
         );
       case AppChipTone.error:
-        return const _ChipTone(
+        return _ChipTone(
           fg: AppColors.error,
-          bg: AppColors.errorSoft,
-          border: AppColors.error,
+          bg: AppColors.errorSoft.withValues(alpha: 0.25),
+          border: AppColors.error.withValues(alpha: 0.35),
         );
       case AppChipTone.info:
-        return const _ChipTone(
+        return _ChipTone(
           fg: AppColors.info,
-          bg: AppColors.infoSoft,
-          border: AppColors.info,
+          bg: AppColors.infoSoft.withValues(alpha: 0.25),
+          border: AppColors.info.withValues(alpha: 0.35),
         );
     }
   }
@@ -107,21 +107,21 @@ class AppChip extends StatelessWidget {
       case AppChipShape.pill:
         return const _ChipShapeSpec(
           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-          radius: 100,
+          radius: 20,
           textStyle: null, // labelSm
           solidBg: false,
         );
       case AppChipShape.tag:
         return const _ChipShapeSpec(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          radius: 6,
+          radius: 8,
           textStyle: null, // labelXs
           solidBg: false,
         );
       case AppChipShape.badge:
         return const _ChipShapeSpec(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          radius: 8,
+          radius: 10,
           textStyle: null, // labelSm
           solidBg: true,
         );

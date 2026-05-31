@@ -437,6 +437,16 @@
     "sync_success": "{updated} pack(s) mis à jour",
     "sync_up_to_date": "Tout est à jour",
     "sync_error": "Échec de la synchronisation",
-    "sync_aborted_memory": "Sync interrompue (mémoire faible) — réessayer plus tard"
+    "sync_aborted_memory": "Sync interrompue (mémoire faible) — réessayer plus tard",
+    "catalog_section": "Catalogue",
+    "search_hint": "Rechercher un pack…",
+    "sort_recent": "Récents",
+    "sort_price": "Prix",
+    "sort_alpha": "A–Z",
+    "no_results": "Aucun pack ne correspond",
+    "question_count": "{count} énigmes",
+    "get_cauris": "Obtenir des cauris",
+    "unlock_cta": "Débloquer",
+    "cancel": "Annuler"
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,10 +7,17 @@ import 'package:logger/logger.dart';
 
 /// Repository pour la présence en ligne des joueurs.
 ///
-/// Utilise un compteur centralisé `/lobby/stats/online` en Realtime DB
-/// pour éviter les contentions lors de la lecture de `/lobby/*`.
-/// Incrémenté/décrémenté via onDisconnect() dans le Cloud Function
-/// `requestMatch` et lors de l'entrée au lobby (client-side via updatePresence).
+/// Utilise un modèle standard : source de vérité = ensemble `presence/{uid}`;
+/// une Cloud Function planifiée (prunePresence) recalcule proprement
+/// `/lobby/stats/online` toutes les 1 minute en purgant les entrées TTL >= 120s.
+///
+/// Le client responsabilités :
+/// - Écrire `presence/{uid} = { ts: ServerValue.timestamp }` au démarrage.
+/// - Configurer `onDisconnect().remove()` pour nettoyer à la déconnexion.
+/// - Maintenir un heartbeat toutes les 45s (réécrit `ts`) — idempotent.
+/// - Appeler `stop()` explicitement à la déconnexion (annule le timer).
+///
+/// Le client lit simplement `/lobby/stats/online` (entier calculé par la CF).
 class PresenceRepository {
   PresenceRepository({
     required this.database,
@@ -19,60 +28,96 @@ class PresenceRepository {
   final FirebaseAuth auth;
   final Logger _log = Logger();
 
+  Timer? _heartbeatTimer;
+  bool _isRunning = false;
+
   DatabaseReference get _statsRef => database.ref('lobby/stats');
   DatabaseReference get _onlineRef => _statsRef.child('online');
 
-  /// Enregistre la présence du joueur courant et l'ajoute au compteur.
+  /// Démarre la présence du joueur courant.
   ///
-  /// Écrit un timestamp dans `presence/{uid}` et configure
-  /// `onDisconnect()` pour décrémenter le compteur `/lobby/stats/online`.
-  /// Appelé une seule fois à l'entrée au hub/lobby.
-  Future<void> registerPresence() async {
+  /// Écrit `presence/{uid} = { ts: ServerValue.timestamp }`,
+  /// configure `onDisconnect().remove()`, et lance un heartbeat
+  /// toutes les 45 secondes. Idempotent : ne double pas le timer
+  /// si déjà démarré.
+  Future<void> start() async {
     final uid = auth.currentUser?.uid;
-    if (uid == null) return;
+    if (uid == null) {
+      _log.w('start() called with null uid, no-op');
+      return;
+    }
+
+    if (_isRunning) {
+      _log.i('Presence already running for $uid');
+      return;
+    }
 
     try {
-      final now = DateTime.now().millisecondsSinceEpoch;
-      final updates = <String, Object?>{
-        'presence/$uid': {
-          'ts': now,
+      final presenceRef = database.ref('presence/$uid');
+
+      // Écriture initiale + setup onDisconnect
+      await presenceRef.set({
+        'ts': ServerValue.timestamp,
+      });
+      await presenceRef.onDisconnect().remove();
+
+      _isRunning = true;
+
+      // Heartbeat : réécrit ts toutes les 45 secondes
+      _heartbeatTimer = Timer.periodic(
+        const Duration(seconds: 45),
+        (_) async {
+          try {
+            if (_isRunning) {
+              await presenceRef.update({
+                'ts': ServerValue.timestamp,
+              });
+              _log.d('Heartbeat sent for $uid');
+            }
+          } on Exception catch (e) {
+            _log.e('Heartbeat failed for $uid', error: e);
+          }
         },
-        'lobby/stats/online': ServerValue.increment(1),
-      };
-
-      await database.ref().update(updates);
-
-      // Setup onDisconnect to decrement counter when connection drops
-      await _onlineRef.onDisconnect().set(
-        ServerValue.increment(-1),
       );
 
-      _log.i('Presence registered for $uid');
+      _log.i('Presence started for $uid with 45s heartbeat');
     } on Exception catch (e) {
-      _log.e('registerPresence failed', error: e);
+      _log.e('start() failed', error: e);
+      _isRunning = false;
+      rethrow;
     }
   }
 
-  /// Unregisters presence explicitly (e.g., on logout).
-  Future<void> unregisterPresence() async {
+  /// Arrête la présence du joueur courant.
+  ///
+  /// Annule le timer de heartbeat, détruit `onDisconnect()` s'il n'a pas
+  /// déclenché, et supprime l'entrée `presence/{uid}`.
+  Future<void> stop() async {
     final uid = auth.currentUser?.uid;
     if (uid == null) return;
 
-    try {
-      await database.ref().update(<String, Object?>{
-        'presence/$uid': null,
-        'lobby/stats/online': ServerValue.increment(-1),
-      });
+    if (!_isRunning) return;
 
-      _log.i('Presence unregistered for $uid');
+    try {
+      _heartbeatTimer?.cancel();
+      _heartbeatTimer = null;
+      _isRunning = false;
+
+      final presenceRef = database.ref('presence/$uid');
+      await Future.wait([
+        presenceRef.onDisconnect().cancel(),
+        presenceRef.remove(),
+      ]);
+
+      _log.i('Presence stopped for $uid');
     } on Exception catch (e) {
-      _log.e('unregisterPresence failed', error: e);
+      _log.e('stop() failed', error: e);
     }
   }
 
   /// Stream the online player count.
   ///
-  /// Listens to `/lobby/stats/online` and emits the count.
+  /// Listens to `/lobby/stats/online` (calculé par prunePresence CF).
   /// Emits 0 if the path doesn't exist or is null.
   Stream<int> watchOnlineCount() {
     return _onlineRef.onValue.map((event) {
@@ -90,6 +135,15 @@ final presenceRepositoryProvider = Provider<PresenceRepository>((ref) {
     database: FirebaseDatabase.instance,
     auth: FirebaseAuth.instance,
   );
+});
+
+/// Provider autoDispose qui gère le cycle de vie de la présence.
+///
+/// Démarre le heartbeat au premier watch et l'arrête à la disposition.
+/// Utilisé dans DuelHubView pour maintenir la présence tant que le hub est affiché.
+final presenceHeartbeatProvider = Provider.autoDispose<void>((ref) {
+  final repo = ref.watch(presenceRepositoryProvider)..start();
+  ref.onDispose(repo.stop);
 });
 
 /// Stream provider : nombre actuel de joueurs en ligne.

@@ -14,6 +14,7 @@ abstract final class AppAssets {
   static const _badges = 'assets/images/badges';
   static const _shop = 'assets/images/shop';
   static const _duel = 'assets/images/duel';
+  static const _packs = 'assets/images/packs';
 
   /// Dossier contenant les PNG du catalogue d'avatars (cf. `AvatarCatalog`).
   /// Référencé via `'${AppAssets.avatarsDir}/<id>.png'` dans chaque `Avatar`.
@@ -133,6 +134,11 @@ abstract final class AppAssets {
   static const String shopCaurisXL = '$_shop/coins_xl.png';
   static const String shopCaurisMega = '$_shop/coins_mega.png';
   static const String shopNoAds = '$_shop/no_ads.png';
+
+  // --- Packs (icônes thématiques du catalogue) ---
+  /// Illustration carrée d'un pack (ex. `culture_ci.png`). Tous les packs
+  /// n'ont pas forcément d'asset — prévoir un fallback (`errorBuilder`).
+  static String packIcon(String id) => '$_packs/$id.png';
 
   // --- Duel ---
   static const String duelVsBanner = '$_duel/vs_banner.png';

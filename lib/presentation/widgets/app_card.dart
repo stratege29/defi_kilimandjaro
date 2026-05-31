@@ -56,40 +56,40 @@ class AppCard extends StatelessWidget {
       case AppCardElevation.flat:
         return _Decoration(
           bg: AppColors.surfaceVariant,
-          radius: 12,
-          border: borderColor ?? AppColors.texteDisabled,
+          radius: 16,
+          border: borderColor ?? AppColors.texteDisabled.withValues(alpha: 0.35),
           borderWidth: 1,
           shadow: null,
         );
       case AppCardElevation.raised:
         return _Decoration(
           bg: AppColors.surfaceContainer,
-          radius: 14,
-          border: borderColor ?? AppColors.orJour,
-          borderWidth: 1.5,
+          radius: 16,
+          border: borderColor ?? AppColors.orJour.withValues(alpha: 0.25),
+          borderWidth: 1.2,
           shadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
+              color: Colors.black.withValues(alpha: 0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         );
       case AppCardElevation.modal:
         return _Decoration(
-          bg: AppColors.surfaceContainer,
-          radius: 20,
-          border: borderColor ?? AppColors.orJour,
-          borderWidth: 2,
+          bg: AppColors.surfaceContainer.withValues(alpha: 0.90),
+          radius: 24,
+          border: borderColor ?? AppColors.orJour.withValues(alpha: 0.45),
+          borderWidth: 1.5,
           shadow: [
             BoxShadow(
-              color: AppColors.orJour.withValues(alpha: 0.2),
-              blurRadius: 24,
+              color: AppColors.orJour.withValues(alpha: 0.12),
+              blurRadius: 32,
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.5),
-              blurRadius: 32,
-              offset: const Offset(0, 10),
+              color: Colors.black.withValues(alpha: 0.6),
+              blurRadius: 40,
+              offset: const Offset(0, 16),
             ),
           ],
         );

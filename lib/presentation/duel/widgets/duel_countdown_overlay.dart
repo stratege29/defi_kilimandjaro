@@ -167,12 +167,13 @@ class _DuelCountdownOverlayState extends ConsumerState<DuelCountdownOverlay>
             ),
           ),
 
-          // Bandeau bas « Le duel commence dans N » (maquette `.ds-count2`).
+          // Décompte « Le duel commence dans N » placé juste sous le badge VS,
+          // au cœur de l'écran, pour une lecture immédiate du 3·2·1·GO.
           Positioned(
+            top: h * kDuelVsCenterFraction + 92,
             left: 0,
             right: 0,
-            bottom: 0,
-            child: _CountdownFooter(
+            child: _CountdownIndicator(
               digit: _currentDigit,
               showGo: _showGo,
               pulse: _digitCtrl,
@@ -188,8 +189,8 @@ class _DuelCountdownOverlayState extends ConsumerState<DuelCountdownOverlay>
 // Bandeau de décompte (label + grand chiffre Fraunces pulsé).
 // ---------------------------------------------------------------------------
 
-class _CountdownFooter extends StatelessWidget {
-  const _CountdownFooter({
+class _CountdownIndicator extends StatelessWidget {
+  const _CountdownIndicator({
     required this.digit,
     required this.showGo,
     required this.pulse,
@@ -201,68 +202,50 @@ class _CountdownFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(top: 12, bottom: 18),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.surface.withValues(alpha: 0),
-            AppColors.surface.withValues(alpha: 0.88),
-            AppColors.surface,
-          ],
-          stops: const [0, 0.42, 1],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Le duel commence dans'.toUpperCase(),
+          style: AppTypography.labelXs.copyWith(
+            color: AppColors.texteTertiaire,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 2,
+          ),
         ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Le duel commence dans'.toUpperCase(),
-              style: AppTypography.labelXs.copyWith(
-                color: AppColors.texteTertiaire,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 2,
-              ),
-            ),
-            const SizedBox(height: 4),
-            if (showGo)
-              const _Digit(text: 'GO', size: 46)
-            else
-              AnimatedBuilder(
-                animation: pulse,
-                builder: (_, __) {
-                  final scale = Tween<double>(begin: 1.3, end: 1)
-                      .animate(
-                        CurvedAnimation(parent: pulse, curve: Curves.easeOut),
-                      )
-                      .value;
-                  final opacity = Tween<double>(begin: 0.5, end: 1)
-                      .animate(
-                        CurvedAnimation(
-                          parent: pulse,
-                          curve: const Interval(0, 0.5, curve: Curves.easeIn),
-                        ),
-                      )
-                      .value;
-                  return Semantics(
-                    label: 'Compte à rebours : $digit',
-                    child: Transform.scale(
-                      scale: scale,
-                      child: Opacity(
-                        opacity: opacity,
-                        child: _Digit(text: '$digit', size: 56),
-                      ),
+        const SizedBox(height: 6),
+        if (showGo)
+          const _Digit(text: 'GO', size: 56)
+        else
+          AnimatedBuilder(
+            animation: pulse,
+            builder: (_, __) {
+              final scale = Tween<double>(begin: 1.3, end: 1)
+                  .animate(
+                    CurvedAnimation(parent: pulse, curve: Curves.easeOut),
+                  )
+                  .value;
+              final opacity = Tween<double>(begin: 0.5, end: 1)
+                  .animate(
+                    CurvedAnimation(
+                      parent: pulse,
+                      curve: const Interval(0, 0.5, curve: Curves.easeIn),
                     ),
-                  );
-                },
-              ),
-          ],
-        ),
-      ),
+                  )
+                  .value;
+              return Semantics(
+                label: 'Compte à rebours : $digit',
+                child: Transform.scale(
+                  scale: scale,
+                  child: Opacity(
+                    opacity: opacity,
+                    child: _Digit(text: '$digit', size: 64),
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 }

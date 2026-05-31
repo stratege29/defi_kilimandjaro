@@ -376,8 +376,16 @@ class _VictoryCard extends StatelessWidget {
           // Moment éditorial fort : la 1re fois que le mot ivoirien
           // apparaît au joueur. Centré, sans décoration.
           Text(
-            devinette.answer,
-            style: AppTypography.displayMd,
+            devinette.answer.toUpperCase(),
+            style: AppTypography.displayMd.copyWith(
+              shadows: [
+                Shadow(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  offset: const Offset(0, 2),
+                  blurRadius: 4,
+                ),
+              ],
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),

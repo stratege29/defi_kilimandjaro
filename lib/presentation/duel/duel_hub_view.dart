@@ -4,8 +4,10 @@ import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_history_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/leaderboard_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/matchmaking_repository.dart';
-import 'package:defi_kilimandjaro/data/repositories/presence_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/presence_repository.dart'
+    show onlinePlayersCountProvider, presenceHeartbeatProvider;
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_history_entry.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart';
@@ -84,13 +86,10 @@ final _pendingChallengeProvider = StreamProvider<_PendingChallenge?>((ref) {
 ///
 /// Data wiring:
 ///   - ELO / profil : [playerProfileStreamProvider] (Firestore).
-///   - Présence "N en ligne" : NON disponible côté client — omise.
-///     // TODO(presence): exposer un compteur RTDB `/lobby/stats/online` depuis
-///     // la Cloud Function requestMatch et lire ici en StreamProvider.
-///   - Historique duels : NON persisté côté client — empty state affiché.
-///     // TODO(history): persister les N derniers résultats dans
-///     // Firestore `profiles/{uid}/duel_history` depuis la CF endMatch et
-///     // exposer via un StreamProvider ici.
+///   - Présence "N en ligne" : [presenceHeartbeatProvider] (démarrage auto via ref.watch)
+///     et [onlinePlayersCountProvider] (compte actualisé par CF prunePresence).
+///   - Historique duels : [recentDuelsProvider] (Firestore subcollection
+///     `profiles/{uid}/duel_history`, écrite par CF endMatch).
 ///   - Challenge entrant : `_pendingChallengeProvider` (même noeud RTDB que
 ///     `IncomingChallengeListener`).
 class DuelHubView extends ConsumerWidget {
@@ -98,6 +97,9 @@ class DuelHubView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Démarre et maintient la présence du joueur tant que le hub est affichage.
+    ref.watch(presenceHeartbeatProvider);
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
@@ -118,6 +120,8 @@ class DuelHubView extends ConsumerWidget {
                   _InviteBanner(),
                   AppSpacing.gapSm,
                   _ActionCardsRow(),
+                  AppSpacing.gapSm,
+                  _ClassementCard(),
                   SizedBox(height: AppSpacing.md),
                   _RecentDuelsSection(),
                 ],
@@ -586,6 +590,92 @@ class _ActionCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
+// Classement card — entrée vers le leaderboard global/amis
+// ---------------------------------------------------------------------------
+
+/// Carte d'accès au classement.
+///
+/// Affiche le rang global approximatif du joueur ([myRankProvider]) avec son
+/// altitude (ELO). Tap → écran `LeaderboardView` (top-100 + amis).
+class _ClassementCard extends ConsumerWidget {
+  const _ClassementCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final rankAsync = uid != null ? ref.watch(myRankProvider(uid)) : null;
+    final entry = rankAsync?.value;
+
+    final subtitle = entry != null
+        ? '#${entry.rank} · ${entry.altitudeLabel}'
+        : 'Découvre le top des grimpeurs';
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusLg - 2),
+      child: InkWell(
+        onTap: () => context.push(AppRoutes.leaderboard),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg - 2),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainer,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg - 2),
+            border: Border.all(color: AppColors.hairline),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: AppColors.orSoleil.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(AppSpacing.sm + 2),
+                ),
+                child: const Icon(
+                  Icons.emoji_events_rounded,
+                  size: 20,
+                  color: AppColors.orSoleil,
+                ),
+              ),
+              AppSpacing.hGapSm,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Classement',
+                      style: AppTypography.headingSm.copyWith(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                    AppSpacing.gapXs,
+                    Text(
+                      subtitle,
+                      style: AppTypography.labelXs.copyWith(
+                        color: AppColors.texteTertiaire,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 22,
+                color: AppColors.texteTertiaire,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Derniers duels section
 // ---------------------------------------------------------------------------
 
@@ -641,16 +731,34 @@ class _RecentDuelsSection extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
-                  Icons.error_outline_rounded,
+                  Icons.history_rounded,
                   size: 28,
                   color: AppColors.texteDisabled,
                 ),
                 AppSpacing.gapSm,
                 Text(
-                  'Erreur de chargement',
+                  'Historique indisponible',
                   style: AppTypography.bodyMd.copyWith(
                     color: AppColors.texteSecondaire,
                     fontWeight: FontWeight.w600,
+                  ),
+                ),
+                AppSpacing.gapXs,
+                TextButton(
+                  onPressed: () => ref.invalidate(recentDuelsProvider),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    'Réessayer',
+                    style: AppTypography.labelSm.copyWith(
+                      color: AppColors.orJour,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ],

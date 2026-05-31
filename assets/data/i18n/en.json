@@ -437,6 +437,16 @@
     "sync_success": "{updated} pack(s) updated",
     "sync_up_to_date": "Everything up to date",
     "sync_error": "Sync failed",
-    "sync_aborted_memory": "Sync paused (low memory) — try again later"
+    "sync_aborted_memory": "Sync paused (low memory) — try again later",
+    "catalog_section": "Catalog",
+    "search_hint": "Search a pack…",
+    "sort_recent": "Recent",
+    "sort_price": "Price",
+    "sort_alpha": "A–Z",
+    "no_results": "No pack matches",
+    "question_count": "{count} riddles",
+    "get_cauris": "Get cauris",
+    "unlock_cta": "Unlock",
+    "cancel": "Cancel"
   }
 }

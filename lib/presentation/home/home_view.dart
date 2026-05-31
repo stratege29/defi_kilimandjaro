@@ -12,6 +12,7 @@ import 'package:defi_kilimandjaro/presentation/home/widgets/continue_ascent_card
 import 'package:defi_kilimandjaro/presentation/home/widgets/daily_streak_dialog.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/home_access_tiles.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/home_header.dart';
+import 'package:defi_kilimandjaro/presentation/home/widgets/packs_section.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,8 @@ import 'package:go_router/go_router.dart';
 /// Composition :
 /// - [HomeHeader] : pastilles série + cauris
 /// - [ContinueAscentCard] : HERO sommet en cours + CTA GRIMPER intégré
-/// - [HomeAccessTiles] : Défier un ami · Défi du jour · Sommets
+/// - [HomeAccessTiles] : Défier en ligne · Défier un ami · Défi du jour · Sommets
+/// - [PacksSection] : carrousel TES PACKS (packs possédés + Découvrir)
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 
@@ -79,8 +81,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   // Zone 1 — HÉROS : continuer l'ascension + CTA GRIMPER.
                   ContinueAscentCard(),
                   SizedBox(height: 16),
-                  // Zone 2 — accès rapide : duel, défi du jour, sommets.
+                  // Zone 2 — accès rapide : duels, défi du jour, sommets.
                   HomeAccessTiles(),
+                  SizedBox(height: 24),
+                  // Zone 3 — TES PACKS : carrousel des packs possédés.
+                  PacksSection(),
                 ],
               ),
             ),
