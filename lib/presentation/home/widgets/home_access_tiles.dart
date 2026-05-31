@@ -13,10 +13,11 @@ import 'package:go_router/go_router.dart';
 
 /// Zone 3 de l'accueil — tuiles d'accès rapide façon maquette Vert Nuit.
 ///
-/// Une tuile large « Défier un ami » (duel 1v1) puis une rangée de deux
-/// tuiles carrées : « Défi du jour » et « Sommets ». Surfaces opaques
-/// `surfaceContainer`, bordures hairline, pastilles d'icône teintées par
-/// fonction (kola = duel, info = quotidien, or = ascension).
+/// Grille 2×2 de tuiles carrées : « Défier en ligne » (matchmaking ELO) et
+/// « Défier un ami » (QR) en première rangée, puis « Défi du jour » et
+/// « Sommets ». Surfaces opaques `surfaceContainer`, bordures hairline,
+/// pastilles d'icône teintées par fonction (kola = duel, info = quotidien,
+/// or = ascension).
 class HomeAccessTiles extends ConsumerWidget {
   const HomeAccessTiles({super.key});
 
@@ -39,12 +40,31 @@ class HomeAccessTiles extends ConsumerWidget {
 
     return Column(
       children: [
-        _WideTile(
-          icon: Icons.sports_kabaddi_rounded,
-          accent: AppColors.kola,
-          title: 'Défier un ami',
-          subtitle: 'Duel 1v1 en temps réel',
-          onTap: () => showQuickmatchOverlay(context),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _SquareTile(
+                  icon: Icons.public_rounded,
+                  accent: AppColors.kola,
+                  title: 'Défier en ligne',
+                  subtitle: 'Adversaire au hasard',
+                  onTap: () => showQuickmatchOverlay(context),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _SquareTile(
+                  icon: Icons.people_alt_rounded,
+                  accent: AppColors.kola,
+                  title: 'Défier un ami',
+                  subtitle: 'Crée ou rejoins via QR',
+                  onTap: () => context.push(AppRoutes.duel),
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 12),
         IntrinsicHeight(
@@ -99,59 +119,6 @@ class _IconBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Icon(icon, size: 18, color: accent),
-    );
-  }
-}
-
-/// Tuile large pleine largeur (icône · texte · chevron).
-class _WideTile extends StatelessWidget {
-  const _WideTile({
-    required this.icon,
-    required this.accent,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final Color accent;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return _TileShell(
-      onTap: onTap,
-      child: Row(
-        children: [
-          _IconBadge(icon: icon, accent: accent),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: AppTypography.headingSm
-                      .copyWith(color: AppColors.textePrimaire),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: AppTypography.bodySm
-                      .copyWith(color: AppColors.texteTertiaire),
-                ),
-              ],
-            ),
-          ),
-          const Icon(
-            Icons.chevron_right_rounded,
-            color: AppColors.texteSecondaire,
-          ),
-        ],
-      ),
     );
   }
 }

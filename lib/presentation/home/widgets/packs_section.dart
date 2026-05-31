@@ -11,39 +11,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Section TES PACKS : carrousel horizontal des packs possédés + bouton
-/// SYNC (placebo pour le MVP — vraie synchro Phase 3+, cf. tâche #14).
-class PacksSection extends ConsumerStatefulWidget {
+/// Section TES PACKS de l'accueil — carrousel horizontal des packs possédés
+/// (pack actif mis en avant), une carte « Découvrir » pour débloquer de
+/// nouveaux packs, et un lien « Gérer » vers l'écran de pondération complet.
+///
+/// Surfaces opaques `surfaceContainer`, bordures hairline, accent or réservé
+/// au pack actif — cohérent avec les tuiles d'accès Vert Nuit.
+class PacksSection extends ConsumerWidget {
   const PacksSection({super.key});
 
   @override
-  ConsumerState<PacksSection> createState() => _PacksSectionState();
-}
-
-class _PacksSectionState extends ConsumerState<PacksSection> {
-  bool _syncing = false;
-
-  Future<void> _onSync() async {
-    if (_syncing) return;
-    setState(() => _syncing = true);
-    // Placebo : laisse le temps au spinner d'apparaître, puis snackbar.
-    await Future<void>.delayed(const Duration(milliseconds: 900));
-    if (!mounted) return;
-    setState(() => _syncing = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Tes packs sont à jour',
-          style: AppTypography.bebas(),
-        ),
-        backgroundColor: AppColors.boisFonce,
-        duration: const Duration(milliseconds: 1500),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ownedIds = ref.watch(ownedPacksProvider);
     final catalogAsync = ref.watch(packCatalogProvider);
 
@@ -52,10 +30,12 @@ class _PacksSectionState extends ConsumerState<PacksSection> {
       children: [
         SectionTitle(
           label: 'TES PACKS',
-          trailing: _SyncButton(syncing: _syncing, onTap: _onSync),
+          trailing: _ManageLink(
+            onTap: () => context.push(AppRoutes.myPacks),
+          ),
         ),
         SizedBox(
-          height: 100,
+          height: 120,
           child: catalogAsync.when(
             loading: () => const SizedBox.shrink(),
             error: (_, __) => const SizedBox.shrink(),
@@ -64,15 +44,21 @@ class _PacksSectionState extends ConsumerState<PacksSection> {
                   catalog.where((p) => ownedIds.contains(p.id)).toList();
               if (ownedPacks.isEmpty) {
                 return _EmptyOwned(
-                  onTap: () => context.push(AppRoutes.packChooser),
+                  onTap: () => context.push(AppRoutes.myPacks),
                 );
               }
+              final cards = <Widget>[
+                for (final pack in ownedPacks) _OwnedPackCard(pack: pack),
+                _DiscoverCard(
+                  onTap: () => context.push(AppRoutes.myPacks),
+                ),
+              ];
               return ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: EdgeInsets.zero,
-                itemCount: ownedPacks.length,
+                itemCount: cards.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 10),
-                itemBuilder: (_, i) => _OwnedPackCard(pack: ownedPacks[i]),
+                itemBuilder: (_, i) => cards[i],
               );
             },
           ),
@@ -82,10 +68,10 @@ class _PacksSectionState extends ConsumerState<PacksSection> {
   }
 }
 
-class _SyncButton extends StatelessWidget {
-  const _SyncButton({required this.syncing, required this.onTap});
+/// Lien discret « GÉRER » → écran de pondération des packs.
+class _ManageLink extends StatelessWidget {
+  const _ManageLink({required this.onTap});
 
-  final bool syncing;
   final VoidCallback onTap;
 
   @override
@@ -93,41 +79,25 @@ class _SyncButton extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: syncing ? null : onTap,
+        onTap: onTap,
         borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.bois.withValues(alpha: 0.28),
-            borderRadius: BorderRadius.circular(20),
-            border:
-                Border.all(color: AppColors.orSoleil.withValues(alpha: 0.4)),
-          ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (syncing)
-                const SizedBox(
-                  width: 12,
-                  height: 12,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 1.6,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.orSoleil,
-                    ),
-                  ),
-                )
-              else
-                const Icon(
-                  Icons.refresh,
-                  size: 14,
-                  color: AppColors.orSoleil,
-                ),
-              const SizedBox(width: 4),
               Text(
-                'SYNC',
-                style:
-                    AppTypography.bebas(size: 12, color: AppColors.orSoleil),
+                'GÉRER',
+                style: AppTypography.bebas(
+                  size: 12,
+                  color: AppColors.texteSecondaire,
+                ),
+              ),
+              const SizedBox(width: 2),
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 16,
+                color: AppColors.texteSecondaire,
               ),
             ],
           ),
@@ -137,6 +107,8 @@ class _SyncButton extends StatelessWidget {
   }
 }
 
+/// Carte d'un pack possédé : nom · nb de devinettes · badge ACTIF.
+/// Tap = active le pack (s'il ne l'est pas) puis va aux Sommets.
 class _OwnedPackCard extends ConsumerWidget {
   const _OwnedPackCard({required this.pack});
 
@@ -148,22 +120,20 @@ class _OwnedPackCard extends ConsumerWidget {
     final isActive = activeMix.packIds.contains(pack.id);
 
     return SizedBox(
-      width: 190,
+      width: 188,
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: () => _resume(context, ref),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.bois.withValues(alpha: 0.20),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isActive
-                    ? AppColors.orSoleil.withValues(alpha: 0.85)
-                    : AppColors.orSoleil.withValues(alpha: 0.3),
-                width: isActive ? 2 : 1,
+                color: isActive ? AppColors.orJour : AppColors.hairline,
+                width: isActive ? 1.5 : 1,
               ),
             ),
             child: Column(
@@ -175,10 +145,8 @@ class _OwnedPackCard extends ConsumerWidget {
                     Expanded(
                       child: Text(
                         pack.nameKey.tr(),
-                        style: AppTypography.bebas(
-                          size: 14,
-                          color: AppColors.orSoleil,
-                        ),
+                        style: AppTypography.headingSm
+                            .copyWith(color: AppColors.textePrimaire),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -186,26 +154,23 @@ class _OwnedPackCard extends ConsumerWidget {
                     if (isActive)
                       const Icon(
                         Icons.check_circle,
-                        size: 14,
-                        color: AppColors.vertClair,
+                        size: 16,
+                        color: AppColors.success,
                       ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
                   '${pack.questionCount} devinettes',
-                  style: AppTypography.crimson(
-                    size: 11,
-                    color: AppColors.texteSecondaire,
-                    style: FontStyle.italic,
-                  ),
+                  style: AppTypography.bodySm
+                      .copyWith(color: AppColors.texteTertiaire),
                 ),
                 const Spacer(),
                 Text(
-                  isActive ? 'PACK ACTIF · GRIMPER' : 'REPRENDRE',
+                  isActive ? 'PACK ACTIF · GRIMPER' : 'ACTIVER',
                   style: AppTypography.bebas(
                     size: 12,
-                    color: AppColors.vertClair,
+                    color: isActive ? AppColors.orJour : AppColors.success,
                   ),
                 ),
               ],
@@ -227,6 +192,67 @@ class _OwnedPackCard extends ConsumerWidget {
   }
 }
 
+/// Carte d'appel à l'action « Découvrir » → catalogue de packs à débloquer.
+class _DiscoverCard extends StatelessWidget {
+  const _DiscoverCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 132,
+      child: Material(
+        color: AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.hairline),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: AppColors.orJour.withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.add_rounded,
+                    size: 20,
+                    color: AppColors.orJour,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  'Découvrir',
+                  style: AppTypography.headingSm
+                      .copyWith(color: AppColors.textePrimaire),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Nouveaux packs',
+                  style: AppTypography.bodySm
+                      .copyWith(color: AppColors.texteTertiaire),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// État vide (aucun pack possédé) — CTA pleine largeur vers le catalogue.
 class _EmptyOwned extends StatelessWidget {
   const _EmptyOwned({required this.onTap});
 
@@ -235,24 +261,31 @@ class _EmptyOwned extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppColors.surfaceContainer,
+      borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.bois.withValues(alpha: 0.18),
-            borderRadius: BorderRadius.circular(14),
-            border:
-                Border.all(color: AppColors.orSoleil.withValues(alpha: 0.4)),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.hairline),
           ),
           child: Row(
             children: [
-              const Icon(
-                Icons.library_add,
-                color: AppColors.orSoleil,
-                size: 28,
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: AppColors.orJour.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.library_add,
+                  color: AppColors.orJour,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -261,22 +294,22 @@ class _EmptyOwned extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'CHOISIS TON PREMIER PACK',
-                      style: AppTypography.bebas(
-                        size: 14,
-                        color: AppColors.orSoleil,
-                      ),
+                      'Choisis ton premier pack',
+                      style: AppTypography.headingSm
+                          .copyWith(color: AppColors.textePrimaire),
                     ),
+                    const SizedBox(height: 2),
                     Text(
-                      'Une famille de devinettes culturelles à explorer.',
-                      style: AppTypography.crimson(
-                        size: 11,
-                        color: AppColors.texteSecondaire,
-                        style: FontStyle.italic,
-                      ),
+                      'Une famille de devinettes à explorer.',
+                      style: AppTypography.bodySm
+                          .copyWith(color: AppColors.texteTertiaire),
                     ),
                   ],
                 ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.texteSecondaire,
               ),
             ],
           ),

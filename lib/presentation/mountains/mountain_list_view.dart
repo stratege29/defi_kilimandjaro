@@ -4,7 +4,6 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
-import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/altimeter_rail.dart';
@@ -13,7 +12,6 @@ import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhou
 import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/mountain_hero_image.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -508,7 +506,6 @@ class _SommetsHeader extends StatelessWidget {
         children: [
           Text('Sommets', style: AppTypography.headingMd),
           const Spacer(),
-          if (kDebugMode) _DevUnlockButton(mountains: mountains),
           Semantics(
             button: true,
             label: 'my_packs.title'.tr(),
@@ -836,54 +833,6 @@ class _ErrorView extends StatelessWidget {
         child: Text(
           'Impossible de charger les sommets',
           style: AppTypography.crimson(color: AppColors.rouge),
-        ),
-      ),
-    );
-  }
-}
-
-/// Bouton debug-only (kDebugMode) : tape pour marquer toutes les montagnes
-/// comme intégralement complétées. Permet de tester rapidement les
-/// niveaux haute altitude (reverse, thinAir, boss tier 5) sans grinder
-/// 15+ montagnes. À retirer après validation du S1.
-class _DevUnlockButton extends ConsumerWidget {
-  const _DevUnlockButton({required this.mountains});
-
-  final List<Mountain> mountains;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 6),
-      child: Semantics(
-        button: true,
-        label: 'Dev: déverrouiller tout',
-        child: Material(
-          color: AppColors.rouge.withValues(alpha: 0.85),
-          shape: const CircleBorder(),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: () async {
-              await ref
-                  .read(playerProgressProvider.notifier)
-                  .unlockAllForDebug(mountains);
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('DEV : toutes les montagnes débloquées'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
-            child: const Padding(
-              padding: EdgeInsets.all(10),
-              child: Icon(
-                Icons.lock_open,
-                color: Colors.white,
-                size: 22,
-              ),
-            ),
-          ),
         ),
       ),
     );
