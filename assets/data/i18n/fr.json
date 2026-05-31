@@ -36,10 +36,11 @@
     "level": "Niveau",
     "watch_ad_short": "Pub",
     "briefing": {
-      "title": "LE GRIOT T'AVERTIT",
-      "intro_normal": "« Ce défi est plus rude. Prépare bien ta sagesse, jeune apprenti. »",
-      "intro_boss": "« Voici un boss du sommet ! Ouvre grand tes oreilles, jeune apprenti. »",
-      "cta": "Je suis prêt",
+      "title_normal": "LA PENTE SE RAIDIT",
+      "title_boss": "GARDIEN DU SOMMET",
+      "intro_normal": "La montée se durcit. Reste vigilant.",
+      "intro_boss": "Un gardien défend ce sommet. Tiens bon.",
+      "cta": "En route",
       "modifier": {
         "reverse": {
           "name": "Mot à l'envers",

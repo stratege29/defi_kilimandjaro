@@ -36,10 +36,11 @@
     "level": "Level",
     "watch_ad_short": "Ad",
     "briefing": {
-      "title": "THE GRIOT WARNS YOU",
-      "intro_normal": "“This challenge is sterner. Prepare your wisdom, young apprentice.”",
-      "intro_boss": "“Behold a summit boss! Open wide your ears, young apprentice.”",
-      "cta": "I'm ready",
+      "title_normal": "THE SLOPE STEEPENS",
+      "title_boss": "SUMMIT GUARDIAN",
+      "intro_normal": "The climb gets harder. Stay sharp.",
+      "intro_boss": "A guardian holds this summit. Hold firm.",
+      "cta": "Let's climb",
       "modifier": {
         "reverse": {
           "name": "Reversed word",

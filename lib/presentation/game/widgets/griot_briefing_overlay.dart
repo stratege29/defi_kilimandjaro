@@ -1,19 +1,23 @@
-import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-/// Overlay « Le griot t'avertit » affiché juste avant que le timer démarre
-/// sur les niveaux qui contiennent des modifiers ou un boss.
+/// Overlay de mise en garde d'ascension (« la pente se raidit » /
+/// « gardien du sommet ») affiché juste avant que le timer démarre sur les
+/// niveaux qui contiennent des modifiers ou un boss.
+///
+/// Style aligné sur les autres popups « Vert Nuit » (cf. `DailyStreakDialog`)
+/// : `surfaceContainer`, eyebrow doré all-caps, `AppButton` pleine largeur.
 ///
 /// Best practices (cf. discussion produit) :
 /// - **Pause forcée** du timer pendant la lecture (côté `_GameViewState`)
-/// - **Friction minimale** : un seul tap sur "Je suis prêt" suffit, et le
-///   tap hors de la card ferme également l'overlay (barrierDismissible)
-/// - **Cohérence narrative** : c'est le griot qui prévient (pas un "Niveau
-///   Spécial!"), conforme au rôle de sage bienveillant
+/// - **Friction minimale** : un seul tap sur le CTA suffit, et le tap hors
+///   de la card ferme également l'overlay (barrierDismissible)
+/// - **Cadre escalade** : le titre parle du sommet/de la pente, pas d'un
+///   « Niveau Spécial! », pour rester dans la métaphore de l'ascension
 /// - **Ne pas réafficher au restart** : un flag `_briefingShown` côté view
 ///   garantit que la réessai après échec ne re-déclenche pas le briefing
 ///
@@ -51,52 +55,51 @@ class GriotBriefingOverlay extends StatelessWidget {
       }
     }
 
+    final accent = isBoss ? AppColors.orJour : AppColors.orSoleil;
+
     return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
-        decoration: BoxDecoration(
-          color: AppColors.boisFonce,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: (isBoss ? AppColors.orJour : AppColors.orSoleil)
-                .withValues(alpha: 0.65),
-            width: 1.5,
-          ),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.55),
-              blurRadius: 24,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
+      backgroundColor: AppColors.surfaceContainer,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: accent.withValues(alpha: 0.5)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            // Avatar griot — 64pt centré, juste assez grand pour ancrer
-            // l'identité narrative sans gaspiller la verticale.
-            Image.asset(AppAssets.griotIdle, width: 64, height: 64),
-            const SizedBox(height: 8),
+            // Icône d'ascension (drapeau de sommet pour un boss, relief sinon)
+            // — ancre la mise en garde dans l'escalade plutôt que le griot.
+            Icon(
+              isBoss ? Icons.flag_rounded : Icons.terrain_rounded,
+              size: 40,
+              color: accent,
+            ),
+            const SizedBox(height: 6),
+            // Eyebrow all-caps espacé, cohérent avec les autres popups
+            // « Vert Nuit » (cf. DailyStreakDialog).
             Text(
-              'game.briefing.title'.tr(),
-              style: AppTypography.bebas(
-                size: 22,
-                color: isBoss ? AppColors.orJour : AppColors.orSoleil,
-                letterSpacing: 1.6,
+              (isBoss
+                      ? 'game.briefing.title_boss'
+                      : 'game.briefing.title_normal')
+                  .tr(),
+              style: AppTypography.labelXs.copyWith(
+                color: accent,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 2,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Text(
               isBoss
                   ? 'game.briefing.intro_boss'.tr()
                   : 'game.briefing.intro_normal'.tr(),
-              style: AppTypography.crimson(
-                size: 15,
-                color: AppColors.textePrimaire,
-                style: FontStyle.italic,
+              style: AppTypography.bodyMd.copyWith(
+                fontSize: 13,
+                color: AppColors.texteSecondaire,
+                height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
@@ -108,11 +111,9 @@ class GriotBriefingOverlay extends StatelessWidget {
               // sur ListView shrink-wrapped.
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.bois.withValues(alpha: 0.22),
+                  color: AppColors.surfaceVariant,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.orSoleil.withValues(alpha: 0.25),
-                  ),
+                  border: Border.all(color: AppColors.hairline),
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -125,10 +126,7 @@ class GriotBriefingOverlay extends StatelessWidget {
                       _BriefingRow(entry: entries[i]),
                       if (i < entries.length - 1) ...[
                         const SizedBox(height: 10),
-                        Container(
-                          height: 1,
-                          color: AppColors.orSoleil.withValues(alpha: 0.15),
-                        ),
+                        Container(height: 1, color: AppColors.hairline),
                         const SizedBox(height: 10),
                       ],
                     ],
@@ -136,27 +134,11 @@ class GriotBriefingOverlay extends StatelessWidget {
                 ),
               ),
             ],
-            const SizedBox(height: 18),
-            // CTA "Je suis prêt" — pleine largeur, doré, hauteur 48pt
-            // (au-dessus des 44pt iOS et 48dp Android pour tap confort).
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: onConfirm,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.vertClair,
-                  foregroundColor: AppColors.ivoire,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  elevation: 4,
-                ),
-                child: Text(
-                  'game.briefing.cta'.tr(),
-                  style: AppTypography.bebas(size: 18, letterSpacing: 1.5),
-                ),
-              ),
+            const SizedBox(height: 16),
+            AppButton(
+              label: 'game.briefing.cta'.tr(),
+              fullWidth: true,
+              onPressed: onConfirm,
             ),
           ],
         ),

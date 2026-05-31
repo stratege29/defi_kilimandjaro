@@ -16,9 +16,10 @@ import 'package:flutter/material.dart';
 ///   réessayer. Utilisé en zone d'amorçage (Tier 1) ET sur les niveaux
 ///   T2+ où le joueur a déjà payé le reveal ou cumulé 3 échecs.
 /// - `answerRevealed: false` — la réponse est **masquée**. L'explication
-///   culturelle reste affichée (la promesse pédagogique survit), et deux
-///   boutons cohabitent : RÉESSAYER (gratuit, primaire danger) et
-///   « Voir la réponse — N 🐚 » (achat cauris, secondaire).
+///   culturelle est elle aussi cachée (elle nomme presque toujours le mot,
+///   donc l'afficher spoilerait le paywall), et deux boutons cohabitent :
+///   RÉESSAYER (gratuit, primaire danger) et « Voir la réponse — N 🐚 »
+///   (achat cauris, secondaire). L'explication réapparaît après le reveal.
 ///
 /// Le state local `_revealed` permet à l'overlay de basculer en mode
 /// révélé après un achat réussi sans devoir recréer le dialog.
@@ -206,23 +207,26 @@ class _FailureCard extends StatelessWidget {
           const SizedBox(height: 16),
           if (revealed) ..._revealedHeader() else ..._hiddenHeader(),
           const SizedBox(height: 16),
-          // Explication culturelle — toujours affichée, dans les 2 modes.
-          // C'est la promesse "tu apprends quelque chose" qui survit même
-          // quand la réponse reste masquée.
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 160),
-            child: SingleChildScrollView(
-              child: Text(
-                devinette.explanation,
-                textAlign: TextAlign.center,
-                style: AppTypography.bodyMd.copyWith(
-                  color: AppColors.textePrimaire,
-                  height: 1.5,
+          // Explication culturelle — affichée UNIQUEMENT en mode révélé.
+          // Elle nomme presque toujours la réponse (« La jujube est… »), donc
+          // la montrer alors que le mot est masqué spoile le paywall. On la
+          // réserve à l'après-reveal, où elle tient sa promesse pédagogique.
+          if (revealed) ...[
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 160),
+              child: SingleChildScrollView(
+                child: Text(
+                  devinette.explanation,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.bodyMd.copyWith(
+                    color: AppColors.textePrimaire,
+                    height: 1.5,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
+          ],
           Text(
             'result.failure.consolation'.tr(),
             textAlign: TextAlign.center,
