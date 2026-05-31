@@ -3,6 +3,7 @@ import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/data/local/seen_devinette_store.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
@@ -242,6 +243,9 @@ class ProfileView extends ConsumerWidget {
     );
     if (confirmed ?? false) {
       await ref.read(playerProgressProvider.notifier).reset();
+      // Vide aussi le journal anti-répétition « déjà vu » : un reset de
+      // progression doit rendre tout le pool de devinettes à nouveau frais.
+      await ref.read(seenDevinetteTrackerProvider).clearAll();
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
+import 'package:defi_kilimandjaro/core/constants/loss_economy.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
@@ -10,6 +11,7 @@ import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/ads/att_service.dart';
 import 'package:defi_kilimandjaro/data/ads/rewarded_daily_cap_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
+import 'package:defi_kilimandjaro/data/local/seen_devinette_store.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
@@ -201,6 +203,15 @@ class _GameViewState extends ConsumerState<GameView>
       if (next.phase == GamePhase.won &&
           (previous == null || previous.phase != GamePhase.won)) {
         _overlayShown = true;
+        // Anti-répétition : marque cette devinette comme résolue dans son
+        // pack. Seule une victoire effective déclenche le marquage (une
+        // défaite garde la devinette ouverte pour un retry).
+        unawaited(
+          ref.read(seenDevinetteTrackerProvider).markSolved(
+                packId: next.devinette.pack,
+                devinetteId: next.devinette.id,
+              ),
+        );
         // En mode défi du jour, on persiste le résultat via le flow
         // dédié AVANT d'afficher la victoire (l'overlay affiche le solde
         // mis à jour). Le controller a déjà skippé recordWin standard.
@@ -683,6 +694,12 @@ class _GameViewState extends ConsumerState<GameView>
       if (!ref.read(playerProgressProvider).noAdsPurchased) {
         await ref.read(playerProgressProvider.notifier).recordFailure();
       }
+      // Anti-tilt : incrémente les défaites consécutives sur cette
+      // devinette (sans pénalité cauris). Au seuil, l'écran d'échec
+      // proposera un skip gratuit. Hors défi du jour (flow dédié).
+      await ref
+          .read(playerProgressProvider.notifier)
+          .recordSoloLoss(devinetteId: widget.args.devinette.id);
     }
 
     // Logique de reveal (T3+ uniquement, et seulement en mode montagne
@@ -721,6 +738,16 @@ class _GameViewState extends ConsumerState<GameView>
       playerProgressProvider.select((p) => p.cauris >= _revealCostCauris),
     );
 
+    // Anti-tilt : skip gratuit proposé dès que les défaites consécutives
+    // sur cette devinette atteignent le seuil (hors défi du jour — déjà
+    // exclu de `recordSoloLoss` ci-dessus, donc le compteur y reste à 0).
+    final devinetteId = widget.args.devinette.id;
+    final showSkip = ref.read(
+      playerProgressProvider.select(
+        (p) => p.consecutiveLossesOn(devinetteId) >= kFreeSkipLossThreshold,
+      ),
+    );
+
     await showDialog<void>(
       context: ctx,
       barrierDismissible: false,
@@ -742,6 +769,22 @@ class _GameViewState extends ConsumerState<GameView>
           _overlayShown = false;
           controller.restart();
         },
+        onSkip: showSkip
+            ? () {
+                // Reset du compteur (sans pénalité), ferme l'échec puis
+                // ressort de la partie : le prochain tirage — désormais
+                // filtré par le seen-tracker — servira une devinette
+                // fraîche.
+                unawaited(
+                  ref
+                      .read(playerProgressProvider.notifier)
+                      .recordSoloSkipFree(devinetteId: devinetteId),
+                );
+                ctx
+                  ..pop() // closes dialog
+                  ..pop(); // exits game view
+              }
+            : null,
       ),
     );
   }

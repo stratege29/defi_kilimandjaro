@@ -401,6 +401,7 @@ class GameController extends StateNotifier<GameState> {
             caurisAwarded: caurisAwarded,
             levelIndex: _args.levelIndex,
             starsEarned: stars,
+            devinetteId: state.devinette.id,
           ),
         );
       }

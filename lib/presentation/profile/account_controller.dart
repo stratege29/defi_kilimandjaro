@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/data/local/seen_devinette_store.dart';
 import 'package:defi_kilimandjaro/data/repositories/auth_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -102,6 +103,8 @@ class AccountController extends StateNotifier<AccountUiState> {
       await _auth.deleteAccount();
       // Efface la progression locale (cauris/niveaux/streaks) du device.
       await _ref.read(playerProgressProvider.notifier).reset();
+      // RGPD : efface aussi le journal anti-répétition « déjà vu ».
+      await _ref.read(seenDevinetteTrackerProvider).clearAll();
       state = state.copyWith(isBusy: false);
     } on Object {
       state = state.copyWith(

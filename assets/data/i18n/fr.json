@@ -81,7 +81,8 @@
       "answer_hidden_title": "Mot caché",
       "answer_hidden_hint": "La sagesse se mérite — réessaie ou révèle la réponse.",
       "reveal_button": "Voir la réponse — {cost}",
-      "reveal_insufficient": "Solde insuffisant ({cost} requis)"
+      "reveal_insufficient": "Solde insuffisant ({cost} requis)",
+      "skip_free": "Passer cette devinette (gratuit)"
     }
   },
   "hub": {

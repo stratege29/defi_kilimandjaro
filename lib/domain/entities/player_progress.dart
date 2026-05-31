@@ -31,6 +31,7 @@ class PlayerProgress extends Equatable {
     this.freeHintAvailable = false,
     this.lastFreeHintGrantedDate,
     this.encounteredModifiers = const <LevelModifier>{},
+    this.consecutiveLossesByDevinetteId = const <String, int>{},
   }) : activePackMix =
            activePackMix ?? _defaultPackMix(ownedPacks, freePackChosen);
 
@@ -111,6 +112,11 @@ class PlayerProgress extends Equatable {
       encounteredModifiers: _parseEncounteredModifiers(
         json['encountered_modifiers'],
       ),
+      consecutiveLossesByDevinetteId:
+          ((json['consecutive_losses_by_devinette']
+                      as Map<String, dynamic>?) ??
+                  <String, dynamic>{})
+              .map((k, v) => MapEntry(k, v as int)),
     );
   }
 
@@ -290,6 +296,25 @@ class PlayerProgress extends Equatable {
   /// ignorés au load — cf. [_parseEncounteredModifiers].
   final Set<LevelModifier> encounteredModifiers;
 
+  /// Nombre de défaites consécutives par devinette en mode **solo**.
+  ///
+  /// Clé : `devinetteId`. Reset à zéro :
+  /// - après une victoire sur cette devinette (cf.
+  ///   `PlayerProgressNotifier.recordWin` — étendu à passer un
+  ///   `devinetteId`) ;
+  /// - après un skip gratuit anti-tilt (cf.
+  ///   `PlayerProgressNotifier.recordSoloSkipFree`) ;
+  /// - lors d'un reset complet.
+  ///
+  /// Sert exclusivement le mécanisme d'anti-tilt : au seuil
+  /// `kFreeSkipLossThreshold` (3), l'UI d'échec propose un bouton
+  /// "Passer (gratuit)" qui débloque la frustration sans pénalité
+  /// supplémentaire.
+  ///
+  /// **Solo uniquement** — le duel 1v1 a sa propre logique de fin de
+  /// manche sans cauris ni pub (cf. CLAUDE.md).
+  final Map<String, int> consecutiveLossesByDevinetteId;
+
   /// True quand l'utilisateur a déjà choisi son pack gratuit (gating
   /// d'onboarding).
   bool get hasChosenFreePack => freePackChosen != null;
@@ -326,6 +351,8 @@ class PlayerProgress extends Equatable {
     if (encounteredModifiers.isNotEmpty)
       'encountered_modifiers':
           encounteredModifiers.map((m) => m.name).toList(growable: false),
+    if (consecutiveLossesByDevinetteId.isNotEmpty)
+      'consecutive_losses_by_devinette': consecutiveLossesByDevinetteId,
   };
 
   /// Combien de niveaux complétés sur cette montagne.
@@ -349,6 +376,13 @@ class PlayerProgress extends Equatable {
   /// `StarGate.computeUnlockedTier`).
   int get totalStars =>
       starsByLevel.values.fold<int>(0, (sum, s) => sum + s);
+
+  /// Nombre de défaites consécutives en cours sur une devinette donnée
+  /// (0 si jamais perdu ou si reset suite à victoire/skip). Sert au
+  /// déclenchement du skip gratuit anti-tilt au seuil
+  /// `kFreeSkipLossThreshold`.
+  int consecutiveLossesOn(String devinetteId) =>
+      consecutiveLossesByDevinetteId[devinetteId] ?? 0;
 
   PlayerProgress copyWith({
     int? cauris,
@@ -374,6 +408,7 @@ class PlayerProgress extends Equatable {
     bool? freeHintAvailable,
     DateTime? lastFreeHintGrantedDate,
     Set<LevelModifier>? encounteredModifiers,
+    Map<String, int>? consecutiveLossesByDevinetteId,
   }) {
     return PlayerProgress(
       cauris: cauris ?? this.cauris,
@@ -406,6 +441,8 @@ class PlayerProgress extends Equatable {
           lastFreeHintGrantedDate ?? this.lastFreeHintGrantedDate,
       encounteredModifiers:
           encounteredModifiers ?? this.encounteredModifiers,
+      consecutiveLossesByDevinetteId: consecutiveLossesByDevinetteId ??
+          this.consecutiveLossesByDevinetteId,
     );
   }
 
@@ -434,5 +471,6 @@ class PlayerProgress extends Equatable {
     freeHintAvailable,
     lastFreeHintGrantedDate,
     encounteredModifiers,
+    consecutiveLossesByDevinetteId,
   ];
 }

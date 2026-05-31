@@ -1,10 +1,12 @@
 import 'dart:math';
 
+import 'package:defi_kilimandjaro/data/local/seen_devinette_store.dart';
 import 'package:defi_kilimandjaro/data/repositories/composite_devinette_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:defi_kilimandjaro/domain/repositories/devinette_repository.dart';
 import 'package:defi_kilimandjaro/domain/services/devinette_selection_service.dart';
+import 'package:defi_kilimandjaro/domain/services/seen_devinette_tracker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Implémentation par défaut du [DevinetteSelectionService].
@@ -15,11 +17,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class WeightedDevinetteSelectionService implements DevinetteSelectionService {
   WeightedDevinetteSelectionService({
     required DevinetteRepository repository,
+    SeenDevinetteTracker? seenTracker,
     Random? rng,
   }) : _repo = repository,
+       _seenTracker = seenTracker,
        _rng = rng ?? Random();
 
   final DevinetteRepository _repo;
+
+  /// Tracker anti-répétition (optionnel). Quand présent, ses exclusions
+  /// "déjà vu" (scopées au pack, avec garantie de fraîcheur ≥ 20 %) sont
+  /// fusionnées avec les `excludeIds` du caller pour chaque pack tenté.
+  /// Nullable pour rester injectable par les tests sans dépendance prefs.
+  final SeenDevinetteTracker? _seenTracker;
+
   final Random _rng;
 
   /// Fallback maximal sur la distance de difficulté (±). 10 = largement
@@ -50,11 +61,25 @@ class WeightedDevinetteSelectionService implements DevinetteSelectionService {
       final packId = orderedPacks.removeAt(0);
       final list = await _repo.loadPack(packId);
 
+      // Fusionne les exclusions "déjà vu" (scopées à ce pack, avec
+      // garantie de fraîcheur ≥ 20 % via le tracker) avec celles du
+      // caller (`recentDevinetteIds`). `list.length` = packTotalCount
+      // effectif post-merge bundle+OTA pour ce pack.
+      final effectiveExclude = _seenTracker == null
+          ? excludeIds
+          : <String>{
+              ...excludeIds,
+              ..._seenTracker.effectiveExclusions(
+                packId: packId,
+                packTotalCount: list.length,
+              ),
+            };
+
       final picked = _pickFromList(
         list: list,
         targetDifficulty: targetDifficulty,
         wordLengthBucket: wordLengthBucket,
-        excludeIds: excludeIds,
+        excludeIds: effectiveExclude,
         rng: rng,
       );
       if (picked != null) return picked;
@@ -166,6 +191,7 @@ final devinetteSelectionServiceProvider = Provider<DevinetteSelectionService>(
   (ref) {
     return WeightedDevinetteSelectionService(
       repository: ref.watch(compositeDevinetteRepositoryProvider),
+      seenTracker: ref.watch(seenDevinetteTrackerProvider),
     );
   },
 );

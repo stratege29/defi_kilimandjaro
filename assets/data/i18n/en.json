@@ -81,7 +81,8 @@
       "answer_hidden_title": "Hidden word",
       "answer_hidden_hint": "Wisdom is earned — try again or reveal the answer.",
       "reveal_button": "Reveal answer — {cost}",
-      "reveal_insufficient": "Not enough cauris ({cost} needed)"
+      "reveal_insufficient": "Not enough cauris ({cost} needed)",
+      "skip_free": "Skip this riddle (free)"
     }
   },
   "hub": {

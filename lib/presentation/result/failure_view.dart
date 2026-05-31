@@ -35,6 +35,7 @@ class FailureView extends StatefulWidget {
     this.revealCost,
     this.onPurchaseReveal,
     this.canAffordReveal = false,
+    this.onSkip,
     super.key,
   });
 
@@ -42,6 +43,12 @@ class FailureView extends StatefulWidget {
 
   /// Callback appelé quand l'utilisateur tape RÉESSAYER.
   final VoidCallback onRetry;
+
+  /// Anti-tilt : callback du skip gratuit. Quand non-`null`, une CTA
+  /// tertiaire « Passer (gratuit) » est affichée sous RÉESSAYER. Le caller
+  /// ne la fournit qu'au-delà du seuil `kFreeSkipLossThreshold` de défaites
+  /// consécutives sur cette devinette. `null` = pas de skip proposé.
+  final VoidCallback? onSkip;
 
   /// Mode d'affichage initial. `true` (default) reproduit le comportement
   /// historique. `false` masque la réponse et active le bouton d'achat.
@@ -137,6 +144,7 @@ class _FailureViewState extends State<FailureView>
             purchasePending: _purchasePending,
             onPurchaseReveal:
                 widget.onPurchaseReveal == null ? null : _handlePurchase,
+            onSkip: widget.onSkip,
           ),
         ),
       ),
@@ -157,6 +165,7 @@ class _FailureCard extends StatelessWidget {
     required this.purchasePending,
     this.revealCost,
     this.onPurchaseReveal,
+    this.onSkip,
   });
 
   final Devinette devinette;
@@ -166,6 +175,7 @@ class _FailureCard extends StatelessWidget {
   final bool canAffordReveal;
   final bool purchasePending;
   final VoidCallback? onPurchaseReveal;
+  final VoidCallback? onSkip;
 
   @override
   Widget build(BuildContext context) {
@@ -253,6 +263,18 @@ class _FailureCard extends StatelessWidget {
                       ),
                     )
                   : const CaurisIcon(size: 16),
+            ),
+          ],
+          // Anti-tilt : skip gratuit après N défaites consécutives sur
+          // cette devinette. CTA tertiaire « ghost » — désamorce la
+          // frustration sans éclipser RÉESSAYER ni le reveal.
+          if (onSkip != null) ...[
+            const SizedBox(height: 10),
+            AppButton(
+              label: 'result.failure.skip_free'.tr(),
+              onPressed: onSkip,
+              variant: AppButtonVariant.ghost,
+              fullWidth: true,
             ),
           ],
         ],

@@ -93,6 +93,7 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     required int caurisAwarded,
     int? levelIndex,
     int? starsEarned,
+    String? devinetteId,
   }) async {
     final levels = Map<String, int>.from(state.completedLevelsByMountain);
     if (mountainId != null) {
@@ -131,6 +132,14 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
       }
     }
 
+    // Reset du compteur anti-tilt **sur cette devinette** : on l'a
+    // résolue, l'historique de blocage est effacé. Copie conditionnelle
+    // pour éviter une allocation à chaque victoire sans blocage antérieur.
+    var soloLosses = state.consecutiveLossesByDevinetteId;
+    if (devinetteId != null && soloLosses.containsKey(devinetteId)) {
+      soloLosses = Map<String, int>.from(soloLosses)..remove(devinetteId);
+    }
+
     final newState = state.copyWith(
       cauris: state.cauris + caurisAwarded,
       completedLevelsByMountain: levels,
@@ -140,7 +149,40 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
       consecutiveFailures: 0,
       starsByLevel: stars,
       failsByLevel: fails,
+      consecutiveLossesByDevinetteId: soloLosses,
     );
+    state = newState;
+    await _repo.save(newState);
+  }
+
+  /// Anti-tilt — incrémente le compteur de défaites consécutives sur
+  /// **cette devinette** (solo). Aucune pénalité en cauris : décision
+  /// produit « ne pas punir l'échec » (cf. `kFreeSkipLossThreshold` et
+  /// `game_view`). Au seuil `kFreeSkipLossThreshold`, l'écran d'échec
+  /// propose un skip gratuit via [recordSoloSkipFree].
+  Future<void> recordSoloLoss({required String devinetteId}) async {
+    if (devinetteId.isEmpty) return;
+    final losses =
+        Map<String, int>.from(state.consecutiveLossesByDevinetteId);
+    losses[devinetteId] = (losses[devinetteId] ?? 0) + 1;
+    final newState =
+        state.copyWith(consecutiveLossesByDevinetteId: losses);
+    state = newState;
+    await _repo.save(newState);
+  }
+
+  /// Anti-tilt — reset du compteur de défaites consécutives sur cette
+  /// devinette suite à un skip gratuit, sans pénalité. No-op si aucun
+  /// compteur n'existe (évite une allocation inutile).
+  Future<void> recordSoloSkipFree({required String devinetteId}) async {
+    if (!state.consecutiveLossesByDevinetteId.containsKey(devinetteId)) {
+      return;
+    }
+    final losses =
+        Map<String, int>.from(state.consecutiveLossesByDevinetteId)
+          ..remove(devinetteId);
+    final newState =
+        state.copyWith(consecutiveLossesByDevinetteId: losses);
     state = newState;
     await _repo.save(newState);
   }
