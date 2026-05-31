@@ -3447,7 +3447,7 @@
     "estimated_time_s": 20,
     "tags": [
       "couleur",
-      "océan",
+      "club",
       "football"
     ],
     "format_version": 3
@@ -5823,19 +5823,23 @@
     "id": "football_ci_201",
     "pack": "football_ci",
     "country": "ci",
-    "answer": "1992",
-    "answer_normalized": "1992",
+    "answer": "GOUAMENE",
+    "answer_normalized": "gouamene",
     "letters_pool": [
-      "1",
-      "9",
-      "9",
-      "2"
+      "G",
+      "O",
+      "U",
+      "A",
+      "M",
+      "E",
+      "N",
+      "E"
     ],
     "riddle": {
-      "fr": "L'année où les Éléphants ont rugi pour la première fois en terre sénégalaise."
+      "fr": "Gardien de légende, ses arrêts aux tirs au but ont offert aux Éléphants leur premier sacre à la CAN en 1992."
     },
     "explanation": {
-      "fr": "1992 est l'année de la première victoire de la Côte d'Ivoire à la CAN, remportée au Sénégal."
+      "fr": "Alain Gouaméné, gardien des Éléphants, fut le héros de la séance de tirs au but victorieuse en finale de la CAN 1992 face au Ghana."
     },
     "difficulty": 1,
     "estimated_time_s": 20,
@@ -5850,19 +5854,26 @@
     "id": "football_ci_202",
     "pack": "football_ci",
     "country": "ci",
-    "answer": "2015",
-    "answer_normalized": "2015",
+    "answer": "EQUATORIALE",
+    "answer_normalized": "equatoriale",
     "letters_pool": [
-      "2",
-      "0",
-      "1",
-      "5"
+      "E",
+      "Q",
+      "U",
+      "A",
+      "T",
+      "O",
+      "R",
+      "I",
+      "A",
+      "L",
+      "E"
     ],
     "riddle": {
-      "fr": "Cette année en Guinée équatoriale, les Éléphants ont triomphé à nouveau."
+      "fr": "Ce pays africain a accueilli la CAN 2015, où les Éléphants ont remporté une victoire éclatante."
     },
     "explanation": {
-      "fr": "La Côte d'Ivoire a remporté la CAN 2015 en Guinée équatoriale."
+      "fr": "La Côte d'Ivoire a remporté la CAN 2015 en Guinée équatoriale, consolidant sa domination dans le football continental."
     },
     "difficulty": 1,
     "estimated_time_s": 20,
@@ -5877,19 +5888,22 @@
     "id": "football_ci_203",
     "pack": "football_ci",
     "country": "ci",
-    "answer": "2023",
-    "answer_normalized": "2023",
+    "answer": "ADINGRA",
+    "answer_normalized": "adingra",
     "letters_pool": [
-      "2",
-      "0",
-      "2",
-      "3"
+      "A",
+      "D",
+      "I",
+      "N",
+      "G",
+      "R",
+      "A"
     ],
     "riddle": {
-      "fr": "L'année où les Éléphants ont brillé devant leur public à Ebimpé."
+      "fr": "Ailier révélation des Éléphants, il a illuminé le sacre à domicile lors de la CAN 2023."
     },
     "explanation": {
-      "fr": "La CAN 2023 a été remportée par la Côte d'Ivoire à domicile."
+      "fr": "Simon Adingra s'est révélé comme l'une des étoiles des Éléphants lors de la CAN 2023, remportée par la Côte d'Ivoire devant son public."
     },
     "difficulty": 1,
     "estimated_time_s": 20,
@@ -9783,11 +9797,10 @@
     "id": "football_ci_338",
     "pack": "football_ci",
     "country": "ci",
-    "answer": "N'GUESSAN",
-    "answer_normalized": "n'guessan",
+    "answer": "NGUESSAN",
+    "answer_normalized": "nguessan",
     "letters_pool": [
       "N",
-      "'",
       "G",
       "U",
       "E",
@@ -11187,8 +11200,8 @@
     "id": "football_ci_386",
     "pack": "football_ci",
     "country": "ci",
-    "answer": "ESSUIE-GLACE",
-    "answer_normalized": "essuie-glace",
+    "answer": "ESSUIEGLACE",
+    "answer_normalized": "essuieglace",
     "letters_pool": [
       "E",
       "S",
@@ -11196,7 +11209,6 @@
       "U",
       "I",
       "E",
-      "-",
       "G",
       "L",
       "A",

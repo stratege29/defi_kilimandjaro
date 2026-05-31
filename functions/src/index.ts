@@ -26,6 +26,11 @@ const projectId =
   process.env["GCLOUD_PROJECT"] ?? "kilimandjaro-dev";
 initializeApp({
   databaseURL: `https://${projectId}-default-rtdb.firebaseio.com`,
+  // Bucket de stockage explicite : `getStorage().bucket()` (sans nom)
+  // requiert un storageBucket par defaut, sinon `publishPack` echoue avec
+  // « Bucket name not specified or invalid » lors de l'upload de l'artefact.
+  // Les projets recents utilisent le suffixe `.firebasestorage.app`.
+  storageBucket: `${projectId}.firebasestorage.app`,
 });
 
 // --- Matchmaking ELO (Phase 6) ---
