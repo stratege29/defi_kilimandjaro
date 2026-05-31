@@ -15,7 +15,9 @@ import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart'
     show kAltitudeHeroTag;
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/widgets/display_name_prompt.dart';
+import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -93,13 +95,13 @@ class ProfileView extends ConsumerWidget {
               mountainsConquered: conquered.length,
               cauris: progress.cauris,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+            _AltitudeCard(profile: profileAsync.value),
+            const SizedBox(height: 16),
             _StatsGrid(
               progress: progress,
               mountainsConquered: conquered.length,
             ),
-            const SizedBox(height: 16),
-            _AltitudeCard(profile: profileAsync.value),
             const SizedBox(height: 28),
             const _SectionHeader(title: 'MONTAGNES GRAVIES'),
             const SizedBox(height: 12),
@@ -305,30 +307,16 @@ class _ProfileHero extends ConsumerWidget {
     final displayName = hasName ? profile!.displayName! : 'Grimpeur anonyme';
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: AppColors.orJour.withValues(alpha: 0.45),
-          width: 1.2,
-        ),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.orJour.withValues(alpha: 0.12),
-            blurRadius: 20,
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Row(
         children: [
           const _AvatarBadge(),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -350,8 +338,7 @@ class _ProfileHero extends ConsumerWidget {
                           Flexible(
                             child: Text(
                               displayName,
-                              style: AppTypography.displaySm.copyWith(
-                                fontSize: 24,
+                              style: AppTypography.headingLg.copyWith(
                                 color: hasName
                                     ? AppColors.textePrimaire
                                     : AppColors.texteSecondaire,
@@ -444,32 +431,15 @@ class _AvatarBadge extends ConsumerWidget {
       child: GestureDetector(
         onTap: () => context.push(AppRoutes.avatarPicker),
         behavior: HitTestBehavior.opaque,
-        child: Container(
-          width: 88,
-          height: 88,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: <Color>[
-                AppColors.orJour.withValues(alpha: 0.25),
-                Colors.transparent,
-              ],
-              stops: const <double>[0.55, 1],
-            ),
-          ),
-          padding: const EdgeInsets.all(4),
+        child: SizedBox(
+          width: 74,
+          height: 74,
           child: Stack(
             children: [
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.orJour, width: 1.5),
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                      color: AppColors.orJour.withValues(alpha: 0.3),
-                      blurRadius: 12,
-                    ),
-                  ],
+                  border: Border.all(color: AppColors.orJour, width: 2),
                 ),
                 child: ClipOval(child: avatarChild),
               ),
@@ -522,7 +492,7 @@ class _CurrentTitleChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(title.icon, style: const TextStyle(fontSize: 14)),
+          Image.asset(title.badgeAsset, width: 18, height: 18),
           const SizedBox(width: 6),
           Text(
             title.name,
@@ -606,43 +576,34 @@ class _StatsGrid extends StatelessWidget {
           children: [
             Expanded(
               child: _StatCard(
-                icon: Icons.workspace_premium_outlined,
                 value: '${progress.totalLevelsCompleted}',
                 label: 'Niveaux',
-                accent: AppColors.orJour,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: _StatCard(
-                iconWidget: const CaurisIcon(size: 22),
                 value: '${progress.cauris}',
                 label: 'Cauris',
-                accent: AppColors.orJour,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Row(
           children: [
             Expanded(
               child: _StatCard(
-                icon: Icons.terrain_outlined,
                 value: '$mountainsConquered',
                 label: 'Sommets',
-                accent: AppColors.success,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: _StatCard(
-                icon: Icons.local_fire_department_rounded,
                 value: '${progress.dailyStreak}',
-                label: 'Streak',
-                accent: progress.dailyStreak > 0
-                    ? AppColors.warning
-                    : AppColors.texteTertiaire,
+                label: 'Série',
+                valueColor: AppColors.kola,
               ),
             ),
           ],
@@ -656,62 +617,41 @@ class _StatCard extends StatelessWidget {
   const _StatCard({
     required this.value,
     required this.label,
-    required this.accent,
-    this.icon,
-    this.iconWidget,
-  }) : assert(
-         icon != null || iconWidget != null,
-         'Provide either icon or iconWidget',
-       );
+    this.valueColor,
+  });
 
-  final IconData? icon;
-  final Widget? iconWidget;
   final String value;
   final String label;
-  final Color accent;
+  final Color? valueColor;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+      padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: accent.withValues(alpha: 0.4),
-          width: 1.2,
-        ),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            height: 24,
-            child: iconWidget ?? Icon(icon, color: accent, size: 22),
-          ),
-          const SizedBox(height: 8),
           Text(
             value,
             style: AppTypography.displaySm.copyWith(
-              fontSize: 30,
-              color: AppColors.textePrimaire,
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              color: valueColor ?? AppColors.orJour,
               height: 1,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             label.toUpperCase(),
-            style: AppTypography.labelSm.copyWith(
-              color: AppColors.texteSecondaire,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w500,
+            style: AppTypography.labelXs.copyWith(
+              color: AppColors.texteTertiaire,
+              letterSpacing: 0.8,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
@@ -738,45 +678,27 @@ class _AltitudeCard extends StatelessWidget {
     final isMaster = elo >= PlayerProfile.eloMaster;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: AppColors.orJour.withValues(alpha: 0.45),
-          width: 1.2,
-        ),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.orJour.withValues(alpha: 0.1),
-            blurRadius: 22,
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.terrain_outlined,
-                color: AppColors.orJour,
-                size: 18,
-              ),
-              const SizedBox(width: 8),
               Text(
                 'DÉFI EN LIGNE',
                 style: AppTypography.labelSm.copyWith(
-                  color: AppColors.orJour,
+                  color: AppColors.texteSecondaire,
                   letterSpacing: 1.4,
                   fontWeight: FontWeight.w700,
                 ),
               ),
+              const Spacer(),
+              if (peak > PlayerProfile.eloInitial) _RecordChip(peak: peak),
               if (isMaster) ...[
                 const SizedBox(width: 10),
                 Container(
@@ -820,34 +742,25 @@ class _AltitudeCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Padding(
-                padding: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.only(bottom: 7),
                 child: Text(
                   'm',
-                  style: AppTypography.headingMd.copyWith(
-                    color: AppColors.orJour.withValues(alpha: 0.7),
+                  style: AppTypography.bodyMd.copyWith(
+                    color: AppColors.texteSecondaire,
                   ),
                 ),
               ),
-              const Spacer(),
-              _PillStat(label: 'Record', value: '$peak m'),
             ],
           ),
-          const SizedBox(height: 16),
-          Container(
-            height: 1,
-            color: AppColors.orJour.withValues(alpha: 0.15),
-          ),
+          const SizedBox(height: 14),
+          Container(height: 1, color: AppColors.hairline),
           const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
                 child: _AltitudeStat(label: 'Duels', value: '$totalDuels'),
               ),
-              Container(
-                width: 1,
-                height: 28,
-                color: AppColors.texteTertiaire.withValues(alpha: 0.25),
-              ),
+              Container(width: 1, height: 28, color: AppColors.hairline),
               Expanded(
                 child: _AltitudeStat(
                   label: 'Victoires',
@@ -855,11 +768,7 @@ class _AltitudeCard extends StatelessWidget {
                   valueColor: AppColors.success,
                 ),
               ),
-              Container(
-                width: 1,
-                height: 28,
-                color: AppColors.texteTertiaire.withValues(alpha: 0.25),
-              ),
+              Container(width: 1, height: 28, color: AppColors.hairline),
               Expanded(
                 child: _AltitudeStat(
                   label: 'Défaites',
@@ -875,46 +784,26 @@ class _AltitudeCard extends StatelessWidget {
   }
 }
 
-class _PillStat extends StatelessWidget {
-  const _PillStat({required this.label, required this.value});
-  final String label;
-  final String value;
+class _RecordChip extends StatelessWidget {
+  const _RecordChip({required this.peak});
+  final int peak;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.success.withValues(alpha: 0.14),
+        color: AppColors.orJour.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: AppColors.success.withValues(alpha: 0.45)),
+        border: Border.all(color: AppColors.orJour.withValues(alpha: 0.4)),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.flag_outlined,
-            size: 12,
-            color: AppColors.success,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            value,
-            style: AppTypography.labelSm.copyWith(
-              color: AppColors.success,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.4,
-            ),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            label.toLowerCase(),
-            style: AppTypography.labelXs.copyWith(
-              color: AppColors.success.withValues(alpha: 0.8),
-              letterSpacing: 0.6,
-            ),
-          ),
-        ],
+      child: Text(
+        'Record · $peak m',
+        style: AppTypography.labelXs.copyWith(
+          color: AppColors.orJour,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.4,
+        ),
       ),
     );
   }
@@ -937,17 +826,18 @@ class _AltitudeStat extends StatelessWidget {
       children: [
         Text(
           value,
-          style: AppTypography.headingLg.copyWith(
+          style: AppTypography.displaySm.copyWith(
+            fontSize: 20,
             color: valueColor ?? AppColors.textePrimaire,
             height: 1,
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 3),
         Text(
           label.toUpperCase(),
           style: AppTypography.labelXs.copyWith(
-            color: AppColors.texteSecondaire,
-            letterSpacing: 1,
+            color: AppColors.texteTertiaire,
+            letterSpacing: 0.8,
           ),
         ),
       ],
@@ -1035,10 +925,23 @@ class _MountainsBlock extends StatelessWidget {
     }
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final m in conquered) _MountainCard(mountain: m, conquered: true),
+        // Sommets conquis : carrousel horizontal d'icônes (scroll plus court
+        // qu'une liste verticale quand le joueur a gravi beaucoup de sommets).
+        if (conquered.isNotEmpty)
+          SizedBox(
+            height: 132,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              itemCount: conquered.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (_, i) => _ConqueredMountainChip(mountain: conquered[i]),
+            ),
+          ),
         if (inProgress.isNotEmpty) ...[
-          const SizedBox(height: 8),
+          SizedBox(height: conquered.isEmpty ? 0 : 16),
           Padding(
             padding: const EdgeInsets.only(left: 2, bottom: 6, top: 4),
             child: Text(
@@ -1053,6 +956,86 @@ class _MountainsBlock extends StatelessWidget {
           for (final m in inProgress) _MountainCard(mountain: m, conquered: false),
         ],
       ],
+    );
+  }
+}
+
+/// Vignette icône d'un sommet conquis pour le carrousel horizontal du profil.
+///
+/// Silhouette `.vec` posée sur une tuile Vert Nuit bordée vert (succès), avec
+/// drapeau pays en coin + nom et altitude dessous.
+class _ConqueredMountainChip extends StatelessWidget {
+  const _ConqueredMountainChip({required this.mountain});
+
+  final Mountain mountain;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 116,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AppColors.success.withValues(alpha: 0.55),
+          width: 1.2,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Tuile silhouette (ciel transparent du .vec sur surfaceVariant).
+          SizedBox(
+            height: 64,
+            width: double.infinity,
+            child: ColoredBox(
+              color: AppColors.surfaceVariant,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  MountainSilhouetteVector(mountain: mountain),
+                  Positioned(
+                    top: 6,
+                    left: 6,
+                    child: FlagRoundel(
+                      countryCode: mountain.countryCode,
+                      size: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  mountain.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.labelSm.copyWith(
+                    color: AppColors.textePrimaire,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${mountain.altitude} m',
+                  style: AppTypography.labelXs.copyWith(
+                    color: AppColors.texteSecondaire,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1083,7 +1066,7 @@ class _MountainCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(mountain.flagEmoji, style: const TextStyle(fontSize: 26)),
+          FlagRoundel(countryCode: mountain.countryCode, size: 30),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 /// Si [fingerPosition] est non-null, la ligne est prolongée en live
 /// jusqu'au doigt courant.
 ///
-/// Double couche : trait plein doré + halo flou pour l'effet lumineux.
+/// Trait plein doré + halo empilé (glow GPU-safe, sans `MaskFilter.blur`).
 class GoldenPath extends StatelessWidget {
   const GoldenPath({
     required this.points,
@@ -56,6 +56,15 @@ class _GoldenPathPainter extends CustomPainter {
   /// déjà la nouvelle longueur, et la ligne ne se redessinerait jamais.
   final int _pointsLength;
 
+  /// Couches de halo `(largeur, alpha)` empilées — du plus large/diffus au
+  /// plus serré/dense. Fake-glow **GPU-safe** qui remplace `MaskFilter.blur`
+  /// (cause de crash iOS 26).
+  static const List<(double, double)> _glowLayers = <(double, double)>[
+    (16, 0.08),
+    (11, 0.14),
+    (8, 0.22),
+  ];
+
   @override
   void paint(Canvas canvas, Size size) {
     if (points.isEmpty) return;
@@ -69,28 +78,33 @@ class _GoldenPathPainter extends CustomPainter {
 
     final simplified = _simplify(pts, tolerance: 2);
 
-    // Halo (glow) layer.
-    final glowPaint = Paint()
-      ..color = AppColors.orSoleil.withValues(alpha: 0.3)
-      ..strokeWidth = 16
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..style = PaintingStyle.stroke
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
-
-    // Main line layer.
-    final linePaint = Paint()
-      ..color = AppColors.cheminDore
-      ..strokeWidth = 5
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..style = PaintingStyle.stroke;
-
     final path = _buildPath(simplified);
 
-    canvas
-      ..drawPath(path, glowPaint)
-      ..drawPath(path, linePaint);
+    // Halo (glow) : empilement de traits larges semi-transparents — approxime
+    // un glow gaussien SANS `MaskFilter.blur` (crash iOS 26) ni
+    // `BackdropFilter`. 100 % GPU-safe.
+    for (final (width, alpha) in _glowLayers) {
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = AppColors.orSoleil.withValues(alpha: alpha)
+          ..strokeWidth = width
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..style = PaintingStyle.stroke,
+      );
+    }
+
+    // Trait principal net par-dessus.
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = AppColors.cheminDore
+        ..strokeWidth = 5
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..style = PaintingStyle.stroke,
+    );
   }
 
   /// Réduit la densité de points en supprimant ceux trop proches du

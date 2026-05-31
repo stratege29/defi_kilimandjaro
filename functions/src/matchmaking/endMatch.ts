@@ -150,7 +150,7 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
       { merge: true }
     );
 
-    // --- Écrire l'historique ---
+    // --- Écrire l'historique match ---
     const historyRef = db.collection("matches_history").doc(matchId);
     batch.set(historyRef, {
       players,
@@ -169,6 +169,39 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
       },
       finished_at: now,
     });
+
+    // --- Écrire les entrées duel_history pour les 2 joueurs ---
+    // Chaque joueur a une subcollection profiles/{uid}/duel_history/{matchId}
+    // contenant la vue de son duel : opponent, result, delta, timestamp.
+    const winnerHistoryRef = db
+      .collection("profiles")
+      .doc(winner_uid)
+      .collection("duel_history")
+      .doc(matchId);
+    const loserHistoryRef = db
+      .collection("profiles")
+      .doc(loserUid)
+      .collection("duel_history")
+      .doc(matchId);
+
+    const winnerHistoryData = {
+      opponent_uid: loserUid,
+      opponent_name: loserSnap.data()?.["display_name"] as string | undefined ?? "Grimpeur anonyme",
+      did_win: true,
+      elo_delta: winnerDelta,
+      finished_at: now,
+    };
+
+    const loserHistoryData = {
+      opponent_uid: winner_uid,
+      opponent_name: winnerSnap.data()?.["display_name"] as string | undefined ?? "Grimpeur anonyme",
+      did_win: false,
+      elo_delta: loserDelta,
+      finished_at: now,
+    };
+
+    batch.set(winnerHistoryRef, winnerHistoryData);
+    batch.set(loserHistoryRef, loserHistoryData);
 
     await batch.commit();
 

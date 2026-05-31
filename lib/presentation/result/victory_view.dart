@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
@@ -11,6 +10,7 @@ import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.d
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/dashed_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
@@ -214,12 +214,15 @@ class _VictoryViewState extends ConsumerState<VictoryView>
       type: MaterialType.transparency,
       child: Stack(
         children: <Widget>[
-          // 1. Particules en éventail (derrière la card).
+          // 1. Particules en éventail (derrière la card). RepaintBoundary :
+          // isole le repaint de l'animation des particules de la card.
           Positioned.fill(
-            child: AnimatedBuilder(
-              animation: _particleCtrl,
-              builder: (context, _) => CustomPaint(
-                painter: _ParticlePainter(progress: _particleCtrl.value),
+            child: RepaintBoundary(
+              child: AnimatedBuilder(
+                animation: _particleCtrl,
+                builder: (context, _) => CustomPaint(
+                  painter: _ParticlePainter(progress: _particleCtrl.value),
+                ),
               ),
             ),
           ),
@@ -281,19 +284,20 @@ class _VictoryCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.orJour, width: 1.5),
+        borderRadius: BorderRadius.circular(24),
+        // Vert Nuit : bordure sémantique « victoire » (succès) en hairline
+        // teinté, pas d'or plein. La profondeur naît d'une seule ombre noire
+        // diffuse — aucun halo doré (retenue : « moins de glows »).
+        border: Border.all(
+          color: isBoss
+              ? AppColors.orJour.withValues(alpha: 0.5)
+              : AppColors.success.withValues(alpha: 0.4),
+        ),
         boxShadow: <BoxShadow>[
-          // Halo doré subtil (signature 2026).
-          BoxShadow(
-            color: AppColors.orJour.withValues(alpha: 0.18),
-            blurRadius: 28,
-          ),
-          // Profondeur sous la card.
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.55),
-            blurRadius: 32,
-            offset: const Offset(0, 12),
+            blurRadius: 60,
+            offset: const Offset(0, 24),
           ),
         ],
       ),
@@ -409,10 +413,9 @@ class _VictoryCard extends StatelessWidget {
   }
 }
 
-/// Bouton "Doubler la récompense" — convertit ~25-40 % des victoires
-/// observées sur le segment Word puzzle. Style discret pour ne pas
-/// éclipser le CTA primaire "SUIVANT" : bordure or, fond translucide,
-/// icône play_circle + montant en gros.
+/// Bouton "Doubler la récompense" — filet pointillé doré pleine largeur
+/// (maquette `.double`). Style discret pour ne pas éclipser le CTA primaire
+/// "SUIVANT". Affiche un spinner en tête pendant le chargement de la pub.
 class _DoubleRewardButton extends StatelessWidget {
   const _DoubleRewardButton({
     required this.bonus,
@@ -426,53 +429,19 @@ class _DoubleRewardButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(100),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: AppColors.orJour.withValues(alpha: 0.10),
-            borderRadius: BorderRadius.circular(100),
-            border: Border.all(
-              color: AppColors.orJour.withValues(alpha: 0.55),
-              width: 1.5,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              if (loading)
-                const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.orJour),
-                  ),
-                )
-              else
-                const Icon(
-                  Icons.play_circle_filled_rounded,
-                  size: 20,
-                  color: AppColors.orJour,
-                ),
-              const SizedBox(width: 8),
-              Text(
-                'DOUBLER (+$bonus)',
-                style: AppTypography.bebas(
-                  size: 14,
-                  color: AppColors.orJour,
-                ).copyWith(letterSpacing: 1.2),
+    return DashedButton(
+      label: 'DOUBLER (+$bonus) ▶',
+      onTap: onTap,
+      leading: loading
+          ? const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.orJour),
               ),
-              const SizedBox(width: 6),
-              const CaurisIcon(size: 16),
-            ],
-          ),
-        ),
-      ),
+            )
+          : null,
     );
   }
 }
@@ -559,51 +528,75 @@ class _CaurisRewardChip extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Particle system — 12 emojis projetés en éventail depuis le centre
+// Particules dorées PEINTES (étincelles 4 branches + cauris + poussière crème)
+// projetées en éventail. Remplace les emoji ✨🌟🪙 (rendu OS-dépendant) par
+// du vectoriel crisp, sans dépendance asset.
 // ---------------------------------------------------------------------------
-
-const List<String> _kParticleEmojis = <String>['✨', '🌟', '🪙'];
 
 class _ParticlePainter extends CustomPainter {
   _ParticlePainter({required this.progress});
 
   final double progress;
 
+  static const int _count = 14;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final centre = Offset(size.width / 2, size.height / 2);
-    const particleCount = 12;
+    final centre = size.center(Offset.zero);
     final maxRadius = size.shortestSide * 0.55;
+    // easeOutCubic + fade-out sur les 30 derniers %.
+    final t = 1 - math.pow(1 - progress, 3).toDouble();
+    final opacity = progress < 0.7 ? 1.0 : (1.0 - (progress - 0.7) / 0.3);
+    if (opacity <= 0) return;
 
-    for (var i = 0; i < particleCount; i++) {
-      final angle = (2 * math.pi / particleCount) * i;
+    for (var i = 0; i < _count; i++) {
+      final angle = (2 * math.pi / _count) * i + (i.isEven ? 0 : 0.22);
+      final radius = maxRadius * t * (0.85 + (i % 3) * 0.08);
+      final p = centre + Offset(math.cos(angle), math.sin(angle)) * radius;
 
-      // easeOutCubic curve.
-      final t = 1 - math.pow(1 - progress, 3).toDouble();
-      final radius = maxRadius * t;
-
-      final dx = centre.dx + radius * math.cos(angle);
-      final dy = centre.dy + radius * math.sin(angle);
-
-      // Fade out in last 30 % of animation.
-      final opacity = (progress < 0.7) ? 1.0 : (1.0 - (progress - 0.7) / 0.3);
-
-      final textPainter = TextPainter(
-        text: TextSpan(
-          text: _kParticleEmojis[i % _kParticleEmojis.length],
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.white.withValues(alpha: opacity),
-          ),
-        ),
-        textDirection: ui.TextDirection.ltr,
-      )..layout();
-
-      textPainter.paint(
-        canvas,
-        Offset(dx - textPainter.width / 2, dy - textPainter.height / 2),
-      );
+      switch (i % 3) {
+        case 0:
+          canvas.drawCircle(
+            p,
+            4,
+            Paint()..color = AppColors.orJour.withValues(alpha: opacity),
+          );
+        case 1:
+          _sparkle(
+            canvas,
+            p,
+            7 * t + 2,
+            AppColors.orJour.withValues(alpha: opacity),
+            angle,
+          );
+        default:
+          canvas.drawCircle(
+            p,
+            2.5,
+            Paint()
+              ..color =
+                  AppColors.textePrimaire.withValues(alpha: opacity * 0.85),
+          );
+      }
     }
+  }
+
+  /// Dessine une étincelle 4 branches concave centrée en [c].
+  void _sparkle(Canvas canvas, Offset c, double r, Color color, double rot) {
+    final path = Path();
+    const tips = 4;
+    for (var k = 0; k < tips * 2; k++) {
+      final rr = k.isEven ? r : r * 0.32;
+      final a = rot + (math.pi / tips) * k;
+      final pt = c + Offset(math.cos(a), math.sin(a)) * rr;
+      if (k == 0) {
+        path.moveTo(pt.dx, pt.dy);
+      } else {
+        path.lineTo(pt.dx, pt.dy);
+      }
+    }
+    path.close();
+    canvas.drawPath(path, Paint()..color = color);
   }
 
   @override

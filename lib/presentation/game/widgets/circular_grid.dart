@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
+import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/golden_path.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/letter_grid_pattern.dart';
@@ -494,52 +495,70 @@ class _TileState extends State<_Tile> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final Color bg;
+    // Tuile « sculptée » : carré aux coins doux, dégradé bronze (or à la
+    // sélection), lèvre 3D en bas + ombre ambiante, lettre foncée crisp.
+    final List<Color> gradient;
+    final Color edge;
     final Color textColor;
-    final Color borderColor;
+    final selected = widget.isSelected;
 
-    if (widget.isSelected) {
-      bg = AppColors.orSoleil;
-      textColor = AppColors.vertForet;
-      borderColor = AppColors.orChaud;
+    if (selected) {
+      gradient = <Color>[
+        Color.lerp(AppColors.orJour, AppColors.textePrimaire, 0.22)!,
+        AppColors.orJour,
+      ];
+      edge = AppColors.orCrepuscule;
+      textColor = AppColors.surface;
     } else if (widget.isHint) {
-      bg = AppColors.vertClair.withValues(alpha: 0.8);
-      textColor = AppColors.ivoire;
-      borderColor = AppColors.vertClair;
+      gradient = <Color>[
+        Color.lerp(AppColors.success, AppColors.textePrimaire, 0.20)!,
+        AppColors.success,
+      ];
+      edge = AppColors.successSoft;
+      textColor = AppColors.surface;
     } else {
-      bg = AppColors.bois;
-      textColor = AppColors.ivoire;
-      borderColor = AppColors.boisFonce;
+      gradient = <Color>[
+        Color.lerp(AppColors.bois, AppColors.textePrimaire, 0.16)!,
+        AppColors.bois,
+      ];
+      edge = AppColors.boisFonce;
+      textColor = AppColors.surface;
     }
 
     final tile = AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: bg,
-        border: Border.all(color: borderColor, width: 2),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: gradient,
+        ),
         boxShadow: <BoxShadow>[
+          // Lèvre sculptée (extrusion 3D bas).
+          BoxShadow(color: edge, offset: const Offset(0, 4)),
+          // Ombre ambiante portée.
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            offset: const Offset(0, 3),
-            blurRadius: 6,
+            color: Colors.black.withValues(alpha: 0.32),
+            offset: const Offset(0, 8),
+            blurRadius: 12,
           ),
-          BoxShadow(
-            color: Colors.white.withValues(
-              alpha: widget.isSelected ? 0.4 : 0.15,
+          // Halo or lumineux à la sélection.
+          if (selected)
+            BoxShadow(
+              color: AppColors.orJour.withValues(alpha: 0.5),
+              blurRadius: 22,
             ),
-            offset: const Offset(0, -2),
-            blurRadius: 4,
-          ),
         ],
       ),
       child: Center(
         child: Text(
           widget.letter,
           style: AppTypography.bebas(
-            size: 26,
+            size: 28,
             color: textColor,
             letterSpacing: 0,
+            weight: FontWeight.w800,
           ),
         ),
       ),

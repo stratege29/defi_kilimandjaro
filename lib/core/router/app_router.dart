@@ -2,9 +2,11 @@ import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.d
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
+import 'package:defi_kilimandjaro/presentation/discover/discover_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_create_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_deep_link_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_entry_view.dart';
+import 'package:defi_kilimandjaro/presentation/duel/duel_hub_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_play_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_result_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/duel_scan_view.dart';
@@ -12,7 +14,6 @@ import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_view.dart';
 import 'package:defi_kilimandjaro/presentation/home/home_view.dart';
-import 'package:defi_kilimandjaro/presentation/hub/hub_view.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_confirm_view.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_scan_view.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_view.dart';
@@ -49,6 +50,10 @@ abstract final class AppRoutes {
   static const profile = '/profile';
   static const avatarPicker = '/profile/avatar';
   static const shop = '/shop';
+
+  /// Écran « Découvrir » — packs de contenu, promos & actualités
+  /// (relocalisés hors de l'accueil). Distinct de [shop] (recharge cauris).
+  static const discover = '/discover';
   static const duel = '/duel';
   static const duelCreate = '/duel/create';
   static const duelScan = '/duel/scan';
@@ -107,7 +112,7 @@ class _RouterNotifier extends ChangeNotifier {
 /// Provider du [GoRouter] configuré avec le gate "hasChosenFreePack".
 ///
 /// Exposé comme provider pour que le notifier ait accès au [Ref] Riverpod.
-/// Consommé dans [KilimandjaroApp] via `ref.watch(appRouterProvider)`.
+/// Consommé dans `KilimandjaroApp` via `ref.watch(appRouterProvider)`.
 final appRouterProvider = Provider<GoRouter>((ref) {
   final notifier = _RouterNotifier(ref);
   return GoRouter(
@@ -166,7 +171,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     GoRoute(
       path: AppRoutes.hub,
       name: 'hub',
-      builder: (_, __) => const HubView(),
+      // Phase 5b: Défi tab now lands on the new DuelHubView (Vert Nuit redesign).
+      builder: (_, __) => const DuelHubView(),
     ),
     GoRoute(
       path: AppRoutes.game,
@@ -207,6 +213,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       path: AppRoutes.shop,
       name: 'shop',
       builder: (_, __) => const ShopView(),
+    ),
+    GoRoute(
+      path: AppRoutes.discover,
+      name: 'discover',
+      builder: (_, __) => const DiscoverView(),
     ),
     GoRoute(
       path: AppRoutes.duel,

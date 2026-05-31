@@ -21,6 +21,14 @@ enum AppButtonVariant {
   /// Action destructive ou de fort warning : `errorSoft` + border `error`.
   /// h:52 r:10 — usage : Quitter la partie, supprimer un ami.
   danger,
+
+  /// CTA secondaire énergique : fond [AppColors.kola], texte crème, shadow Kola.
+  /// h:56 r:12 — usage : Défier, Revanche, accepter un défi.
+  kola,
+
+  /// Action neutre posée : fond [AppColors.surfaceContainer], border hairline.
+  /// h:52 r:10 — usage : Plus tard, fermer, options non-engageantes.
+  soft,
 }
 
 /// Bouton unifié Kilimandjaro — design system 2026.
@@ -154,6 +162,33 @@ class _AppButtonState extends State<AppButton>
           bg: AppColors.errorSoft,
           fg: AppColors.error,
           border: AppColors.error,
+          borderWidth: 1,
+          height: 52,
+          radius: 10,
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md + 4),
+          textStyle: AppTypography.headingSm,
+        );
+      case AppButtonVariant.kola:
+        return _ButtonStyle(
+          bg: AppColors.kola,
+          fg: AppColors.textePrimaire,
+          height: 56,
+          radius: 12,
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          shadow: [
+            BoxShadow(
+              color: AppColors.kola.withValues(alpha: 0.26),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+          textStyle: AppTypography.headingMd,
+        );
+      case AppButtonVariant.soft:
+        return _ButtonStyle(
+          bg: AppColors.surfaceContainer,
+          fg: AppColors.textePrimaire,
+          border: AppColors.hairline,
           borderWidth: 1,
           height: 52,
           radius: 10,

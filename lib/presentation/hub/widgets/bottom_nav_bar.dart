@@ -7,10 +7,11 @@ import 'package:flutter/material.dart';
 
 /// Navigation bottom (cf. maquette §Composants p.2 et p.4).
 ///
-/// 3 onglets sticky en bas · fond noir 60% · onglet actif souligné par une
-/// **pill animée** (`AnimatedPositioned` 350 ms `easeOutCubic`, Wave Mobile
-/// Money pattern). La pill glisse d'un onglet à l'autre quand `current`
-/// change, ce qui donne immédiatement un feeling 2026.
+/// Barre flottante façon maquette Vert Nuit : conteneur arrondi avec une
+/// **bordure hairline tout autour**, posé au-dessus de la safe area. L'onglet
+/// actif n'a **pas de bordure** — il est signalé par un squircle doré discret
+/// derrière l'icône (fond `orJour` @ 14 %) + icône/label en or. Les inactifs
+/// restent sobres (texte tertiaire).
 enum NavTab { accueil, defi, sommets, profil }
 
 class AppBottomNavBar extends StatelessWidget {
@@ -23,91 +24,59 @@ class AppBottomNavBar extends StatelessWidget {
   final NavTab current;
   final ValueChanged<NavTab> onTabSelected;
 
-  static const double _barHeight = 64;
-  static const double _pillMarginH = 12;
-  static const double _pillMarginV = 6;
+  static const double _barHeight = 72;
+  static const double _radius = 28;
 
   @override
   Widget build(BuildContext context) {
-    final currentIdx = NavTab.values.indexOf(current);
-
     // Frosted glass : BackdropFilter blur 18 sur le contenu sous la nav,
     // puis tint vertForet @ 65 % par-dessus pour préserver l'identité
     // colorimétrique et garantir le contraste des labels.
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.65),
-            border: Border(
-              top: BorderSide(color: AppColors.orJour.withValues(alpha: 0.25)),
-            ),
-          ),
-          child: SafeArea(
-            top: false,
-            child: SizedBox(
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(_radius),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: Container(
               height: _barHeight,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final tabWidth = constraints.maxWidth / NavTab.values.length;
-                  return Stack(
-                    children: [
-                      // Pill indicator — glisse d'un onglet à l'autre.
-                      AnimatedPositioned(
-                        duration: const Duration(milliseconds: 350),
-                        curve: Curves.easeOutCubic,
-                        left: currentIdx * tabWidth + _pillMarginH,
-                        top: _pillMarginV,
-                        bottom: _pillMarginV,
-                        width: tabWidth - 2 * _pillMarginH,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: AppColors.orJour.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(
-                              (_barHeight - 2 * _pillMarginV) / 2,
-                            ),
-                            border: Border.all(
-                              color: AppColors.orJour.withValues(alpha: 0.35),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Row d'onglets — au-dessus de la pill.
-                      Row(
-                        children: [
-                          _NavItem(
-                            // Placeholder Material : pas encore de PNG dédié
-                            // dans assets/images/icons/. Voir `iconNavPlay`
-                            // pour le style cible à reproduire.
-                            icon: Icons.home_rounded,
-                            label: 'Accueil',
-                            active: current == NavTab.accueil,
-                            onTap: () => onTabSelected(NavTab.accueil),
-                          ),
-                          _NavItem(
-                            assetPath: AppAssets.iconNavPlay,
-                            label: 'Défi',
-                            active: current == NavTab.defi,
-                            onTap: () => onTabSelected(NavTab.defi),
-                          ),
-                          _NavItem(
-                            assetPath: AppAssets.iconNavMap,
-                            label: 'Sommets',
-                            active: current == NavTab.sommets,
-                            onTap: () => onTabSelected(NavTab.sommets),
-                          ),
-                          _NavItem(
-                            assetPath: AppAssets.iconNavProfile,
-                            label: 'Profil',
-                            active: current == NavTab.profil,
-                            onTap: () => onTabSelected(NavTab.profil),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
+              decoration: BoxDecoration(
+                color: AppColors.surface.withValues(alpha: 0.65),
+                borderRadius: BorderRadius.circular(_radius),
+                border: Border.all(color: AppColors.hairline),
+              ),
+              child: Row(
+                children: [
+                  _NavItem(
+                    // Placeholder Material : pas encore de PNG dédié
+                    // dans assets/images/icons/. Voir `iconNavPlay`
+                    // pour le style cible à reproduire.
+                    icon: Icons.home_rounded,
+                    label: 'Accueil',
+                    active: current == NavTab.accueil,
+                    onTap: () => onTabSelected(NavTab.accueil),
+                  ),
+                  _NavItem(
+                    assetPath: AppAssets.iconNavPlay,
+                    label: 'Défi',
+                    active: current == NavTab.defi,
+                    onTap: () => onTabSelected(NavTab.defi),
+                  ),
+                  _NavItem(
+                    assetPath: AppAssets.iconNavMap,
+                    label: 'Sommets',
+                    active: current == NavTab.sommets,
+                    onTap: () => onTabSelected(NavTab.sommets),
+                  ),
+                  _NavItem(
+                    assetPath: AppAssets.iconNavProfile,
+                    label: 'Profil',
+                    active: current == NavTab.profil,
+                    onTap: () => onTabSelected(NavTab.profil),
+                  ),
+                ],
               ),
             ),
           ),
@@ -152,16 +121,29 @@ class _NavItem extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          // Pas de splash visible — la pill animée fait déjà le feedback.
+          // Pas de splash visible — le squircle doré fait déjà le feedback.
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: 6),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                iconWidget,
+                // Squircle doré derrière l'icône active — sans bordure.
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  width: 48,
+                  height: 34,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: active
+                        ? AppColors.orJour.withValues(alpha: 0.14)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: iconWidget,
+                ),
                 const SizedBox(height: 2),
                 AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 250),

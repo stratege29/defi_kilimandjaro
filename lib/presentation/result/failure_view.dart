@@ -3,6 +3,8 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/dashed_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -174,17 +176,16 @@ class _FailureCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.error, width: 1.5),
+        borderRadius: BorderRadius.circular(24),
+        // Vert Nuit : bordure sémantique « échec » en hairline rouge teinté,
+        // pas de rouge plein ni de glow. Seule une ombre noire diffuse porte
+        // l'élévation.
+        border: Border.all(color: AppColors.error.withValues(alpha: 0.4)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.error.withValues(alpha: 0.18),
-            blurRadius: 28,
-          ),
-          BoxShadow(
             color: Colors.black.withValues(alpha: 0.55),
-            blurRadius: 32,
-            offset: const Offset(0, 12),
+            blurRadius: 60,
+            offset: const Offset(0, 24),
           ),
         ],
       ),
@@ -230,16 +231,28 @@ class _FailureCard extends StatelessWidget {
           ),
           if (!revealed && onPurchaseReveal != null && revealCost != null) ...[
             const SizedBox(height: 10),
-            AppButton(
+            // Filet anti-blocage façon maquette `.double` : bordure pointillée
+            // hairline neutre, coût en cauris en trailing — n'éclipse pas le
+            // CTA RÉESSAYER primaire au-dessus.
+            DashedButton(
               label: 'result.failure.reveal_button'.tr(
                 namedArgs: <String, String>{
                   'cost': revealCost!.toString(),
                 },
               ),
-              onPressed: canAffordReveal ? onPurchaseReveal : null,
-              variant: AppButtonVariant.secondary,
-              loading: purchasePending,
-              fullWidth: true,
+              onTap: canAffordReveal ? onPurchaseReveal : null,
+              borderColor: AppColors.hairline,
+              textColor: AppColors.texteSecondaire,
+              trailing: purchasePending
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.texteSecondaire,
+                      ),
+                    )
+                  : const CaurisIcon(size: 16),
             ),
           ],
         ],
@@ -248,23 +261,25 @@ class _FailureCard extends StatelessWidget {
   }
 
   /// En-tête en mode "réponse révélée" (comportement historique).
+  ///
+  /// Maquette `.pp.lose` : petit label all-caps tertiaire « LA RÉPONSE ÉTAIT »
+  /// AU-DESSUS du mot rouge prestige, pas en légende dessous.
   List<Widget> _revealedHeader() {
     return <Widget>[
+      Text(
+        'result.failure.answer_was_label'.tr().toUpperCase(),
+        textAlign: TextAlign.center,
+        style: AppTypography.labelXs.copyWith(
+          color: AppColors.texteTertiaire,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1,
+        ),
+      ),
+      const SizedBox(height: 6),
       Text(
         devinette.answer,
         style: AppTypography.displayMd.copyWith(color: AppColors.error),
         textAlign: TextAlign.center,
-      ),
-      const SizedBox(height: 8),
-      Text(
-        'result.failure.answer_was'.tr(
-          namedArgs: <String, String>{'answer': devinette.answer},
-        ),
-        textAlign: TextAlign.center,
-        style: AppTypography.crimson(
-          size: 13,
-          color: AppColors.texteSecondaire,
-        ),
       ),
     ];
   }

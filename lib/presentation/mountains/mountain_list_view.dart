@@ -10,6 +10,8 @@ import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/altimeter_rail.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/atmosphere_layer.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/mountain_hero_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
@@ -17,11 +19,27 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Écran "Sommets" — ascension visuelle plein écran des 52 sommets africains.
+/// Marge horizontale de la carte sommet dans chaque page (cf. maquette
+/// « peakcard »). Sert aussi à aligner l'overlay altimètre sur le bord
+/// droit intérieur de la carte.
+const double _kCardMarginH = 16;
+
+/// Padding de chaque page autour de la carte (haut/bas réduits pour laisser
+/// respirer header & nav). L'altimètre overlay se cale sur ces valeurs.
+const EdgeInsets _kCardPad = EdgeInsets.fromLTRB(
+  _kCardMarginH,
+  6,
+  _kCardMarginH,
+  12,
+);
+
+/// Écran "Sommets" — ascension visuelle en carte des 52 sommets africains.
 ///
+/// Header « Sommets · rang/total » + carte « peakcard » bordée par sommet
+/// (scène biome, infos, étoiles, CTA) + altimètre intégré au bord droit.
 /// PageView vertical snap : page 0 = Red Rocks (le plus bas), page 51 =
-/// Kilimandjaro. Le scroll vers le haut fait "monter" le joueur.
-/// Chaque page occupe exactement un viewport — expérience d'élévation totale.
+/// Kilimandjaro. Le scroll vers le haut fait "monter" le joueur ; l'altimètre
+/// reste un scrubber alternatif.
 class MountainListView extends ConsumerStatefulWidget {
   const MountainListView({super.key});
 
@@ -202,128 +220,84 @@ class _MountainListViewState extends ConsumerState<MountainListView>
     final mountains = _cachedMountains;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      body: Builder(
-        builder: (context) {
-          if (asyncMountains.hasError && mountains == null) {
-            return const _ErrorView();
-          }
-          if (mountains == null) {
-            return const _LoadingView();
-          }
+      backgroundColor: AppColors.surface,
+      body: SafeArea(
+        bottom: false,
+        child: Builder(
+          builder: (context) {
+            if (asyncMountains.hasError && mountains == null) {
+              return const _ErrorView();
+            }
+            if (mountains == null) {
+              return const _LoadingView();
+            }
 
-          // Positionnement initial sur le sommet courant.
-          WidgetsBinding.instance.addPostFrameCallback(
-            (_) => _jumpToCurrentMountain(mountains),
-          );
+            // Positionnement initial sur le sommet courant.
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => _jumpToCurrentMountain(mountains),
+            );
 
-          final currentPage = _pagePosition.round().clamp(
-            0,
-            mountains.length - 1,
-          );
-          final currentMountain = mountains[currentPage];
-          final biome = biomeForAltitude(currentMountain.altitude);
-          final interpolatedAlt = _interpolatedAltitude(mountains);
-          final bestAlt = _bestAltitude(mountains);
-          final currentIdx = _currentMountainIndex(mountains) ?? 0;
+            final currentPage = _pagePosition.round().clamp(
+              0,
+              mountains.length - 1,
+            );
+            final interpolatedAlt = _interpolatedAltitude(mountains);
+            final bestAlt = _bestAltitude(mountains);
+            final currentIdx = _currentMountainIndex(mountains) ?? 0;
+            final scrollFraction =
+                _pagePosition / math.max(mountains.length - 1, 1);
 
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              // 1. Atmosphère animée (dégradé biome plein écran).
-              Positioned.fill(child: AtmosphereLayer(biome: biome)),
-
-              // 2. Nuages parallax animés — 3 couches stratifiées qui
-              // dérivent horizontalement + déplacement vertical sur scroll.
-              Positioned.fill(
-                child: ParallaxBgLayer(
-                  scrollFraction:
-                      _pagePosition / math.max(mountains.length - 1, 1),
-                  biome: biome,
+            return Column(
+              children: [
+                // Header « Sommets · rang/total » + accès Mes packs.
+                _SommetsHeader(
+                  rank: currentPage + 1,
+                  total: mountains.length,
+                  mountains: mountains,
                 ),
-              ),
-
-              // 3. Scrim contextuel : dégradé sombre haut + bas pour
-              // garantir la lisibilité du HUD sur les ciels clairs.
-              const Positioned.fill(child: _HudScrim()),
-
-              // 4. PageView principal — 1 montagne = 1 viewport.
-              PageView.builder(
-                controller: _pageController,
-                scrollDirection: Axis.vertical,
-                itemCount: mountains.length,
-                itemBuilder: (context, index) {
-                  final m = mountains[index];
-                  final isCurrentTarget = index == currentIdx;
-                  return RepaintBoundary(
-                    child: _MountainPage(
-                      mountain: m,
-                      rank: index + 1,
-                      isCurrentTarget: isCurrentTarget,
-                      pulseAnim: _pulseAnim,
-                      onTap: () => _onMountainTap(m),
-                    ),
-                  );
-                },
-              ),
-
-              // 4. Altimètre rail droit — scrubber interactif.
-              Positioned(
-                right: 0,
-                top: 60,
-                bottom: 0,
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 4, bottom: 80),
-                    child: AltimeterRail(
-                      currentAltitude: interpolatedAlt,
-                      bestAltitude: bestAlt,
-                      mountains: mountains,
-                      onSeekToIndex: _jumpToIndex,
-                    ),
-                  ),
-                ),
-              ),
-
-              // 5. Boutons coin supérieur droit : [dev unlock]? + "Mes packs".
-              // Libère l'espace pour le nom de la montagne en haut-gauche.
-              Positioned(
-                top: 0,
-                right: 0,
-                child: SafeArea(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      if (kDebugMode)
-                        _DevUnlockButton(mountains: mountains),
-                      Semantics(
-                        button: true,
-                        label: 'my_packs.title'.tr(),
-                        child: Material(
-                          color: AppColors.surfaceContainer
-                              .withValues(alpha: 0.85),
-                          shape: const CircleBorder(),
-                          child: InkWell(
-                            customBorder: const CircleBorder(),
-                            onTap: () => context.push(AppRoutes.myPacks),
-                            child: const Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Icon(
-                                Icons.layers_outlined,
-                                color: AppColors.orJour,
-                                size: 22,
-                              ),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      // PageView principal — 1 montagne = 1 carte.
+                      PageView.builder(
+                        controller: _pageController,
+                        scrollDirection: Axis.vertical,
+                        itemCount: mountains.length,
+                        itemBuilder: (context, index) {
+                          final m = mountains[index];
+                          return RepaintBoundary(
+                            child: _MountainPage(
+                              mountain: m,
+                              rank: index + 1,
+                              isCurrentTarget: index == currentIdx,
+                              pulseAnim: _pulseAnim,
+                              scrollFraction: scrollFraction,
+                              onTap: () => _onMountainTap(m),
                             ),
-                          ),
+                          );
+                        },
+                      ),
+
+                      // Altimètre — aligné sur le bord droit intérieur de la
+                      // carte (scrubber alternatif au swipe vertical).
+                      Positioned(
+                        right: _kCardMarginH + 6,
+                        top: _kCardPad.top + 54,
+                        bottom: _kCardPad.bottom + 104,
+                        child: AltimeterRail(
+                          currentAltitude: interpolatedAlt,
+                          bestAltitude: bestAlt,
+                          mountains: mountains,
+                          onSeekToIndex: _jumpToIndex,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
       bottomNavigationBar: AppBottomNavBar(
         current: NavTab.sommets,
@@ -361,6 +335,7 @@ class _MountainPage extends StatelessWidget {
     required this.rank,
     required this.isCurrentTarget,
     required this.pulseAnim,
+    required this.scrollFraction,
     required this.onTap,
   });
 
@@ -368,6 +343,7 @@ class _MountainPage extends StatelessWidget {
   final int rank;
   final bool isCurrentTarget;
   final Animation<double> pulseAnim;
+  final double scrollFraction;
   final VoidCallback onTap;
 
   bool get _isCompleted =>
@@ -376,54 +352,201 @@ class _MountainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
+    final biome = biomeForAltitude(mountain.altitude);
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Silhouette FG — stripped SVG (transparent au-dessus de la
-        // montagne) qui laisse passer AtmosphereLayer + nuages parallax.
-        // Ancrée au bas de l'écran avec un haut réservé au HUD.
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 96,
-          top: size.height * 0.18,
-          child: AnimatedBuilder(
-            animation: pulseAnim,
-            builder: (context, _) {
-              return MountainSilhouetteVector(
-                mountain: mountain,
-                hasPulse: isCurrentTarget && !_isCompleted,
-                pulseValue: pulseAnim.value,
-              );
-            },
+    return Padding(
+      padding: _kCardPad,
+      child: DecoratedBox(
+        // Élévation maquette : surface opaque + bordure hairline + une seule
+        // ombre noire diffuse (pas de glow coloré).
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppColors.hairline),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.45),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // 1. Scène : ciel biome + nuages parallax (clippés dans la carte).
+              Positioned.fill(child: AtmosphereLayer(biome: biome)),
+              Positioned.fill(
+                child: ParallaxBgLayer(
+                  scrollFraction: scrollFraction,
+                  biome: biome,
+                ),
+              ),
+
+              // 2. Sommet peint (hero PNG) + halo pulsé sur le sommet courant.
+              // Repli : silhouette vectorielle si l'asset hero manque.
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 48,
+                bottom: 108,
+                child: AnimatedBuilder(
+                  animation: pulseAnim,
+                  builder: (context, child) {
+                    final showPulse = isCurrentTarget && !_isCompleted;
+                    return Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        if (showPulse)
+                          Center(
+                            child: Transform.scale(
+                              scale: 0.92 + 0.14 * pulseAnim.value,
+                              child: SizedBox(
+                                width: 200,
+                                height: 200,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: RadialGradient(
+                                      colors: [
+                                        AppColors.orJour.withValues(
+                                          alpha: 0.18 * pulseAnim.value,
+                                        ),
+                                        Colors.transparent,
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        child!,
+                      ],
+                    );
+                  },
+                  child: MountainHeroImage(
+                    mountainId: mountain.id,
+                    alignment: Alignment.bottomCenter,
+                    fallback: MountainSilhouetteVector(mountain: mountain),
+                  ),
+                ),
+              ),
+
+              // 3. Dégradé bas (scenefade) : fond vers la surface pour la
+              // lisibilité des étoiles / altitude / CTA.
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 150,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        AppColors.surface.withValues(alpha: 0),
+                        AppColors.surface,
+                      ],
+                      stops: const [0, 0.86],
+                    ),
+                  ),
+                ),
+              ),
+
+              // 4. Infos : topinfo (nom + progression) en haut, botinfo
+              // (étoiles + altitude + CTA) en bas.
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 14),
+                    _NameHeader(mountain: mountain),
+                    const Spacer(),
+                    _ProgressFooter(
+                      mountain: mountain,
+                      isCompleted: _isCompleted,
+                      onTap: onTap,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+}
 
-        // HUD — informations de la montagne.
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 16),
-                _NameHeader(mountain: mountain),
-                const SizedBox(height: 8),
-                _AltitudeDisplay(altitude: mountain.altitude),
-                const Spacer(),
-                _ProgressFooter(
-                  mountain: mountain,
-                  isCompleted: _isCompleted,
-                  onTap: onTap,
+// ============================================================
+// Header de l'écran Sommets
+// ============================================================
+
+/// Barre supérieure : titre « Sommets », accès « Mes packs » (sinon route
+/// orpheline) et puce « rang / total » alignée à droite (cf. maquette).
+class _SommetsHeader extends StatelessWidget {
+  const _SommetsHeader({
+    required this.rank,
+    required this.total,
+    required this.mountains,
+  });
+
+  final int rank;
+  final int total;
+  final List<Mountain> mountains;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 12, 6),
+      child: Row(
+        children: [
+          Text('Sommets', style: AppTypography.headingMd),
+          const Spacer(),
+          if (kDebugMode) _DevUnlockButton(mountains: mountains),
+          Semantics(
+            button: true,
+            label: 'my_packs.title'.tr(),
+            child: Material(
+              color: AppColors.surfaceContainer,
+              shape: const CircleBorder(),
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () => context.push(AppRoutes.myPacks),
+                child: const Padding(
+                  padding: EdgeInsets.all(9),
+                  child: Icon(
+                    Icons.layers_outlined,
+                    color: AppColors.orJour,
+                    size: 20,
+                  ),
                 ),
-                const SizedBox(height: 12),
-              ],
+              ),
             ),
           ),
-        ),
-      ],
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: AppColors.hairline),
+            ),
+            child: Text(
+              '$rank / $total',
+              style: AppTypography.labelSm.copyWith(
+                color: AppColors.texteSecondaire,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -441,21 +564,43 @@ class _NameHeader extends StatelessWidget {
       opacity: opacity,
       child: Row(
         children: [
-          Text(mountain.flagEmoji, style: const TextStyle(fontSize: 20)),
-          const SizedBox(width: 8),
+          FlagRoundel(countryCode: mountain.countryCode, size: 30),
+          const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              mountain.name.toUpperCase(),
-              style: AppTypography.bebas(size: 18, letterSpacing: 3),
-              overflow: TextOverflow.ellipsis,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  mountain.name.toUpperCase(),
+                  style: AppTypography.bebas(size: 14),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  mountain.countryName,
+                  style: AppTypography.crimson(
+                    size: 12,
+                    style: FontStyle.italic,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
-          Text(
-            mountain.countryName,
-            style: AppTypography.crimson(
-              size: 12,
-              color: AppColors.texteSecondaire,
-              style: FontStyle.italic,
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.surface.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: AppColors.hairline),
+            ),
+            child: Text(
+              'Niv. ${mountain.completedLevels}/${mountain.totalLevels}',
+              style: AppTypography.labelXs.copyWith(
+                color: AppColors.textePrimaire,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
@@ -476,13 +621,15 @@ class _AltitudeDisplay extends StatelessWidget {
         children: [
           TextSpan(
             text: formatted,
-            style: AppTypography.bebas(size: 56, color: AppColors.orSoleil),
+            style: AppTypography.displayLg.copyWith(
+              fontSize: 46,
+              color: AppColors.textePrimaire,
+            ),
           ),
           TextSpan(
             text: ' m',
-            style: AppTypography.bebas(
-              size: 24,
-              color: AppColors.orSoleil.withValues(alpha: 0.7),
+            style: AppTypography.bodyMd.copyWith(
+              color: AppColors.texteSecondaire,
             ),
           ),
         ],
@@ -527,16 +674,29 @@ class _ProgressFooter extends StatelessWidget {
             completed: mountain.completedLevels,
             total: mountain.totalLevels,
           ),
-          const SizedBox(height: 4),
-          Text(
-            '${mountain.completedLevels}/${mountain.totalLevels} niveaux conquis',
-            style: AppTypography.crimson(
-              size: 13,
-              color: AppColors.texteSecondaire,
-            ),
+          const SizedBox(height: 8),
+          // Altitude (Fraunces) + libellé de progression alignés en bas.
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _AltitudeDisplay(altitude: mountain.altitude),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 5),
+                  child: Text(
+                    '${mountain.completedLevels}/${mountain.totalLevels} niveaux conquis',
+                    style: AppTypography.bodySm.copyWith(
+                      color: AppColors.texteSecondaire,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 14),
-          // Bouton CTA.
+          const SizedBox(height: 12),
+          // Bouton CTA pleine largeur.
           _CtaButton(
             unlocked: unlocked,
             isCompleted: isCompleted,
@@ -597,9 +757,11 @@ class _CtaButton extends StatelessWidget {
     final Color textColor;
     final String label;
 
+    final Color borderColor;
     if (!unlocked) {
-      bgColor = AppColors.boisFonce.withValues(alpha: 0.6);
+      bgColor = AppColors.surface.withValues(alpha: 0.6);
       textColor = AppColors.texteTertiaire;
+      borderColor = AppColors.hairline;
       final stars = starsRequiredToUnlock ?? 0;
       label = stars > 0
           ? 'mountains.locked_stargate_cta'.tr(
@@ -607,12 +769,14 @@ class _CtaButton extends StatelessWidget {
             )
           : 'mountains.locked_progression_cta'.tr();
     } else if (isCompleted) {
-      bgColor = AppColors.vertClair.withValues(alpha: 0.25);
-      textColor = AppColors.vertClair;
+      bgColor = AppColors.surface;
+      textColor = AppColors.orJour;
+      borderColor = AppColors.orJour.withValues(alpha: 0.5);
       label = 'GRAVIR À NOUVEAU';
     } else {
-      bgColor = AppColors.orSoleil;
-      textColor = AppColors.boisFonce;
+      bgColor = AppColors.orJour;
+      textColor = AppColors.surface;
+      borderColor = AppColors.orJour;
       label = 'GRAVIR';
     }
 
@@ -620,55 +784,17 @@ class _CtaButton extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+        width: double.infinity,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: unlocked
-                ? (isCompleted ? AppColors.vertClair : AppColors.orChaud)
-                : AppColors.boisFonce,
-            width: 1.5,
-          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor),
         ),
         child: Text(
           label,
-          style: AppTypography.bebas(size: 15, color: textColor),
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================
-// Scrim HUD — dégradé vertical sombre sur les bords haut/bas
-// ============================================================
-
-/// Voile sombre sur les 22 % du haut et 30 % du bas de l'écran, transparent
-/// au milieu. Garantit le contraste du HUD (nom, altitude, étoiles, CTA)
-/// sur les biomes clairs (savanne, altitude), sans dénaturer l'atmosphère
-/// au centre de la composition.
-///
-/// `IgnorePointer` : laisse passer les taps vers les widgets sous-jacents.
-class _HudScrim extends StatelessWidget {
-  const _HudScrim();
-
-  @override
-  Widget build(BuildContext context) {
-    return const IgnorePointer(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0x99000000), // 60 % black — derrière nom + altitude
-              Color(0x00000000), // transparent
-              Color(0x00000000), // transparent
-              Color(0xB3000000), // 70 % black — derrière étoiles + CTA
-            ],
-            stops: [0.0, 0.22, 0.62, 1.0],
-          ),
+          style: AppTypography.headingMd.copyWith(color: textColor),
         ),
       ),
     );

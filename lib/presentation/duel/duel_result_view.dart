@@ -13,6 +13,8 @@ import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_controller.dart'
     show lobbyPreviousMatchIdProvider, lobbyRematchUidProvider;
+import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/dashed_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -160,8 +162,13 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
     final opponentScore = opponent?.roundsWon ?? 0;
     final won = widget.session.winner == myUid;
 
+    // Bordure sémantique du héros (maquette `.pp.win` / `.pp.lose`).
+    final heroBorder = won
+        ? AppColors.vertClair.withValues(alpha: 0.4)
+        : AppColors.error.withValues(alpha: 0.4);
+
     return Scaffold(
-      backgroundColor: AppColors.vertForet,
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -171,83 +178,95 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                 child: RepaintBoundary(
                   key: _repaintKey,
                   child: ColoredBox(
-                    color: AppColors.vertForet,
+                    color: AppColors.surface,
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 8),
 
-                          // Trophée ou icône résultat.
-                          if (won)
-                            Image.asset(
-                              AppAssets.duelTrophy,
-                              width: 100,
-                              height: 100,
-                            )
-                          else
-                            Image.asset(
-                              AppAssets.iconStreak,
-                              width: 100,
-                              height: 100,
+                          // Héros « carte » façon maquette : titre, avatars,
+                          // scorebadge et altitude regroupés dans une carte
+                          // Vert Nuit bordée sémantiquement.
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceContainer,
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(color: heroBorder),
+                              boxShadow: <BoxShadow>[
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.55),
+                                  blurRadius: 60,
+                                  offset: const Offset(0, 24),
+                                ),
+                              ],
                             ),
-                          const SizedBox(height: 12),
-
-                          // Titre VICTOIRE / DÉFAITE.
-                          Text(
-                            won ? 'VICTOIRE' : 'DÉFAITE',
-                            style: AppTypography.bebas(
-                              size: 36,
-                              color: won
-                                  ? AppColors.vertClair
-                                  : AppColors.rouge,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (won)
+                                  Image.asset(
+                                    AppAssets.duelTrophy,
+                                    width: 80,
+                                    height: 80,
+                                  )
+                                else
+                                  Image.asset(
+                                    AppAssets.iconStreak,
+                                    width: 80,
+                                    height: 80,
+                                  ),
+                                const SizedBox(height: 10),
+                                // Eyebrow VICTOIRE / DÉFAITE (success / error).
+                                Text(
+                                  won ? 'VICTOIRE' : 'DÉFAITE',
+                                  style: AppTypography.bebas(
+                                    size: 30,
+                                    color: won
+                                        ? AppColors.vertClair
+                                        : AppColors.error,
+                                  ).copyWith(letterSpacing: 2),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  won
+                                      ? 'Tu as été le plus fort !'
+                                      : 'Ton adversaire a été plus fort.',
+                                  textAlign: TextAlign.center,
+                                  style: AppTypography.crimson(
+                                    size: 14,
+                                    color: AppColors.texteSecondaire,
+                                    style: FontStyle.italic,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                _PlayerVsBanner(
+                                  selfUid: myUid,
+                                  opponentUid: opponent?.uid ?? '',
+                                  won: won,
+                                ),
+                                const SizedBox(height: 16),
+                                Semantics(
+                                  label:
+                                      'Score final : Toi $selfScore, adversaire $opponentScore',
+                                  child: _ScoreBadgePill(
+                                    selfScore: selfScore,
+                                    opponentScore: opponentScore,
+                                  ),
+                                ),
+                                if (widget.session.isRanked) ...[
+                                  const SizedBox(height: 14),
+                                  _EloSection(
+                                    loading: _eloLoading,
+                                    delta: _eloDelta,
+                                    won: won,
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            won
-                                ? 'Tu as été le plus fort !'
-                                : 'Ton adversaire a été plus fort.',
-                            textAlign: TextAlign.center,
-                            style: AppTypography.crimson(
-                              size: 14,
-                              color: AppColors.textePrimaire,
-                              style: FontStyle.italic,
-                            ),
-                          ),
 
-                          // Bandeau VS — pseudos + avatars des 2 joueurs.
-                          const SizedBox(height: 16),
-                          _PlayerVsBanner(
-                            selfUid: myUid,
-                            opponentUid: opponent?.uid ?? '',
-                            won: won,
-                          ),
-
-                          // Score final en grand.
-                          const SizedBox(height: 16),
-                          Semantics(
-                            label:
-                                'Score final : Toi $selfScore - Adversaire $opponentScore',
-                            child: _FinalScoreBadge(
-                              selfUid: myUid,
-                              opponentUid: opponent?.uid ?? '',
-                              selfScore: selfScore,
-                              opponentScore: opponentScore,
-                              won: won,
-                            ),
-                          ),
-
-                          // Section ELO (ranked uniquement).
-                          if (widget.session.isRanked) ...[
-                            const SizedBox(height: 16),
-                            _EloSection(
-                              loading: _eloLoading,
-                              delta: _eloDelta,
-                              won: won,
-                            ),
-                          ],
-
-                          // Détail des 3 manches.
+                          // Détail des 3 manches (hors carte héros).
                           const SizedBox(height: 20),
                           _RoundsBreakdown(
                             session: widget.session,
@@ -264,78 +283,44 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
 
               // CTAs.
               const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => context.go(AppRoutes.hub),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.vertClair,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  child: Text(
-                    'RETOUR AU HUB',
-                    style: AppTypography.bebas(
-                      size: 18,
-                      color: AppColors.vertForet,
-                    ),
-                  ),
-                ),
+              AppButton(
+                label: 'RETOUR AU HUB',
+                onPressed: () => context.go(AppRoutes.hub),
+                fullWidth: true,
               ),
               if (widget.session.isRanked) ...[
                 const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: _onRematch,
-                    icon: const Icon(
-                      Icons.replay,
-                      color: AppColors.vertClair,
-                      size: 20,
-                    ),
-                    label: Text(
-                      'REMATCH',
-                      style: AppTypography.bebas(
-                        size: 18,
-                        color: AppColors.vertClair,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.vertClair),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
+                DashedButton(
+                  label: 'REVANCHE',
+                  onTap: _onRematch,
+                  borderColor: AppColors.hairline,
+                  textColor: AppColors.textePrimaire,
+                  leading: const Icon(
+                    Icons.replay,
+                    color: AppColors.textePrimaire,
+                    size: 18,
                   ),
                 ),
                 const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: _shareLoading ? null : _onShare,
-                    icon: _shareLoading
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              color: AppColors.orChaud,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Icon(
-                            Icons.share,
-                            color: AppColors.orChaud,
-                            size: 20,
+                DashedButton(
+                  label: 'PARTAGER LE DÉFI',
+                  onTap: _shareLoading ? null : _onShare,
+                  borderColor: AppColors.hairline,
+                  textColor: AppColors.texteSecondaire,
+                  leading: _shareLoading
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            color: AppColors.texteSecondaire,
+                            strokeWidth: 2,
                           ),
-                    label: Text(
-                      'PARTAGER LE DÉFI',
-                      style: AppTypography.bebas(
-                        size: 18,
-                        color: AppColors.orChaud,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.orChaud),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
+                        )
+                      : const Icon(
+                          Icons.share,
+                          color: AppColors.texteSecondaire,
+                          size: 18,
+                        ),
                 ),
               ],
               const SizedBox(height: 8),
@@ -351,105 +336,32 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
 // Score final
 // ---------------------------------------------------------------------------
 
-class _FinalScoreBadge extends StatelessWidget {
-  const _FinalScoreBadge({
-    required this.selfUid,
-    required this.opponentUid,
+/// Pastille de score compacte « 2 — 1 » (maquette `.scorebadge`).
+class _ScoreBadgePill extends StatelessWidget {
+  const _ScoreBadgePill({
     required this.selfScore,
     required this.opponentScore,
-    required this.won,
   });
 
-  final String selfUid;
-  final String opponentUid;
   final int selfScore;
   final int opponentScore;
-  final bool won;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: won
-              ? AppColors.orJour.withValues(alpha: 0.6)
-              : AppColors.laterite.withValues(alpha: 0.4),
-          width: 2,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.hairline),
+      ),
+      child: Text(
+        '$selfScore — $opponentScore',
+        style: AppTypography.displaySm.copyWith(
+          fontSize: 24,
+          fontWeight: FontWeight.w800,
         ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _ScoreCol(
-            uid: selfUid,
-            fallbackLabel: 'Toi',
-            value: selfScore,
-            highlighted: won,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Text(
-              '-',
-              style: AppTypography.displayMd.copyWith(
-                color: AppColors.texteSecondaire,
-              ),
-            ),
-          ),
-          _ScoreCol(
-            uid: opponentUid,
-            fallbackLabel: 'Adv.',
-            value: opponentScore,
-            highlighted: !won,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ScoreCol extends ConsumerWidget {
-  const _ScoreCol({
-    required this.uid,
-    required this.fallbackLabel,
-    required this.value,
-    required this.highlighted,
-  });
-
-  final String uid;
-  final String fallbackLabel;
-  final int value;
-  final bool highlighted;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final color = highlighted ? AppColors.orJour : AppColors.textePrimaire;
-    final asyncProfile = uid.isEmpty
-        ? const AsyncValue<PlayerProfile?>.data(null)
-        : ref.watch(playerProfileProvider(uid));
-    final profile = asyncProfile.asData?.value;
-    final hasName = profile?.displayName?.isNotEmpty ?? false;
-    final label = hasName ? profile!.displayName! : fallbackLabel;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          '$value',
-          style: AppTypography.displayLg.copyWith(color: color),
-        ),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 110),
-          child: Text(
-            label,
-            style: AppTypography.labelSm.copyWith(color: color),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -897,28 +809,30 @@ class _EloSection extends StatelessWidget {
 
     final d = delta!.delta;
     final sign = d >= 0 ? '+' : '';
-    final color = d >= 0 ? AppColors.vertClair : AppColors.rouge;
-    final label = "$sign$d m d'altitude";
+    final color = d >= 0 ? AppColors.vertClair : AppColors.error;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
-      ),
-      child: Column(
-        children: [
-          Text(label, style: AppTypography.bebas(size: 22, color: color)),
-          Text(
-            'Nouvelle altitude : ${delta!.newElo} m',
-            style: AppTypography.crimson(
-              size: 13,
-              color: AppColors.texteSecondaire,
-            ),
+    // Maquette `.expl` : altitude gagnée en gras coloré + nouvelle altitude,
+    // texte simple (pas de cartouche) puisque déjà dans la carte héros.
+    return Column(
+      children: [
+        Text(
+          "$sign$d m d'altitude",
+          textAlign: TextAlign.center,
+          style: AppTypography.bodyMd.copyWith(
+            fontWeight: FontWeight.w800,
+            color: color,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          'Nouvelle altitude : ${delta!.newElo} m',
+          textAlign: TextAlign.center,
+          style: AppTypography.bodyMd.copyWith(
+            fontSize: 13,
+            color: AppColors.texteSecondaire,
+          ),
+        ),
+      ],
     );
   }
 }

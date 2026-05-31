@@ -4,6 +4,7 @@ import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
+import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
@@ -29,7 +30,7 @@ import 'package:go_router/go_router.dart';
 ///
 /// - [DuelPhase.waiting]   → en attente (existant)
 /// - [DuelPhase.intro]     → [DuelIntroOverlay] par-dessus
-/// - [DuelPhase.countdown] → [DuelCountdownOverlay] (grille floue + cadenas)
+/// - [DuelPhase.countdown] → [DuelCountdownOverlay] (VERSUS + décompte)
 /// - [DuelPhase.active]    → gameplay normal
 /// - [DuelPhase.roundEnd]  → [DuelRoundEndOverlay] par-dessus
 /// - [DuelPhase.finished]  → navigation vers DuelResultView
@@ -195,8 +196,6 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
         return DuelCountdownOverlay(
           key: const ValueKey('countdown'),
           session: session,
-          gameContent: gameContent,
-          riddleContent: _RiddleCard(riddle: session.riddle),
         );
 
       case DuelPhase.roundEnd:
@@ -420,7 +419,8 @@ class _ProgressRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final color = isSelf ? AppColors.vertClair : AppColors.orSoleil;
+    // Couleurs de camp cohérentes avec l'écran VERSUS : joueur = or, adversaire = indigo.
+    final color = isSelf ? AppColors.orJour : AppColors.cielHauteur;
     final asyncProfile = uid.isEmpty
         ? const AsyncValue<PlayerProfile?>.data(null)
         : ref.watch(playerProfileProvider(uid));
@@ -501,16 +501,11 @@ class _RiddleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Carte devinette à accent gauche or (cohérence avec le mode solo).
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.fromLTRB(14, 16, 16, 16),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: AppColors.orJour.withValues(alpha: 0.6),
-          width: 1.5,
-        ),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.4),
@@ -519,25 +514,44 @@ class _RiddleCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: <Widget>[
-          Image.asset(
-            AppAssets.griotIdle,
-            width: 56,
-            height: 56,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              riddle,
-              style: AppTypography.bodyMd.copyWith(
-                fontSize: 16,
-                height: 1.45,
-                color: AppColors.textePrimaire,
-              ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        child: ColoredBox(
+          color: AppColors.surfaceContainer,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Container(width: 3, color: AppColors.orJour),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(13, 16, 16, 16),
+                    child: Row(
+                      children: <Widget>[
+                        Image.asset(
+                          AppAssets.griotIdle,
+                          width: 56,
+                          height: 56,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            riddle,
+                            style: AppTypography.bodyMd.copyWith(
+                              fontSize: 16,
+                              height: 1.45,
+                              color: AppColors.textePrimaire,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

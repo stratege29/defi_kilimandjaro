@@ -5,28 +5,24 @@
 enum HonorificTitle {
   oreilleDuVillage(
     name: 'Oreille du Village',
-    icon: '👂',
     badgeAsset: 'assets/images/badges/oreille_du_village.png',
     description: 'Tu commences à reconnaître les chants du griot.',
     threshold: 5,
   ),
   gardienDeLaParole(
     name: 'Gardien de la Parole',
-    icon: '📖',
     badgeAsset: 'assets/images/badges/gardien_de_la_parole.png',
     description: 'Les proverbes commencent à habiter ta mémoire.',
     threshold: 25,
   ),
   griotDuFeu(
     name: 'Griot du Feu',
-    icon: '🔥',
     badgeAsset: 'assets/images/badges/griot_du_feu.png',
     description: 'Tu portes les histoires de tout un peuple.',
     threshold: 75,
   ),
   ancetreVivant(
     name: 'Ancêtre Vivant',
-    icon: '🌿',
     badgeAsset: 'assets/images/badges/ancetre_vivant.png',
     description: 'Ta sagesse rejoint celle des aïeux.',
     threshold: 200,
@@ -34,14 +30,12 @@ enum HonorificTitle {
 
   const HonorificTitle({
     required this.name,
-    required this.icon,
     required this.badgeAsset,
     required this.description,
     required this.threshold,
   });
 
   final String name;
-  final String icon;
 
   /// Illustration du masque sculpté (cf. badges K1-K4).
   final String badgeAsset;

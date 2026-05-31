@@ -3,39 +3,29 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
+import 'package:defi_kilimandjaro/data/repositories/composite_daily_challenge_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/continue_ascent_card.dart';
-import 'package:defi_kilimandjaro/presentation/home/widgets/daily_challenge_card.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/daily_streak_dialog.dart';
-import 'package:defi_kilimandjaro/presentation/home/widgets/duels_carousel.dart';
+import 'package:defi_kilimandjaro/presentation/home/widgets/home_access_tiles.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/home_header.dart';
-import 'package:defi_kilimandjaro/presentation/home/widgets/news_carousel.dart';
-import 'package:defi_kilimandjaro/presentation/home/widgets/packs_section.dart';
-import 'package:defi_kilimandjaro/presentation/home/widgets/recommended_match_banner.dart';
-import 'package:defi_kilimandjaro/presentation/home/widgets/stats_row.dart';
-import 'package:defi_kilimandjaro/presentation/home/widgets/sticky_cta_bar.dart';
-import 'package:defi_kilimandjaro/presentation/home/widgets/welcome_card.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Écran 00 — Hub d'Accueil.
 ///
-/// Page d'atterrissage par défaut au lancement de l'app. Composition de
-/// blocs world-class :
-/// - [HomeHeader] : streak pulsé · KILIMANDJARO · cauris · altitude (Hero)
-/// - [WelcomeCard] : griot animé + salutation + bulle parchemin proverbe
-/// - [ContinueAscentCard] : HERO sommet en cours, silhouette + Fraunces XL
-/// - [DuelsCarousel] : 3 cards défis horizontales
-/// - [RecommendedMatchBanner] : stub conditionnel
-/// - [PacksSection] : carrousel packs possédés + SYNC
-/// - [NewsCarousel] : promos packs payants + UGC + classement
-/// - [StatsRow] : 3 carrés stats premium Fraunces
-/// - [StickyCtaBar] : GRIMPER (shimmer) + DÉFIER (outline)
+/// Page d'atterrissage par défaut au lancement de l'app. **Retenue radicale** :
+/// 3 zones à l'espace négatif généreux, centrées sur l'ascension.
+/// Composition :
+/// - [HomeHeader] : pastilles série + cauris
+/// - [ContinueAscentCard] : HERO sommet en cours + CTA GRIMPER intégré
+/// - [HomeAccessTiles] : Défier un ami · Défi du jour · Sommets
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 
@@ -86,27 +76,14 @@ class _HomeViewState extends ConsumerState<HomeView> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                 children: const [
-                  WelcomeCard(),
-                  SizedBox(height: 22),
-                  DailyChallengeCard(),
-                  SizedBox(height: 22),
+                  // Zone 1 — HÉROS : continuer l'ascension + CTA GRIMPER.
                   ContinueAscentCard(),
-                  SizedBox(height: 22),
-                  DuelsCarousel(),
-                  SizedBox(height: 22),
-                  RecommendedMatchBanner(),
-                  // RecommendedMatchBanner se réduit à SizedBox.shrink quand
-                  // aucune reco n'est dispo — pas besoin de SizedBox conditionnel.
-                  PacksSection(),
-                  SizedBox(height: 22),
-                  NewsCarousel(),
-                  SizedBox(height: 22),
-                  StatsRow(),
                   SizedBox(height: 16),
+                  // Zone 2 — accès rapide : duel, défi du jour, sommets.
+                  HomeAccessTiles(),
                 ],
               ),
             ),
-            const StickyCtaBar(),
           ],
         ),
       ),
@@ -172,6 +149,58 @@ Future<void> launchNextLevel(
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Erreur de chargement', style: AppTypography.bebas()),
+        backgroundColor: AppColors.rouge,
+      ),
+    );
+  }
+}
+
+/// Lance le Défi du jour : calibre une config Tier 3 via une montagne
+/// virtuelle, lit le mot du jour partagé (Firestore d'abord, fallback
+/// bundle) puis navigue vers `/game` en mode daily.
+///
+/// Helper public partagé entre la tuile « Défi du jour » de l'accueil et
+/// tout autre point d'entrée. Si le pool est vide (ni Firestore ni bundle),
+/// affiche un snackbar d'erreur.
+Future<void> launchDailyChallenge(BuildContext context, WidgetRef ref) async {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  try {
+    const virtualMountain = Mountain(
+      id: '__daily__',
+      name: 'Daily',
+      countryCode: 'XX',
+      countryName: 'Daily',
+      flagEmoji: '★',
+      altitude: 2000,
+      totalLevels: 1,
+    );
+    final config = LevelDifficultyResolver.resolve(
+      mountain: virtualMountain,
+      levelIndex: 1,
+    );
+    final devinette = await ref
+        .read(dailyChallengeRepositoryProvider)
+        .fetchDevinetteForDate(today);
+    if (!context.mounted) return;
+    if (devinette == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('daily.pool_empty'.tr(), style: AppTypography.bebas()),
+          backgroundColor: AppColors.rouge,
+        ),
+      );
+      return;
+    }
+    await context.push<void>(
+      AppRoutes.game,
+      extra: GameArgs.daily(devinette: devinette, config: config, date: today),
+    );
+  } on Exception catch (_) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('daily.pool_empty'.tr(), style: AppTypography.bebas()),
         backgroundColor: AppColors.rouge,
       ),
     );

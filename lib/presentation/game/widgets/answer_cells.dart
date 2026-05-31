@@ -201,7 +201,7 @@ class _CellFace extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 3),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: borderColor, width: 2),
         boxShadow: shadowColor == null
             ? null

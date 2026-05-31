@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
+import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
@@ -24,6 +25,7 @@ import 'package:defi_kilimandjaro/presentation/result/failure_view.dart';
 import 'package:defi_kilimandjaro/presentation/result/mountain_conquest_view.dart';
 import 'package:defi_kilimandjaro/presentation/result/victory_view.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -183,7 +185,7 @@ class _GameViewState extends ConsumerState<GameView>
       onBack: _confirmBack,
       mountainName: mountain.name,
       levelLabel: 'Niveau $currentLevel / ${mountain.totalLevels}',
-      flagEmoji: mountain.flagEmoji,
+      countryCode: mountain.countryCode,
     );
   }
 
@@ -755,7 +757,7 @@ class _GameHeader extends StatelessWidget {
     required this.onBack,
     this.mountainName,
     this.levelLabel,
-    this.flagEmoji,
+    this.countryCode,
   });
 
   final int cauris;
@@ -767,8 +769,9 @@ class _GameHeader extends StatelessWidget {
   /// Sous-titre niveau (ex. "Niveau 3/6"). `null` si pas pertinent.
   final String? levelLabel;
 
-  /// Drapeau emoji de la montagne (ex. "🇨🇮"). `null` en mode Hub.
-  final String? flagEmoji;
+  /// Code pays ISO-2 de la montagne (ex. "CI"). `null` en mode Hub.
+  /// Rendu via [FlagRoundel] (vectoriel) — fini l'emoji drapeau.
+  final String? countryCode;
 
   @override
   Widget build(BuildContext context) {
@@ -788,9 +791,9 @@ class _GameHeader extends StatelessWidget {
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
           ),
-          if (flagEmoji != null) ...[
+          if (countryCode != null) ...[
             const SizedBox(width: 4),
-            Text(flagEmoji!, style: const TextStyle(fontSize: 20)),
+            FlagRoundel(countryCode: countryCode!, size: 26),
           ],
           if (levelLabel != null) ...[
             const SizedBox(width: 8),
@@ -852,16 +855,12 @@ class _RiddleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Carte devinette — accent gauche or (3pt) sur fond surfaceContainer.
+    // Plus de bordure dorée pleine : la hiérarchie vient de l'accent + ombre.
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.fromLTRB(16, 16, 18, 16),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.orJour.withValues(alpha: 0.6),
-          width: 1.5,
-        ),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.4),
@@ -870,26 +869,44 @@ class _RiddleCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          // Griot avatar — 44pt, gauche, sans rien ajouter en décoration.
-          Image.asset(AppAssets.griotIdle, width: 44, height: 44),
-          const SizedBox(width: 12),
-          // Énoncé — taille remontée à 22pt pour faire de la devinette le
-          // héros culturel de l'écran (cf. discussion produit). bodyMd
-          // non-italique, l'italique restant réservé aux proverbes.
-          Expanded(
-            child: Text(
-              riddle,
-              style: AppTypography.bodyMd.copyWith(
-                fontSize: 22,
-                height: 1.35,
-                color: AppColors.textePrimaire,
-              ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        child: ColoredBox(
+          color: AppColors.surfaceContainer,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                // Filet d'accent or pleine hauteur.
+                Container(width: 3, color: AppColors.orJour),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(13, 16, 18, 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        // Griot avatar — 44pt, gauche.
+                        Image.asset(AppAssets.griotIdle, width: 44, height: 44),
+                        const SizedBox(width: 12),
+                        // Énoncé — 22pt, héros culturel de l'écran.
+                        Expanded(
+                          child: Text(
+                            riddle,
+                            style: AppTypography.bodyMd.copyWith(
+                              fontSize: 22,
+                              height: 1.35,
+                              color: AppColors.textePrimaire,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

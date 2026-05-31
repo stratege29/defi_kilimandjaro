@@ -14,20 +14,10 @@ import 'package:go_router/go_router.dart';
 /// "Altitude X m". Donne une continuité visuelle à travers les écrans.
 const kAltitudeHeroTag = 'player-altitude-chip';
 
-// ─── Constantes de timing ────────────────────────────────────────────────────
-
-/// Durée du timeout lobby en secondes (doit correspondre à
-/// [LobbyController._timeoutSeconds]).
-const _kLobbyTimeoutSeconds = 30;
-
-/// BPM du tam-tam lobby — 108 BPM → 556 ms par beat.
-const _kLobbyBpm = 108.0;
-const _kLobbyBeatMs = 60000 / _kLobbyBpm; // ~556 ms
-
 /// Écran lobby du matchmaking ELO (Phase 6).
 ///
 /// Trois états :
-/// - [LobbyPhase.searching] : tam-tam animé + anneau countdown + bande ELO.
+/// - [LobbyPhase.searching] : **radar** (ondes + balayage) autour de ton avatar + bande ELO.
 /// - [LobbyPhase.matched] : flash doré + transition crossfade vers [AppRoutes.duelPlay].
 /// - [LobbyPhase.noOpponent] : griot pensif + 2 CTA slide-up.
 class LobbyView extends ConsumerStatefulWidget {
@@ -234,52 +224,39 @@ class _SearchingBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // En mode rematch, l'attente est plus courte (l'adversaire est connu).
-    final totalTimeout = state.isRematch ? 15 : _kLobbyTimeoutSeconds;
-    final remaining = (totalTimeout - state.secondsElapsed).clamp(
-      0,
-      totalTimeout,
-    );
+    final profile = ref.watch(playerProfileStreamProvider).value;
+    final name = profile?.displayName?.trim();
+    final initial =
+        (name != null && name.isNotEmpty) ? name[0].toUpperCase() : '?';
+    final title = state.isRematch
+        ? 'Défi envoyé — en attente…'
+        : "Recherche d'un adversaire…";
 
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Tam-tam animé avec anneau countdown.
-          _CountdownRing(
-            secondsRemaining: remaining,
-            totalSeconds: totalTimeout,
-            child: const _TamTamMascot(),
-          ),
+          // Radar : ondes concentriques + balayage rotatif autour de l'avatar.
+          _RadarSearch(initial: initial),
           const SizedBox(height: 32),
           Text(
-            'Altitude actuelle : $myElo m',
-            style: AppTypography.bebas(color: AppColors.orSoleil),
+            title,
+            textAlign: TextAlign.center,
+            style: AppTypography.bebas(size: 19),
           ),
-          const SizedBox(height: 4),
-          if (state.isRematch)
-            Text(
-              "Défi envoyé — en attente de\nréponse de l'adversaire…",
-              textAlign: TextAlign.center,
-              style: AppTypography.crimson(
-                size: 15,
-                color: AppColors.textePrimaire,
-                style: FontStyle.italic,
-              ),
-            )
-          else
-            Text(
-              "Recherche d'un grimpeur de niveau similaire…",
-              textAlign: TextAlign.center,
-              style: AppTypography.crimson(
-                size: 15,
-                color: AppColors.textePrimaire,
-                style: FontStyle.italic,
-              ),
+          const SizedBox(height: 6),
+          Text(
+            'À ta hauteur · $myElo m',
+            textAlign: TextAlign.center,
+            style: AppTypography.crimson(
+              size: 14,
+              color: AppColors.texteSecondaire,
+              style: FontStyle.italic,
             ),
+          ),
           const SizedBox(height: 28),
-          // Bande ELO visuelle.
+          // Bande ELO visuelle (zone de recherche).
           _BandExpansionBar(state: state),
           const Spacer(),
           SizedBox(
@@ -291,12 +268,12 @@ class _SearchingBody extends ConsumerWidget {
                 context.pop();
               },
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppColors.rouge),
+                side: const BorderSide(color: AppColors.error),
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
               child: Text(
                 'ANNULER',
-                style: AppTypography.bebas(color: AppColors.rouge),
+                style: AppTypography.bebas(color: AppColors.error),
               ),
             ),
           ),
@@ -306,212 +283,158 @@ class _SearchingBody extends ConsumerWidget {
   }
 }
 
-// ─── Countdown ring (CustomPainter) ──────────────────────────────────────────
+// ─── Radar de recherche d'adversaire ─────────────────────────────────────────
 
-class _CountdownRing extends StatelessWidget {
-  const _CountdownRing({
-    required this.secondsRemaining,
-    required this.totalSeconds,
-    required this.child,
-  });
+/// Radar « scan du monde » : ondes concentriques qui se propagent + balayage
+/// rotatif doré autour de ton avatar. Remplace l'ancien anneau de décompte +
+/// emoji tam-tam. Aucun `MaskFilter.blur` (perf iOS 26).
+class _RadarSearch extends StatefulWidget {
+  const _RadarSearch({required this.initial});
 
-  final int secondsRemaining;
-  final int totalSeconds;
-  final Widget child;
-
-  Color _ringColor() {
-    if (secondsRemaining > 15) return AppColors.vertClair;
-    if (secondsRemaining > 5) return AppColors.orChaud;
-    return AppColors.rouge;
-  }
+  final String initial;
 
   @override
-  Widget build(BuildContext context) {
-    final progress = secondsRemaining / totalSeconds;
-    final color = _ringColor();
-
-    return SizedBox(
-      width: 170,
-      height: 170,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Anneau de fond.
-          CustomPaint(
-            size: const Size(170, 170),
-            painter: _RingPainter(
-              progress: 1,
-              color: AppColors.boisFonce.withValues(alpha: 0.35),
-            ),
-          ),
-          // Anneau de progression animé.
-          AnimatedCustomPaint(progress: progress, color: color),
-          child,
-        ],
-      ),
-    );
-  }
+  State<_RadarSearch> createState() => _RadarSearchState();
 }
 
-class AnimatedCustomPaint extends ImplicitlyAnimatedWidget {
-  const AnimatedCustomPaint({
-    required this.progress,
-    required this.color,
-    super.key,
-  }) : super(duration: const Duration(milliseconds: 800));
-
-  final double progress;
-  final Color color;
-
-  @override
-  ImplicitlyAnimatedWidgetState<AnimatedCustomPaint> createState() =>
-      _AnimatedCustomPaintState();
-}
-
-class _AnimatedCustomPaintState
-    extends AnimatedWidgetBaseState<AnimatedCustomPaint> {
-  Tween<double>? _progress;
-  ColorTween? _color;
-
-  @override
-  void forEachTween(TweenVisitor<dynamic> visitor) {
-    _progress =
-        visitor(
-              _progress,
-              widget.progress,
-              (v) => Tween<double>(begin: v as double),
-            )
-            as Tween<double>?;
-    _color =
-        visitor(_color, widget.color, (v) => ColorTween(begin: v as Color))
-            as ColorTween?;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(170, 170),
-      painter: _RingPainter(
-        progress: _progress?.evaluate(animation) ?? widget.progress,
-        color: _color?.evaluate(animation) ?? widget.color,
-      ),
-    );
-  }
-}
-
-class _RingPainter extends CustomPainter {
-  _RingPainter({required this.progress, required this.color});
-
-  final double progress;
-  final Color color;
-  static const double strokeWidth = 6;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width / 2) - strokeWidth / 2;
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      // Commence à midi (−π/2) et dessine dans le sens horaire.
-      -math.pi / 2,
-      2 * math.pi * progress,
-      false,
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_RingPainter old) =>
-      old.progress != progress || old.color != color;
-}
-
-// ─── Tam-tam mascot (bounce + slight rotation) ───────────────────────────────
-
-class _TamTamMascot extends StatefulWidget {
-  const _TamTamMascot();
-
-  @override
-  State<_TamTamMascot> createState() => _TamTamMascotState();
-}
-
-class _TamTamMascotState extends State<_TamTamMascot>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late final Animation<double> _bounce;
-  late final Animation<double> _rotation;
+class _RadarSearchState extends State<_RadarSearch>
+    with TickerProviderStateMixin {
+  late final AnimationController _pulse;
+  late final AnimationController _sweep;
 
   @override
   void initState() {
     super.initState();
-    // 108 BPM → 556 ms. On fait un demi-cycle par beat (bounce aller-retour).
-    _ctrl = AnimationController(
+    _pulse = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: _kLobbyBeatMs.round()),
-    )..repeat(reverse: true);
-
-    _bounce = Tween<double>(
-      begin: 0,
-      end: -10,
-    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
-
-    // Rotation 5° gauche/droite synchronisée avec le bounce.
-    _rotation = Tween<double>(
-      begin: -0.087,
-      end: 0.087,
-    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+      duration: const Duration(milliseconds: 2700),
+    )..repeat();
+    _sweep = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2600),
+    )..repeat();
   }
 
   @override
   void dispose() {
-    _ctrl.dispose();
+    _pulse.dispose();
+    _sweep.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _ctrl,
-      builder: (_, child) {
-        return Transform.translate(
-          offset: Offset(0, _bounce.value),
-          child: Transform.rotate(angle: _rotation.value, child: child),
-        );
-      },
-      child: Container(
-        width: 90,
-        height: 90,
-        decoration: BoxDecoration(
-          color: AppColors.bois.withValues(alpha: 0.35),
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: AppColors.orSoleil.withValues(alpha: 0.85),
-            width: 3,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.orSoleil.withValues(alpha: 0.25),
-              blurRadius: 16,
-              spreadRadius: 4,
+    return RepaintBoundary(
+      child: SizedBox(
+        width: 190,
+        height: 190,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            AnimatedBuilder(
+              animation: Listenable.merge([_pulse, _sweep]),
+              builder: (_, __) => CustomPaint(
+                size: const Size(190, 190),
+                painter: _RadarPainter(
+                  pulseT: _pulse.value,
+                  sweep: _sweep.value * 2 * math.pi,
+                ),
+              ),
+            ),
+            // Cœur : ton avatar (initiale) sur disque or lumineux.
+            Container(
+              width: 86,
+              height: 86,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const RadialGradient(
+                  center: Alignment(-0.3, -0.35),
+                  colors: [AppColors.orJour, AppColors.orCrepuscule],
+                ),
+                border: Border.all(color: AppColors.orJour, width: 3),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.orJour.withValues(alpha: 0.5),
+                    blurRadius: 26,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Text(
+                widget.initial,
+                style: AppTypography.playfair(
+                  size: 32,
+                  color: AppColors.surface,
+                  weight: FontWeight.w800,
+                ),
+              ),
             ),
           ],
-        ),
-        child: const Center(
-          // Emoji tam-tam. Fallback : icône music_note si le rendu l'écrase.
-          child: Text(
-            '\u{1F941}', // drum 🥁
-            style: TextStyle(fontSize: 42),
-          ),
         ),
       ),
     );
   }
+}
+
+class _RadarPainter extends CustomPainter {
+  _RadarPainter({required this.pulseT, required this.sweep});
+
+  /// Phase 0..1 des ondes concentriques.
+  final double pulseT;
+
+  /// Angle du balayage en radians.
+  final double sweep;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = size.center(Offset.zero);
+    final maxR = size.width / 2;
+    final ringRect = Rect.fromCircle(center: c, radius: maxR * 0.96);
+
+    canvas
+      // Anneau statique discret.
+      ..drawCircle(
+        c,
+        maxR * 0.96,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1
+          ..color = AppColors.orJour.withValues(alpha: 0.18),
+      )
+      // Balayage rotatif (secteur dégradé).
+      ..drawCircle(
+        c,
+        maxR * 0.96,
+        Paint()
+          ..shader = SweepGradient(
+            colors: [
+              AppColors.orJour.withValues(alpha: 0.38),
+              AppColors.orJour.withValues(alpha: 0),
+            ],
+            stops: const [0, 0.25],
+            transform: GradientRotation(sweep),
+          ).createShader(ringRect),
+      );
+
+    // Ondes concentriques (3 anneaux déphasés).
+    for (var i = 0; i < 3; i++) {
+      final p = (pulseT + i / 3) % 1.0;
+      final r = maxR * (0.20 + 0.78 * p);
+      canvas.drawCircle(
+        c,
+        r,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5
+          ..color = AppColors.orJour.withValues(alpha: 0.5 * (1 - p)),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_RadarPainter old) =>
+      old.pulseT != pulseT || old.sweep != sweep;
 }
 
 // ─── Band expansion bar (visual slider) ──────────────────────────────────────
@@ -637,7 +560,6 @@ class _NoOpponentBody extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: AppTypography.crimson(
                 size: 14,
-                color: AppColors.textePrimaire,
                 style: FontStyle.italic,
               ),
             ),
