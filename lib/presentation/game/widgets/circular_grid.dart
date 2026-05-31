@@ -7,18 +7,20 @@ import 'package:defi_kilimandjaro/presentation/game/widgets/golden_path.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/letter_grid_pattern.dart';
 import 'package:flutter/material.dart';
 
-/// Grille circulaire de tuiles lettres avec détection de drag.
+/// Grille de tuiles lettres avec détection de drag.
 ///
-/// **Disposition** : cercle unique, rayon **adaptatif au viewport parent**
-/// via `LayoutBuilder` — plus jamais d'overflow horizontal ni de tuile
-/// clippée en bas d'écran. Les variantes géométriques (arc/oval/square)
-/// supprimées : un Word Connect world-class garde un arrangement
-/// reconnaissable et constant.
+/// **Disposition** : une forme tirée par session parmi
+/// `compatiblePatterns(count)` — réguliers curés (cercle, hexagone, diamant,
+/// zigzag, deux-rangées, triangle, arc, V, grille, étoile) et procéduraux
+/// irréguliers (`scatter`, `jittered`). Tous **adaptatifs au viewport** via
+/// `LayoutBuilder` et garantis jouables (anti-chevauchement + anti-piège, cf.
+/// `letter_grid_pattern.dart`). Voir [GridPattern].
 ///
-/// **Aléa préservé** : l'ordre des lettres autour du cercle est shufflé
-/// au démarrage de chaque partie (`GameController._shuffleIndices`,
-/// Fisher-Yates). Deux sessions de la même devinette → cercles avec
-/// lettres dans un ordre différent.
+/// **Aléa préservé sur 2 axes** : la FORME change d'une partie à l'autre
+/// (`pickPattern`), et l'ORDRE des lettres dans la forme est shufflé
+/// indépendamment (`GameController._shuffleIndices`, Fisher-Yates). Les
+/// patterns procéduraux dépendent en plus d'un `_layoutSeed` stable par
+/// session.
 ///
 /// **Hit-test** : `Listener` raw pour la précision pendant le drag.
 /// **Chemin doré** : dessiné par [GoldenPath] en overlay.
@@ -89,8 +91,15 @@ class _CircularGridState extends State<CircularGrid>
   static const double _tileSize = 68;
 
   /// Pattern choisi pour CETTE session — stable durant toute la partie.
-  /// Phase 1 : circle universel, hexagon 50/50 si count == 7.
+  /// Tiré uniformément parmi `compatiblePatterns(count)` (cercle + variantes
+  /// curées + procédurales).
   late final GridPattern _pattern;
+
+  /// Seed stable de CETTE session pour les patterns procéduraux (`scatter`,
+  /// `jittered`). `computeLayout` étant rappelé à chaque build, un seed fixe
+  /// garantit des positions identiques d'un build à l'autre (sinon les tuiles
+  /// « sauteraient » à chaque frame).
+  late final int _layoutSeed;
 
   /// Centres des tuiles en coordonnées locales (mis à jour à chaque layout).
   final List<Offset> _tileCenters = <Offset>[];
@@ -137,7 +146,9 @@ class _CircularGridState extends State<CircularGrid>
   @override
   void initState() {
     super.initState();
-    _pattern = pickPattern(widget.letters.length, math.Random());
+    final rng = math.Random();
+    _pattern = pickPattern(widget.letters.length, rng);
+    _layoutSeed = rng.nextInt(1 << 31);
     _shakeCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 450),
@@ -334,6 +345,7 @@ class _CircularGridState extends State<CircularGrid>
           count: count,
           available: available,
           tileSize: _tileSize,
+          seed: _layoutSeed,
         );
 
         _tileCenters
