@@ -4,6 +4,7 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/composite_devinette_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/composite_pack_catalog_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/sync/sync_state.dart';
@@ -205,9 +206,32 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
             icon: const Icon(Icons.refresh, color: AppColors.orJour),
             onPressed: isSyncing
                 ? null
-                : () => ref
-                    .read(manifestSyncStateProvider.notifier)
-                    .startRefresh(),
+                : () async {
+                    // Phase 3 : refresh à la fois le manifest (devinettes
+                    // OTA) ET le catalog distant (visibilité/ordering/prix).
+                    // Les deux sont indépendants — on lance en parallèle.
+                    final messenger = ScaffoldMessenger.of(context);
+                    unawaited(ref
+                        .read(manifestSyncStateProvider.notifier)
+                        .startRefresh());
+                    try {
+                      await ref
+                          .read(refreshRemoteCatalogProvider.future);
+                    } catch (e) {
+                      // Échec catalog n'est pas bloquant — l'app continue
+                      // de fonctionner sur le bundle. Juste un toast discret.
+                      if (mounted) {
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Catalogue distant non récupéré ($e)',
+                            ),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    }
+                  },
           ),
         ],
       ),
