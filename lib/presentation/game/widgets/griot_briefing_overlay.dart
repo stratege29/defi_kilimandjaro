@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
@@ -69,14 +70,35 @@ class GriotBriefingOverlay extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            // Icône d'ascension (drapeau de sommet pour un boss, relief sinon)
-            // — ancre la mise en garde dans l'escalade plutôt que le griot.
-            Icon(
-              isBoss ? Icons.flag_rounded : Icons.terrain_rounded,
-              size: 40,
-              color: accent,
-            ),
-            const SizedBox(height: 6),
+            // Avatar griot — identité narrative conservée dans les 2 modes.
+            Image.asset(AppAssets.griotIdle, width: 64, height: 64),
+            const SizedBox(height: 8),
+            // Badge « BOSS » — uniquement sur un stage boss, pastille dorée
+            // pour signaler l'enjeu sans alourdir la card.
+            if (isBoss) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.orJour.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: AppColors.orJour.withValues(alpha: 0.5),
+                  ),
+                ),
+                child: Text(
+                  'game.briefing.boss_tag'.tr(),
+                  style: AppTypography.labelXs.copyWith(
+                    color: AppColors.orJour,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 2,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
             // Eyebrow all-caps espacé, cohérent avec les autres popups
             // « Vert Nuit » (cf. DailyStreakDialog).
             Text(

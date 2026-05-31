@@ -38,6 +38,7 @@
     "briefing": {
       "title_normal": "THE SLOPE STEEPENS",
       "title_boss": "SUMMIT GUARDIAN",
+      "boss_tag": "BOSS",
       "intro_normal": "The climb gets harder. Stay sharp.",
       "intro_boss": "A guardian holds this summit. Hold firm.",
       "cta": "Let's climb",
