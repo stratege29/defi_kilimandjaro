@@ -12,9 +12,9 @@ import 'package:go_router/go_router.dart';
 
 /// Écran 01 — Splash Screen, sobre.
 ///
-/// Ciel en dégradé (savane → forêt → indigo d'altitude), logo "K", kicker
-/// « Défi » et titre KILIMANDJARO centrés, avec un point or pulsant comme
-/// indicateur de chargement.
+/// Fond uni « Vert Nuit » (couleur du thème), logo "K", kicker « Défi » et
+/// titre KILIMANDJARO centrés, avec un point or pulsant comme indicateur de
+/// chargement.
 ///
 /// Auto-transition après 2.5s vers l'onboarding (1er lancement) ou le hub.
 class SplashView extends ConsumerStatefulWidget {
@@ -57,81 +57,59 @@ class _SplashViewState extends ConsumerState<SplashView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: DecoratedBox(
-        // Ciel de l'ascension : savane chaude en bas → indigo d'altitude.
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            colors: [
-              AppColors.savanneOcre,
-              AppColors.vertForet,
-              AppColors.info,
-              AppColors.infoSoft,
-            ],
-            stops: [0.0, 0.42, 0.78, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Logo + kicker « Défi » + titre, centrés.
-              Align(
-                alignment: const Alignment(0, -0.08),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(
-                      AppAssets.logoK,
-                      width: 128,
-                      height: 128,
-                      fit: BoxFit.contain,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Défi',
-                      style: AppTypography.playfair(
-                        size: 22,
-                        color: AppColors.orJour,
-                        style: FontStyle.italic,
-                      ).copyWith(shadows: _textShadow),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'KILIMANDJARO',
-                      style: AppTypography.logoTitle.copyWith(
-                        shadows: _textShadow,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Indicateur de chargement pulsant (or).
-              Align(
-                alignment: const Alignment(0, 0.92),
-                child: ScaleTransition(
-                  scale: Tween<double>(begin: 0.7, end: 1.15).animate(
-                    CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
+      backgroundColor: AppColors.surface,
+      body: SafeArea(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Logo + kicker « Défi » + titre, centrés.
+            Align(
+              alignment: const Alignment(0, -0.08),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    AppAssets.logoK,
+                    width: 128,
+                    height: 128,
+                    fit: BoxFit.contain,
                   ),
-                  child: Container(
-                    width: 12,
-                    height: 12,
-                    decoration: const BoxDecoration(
-                      color: AppColors.orJour,
-                      shape: BoxShape.circle,
+                  const SizedBox(height: 10),
+                  Text(
+                    'Défi',
+                    style: AppTypography.playfair(
+                      size: 22,
+                      style: FontStyle.italic,
                     ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'KILIMANDJARO',
+                    style: AppTypography.logoTitle,
+                  ),
+                ],
+              ),
+            ),
+            // Indicateur de chargement pulsant (or).
+            Align(
+              alignment: const Alignment(0, 0.92),
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 0.7, end: 1.15).animate(
+                  CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
+                ),
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: const BoxDecoration(
+                    color: AppColors.orJour,
+                    shape: BoxShape.circle,
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
-
-  static const List<Shadow> _textShadow = [
-    Shadow(color: AppColors.surface, blurRadius: 8),
-  ];
 }
