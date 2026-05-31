@@ -150,8 +150,16 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
     final syncState = ref.watch(manifestSyncStateProvider);
     final isSyncing = syncState is SyncStateSyncing;
 
+    // Messenger capturé au build (élément actif) : ne JAMAIS appeler
+    // `ScaffoldMessenger.of(context)` dans le callback de `ref.listen`. Une
+    // fin de sync qui arrive pendant le pop de l'écran ferait un lookup
+    // d'inherited widget sur un élément en cours de désactivation →
+    // assertion `_dependents.isEmpty` et écran d'erreur global.
+    final messenger = ScaffoldMessenger.of(context);
+
     // Affiche un SnackBar éphémère à la fin de chaque sync.
     ref.listen<SyncState>(manifestSyncStateProvider, (prev, next) {
+      if (!mounted) return;
       if (prev is! SyncStateSyncing) return;
       if (next is SyncStateSuccess) {
         final String msg;
@@ -167,7 +175,7 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
           msg = 'my_packs.sync_up_to_date'.tr();
           background = AppColors.boisFonce;
         }
-        ScaffoldMessenger.of(context)
+        messenger
           ..hideCurrentSnackBar()
           ..showSnackBar(
             SnackBar(
@@ -181,7 +189,7 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
             ),
           );
       } else if (next is SyncStateError) {
-        ScaffoldMessenger.of(context)
+        messenger
           ..hideCurrentSnackBar()
           ..showSnackBar(
             SnackBar(
