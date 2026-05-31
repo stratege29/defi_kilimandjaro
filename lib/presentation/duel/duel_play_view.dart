@@ -30,7 +30,7 @@ import 'package:go_router/go_router.dart';
 ///
 /// - [DuelPhase.waiting]   → en attente (existant)
 /// - [DuelPhase.intro]     → [DuelIntroOverlay] par-dessus
-/// - [DuelPhase.countdown] → [DuelCountdownOverlay] (grille floue + cadenas)
+/// - [DuelPhase.countdown] → [DuelCountdownOverlay] (VERSUS + décompte)
 /// - [DuelPhase.active]    → gameplay normal
 /// - [DuelPhase.roundEnd]  → [DuelRoundEndOverlay] par-dessus
 /// - [DuelPhase.finished]  → navigation vers DuelResultView
@@ -196,8 +196,6 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
         return DuelCountdownOverlay(
           key: const ValueKey('countdown'),
           session: session,
-          gameContent: gameContent,
-          riddleContent: _RiddleCard(riddle: session.riddle),
         );
 
       case DuelPhase.roundEnd:

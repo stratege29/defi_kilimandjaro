@@ -75,6 +75,7 @@
     },
     "failure": {
       "answer_was": "The answer was {answer}",
+      "answer_was_label": "The answer was",
       "retry": "TRY AGAIN",
       "consolation": "Give it another shot!",
       "answer_hidden_title": "Hidden word",

@@ -15,6 +15,7 @@ import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart'
     show kAltitudeHeroTag;
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/widgets/display_name_prompt.dart';
+import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -924,10 +925,23 @@ class _MountainsBlock extends StatelessWidget {
     }
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final m in conquered) _MountainCard(mountain: m, conquered: true),
+        // Sommets conquis : carrousel horizontal d'icônes (scroll plus court
+        // qu'une liste verticale quand le joueur a gravi beaucoup de sommets).
+        if (conquered.isNotEmpty)
+          SizedBox(
+            height: 132,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              itemCount: conquered.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (_, i) => _ConqueredMountainChip(mountain: conquered[i]),
+            ),
+          ),
         if (inProgress.isNotEmpty) ...[
-          const SizedBox(height: 8),
+          SizedBox(height: conquered.isEmpty ? 0 : 16),
           Padding(
             padding: const EdgeInsets.only(left: 2, bottom: 6, top: 4),
             child: Text(
@@ -942,6 +956,86 @@ class _MountainsBlock extends StatelessWidget {
           for (final m in inProgress) _MountainCard(mountain: m, conquered: false),
         ],
       ],
+    );
+  }
+}
+
+/// Vignette icône d'un sommet conquis pour le carrousel horizontal du profil.
+///
+/// Silhouette `.vec` posée sur une tuile Vert Nuit bordée vert (succès), avec
+/// drapeau pays en coin + nom et altitude dessous.
+class _ConqueredMountainChip extends StatelessWidget {
+  const _ConqueredMountainChip({required this.mountain});
+
+  final Mountain mountain;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 116,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AppColors.success.withValues(alpha: 0.55),
+          width: 1.2,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Tuile silhouette (ciel transparent du .vec sur surfaceVariant).
+          SizedBox(
+            height: 64,
+            width: double.infinity,
+            child: ColoredBox(
+              color: AppColors.surfaceVariant,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  MountainSilhouetteVector(mountain: mountain),
+                  Positioned(
+                    top: 6,
+                    left: 6,
+                    child: FlagRoundel(
+                      countryCode: mountain.countryCode,
+                      size: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  mountain.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.labelSm.copyWith(
+                    color: AppColors.textePrimaire,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${mountain.altitude} m',
+                  style: AppTypography.labelXs.copyWith(
+                    color: AppColors.texteSecondaire,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

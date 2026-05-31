@@ -183,7 +183,7 @@ class _ConquestCard extends StatelessWidget {
                     height: 128,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.bois.withValues(alpha: 0.4),
+                      color: AppColors.surfaceVariant,
                       border: Border.all(color: AppColors.orJour, width: 1.5),
                     ),
                     clipBehavior: Clip.antiAlias,
@@ -202,13 +202,13 @@ class _ConquestCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          // Eyebrow — sobre, Barlow Cond 14pt all-caps espacé.
+          // Eyebrow doré all-caps espacé (maquette `.eyebrow2` = gold).
           Text(
             'TU AS CONQUIS',
             style: AppTypography.bebas(
-              size: 14,
-              color: AppColors.texteSecondaire,
-              letterSpacing: 4,
+              size: 12,
+              color: AppColors.orJour,
+              letterSpacing: 2,
             ),
           ),
           const SizedBox(height: 8),

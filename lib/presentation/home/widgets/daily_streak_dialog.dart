@@ -44,53 +44,60 @@ class DailyStreakDialog extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            // Flamme ▲ or (maquette `.fire`).
             const Icon(
               Icons.local_fire_department_rounded,
-              size: 48,
+              size: 40,
               color: AppColors.orJour,
             ),
             const SizedBox(height: 6),
+            // Eyebrow doré all-caps espacé (maquette `.eyebrow2`).
             Text(
               'SÉRIE · JOUR $streakDay',
-              style: AppTypography.bebas(size: 18, color: AppColors.orJour)
-                  .copyWith(letterSpacing: 2),
+              style: AppTypography.labelXs.copyWith(
+                color: AppColors.orJour,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 2,
+              ),
             ),
-            const SizedBox(height: 14),
-            // Escalier 7 jours.
+            const SizedBox(height: 16),
+            // Escalier 7 jours (cases ✓ acquis / chiffre courant).
             _StreakLadder(
               currentDay: streakDay,
               rewards: rewards,
             ),
-            const SizedBox(height: 20),
-            // Bonus du jour mis en avant.
+            const SizedBox(height: 16),
+            Text(
+              'Reviens chaque jour pour gravir plus vite.',
+              textAlign: TextAlign.center,
+              style: AppTypography.bodyMd.copyWith(
+                fontSize: 13,
+                color: AppColors.texteSecondaire,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Pastille récompense du jour (maquette `.reward`).
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
               decoration: BoxDecoration(
-                color: AppColors.orJour.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(100),
+                color: AppColors.orJour.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(999),
                 border: Border.all(
-                  color: AppColors.orJour.withValues(alpha: 0.55),
-                  width: 1.5,
+                  color: AppColors.orJour.withValues(alpha: 0.45),
                 ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  const CaurisIcon(),
-                  const SizedBox(width: 8),
+                  const CaurisIcon(size: 16),
+                  const SizedBox(width: 7),
                   Text(
-                    '+$bonus',
-                    style: AppTypography.headingMd.copyWith(
+                    '+$bonus cauris',
+                    style: AppTypography.bodyMd.copyWith(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
                       color: AppColors.orJour,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'CAURIS',
-                    style: AppTypography.labelSm.copyWith(
-                      color: AppColors.orJour.withValues(alpha: 0.75),
-                      letterSpacing: 1.5,
                     ),
                   ),
                 ],
@@ -115,9 +122,8 @@ class DailyStreakDialog extends ConsumerWidget {
   }
 }
 
-/// Rangée d'icônes correspondant aux 7 paliers du streak. Le jour courant
-/// est entouré + or pulsé, les précédents (1..current-1) en vert "acquis",
-/// les suivants en gris atténué pour donner la trajectoire à venir.
+/// Échelle 7 cases (maquette `.ladder`). Les jours acquis affichent un ✓ vert,
+/// le jour courant son chiffre en or, les jours à venir leur chiffre en gris.
 class _StreakLadder extends StatelessWidget {
   const _StreakLadder({required this.currentDay, required this.rewards});
 
@@ -132,65 +138,62 @@ class _StreakLadder extends StatelessWidget {
       children: <Widget>[
         for (var i = 1; i <= length; i++) ...<Widget>[
           if (i > 1) const SizedBox(width: 6),
-          Expanded(child: _StreakStep(day: i, current: currentDay, reward: rewards[i - 1])),
+          _StreakDay(day: i, current: currentDay),
         ],
       ],
     );
   }
 }
 
-class _StreakStep extends StatelessWidget {
-  const _StreakStep({
-    required this.day,
-    required this.current,
-    required this.reward,
-  });
+/// Case unique de l'échelle (maquette `.day` / `.day.done` / `.day.now`).
+class _StreakDay extends StatelessWidget {
+  const _StreakDay({required this.day, required this.current});
 
   final int day;
   final int current;
-  final int reward;
 
   @override
   Widget build(BuildContext context) {
     final isCurrent = day == current;
     final isPast = day < current;
-    final color = isCurrent
-        ? AppColors.orJour
-        : (isPast
-            ? AppColors.vertClair
-            : AppColors.textePrimaire.withValues(alpha: 0.3));
+
+    final (Color bg, Color border, Color fg) = isPast
+        ? (
+            AppColors.vertClair.withValues(alpha: 0.12),
+            AppColors.vertClair,
+            AppColors.vertClair,
+          )
+        : isCurrent
+            ? (
+                AppColors.orJour.withValues(alpha: 0.16),
+                AppColors.orJour,
+                AppColors.orJour,
+              )
+            : (
+                AppColors.surfaceVariant,
+                AppColors.hairline,
+                AppColors.texteTertiaire,
+              );
+
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+      width: 30,
+      height: 40,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: isCurrent
-            ? AppColors.orJour.withValues(alpha: 0.15)
-            : Colors.transparent,
+        color: bg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: color.withValues(alpha: isCurrent ? 0.8 : 0.4),
-          width: isCurrent ? 1.5 : 1,
-        ),
+        border: Border.all(color: border),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text(
-            'J$day',
-            style: AppTypography.bebas(size: 11, color: color),
-          ),
-          const SizedBox(height: 2),
-          Icon(
-            isPast ? Icons.check_circle_rounded : Icons.local_fire_department,
-            size: 14,
-            color: color,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            '+$reward',
-            style: AppTypography.bebas(size: 10, color: color),
-          ),
-        ],
-      ),
+      child: isPast
+          ? Icon(Icons.check_rounded, size: 16, color: fg)
+          : Text(
+              '$day',
+              style: AppTypography.labelSm.copyWith(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: fg,
+              ),
+            ),
     );
   }
 }

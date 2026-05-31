@@ -10,6 +10,7 @@ import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.d
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/dashed_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
@@ -412,10 +413,9 @@ class _VictoryCard extends StatelessWidget {
   }
 }
 
-/// Bouton "Doubler la récompense" — convertit ~25-40 % des victoires
-/// observées sur le segment Word puzzle. Style discret pour ne pas
-/// éclipser le CTA primaire "SUIVANT" : bordure or, fond translucide,
-/// icône play_circle + montant en gros.
+/// Bouton "Doubler la récompense" — filet pointillé doré pleine largeur
+/// (maquette `.double`). Style discret pour ne pas éclipser le CTA primaire
+/// "SUIVANT". Affiche un spinner en tête pendant le chargement de la pub.
 class _DoubleRewardButton extends StatelessWidget {
   const _DoubleRewardButton({
     required this.bonus,
@@ -429,53 +429,19 @@ class _DoubleRewardButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(100),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: AppColors.orJour.withValues(alpha: 0.10),
-            borderRadius: BorderRadius.circular(100),
-            border: Border.all(
-              color: AppColors.orJour.withValues(alpha: 0.55),
-              width: 1.5,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              if (loading)
-                const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.orJour),
-                  ),
-                )
-              else
-                const Icon(
-                  Icons.play_circle_filled_rounded,
-                  size: 20,
-                  color: AppColors.orJour,
-                ),
-              const SizedBox(width: 8),
-              Text(
-                'DOUBLER (+$bonus)',
-                style: AppTypography.bebas(
-                  size: 14,
-                  color: AppColors.orJour,
-                ).copyWith(letterSpacing: 1.2),
+    return DashedButton(
+      label: 'DOUBLER (+$bonus) ▶',
+      onTap: onTap,
+      leading: loading
+          ? const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.orJour),
               ),
-              const SizedBox(width: 6),
-              const CaurisIcon(size: 16),
-            ],
-          ),
-        ),
-      ),
+            )
+          : null,
     );
   }
 }
