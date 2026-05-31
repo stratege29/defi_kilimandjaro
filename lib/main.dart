@@ -169,7 +169,10 @@ Future<void> _bootstrap() async {
     }
 
     // Crashlytics: route Flutter framework errors to Firebase in release.
+    // En debug on conserve le dump console (sinon cet override masque la
+    // stack et toute erreur de build devient invisible au développement).
     FlutterError.onError = (errorDetails) {
+      if (kDebugMode) FlutterError.presentError(errorDetails);
       FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
     };
     PlatformDispatcher.instance.onError = (error, stack) {
