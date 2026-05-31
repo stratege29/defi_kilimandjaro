@@ -246,10 +246,27 @@ service cloud.firestore {
     }
 
     // -------------------------------------------------------------------------
-    // Users inventory (Phase 4 — monétisation cauris-only)
+    // Users inventory (Phase 4 — wallet serveur cauris-only)
     // -------------------------------------------------------------------------
-    // Le user lit son propre inventaire (cauris balance, owned_packs).
-    // Écriture exclusivement via CFs unlockPack + validateCaurisPurchase.
+    // wallet : doc unique cauris + owned_packs + version.
+    // audit  : append-only log des mutations (unlock, credit, debit, bootstrap).
+    //
+    // Lecture autorisée au user pour transparence (peut voir son audit).
+    // Écriture exclusivement via CFs (bootstrapWallet, unlockPack, creditCauris,
+    // syncWallet — toutes en europe-west1, cf functions/src/wallet/).
+    //
+    // Cf docs/wallet_server_schema.md §6.
+    match /users/{uid}/inventory/wallet {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /users/{uid}/inventory_audit/{logId} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if false;  // append-only via CFs
+    }
+
+    // Fallback pour autres sous-collections d'inventory : lecture self, jamais write.
     match /users/{uid}/inventory/{docId} {
       allow read: if isSignedIn() && request.auth.uid == uid;
       allow write: if false;

@@ -58,3 +58,9 @@ export { publishPack } from "./admin/publishPack";
 export { rollbackPack } from "./admin/rollbackPack";
 export { upsertDevinette } from "./admin/upsertDevinette";
 export { bulkImportDevinettes } from "./admin/bulkImportDevinettes";
+
+// --- Wallet serveur (Phase 4) — cf docs/wallet_server_schema.md ---
+export { bootstrapWallet } from "./wallet/bootstrapWallet";
+export { unlockPack } from "./wallet/unlockPack";
+export { creditCauris } from "./wallet/creditCauris";
+export { syncWallet } from "./wallet/syncWallet";

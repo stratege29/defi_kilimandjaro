@@ -4,7 +4,9 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/composite_devinette_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/composite_pack_catalog_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
+import 'package:defi_kilimandjaro/presentation/my_packs/widgets/unlock_pack_dialog.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/sync/sync_state.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
@@ -205,9 +207,32 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
             icon: const Icon(Icons.refresh, color: AppColors.orJour),
             onPressed: isSyncing
                 ? null
-                : () => ref
-                    .read(manifestSyncStateProvider.notifier)
-                    .startRefresh(),
+                : () async {
+                    // Phase 3 : refresh à la fois le manifest (devinettes
+                    // OTA) ET le catalog distant (visibilité/ordering/prix).
+                    // Les deux sont indépendants — on lance en parallèle.
+                    final messenger = ScaffoldMessenger.of(context);
+                    unawaited(ref
+                        .read(manifestSyncStateProvider.notifier)
+                        .startRefresh());
+                    try {
+                      await ref
+                          .read(refreshRemoteCatalogProvider.future);
+                    } catch (e) {
+                      // Échec catalog n'est pas bloquant — l'app continue
+                      // de fonctionner sur le bundle. Juste un toast discret.
+                      if (mounted) {
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Catalogue distant non récupéré ($e)',
+                            ),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    }
+                  },
           ),
         ],
       ),
@@ -555,8 +580,13 @@ class _LockedPackCard extends StatelessWidget {
   final Pack pack;
   final String emoji;
 
+  /// Coût d'unlock en cauris (Phase 3 catalog + Phase 4 wallet).
+  /// 0 si pack non achetable (legacy "coming soon").
+  int get _unlockCost => pack.unlockCostCauris ?? pack.priceCauris;
+
   @override
   Widget build(BuildContext context) {
+    final unlockable = _unlockCost > 0;
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -586,19 +616,44 @@ class _LockedPackCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'my_packs.coming_soon'.tr(),
+                  unlockable
+                      ? pack.descriptionKey.tr()
+                      : 'my_packs.coming_soon'.tr(),
                   style: AppTypography.bodySm.copyWith(
                     color: AppColors.texteTertiaire,
                   ),
                 ),
-                Text(
-                  'my_packs.coming_soon_sub'.tr(),
-                  style: AppTypography.labelXs,
-                ),
+                if (!unlockable)
+                  Text(
+                    'my_packs.coming_soon_sub'.tr(),
+                    style: AppTypography.labelXs,
+                  ),
               ],
             ),
           ),
-          const Icon(Icons.lock_outline, color: AppColors.texteDisabled, size: 20),
+          if (unlockable)
+            Consumer(
+              builder: (context, ref, _) => OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.orJour,
+                  side: const BorderSide(color: AppColors.orJour),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                ),
+                onPressed: () =>
+                    UnlockPackDialog.show(context, pack: pack),
+                icon: const Icon(Icons.lock_open, size: 16),
+                label: Text('$_unlockCost ♦'),
+              ),
+            )
+          else
+            const Icon(
+              Icons.lock_outline,
+              color: AppColors.texteDisabled,
+              size: 20,
+            ),
         ],
       ),
     );

@@ -11,6 +11,7 @@ import 'package:defi_kilimandjaro/data/ads/consent_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/app_check_setup.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
+import 'package:defi_kilimandjaro/data/repositories/composite_pack_catalog_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/fcm_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
@@ -264,6 +265,12 @@ Future<void> _bootstrap() async {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           remoteConfigServiceProvider.overrideWithValue(_remoteConfig),
+          // Phase 3 : active le catalog remote (Firestore catalog/index)
+          // en override du bundle-only par défaut. Le composite fait le
+          // fallback bundle si remote indisponible. Pas de fetch au boot
+          // (cf OTA v0.2) — il faut un refresh manuel pour récupérer le
+          // remote la première fois.
+          packCatalogRepositoryOverride,
         ],
         child: const _BootGate(child: KilimandjaroApp()),
       ),
