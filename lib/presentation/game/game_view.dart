@@ -646,7 +646,9 @@ class _GameViewState extends ConsumerState<GameView>
           config: config,
         ),
       );
-    } on Exception catch (_) {
+    } on Object catch (_) {
+      // `on Object` (pas `on Exception`) : un tirage épuisé lève un
+      // `StateError`, qui étend `Error` et n'est PAS une `Exception`.
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -659,7 +661,7 @@ class _GameViewState extends ConsumerState<GameView>
   }
 
   /// Coût en cauris pour révéler la réponse à l'écran d'échec en zone
-  /// T3+. Choisi pour rester accessible (~1 victoire T3 = 1 reveal) mais
+  /// T2+. Choisi pour rester accessible (~1 victoire T3 = 1 reveal) mais
   /// créer un vrai sink économique. Constante locale ici parce que ce
   /// levier d'équilibrage économique ne vit que dans le flow d'échec —
   /// à promouvoir vers Remote Config si on veut le tweaker à chaud.
@@ -702,13 +704,13 @@ class _GameViewState extends ConsumerState<GameView>
           .recordSoloLoss(devinetteId: widget.args.devinette.id);
     }
 
-    // Logique de reveal (T3+ uniquement, et seulement en mode montagne
+    // Logique de reveal (T2+ uniquement, et seulement en mode montagne
     // — le Hub n'a pas de structure progression par niveau).
     //
-    // Pour les niveaux T1-T2 OU le mode Hub : on garde le comportement
-    // historique (réponse révélée gratuitement à chaque échec).
+    // Pour les niveaux T1 OU le mode Hub : on garde le comportement
+    // d'amorçage (réponse révélée gratuitement à chaque échec).
     //
-    // Pour T3+ avec mountainId/levelIndex : on incrémente le compteur
+    // Pour T2+ avec mountainId/levelIndex : on incrémente le compteur
     // par niveau et on calcule si la réponse doit être révélée d'office
     // (filet anti-blocage à 3 échecs cumulés sur ce niveau précis).
     final mountainId = widget.args.mountainId;

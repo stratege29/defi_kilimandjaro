@@ -149,7 +149,9 @@ Future<void> launchNextLevel(
         config: config,
       ),
     );
-  } on Exception catch (_) {
+  } on Object catch (_) {
+    // `on Object` (pas `on Exception`) : un tirage épuisé lève un
+    // `StateError`, qui étend `Error` et n'est PAS une `Exception`.
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

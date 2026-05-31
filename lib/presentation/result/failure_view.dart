@@ -12,9 +12,9 @@ import 'package:flutter/material.dart';
 ///
 /// **Deux modes d'affichage**, contrôlés par [answerRevealed] :
 /// - `answerRevealed: true` (default, rétro-compatible) — comportement
-///   historique : la réponse est révélée gratuitement, on encourage à
-///   réessayer. Utilisé en zone tutoriel (Tier 1–2) ET sur les niveaux
-///   T3+ où le joueur a déjà payé le reveal ou cumulé 3 échecs.
+///   d'amorçage : la réponse est révélée gratuitement, on encourage à
+///   réessayer. Utilisé en zone d'amorçage (Tier 1) ET sur les niveaux
+///   T2+ où le joueur a déjà payé le reveal ou cumulé 3 échecs.
 /// - `answerRevealed: false` — la réponse est **masquée**. L'explication
 ///   culturelle reste affichée (la promesse pédagogique survit), et deux
 ///   boutons cohabitent : RÉESSAYER (gratuit, primaire danger) et
@@ -315,7 +315,7 @@ class _FailureCard extends StatelessWidget {
     ];
   }
 
-  /// En-tête en mode "réponse masquée" (T3+ pré-achat, échecs < 3).
+  /// En-tête en mode "réponse masquée" (T2+ pré-achat, échecs < 3).
   /// Affiche "Mot caché" en displayMd rouge + hint italique sur fond
   /// secondaire — préserve l'asymétrie visuelle "ça pique mais ce n'est
   /// pas la fin".

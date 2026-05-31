@@ -50,6 +50,59 @@ class WeightedDevinetteSelectionService implements DevinetteSelectionService {
     }
     final rng = seed != null ? Random(seed) : _rng;
 
+    // Dégradation gracieuse : on relâche les exclusions par paliers tant
+    // qu'aucune devinette n'est trouvée. Servir une répétition vaut mieux
+    // qu'un crash. Palier 0 = anti-répétition complète (recentIds ∪ seen,
+    // fraîcheur ≥ 20 %) ; 1 = on lâche le seen-tracker (B) ; 2 = aucune
+    // exclusion — garantit un tirage tant qu'un pack du mix est non vide.
+    final strategies = <Set<String> Function(String, List<Devinette>)>[
+      (packId, list) => _seenTracker == null
+          ? excludeIds
+          : <String>{
+              ...excludeIds,
+              ..._seenTracker.effectiveExclusions(
+                packId: packId,
+                packTotalCount: list.length,
+              ),
+            },
+      (_, __) => excludeIds,
+      (_, __) => const <String>{},
+    ];
+
+    for (final excludeFor in strategies) {
+      final picked = await _scanPacks(
+        mix: mix,
+        targetDifficulty: targetDifficulty,
+        wordLengthBucket: wordLengthBucket,
+        rng: rng,
+        excludeFor: excludeFor,
+      );
+      if (picked != null) return picked;
+    }
+
+    // Tous les paliers ont échoué, exclusions comprises : la seule cause
+    // possible est qu'aucun pack du mix ne contient la moindre devinette
+    // (config/bundle cassé), pas une simple sur-exclusion.
+    throw StateError(
+      'DevinetteSelectionService: aucun pack du mix '
+      '${mix.weights.keys.toList()} ne contient de devinette '
+      '(targetDifficulty=$targetDifficulty).',
+    );
+  }
+
+  /// Parcourt les packs du mix (pack tiré à la roue d'abord, puis les
+  /// autres en fallback) et renvoie la première devinette compatible, ou
+  /// `null` si chaque pack est épuisé pour le set d'exclusion calculé par
+  /// [excludeFor]. Ne lève jamais : c'est l'appelant qui décide quoi faire
+  /// d'un échec (relâcher les exclusions, ou signaler).
+  Future<Devinette?> _scanPacks({
+    required PackMix mix,
+    required int targetDifficulty,
+    required int? wordLengthBucket,
+    required Random rng,
+    required Set<String> Function(String packId, List<Devinette> list)
+        excludeFor,
+  }) async {
     // On essaie chaque pack du mix au plus une fois — d'abord celui tiré
     // par la roue, puis on tente les autres en cas d'épuisement total.
     final triedPacks = <String>{};
@@ -61,25 +114,11 @@ class WeightedDevinetteSelectionService implements DevinetteSelectionService {
       final packId = orderedPacks.removeAt(0);
       final list = await _repo.loadPack(packId);
 
-      // Fusionne les exclusions "déjà vu" (scopées à ce pack, avec
-      // garantie de fraîcheur ≥ 20 % via le tracker) avec celles du
-      // caller (`recentDevinetteIds`). `list.length` = packTotalCount
-      // effectif post-merge bundle+OTA pour ce pack.
-      final effectiveExclude = _seenTracker == null
-          ? excludeIds
-          : <String>{
-              ...excludeIds,
-              ..._seenTracker.effectiveExclusions(
-                packId: packId,
-                packTotalCount: list.length,
-              ),
-            };
-
       final picked = _pickFromList(
         list: list,
         targetDifficulty: targetDifficulty,
         wordLengthBucket: wordLengthBucket,
-        excludeIds: effectiveExclude,
+        excludeIds: excludeFor(packId, list),
         rng: rng,
       );
       if (picked != null) return picked;
@@ -96,12 +135,7 @@ class WeightedDevinetteSelectionService implements DevinetteSelectionService {
       triedPacks.add(nextId);
       orderedPacks.add(nextId);
     }
-
-    throw StateError(
-      'DevinetteSelectionService: aucun pack du mix '
-      '${mix.weights.keys.toList()} ne contient une devinette compatible '
-      '(targetDifficulty=$targetDifficulty, excludeIds=${excludeIds.length}).',
-    );
+    return null;
   }
 
   /// Sélectionne une devinette dans `list` en respectant la difficulté

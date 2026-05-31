@@ -359,20 +359,19 @@ void main() {
   });
 
   group('LevelDifficultyResolver — revealsAnswerOnFailure', () {
-    test('tier 1-2 (zone tutoriel) révèle la réponse gratuitement', () {
+    test('tier 1 (amorçage) révèle la réponse gratuitement', () {
       final t1 = LevelDifficultyResolver.resolve(
         mountain: _make(id: 't1', altitude: 100),
         levelIndex: 1,
       );
+      expect(t1.revealsAnswerOnFailure, isTrue);
+    });
+
+    test('tier 2+ masque la réponse par défaut (sink économique)', () {
       final t2 = LevelDifficultyResolver.resolve(
         mountain: _make(id: 't2', altitude: 1000),
         levelIndex: 1,
       );
-      expect(t1.revealsAnswerOnFailure, isTrue);
-      expect(t2.revealsAnswerOnFailure, isTrue);
-    });
-
-    test('tier 3+ masque la réponse par défaut (sink économique)', () {
       final t3 = LevelDifficultyResolver.resolve(
         mountain: _make(id: 't3', altitude: 2000),
         levelIndex: 1,
@@ -385,6 +384,7 @@ void main() {
         mountain: _make(id: 't5', altitude: 5000),
         levelIndex: 1,
       );
+      expect(t2.revealsAnswerOnFailure, isFalse);
       expect(t3.revealsAnswerOnFailure, isFalse);
       expect(t4.revealsAnswerOnFailure, isFalse);
       expect(t5.revealsAnswerOnFailure, isFalse);

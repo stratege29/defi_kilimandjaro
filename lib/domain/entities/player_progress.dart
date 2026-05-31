@@ -243,7 +243,7 @@ class PlayerProgress extends Equatable {
   /// Distinct de [consecutiveFailures] (qui est global et sert au
   /// trigger des interstitielles). Ici on suit niveau par niveau pour :
   /// - décider si la réponse doit être révélée gratuitement (≥ 3 échecs
-  ///   consécutifs sur le même niveau, anti-blocage en zone T3+) ;
+  ///   consécutifs sur le même niveau, anti-blocage en zone T2+) ;
   /// - reset à la victoire de **ce** niveau précis.
   ///
   /// Niveaux jamais ratés absents de la map.

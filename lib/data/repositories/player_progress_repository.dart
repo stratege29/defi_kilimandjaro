@@ -201,7 +201,7 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
   ///
   /// Distinct de [recordFailure] (compteur global pour les interstitielles).
   /// Sert au filet anti-blocage du reveal : quand ce compteur atteint 3,
-  /// `GameView` révèle la réponse gratuitement même en zone T3+.
+  /// `GameView` révèle la réponse gratuitement même en zone T2+.
   ///
   /// Reset à 0 dans [recordWin] dès que ce niveau précis est gagné.
   Future<int> recordLevelFailure({

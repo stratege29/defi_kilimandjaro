@@ -106,4 +106,58 @@ void main() {
       expect(seenIds.length, drawsBeforeRecycle);
     },
   );
+
+  test(
+    'dégradation gracieuse : sur-exclusion totale → sert une répétition, '
+    'jamais de StateError',
+    () async {
+      const packId = 'culture_ci';
+      final pack = <Devinette>[
+        for (var i = 0; i < 5; i++) _make(id: 'd$i', pack: packId),
+      ];
+      final repo = _FakeDevinetteRepository(<String, List<Devinette>>{
+        packId: pack,
+      });
+      final prefs = await SharedPreferences.getInstance();
+      final tracker = SeenDevinetteStore(prefs);
+      for (final d in pack) {
+        await tracker.markSolved(packId: packId, devinetteId: d.id);
+      }
+      final service = WeightedDevinetteSelectionService(
+        repository: repo,
+        seenTracker: tracker,
+      );
+
+      // Toutes les ids vues ET passées en excludeIds : les paliers 0 et 1
+      // s'épuisent ; le palier 2 (aucune exclusion) doit servir un mot —
+      // une répétition est préférable à un crash.
+      final d = await service.nextDevinette(
+        mix: PackMix.single(packId),
+        targetDifficulty: 1,
+        excludeIds: <String>{for (final x in pack) x.id},
+        seed: 0,
+      );
+      expect(pack.map((e) => e.id), contains(d.id));
+    },
+  );
+
+  test('pack réellement vide → StateError (vraie erreur de config)', () async {
+    final repo = _FakeDevinetteRepository(<String, List<Devinette>>{
+      'culture_ci': const <Devinette>[],
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final service = WeightedDevinetteSelectionService(
+      repository: repo,
+      seenTracker: SeenDevinetteStore(prefs),
+    );
+    expect(
+      () => service.nextDevinette(
+        mix: PackMix.single('culture_ci'),
+        targetDifficulty: 1,
+        excludeIds: const <String>{},
+        seed: 0,
+      ),
+      throwsStateError,
+    );
+  });
 }
