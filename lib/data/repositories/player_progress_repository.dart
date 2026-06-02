@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
+import 'package:defi_kilimandjaro/data/sync/progress_merge.dart';
 import 'package:defi_kilimandjaro/domain/entities/game_economy_config.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
@@ -471,6 +472,19 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
   /// "même jour" sans se faire piéger par les heures.
   static DateTime _calendarDay(DateTime dt) =>
       DateTime(dt.year, dt.month, dt.day);
+
+  /// Fusionne un instantané **cloud** dans l'état local selon la stratégie
+  /// non destructive « best-of-both » (cf. [mergeProgress]) puis persiste.
+  ///
+  /// Appelé à la restauration multi-appareil (boot + (re)connexion compte).
+  /// Le solde de cauris n'est jamais touché ici : il reste autorité serveur
+  /// (wallet Cloud Functions).
+  Future<void> mergeCloud(PlayerProgress cloud) async {
+    final merged = mergeProgress(state, cloud);
+    if (merged == state) return; // rien de neuf — évite une écriture inutile.
+    state = merged;
+    await _repo.save(merged);
+  }
 
   /// Réinitialisation depuis l'écran Profil.
   Future<void> reset() async {
