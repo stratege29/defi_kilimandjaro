@@ -4,6 +4,7 @@ import 'dart:io' show Platform;
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:defi_kilimandjaro/data/iap/cauris_pack.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/data/wallet/wallet_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logger/logger.dart';
@@ -152,7 +153,11 @@ class IAPService {
       _log.w('Achat reconnu mais produit inconnu: ${purchase.productID}');
       return;
     }
-    await _progress.addCauris(pack.cauris);
+    await _progress.addCauris(
+      pack.cauris,
+      source: CaurisCreditSource.iap,
+      reference: pack.productId,
+    );
     _log.i('+${pack.cauris} cauris crédités via IAP ${pack.productId}');
   }
 

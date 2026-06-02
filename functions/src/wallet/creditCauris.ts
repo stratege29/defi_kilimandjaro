@@ -34,6 +34,14 @@ const Input = z.object({
   source: z.enum(_allowedSources),
   /// Référence optionnelle pour audit (ex: matchId, dailyDate, productId).
   reference: z.string().max(128).optional(),
+  /// Clé d'idempotence (UUID v4 client). Garantit l'exactly-once : un retry
+  /// avec la même clé ne re-crédite pas. Sert d'ID de doc d'audit pour
+  /// dédup transactionnelle. Optionnelle (rétro-compat clients legacy).
+  /// Cf docs/wallet_server_schema.md §3 (outbox idempotent).
+  idempotencyKey: z
+    .string()
+    .regex(/^[A-Za-z0-9_-]{8,128}$/)
+    .optional(),
 });
 
 export type CreditCaurisOutput = {
@@ -55,7 +63,7 @@ export const creditCauris = onCall(
     if (!parsed.success) {
       throw new HttpsError("invalid-argument", parsed.error.message);
     }
-    const { amount, source, reference } = parsed.data;
+    const { amount, source, reference, idempotencyKey } = parsed.data;
 
     const max = CAURIS_CREDIT_MAX_BY_SOURCE[source];
     if (max !== undefined && amount > max) {
@@ -82,9 +90,32 @@ export const creditCauris = onCall(
 
     const db = getFirestore();
     const walletRef = walletDocRef(uid);
-    const auditRef = auditCollectionRef(uid).doc();
+    // Idempotence : la clé client devient l'ID du doc d'audit. Sa présence
+    // dans la transaction prouve que le crédit a déjà été appliqué (le doc
+    // n'est écrit qu'avec la mutation du wallet, atomiquement).
+    const auditRef = idempotencyKey
+      ? auditCollectionRef(uid).doc(idempotencyKey)
+      : auditCollectionRef(uid).doc();
 
     const result = await db.runTransaction(async (tx) => {
+      // Dédup : lecture AVANT toute écriture (contrainte transaction Firestore).
+      if (idempotencyKey) {
+        const auditSnap = await tx.get(auditRef);
+        if (auditSnap.exists) {
+          const prior = auditSnap.data() as {
+            cauris_after?: number;
+            wallet_version_after?: number;
+          };
+          // Replay : no-op idempotent, on renvoie l'état déjà persisté.
+          return {
+            cauris: prior.cauris_after ?? 0,
+            version: prior.wallet_version_after ?? 0,
+            amount: 0,
+            replayed: true,
+          };
+        }
+      }
+
       const walletSnap = await tx.get(walletRef);
       if (!walletSnap.exists) {
         throw new HttpsError(
@@ -126,6 +157,7 @@ export const creditCauris = onCall(
         cauris: newCauris,
         version: newVersion,
         amount: effectiveCredit,
+        replayed: false,
       };
     });
 
@@ -135,8 +167,13 @@ export const creditCauris = onCall(
       requestedAmount: amount,
       effectiveCredit: result.amount,
       newBalance: result.cauris,
+      replayed: result.replayed,
     });
 
-    return result;
+    return {
+      cauris: result.cauris,
+      version: result.version,
+      amount: result.amount,
+    };
   }
 );
