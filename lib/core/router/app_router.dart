@@ -46,7 +46,12 @@ abstract final class AppRoutes {
   static const game = '/game';
   static const result = '/result';
   static const mountains = '/mountains';
-  static const mountain = '/mountain';
+
+  /// Détail d'une montagne — **niché** sous [mountains]. Naviguer via
+  /// `context.go(AppRoutes.mountain, extra: m)` reconstruit la pile
+  /// `[Sommets → détail]` de façon atomique (cf. flux de conquête dans
+  /// `game_view`), ce qui évite l'empilement de détails successifs.
+  static const mountain = '/mountains/mountain';
   static const profile = '/profile';
   static const avatarPicker = '/profile/avatar';
   static const shop = '/shop';
@@ -191,13 +196,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       path: AppRoutes.mountains,
       name: 'mountains',
       builder: (_, __) => const MountainListView(),
-    ),
-    GoRoute(
-      path: AppRoutes.mountain,
-      name: 'mountain',
-      builder: (_, state) => MountainDetailView(
-        mountain: state.extra! as Mountain,
-      ),
+      routes: <RouteBase>[
+        // Détail montagne niché sous Sommets. Le path est relatif
+        // (`mountain`) → résout en `/mountains/mountain` (= AppRoutes.mountain).
+        // Conséquence : `context.go(AppRoutes.mountain, …)` rebâtit la pile
+        // complète [Sommets → détail], donc « retour » ramène toujours au
+        // hub Sommets et les conquêtes en chaîne n'empilent plus de détails.
+        GoRoute(
+          path: 'mountain',
+          name: 'mountain',
+          builder: (_, state) => MountainDetailView(
+            mountain: state.extra! as Mountain,
+          ),
+        ),
+      ],
     ),
     GoRoute(
       path: AppRoutes.profile,

@@ -3,10 +3,13 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
+import 'package:defi_kilimandjaro/data/local/link_prompt_gate.dart';
 import 'package:defi_kilimandjaro/data/repositories/composite_daily_challenge_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/data/services/daily_streak_service.dart';
 import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
+import 'package:defi_kilimandjaro/presentation/auth/link_account_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/continue_ascent_card.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/daily_streak_dialog.dart';
@@ -44,7 +47,18 @@ class _HomeViewState extends ConsumerState<HomeView> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowStreak());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onHomeOpened());
+  }
+
+  /// Enchaîne, à l'ouverture de l'accueil, le popup de série quotidienne
+  /// puis — pour un joueur engagé (série en cours) encore anonyme —
+  /// l'invitation cadencée à lier son compte.
+  Future<void> _onHomeOpened() async {
+    await _maybeShowStreak();
+    if (!mounted) return;
+    final streak = await ref.read(dailyStreakProvider.future);
+    if (!mounted || streak < 2) return;
+    await maybeShowLinkAccountPrompt(context, ref, LinkPromptTrigger.streak);
   }
 
   /// Affiche le popup streak escalier si claimable et pas déjà montré

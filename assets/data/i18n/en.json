@@ -38,6 +38,7 @@
     "briefing": {
       "title_normal": "THE SLOPE STEEPENS",
       "title_boss": "SUMMIT GUARDIAN",
+      "boss_tag": "BOSS",
       "intro_normal": "The climb gets harder. Stay sharp.",
       "intro_boss": "A guardian holds this summit. Hold firm.",
       "cta": "Let's climb",
@@ -126,6 +127,16 @@
     "freeze_buy_full": "Stock full ({max})",
     "freeze_buy_insufficient": "Not enough cauris ({cost} needed)",
     "freeze_saved_banner": "Streak saved by freeze!"
+  },
+  "auth": {
+    "link_prompt": {
+      "title_mountain": "Summit conquered!",
+      "title_duel": "Nice duel!",
+      "title_purchase": "Secure your cauris",
+      "title_streak": "Great streak!",
+      "body": "Link an account to back up your progress, ELO and cauris — and keep them across all your devices.",
+      "later": "Maybe later"
+    }
   },
   "profile": {
     "default_name": "Player",

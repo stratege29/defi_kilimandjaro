@@ -17,6 +17,7 @@ class AnswerCells extends StatefulWidget {
     required this.answer,
     required this.formedLetters,
     required this.isValidated,
+    this.fillFromEnd = false,
     super.key,
   });
 
@@ -27,6 +28,13 @@ class AnswerCells extends StatefulWidget {
 
   /// Passe à true lors d'une validation correcte pour déclencher le flip.
   final bool isValidated;
+
+  /// Modifier `reverse` (« mot à l'envers ») actif : la première lettre
+  /// sélectionnée s'affiche dans la **dernière** case, la deuxième dans
+  /// l'avant-dernière, etc. Les cases se remplissent donc de droite à
+  /// gauche. Validation et indices restent gérés par le controller
+  /// (`expectedAnswer` déjà inversé) — seul l'affichage change ici.
+  final bool fillFromEnd;
 
   @override
   State<AnswerCells> createState() => _AnswerCellsState();
@@ -99,10 +107,15 @@ class _AnswerCellsState extends State<AnswerCells>
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List<Widget>.generate(widget.answer.length, (i) {
-                final hasLetter = i < widget.formedLetters.length;
-                final letter = hasLetter ? widget.formedLetters[i] : '';
+                final n = widget.answer.length;
+                // Position dans la séquence de saisie représentée par la
+                // cellule physique `i`. En mode `fillFromEnd`, la cellule la
+                // plus à droite (i == n-1) porte la 1re lettre saisie.
+                final seqPos = widget.fillFromEnd ? n - 1 - i : i;
+                final hasLetter = seqPos < widget.formedLetters.length;
+                final letter = hasLetter ? widget.formedLetters[seqPos] : '';
                 final displayLetter = widget.isValidated
-                    ? widget.answer[i].toUpperCase()
+                    ? widget.answer[seqPos].toUpperCase()
                     : letter;
                 return _FlipCell(
                   letter: displayLetter,
