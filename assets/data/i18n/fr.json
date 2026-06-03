@@ -128,6 +128,16 @@
     "freeze_buy_insufficient": "Solde insuffisant ({cost} requis)",
     "freeze_saved_banner": "Série sauvée par freeze !"
   },
+  "auth": {
+    "link_prompt": {
+      "title_mountain": "Sommet conquis !",
+      "title_duel": "Beau duel !",
+      "title_purchase": "Sécurise tes cauris",
+      "title_streak": "Belle série !",
+      "body": "Lie un compte pour sauvegarder ta progression, ton ELO et tes cauris — et les retrouver sur tous tes appareils.",
+      "later": "Plus tard"
+    }
+  },
   "profile": {
     "default_name": "Joueur",
     "account": {

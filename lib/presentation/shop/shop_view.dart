@@ -6,8 +6,10 @@ import 'package:defi_kilimandjaro/data/ads/rewarded_daily_cap_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/iap/cauris_pack.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
+import 'package:defi_kilimandjaro/data/local/link_prompt_gate.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
+import 'package:defi_kilimandjaro/presentation/auth/link_account_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -222,6 +224,10 @@ class ShopView extends ConsumerWidget {
       );
       return;
     }
+    // Avant l'achat : proposer (si pertinent) de lier le compte pour
+    // sécuriser les cauris achetés. Non bloquant — l'achat suit ensuite.
+    await maybeShowLinkAccountPrompt(context, ref, LinkPromptTrigger.purchase);
+    if (!context.mounted) return;
     final ok = await ref.read(caurisOffersProvider.notifier).buy(offer.pack);
     if (!context.mounted) return;
     if (!ok) {
