@@ -1,6 +1,10 @@
 import 'dart:convert';
 
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
+import 'package:defi_kilimandjaro/data/sync/progress_merge.dart';
+import 'package:defi_kilimandjaro/data/wallet/cauris_credit_outbox.dart';
+import 'package:defi_kilimandjaro/data/wallet/cauris_credit_sink.dart';
+import 'package:defi_kilimandjaro/data/wallet/wallet_service.dart';
 import 'package:defi_kilimandjaro/domain/entities/game_economy_config.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
@@ -64,12 +68,21 @@ final playerProgressRepositoryProvider = Provider<PlayerProgressRepository>((
 /// État courant de la progression — lu une fois au boot puis muté via
 /// [PlayerProgressNotifier].
 class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
-  PlayerProgressNotifier(this._repo, {int initialCaurisIfNew = 120})
-      : _initialCauris = initialCaurisIfNew,
+  PlayerProgressNotifier(
+    this._repo, {
+    int initialCaurisIfNew = 120,
+    CaurisCreditSink creditSink = const NoopCaurisCreditSink(),
+  })  : _initialCauris = initialCaurisIfNew,
+        _creditSink = creditSink,
         super(_repo.load(initialCauris: initialCaurisIfNew));
 
   final PlayerProgressRepository _repo;
   final int _initialCauris;
+
+  /// Port d'émission des crédits cauris vers le wallet serveur (outbox
+  /// idempotent). No-op par défaut — les gains restent purement locaux tant
+  /// qu'aucun wallet n'est câblé (tests, mode hors-ligne sans compte).
+  final CaurisCreditSink _creditSink;
 
   /// Vrai si le joueur a acheté le pack "Supprimer les pubs". Lecture
   /// publique pour les services qui ont besoin du flag sans avoir besoin
@@ -152,6 +165,11 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     );
     state = newState;
     await _repo.save(newState);
+    _creditSink.enqueue(
+      amount: caurisAwarded,
+      source: CaurisCreditSource.win,
+      reference: devinetteId ?? mountainId,
+    );
   }
 
   /// Anti-tilt — incrémente le compteur de défaites consécutives sur
@@ -254,6 +272,11 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     );
     state = newState;
     await _repo.save(newState);
+    _creditSink.enqueue(
+      amount: caurisBonus,
+      source: CaurisCreditSource.iap,
+      reference: 'starter_pack',
+    );
   }
 
   /// Initialise [PlayerProgress.installDate] si encore null. Appelé une
@@ -378,6 +401,14 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     );
     state = newState;
     await _repo.save(newState);
+    if (awarded > 0) {
+      final day = DateTime(date.year, date.month, date.day);
+      _creditSink.enqueue(
+        amount: awarded,
+        source: CaurisCreditSource.daily,
+        reference: 'daily_${day.toIso8601String()}',
+      );
+    }
     return awarded;
   }
 
@@ -405,11 +436,27 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
 
   /// Ajoute des cauris au solde (utilisé par les achats IAP et les pubs
   /// rewarded vidéo en Phase 4.2).
-  Future<void> addCauris(int amount) async {
+  ///
+  /// [source] indique l'origine du crédit pour le push wallet serveur (outbox
+  /// idempotent). Quand `null`, le crédit reste **purement local** (pas de
+  /// push) — réservé aux crédits déjà réconciliés serveur (ex: adoption d'un
+  /// solde wallet) ou aux tests. [reference] est une trace d'audit optionnelle.
+  Future<void> addCauris(
+    int amount, {
+    CaurisCreditSource? source,
+    String? reference,
+  }) async {
     if (amount <= 0) return;
     final newState = state.copyWith(cauris: state.cauris + amount);
     state = newState;
     await _repo.save(newState);
+    if (source != null) {
+      _creditSink.enqueue(
+        amount: amount,
+        source: source,
+        reference: reference,
+      );
+    }
   }
 
   // ---------------------------------------------------------------------
@@ -464,6 +511,14 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     );
     state = newState;
     await _repo.save(newState);
+    if (claimable.bonus > 0) {
+      final day = DateTime(today.year, today.month, today.day);
+      _creditSink.enqueue(
+        amount: claimable.bonus,
+        source: CaurisCreditSource.streak,
+        reference: 'streak_${day.toIso8601String()}',
+      );
+    }
     return claimable.bonus;
   }
 
@@ -471,6 +526,50 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
   /// "même jour" sans se faire piéger par les heures.
   static DateTime _calendarDay(DateTime dt) =>
       DateTime(dt.year, dt.month, dt.day);
+
+  /// Fusionne un instantané **cloud** dans l'état local selon la stratégie
+  /// non destructive « best-of-both » (cf. [mergeProgress]) puis persiste.
+  ///
+  /// Appelé à la restauration multi-appareil (boot + (re)connexion compte).
+  /// Le solde de cauris n'est jamais touché ici : il reste autorité serveur
+  /// (wallet Cloud Functions).
+  Future<void> mergeCloud(PlayerProgress cloud) async {
+    final merged = mergeProgress(state, cloud);
+    if (merged == state) return; // rien de neuf — évite une écriture inutile.
+    state = merged;
+    await _repo.save(merged);
+  }
+
+  /// Adopte l'état du **wallet serveur** (cauris + packs) dans l'état local,
+  /// de façon **non destructive**, à la (re)connexion de compte.
+  ///
+  /// - **cauris** : `max(local, serveur)`. Le wallet serveur ne reçoit pas
+  ///   les gains in-game (aucun `creditCauris` n'est émis côté app), donc
+  ///   son solde peut être en retard sur le solde local courant. Sur un
+  ///   appareil fraîchement réinstallé, l'inverse est vrai : le local vaut
+  ///   le solde de bienvenue et le serveur détient le vrai solde. `max`
+  ///   couvre les deux sens sans jamais effacer de cauris légitimes.
+  /// - **owned_packs** : union (le pack gratuit d'onboarding ne vit que
+  ///   côté progression locale, les packs achetés vivent côté wallet).
+  ///
+  /// No-op si rien ne change (évite une écriture SharedPreferences inutile).
+  Future<void> adoptWallet({
+    required int serverCauris,
+    required List<String> serverOwnedPacks,
+  }) async {
+    final mergedCauris =
+        serverCauris > state.cauris ? serverCauris : state.cauris;
+    final mergedPacks = <String>{...state.ownedPacks, ...serverOwnedPacks};
+    final caurisChanged = mergedCauris != state.cauris;
+    final packsChanged = mergedPacks.length != state.ownedPacks.length;
+    if (!caurisChanged && !packsChanged) return;
+    final newState = state.copyWith(
+      cauris: mergedCauris,
+      ownedPacks: mergedPacks,
+    );
+    state = newState;
+    await _repo.save(newState);
+  }
 
   /// Réinitialisation depuis l'écran Profil.
   Future<void> reset() async {
@@ -593,6 +692,7 @@ final playerProgressProvider =
       return PlayerProgressNotifier(
         ref.watch(playerProgressRepositoryProvider),
         initialCaurisIfNew: econ.initialCauris,
+        creditSink: ref.watch(caurisCreditOutboxProvider),
       );
     });
 

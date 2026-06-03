@@ -4,6 +4,7 @@ import 'dart:io' show Platform;
 import 'package:defi_kilimandjaro/data/ads/rewarded_daily_cap_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/data/wallet/wallet_service.dart';
 import 'package:defi_kilimandjaro/domain/entities/game_economy_config.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -191,7 +192,10 @@ class AdsService {
 
     await ad.show(
       onUserEarnedReward: (_, __) async {
-        await _progress.addCauris(reward);
+        await _progress.addCauris(
+          reward,
+          source: CaurisCreditSource.rewarded,
+        );
         // Compte la vue **uniquement** quand la récompense est crédité —
         // un dismiss prématuré ne consomme pas le cap (sinon farming par
         // skip).

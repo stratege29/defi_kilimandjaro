@@ -11,12 +11,14 @@ import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/ads/att_service.dart';
 import 'package:defi_kilimandjaro/data/ads/rewarded_daily_cap_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
+import 'package:defi_kilimandjaro/data/local/link_prompt_gate.dart';
 import 'package:defi_kilimandjaro/data/local/seen_devinette_store.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
+import 'package:defi_kilimandjaro/presentation/auth/link_account_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/answer_cells.dart';
@@ -275,13 +277,14 @@ class _GameViewState extends ConsumerState<GameView>
                 totalTime: widget.args.config.timerSeconds,
               ),
               const SizedBox(height: 10),
-              // Answer cells — quand `reverse` est actif on affiche les
-              // cases dans l'ordre de saisie (mot inversé) pour que le
-              // remplissage gauche→droite reste intuitif.
+              // Answer cells — quand `reverse` (« mot à l'envers ») est
+              // actif, les cases se remplissent de droite à gauche : la
+              // 1re lettre saisie va dans la dernière case, etc.
               AnswerCells(
                 answer: gameState.expectedAnswer,
                 formedLetters: gameState.formedWord,
                 isValidated: gameState.validationCorrect,
+                fillFromEnd: gameState.reverseAnswer,
                 revealedPositions: gameState.revealedPositions,
               ),
               const SizedBox(height: 10),
@@ -575,24 +578,40 @@ class _GameViewState extends ConsumerState<GameView>
       // final (Kilimandjaro).
       await _showConquestOverlay(current);
       if (!mounted) return;
+      await maybeShowLinkAccountPrompt(
+        context,
+        ref,
+        LinkPromptTrigger.mountainComplete,
+      );
+      if (!mounted) return;
       context.pop();
       return;
     }
 
-    // Célèbre la conquête, puis bascule vers la montagne suivante.
+    // Célèbre la conquête, propose (si pertinent) de sauvegarder la
+    // progression, puis bascule vers la montagne suivante.
     await _showConquestOverlay(current);
     if (!mounted) return;
-    // Remplace /game par /mountain(suivant) en UNE opération.
+    await maybeShowLinkAccountPrompt(
+      context,
+      ref,
+      LinkPromptTrigger.mountainComplete,
+    );
+    if (!mounted) return;
+    // Bascule vers le détail de la montagne suivante en RÉINITIALISANT la
+    // pile à [Sommets → détail]. `/mountain` étant niché sous `/mountains`
+    // (cf. app_router), `go()` reconstruit toute la pile en UNE opération
+    // atomique. Deux bénéfices :
+    //   1. enchaîner les conquêtes n'empile plus une cascade de /mountain
+    //      (avant : pushReplacement ne remplaçait que /game et laissait le
+    //      détail précédent dessous → « retour » traversait chaque montagne) ;
+    //   2. « retour » depuis le détail ramène toujours au hub Sommets.
     //
     // On NE fait PAS de `pop()` préalable : la partie peut avoir été lancée
-    // directement depuis l'accueil (« continuer l'ascension ») ou le défi du
-    // jour, auquel cas /game est posée sur la racine /home sans /mountain en
-    // dessous. Un pop() consommerait alors cette racine, et le
-    // pushReplacement suivant laisserait la montagne suivante sans aucune
-    // route en dessous → bouton retour mort, joueur bloqué (seul recours :
-    // quitter l'app). pushReplacement échange uniquement la route courante et
-    // préserve toujours la base de la pile.
-    context.pushReplacement(AppRoutes.mountain, extra: next);
+    // depuis l'accueil (« continuer l'ascension ») ou le défi du jour, sans
+    // `/mountain` en dessous. `go()` se moque de la pile d'origine puisqu'il
+    // la remplace intégralement.
+    context.go(AppRoutes.mountain, extra: next);
   }
 
   /// Affiche l'overlay « TU AS CONQUIS » et attend que l'utilisateur tape

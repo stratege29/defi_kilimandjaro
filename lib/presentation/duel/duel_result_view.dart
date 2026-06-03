@@ -5,12 +5,14 @@ import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/data/local/link_prompt_gate.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/matchmaking_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
 import 'package:defi_kilimandjaro/domain/avatars/avatar_catalog.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
+import 'package:defi_kilimandjaro/presentation/auth/link_account_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_controller.dart'
     show lobbyPreviousMatchIdProvider, lobbyRematchUidProvider;
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
@@ -46,6 +48,16 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
   void initState() {
     super.initState();
     _computeEloIfRanked();
+    // Le duel est terminé : moment clé pour inviter (si pertinent) à lier
+    // le compte afin de sécuriser ELO et historique. Non bloquant.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      maybeShowLinkAccountPrompt(
+        context,
+        ref,
+        LinkPromptTrigger.duelFinished,
+      );
+    });
   }
 
   Future<void> _computeEloIfRanked() async {

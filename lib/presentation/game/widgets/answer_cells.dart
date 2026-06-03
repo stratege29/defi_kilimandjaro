@@ -22,6 +22,7 @@ class AnswerCells extends StatefulWidget {
     required this.answer,
     required this.formedLetters,
     required this.isValidated,
+    this.fillFromEnd = false,
     this.revealedPositions = const <int>{},
     super.key,
   });
@@ -34,9 +35,16 @@ class AnswerCells extends StatefulWidget {
   /// Passe à true lors d'une validation correcte pour déclencher le flip.
   final bool isValidated;
 
-  /// Positions (dans [answer]) révélées par l'indice. La case correspondante
-  /// affiche la lettre correcte en aperçu fantôme tant que le joueur ne l'a
-  /// pas formée.
+  /// Modifier `reverse` (« mot à l'envers ») actif : la première lettre
+  /// sélectionnée s'affiche dans la **dernière** case, la deuxième dans
+  /// l'avant-dernière, etc. Les cases se remplissent donc de droite à
+  /// gauche. Validation et indices restent gérés par le controller
+  /// (`expectedAnswer` déjà inversé) — seul l'affichage change ici.
+  final bool fillFromEnd;
+
+  /// Positions (dans [answer], donc déjà en espace `expectedAnswer`)
+  /// révélées par l'indice. La case correspondante affiche la lettre
+  /// correcte en aperçu fantôme tant que le joueur ne l'a pas formée.
   final Set<int> revealedPositions;
 
   @override
@@ -61,8 +69,8 @@ class _AnswerCellsState extends State<AnswerCells>
   late final AnimationController _flipCtrl;
   late final AnimationController _hintCtrl;
 
-  /// Position de la dernière case révélée à animer. `null` tant qu'aucun
-  /// indice n'a été placé dans la session courante du widget.
+  /// Position (espace `answer`) de la dernière case révélée à animer. `null`
+  /// tant qu'aucun indice n'a été placé dans la session courante du widget.
   int? _animHintPos;
 
   @override
@@ -127,28 +135,35 @@ class _AnswerCellsState extends State<AnswerCells>
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List<Widget>.generate(widget.answer.length, (i) {
+                final n = widget.answer.length;
+                // Position dans la séquence de saisie représentée par la
+                // cellule physique `i`. En mode `fillFromEnd`, la cellule la
+                // plus à droite (i == n-1) porte la 1re lettre saisie.
+                final seqPos = widget.fillFromEnd ? n - 1 - i : i;
+
                 // Victoire : flip staggéré de toutes les cases.
                 if (widget.isValidated) {
                   return _FlipCell(
-                    letter: widget.answer[i].toUpperCase(),
+                    letter: widget.answer[seqPos].toUpperCase(),
                     filled: true,
                     flipProgress: _cellProgress(i, _flipCtrl.value),
                     size: cellSize,
                   );
                 }
 
-                final hasPlayerLetter = i < widget.formedLetters.length;
-                final isHint =
-                    !hasPlayerLetter && widget.revealedPositions.contains(i);
+                final hasPlayerLetter = seqPos < widget.formedLetters.length;
+                final isHint = !hasPlayerLetter &&
+                    widget.revealedPositions.contains(seqPos);
                 final kind = hasPlayerLetter
                     ? _CellKind.filled
                     : (isHint ? _CellKind.hint : _CellKind.empty);
                 final letter = hasPlayerLetter
-                    ? widget.formedLetters[i]
-                    : (isHint ? widget.answer[i] : '');
+                    ? widget.formedLetters[seqPos]
+                    : (isHint ? widget.answer[seqPos] : '');
                 // La case révélée la plus récente joue le pop + flip tant que
                 // son controller tourne ; les autres restent statiques.
-                final animating = i == _animHintPos && _hintCtrl.isAnimating;
+                final animating =
+                    seqPos == _animHintPos && _hintCtrl.isAnimating;
 
                 return _PlayCell(
                   letter: letter.toUpperCase(),
