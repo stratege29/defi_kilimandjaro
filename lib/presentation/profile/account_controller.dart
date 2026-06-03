@@ -1,6 +1,8 @@
 import 'package:defi_kilimandjaro/data/local/seen_devinette_store.dart';
 import 'package:defi_kilimandjaro/data/repositories/auth_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/data/sync/progress_sync_service.dart';
+import 'package:defi_kilimandjaro/data/wallet/wallet_sync.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// État UI transient des actions de compte (liaison, déconnexion, suppression).
@@ -57,11 +59,18 @@ class AccountController extends StateNotifier<AccountUiState> {
       final outcome = await action();
       switch (outcome) {
         case LinkOutcome.linked:
+          // Compte fraîchement lié (même uid) : sauvegarde l'état local
+          // sous l'identité désormais pérenne.
+          await _restoreCloudProgress();
           state = state.copyWith(
             isBusy: false,
             notice: () => 'profile.account.linked_success',
           );
         case LinkOutcome.switchedToExisting:
+          // Bascule vers un compte existant (uid différent) : on récupère
+          // sa sauvegarde cloud et on la fusionne (best-of-both) avec la
+          // progression du device courant.
+          await _restoreCloudProgress();
           state = state.copyWith(
             isBusy: false,
             notice: () => 'profile.account.switched_notice',
@@ -111,6 +120,24 @@ class AccountController extends StateNotifier<AccountUiState> {
         isBusy: false,
         error: () => 'profile.account.delete_error',
       );
+    }
+  }
+
+  /// Récupère + fusionne la progression cloud du compte courant, *fail-soft*.
+  /// Une erreur de sync ne doit jamais transformer une liaison réussie en
+  /// échec côté UI.
+  ///
+  /// Deux sources distinctes sont réconciliées :
+  /// - **wallet serveur** (cauris + packs achetés), autorité serveur ;
+  /// - **player_progress** (niveaux, étoiles, séries, freeze tokens…), hors
+  ///   solde.
+  Future<void> _restoreCloudProgress() async {
+    try {
+      // Solde + packs d'abord (autorité serveur), puis la progression solo.
+      await _ref.read(walletSyncCoordinatorProvider).reconcileOnLogin();
+      await _ref.read(progressSyncCoordinatorProvider).restoreAndBackup();
+    } on Object {
+      // best-effort : la sauvegarde debouncée re-tentera au prochain gain.
     }
   }
 

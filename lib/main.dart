@@ -14,6 +14,8 @@ import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/composite_pack_catalog_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/fcm_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/data/sync/progress_sync_service.dart';
+import 'package:defi_kilimandjaro/data/wallet/wallet_sync.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/firebase_options.dart';
 import 'package:defi_kilimandjaro/presentation/duel/incoming_challenge_listener.dart';
@@ -312,6 +314,21 @@ class _BootGateState extends ConsumerState<_BootGate> {
         ref
             .read(playerProgressProvider.notifier)
             .ensureInstallDate(DateTime.now()),
+      );
+
+      // Sync cloud de la progression solo (récupération multi-appareil).
+      // 1. Installe la sauvegarde debouncée (push 3 s après chaque gain).
+      // 2. Réconcilie le wallet serveur (cauris + packs) puis restaure +
+      //    repousse la progression solo. Fail-soft : n'affecte jamais le
+      //    jeu offline. La restauration décisive a lieu après une
+      //    (re)connexion de compte (cf. AccountController).
+      ref.read(progressAutoBackupProvider);
+      unawaited(
+        ref.read(walletSyncCoordinatorProvider).reconcileOnLogin().whenComplete(
+              () => ref
+                  .read(progressSyncCoordinatorProvider)
+                  .restoreAndBackup(),
+            ),
       );
 
       // FCM token storage (permission + persistance Firestore).

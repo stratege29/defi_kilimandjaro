@@ -281,6 +281,26 @@ service cloud.firestore {
     }
 
     // -------------------------------------------------------------------------
+    // Progression solo (sauvegarde multi-appareil) — player_progress/{uid}
+    // -------------------------------------------------------------------------
+    // Miroir cloud de la progression solo (niveaux, étoiles, séries, freeze
+    // tokens, packs possédés, modifiers rencontrés…) pour la récupération
+    // après réinstallation/changement d'appareil. Lecture/écriture limitées
+    // au propriétaire.
+    //
+    // ⚠️ Le solde de **cauris** n'est JAMAIS stocké ici : c'est une monnaie,
+    // autorité serveur via le wallet Cloud Functions (users/{uid}/inventory).
+    // On refuse explicitement les clés `cauris`/`coins` pour fermer tout
+    // vecteur d'inflation via un doc client-inscriptible.
+    match /player_progress/{uid} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if isSignedIn()
+        && request.auth.uid == uid
+        && !('cauris' in request.resource.data)
+        && !('coins' in request.resource.data);
+    }
+
+    // -------------------------------------------------------------------------
     // Default deny
     // -------------------------------------------------------------------------
     match /{document=**} {

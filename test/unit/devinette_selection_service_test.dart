@@ -320,4 +320,57 @@ void main() {
       );
     });
   });
+
+  group('Fallback packs possédés (mix actif vide)', () {
+    test('mix actif vide + secours non vide → tire du secours', () async {
+      final repo = _FakeDevinetteRepository({
+        'football_ci': const <Devinette>[], // pack actif vide (OTA absent)
+        'culture_ci': [_make(id: 'c1', pack: 'culture_ci')],
+      });
+      final service = WeightedDevinetteSelectionService(repository: repo);
+      final d = await service.nextDevinette(
+        mix: PackMix.single('football_ci'),
+        targetDifficulty: 1,
+        excludeIds: const <String>{},
+        fallbackPackIds: const <String>{'football_ci', 'culture_ci'},
+        seed: 0,
+      );
+      expect(d.id, 'c1');
+    });
+
+    test('secours déjà dans le mix → ignoré, StateError', () async {
+      // Le seul pack de secours est celui (vide) du mix : pas de vrai
+      // secours, donc on doit retomber sur l'erreur dure.
+      final repo = _FakeDevinetteRepository({
+        'football_ci': const <Devinette>[],
+      });
+      final service = WeightedDevinetteSelectionService(repository: repo);
+      expect(
+        () => service.nextDevinette(
+          mix: PackMix.single('football_ci'),
+          targetDifficulty: 1,
+          excludeIds: const <String>{},
+          fallbackPackIds: const <String>{'football_ci'},
+          seed: 0,
+        ),
+        throwsStateError,
+      );
+    });
+
+    test('sans fallbackPackIds → comportement legacy (StateError)', () async {
+      final repo = _FakeDevinetteRepository({
+        'football_ci': const <Devinette>[],
+      });
+      final service = WeightedDevinetteSelectionService(repository: repo);
+      expect(
+        () => service.nextDevinette(
+          mix: PackMix.single('football_ci'),
+          targetDifficulty: 1,
+          excludeIds: const <String>{},
+          seed: 0,
+        ),
+        throwsStateError,
+      );
+    });
+  });
 }
