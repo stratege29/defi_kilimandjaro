@@ -27,6 +27,7 @@ class GameState {
     required this.shuffledIndices,
     required this.effectivePool,
     this.hintRevealedCount = 0,
+    this.revealedPositions = const <int>{},
     this.validationCorrect = false,
     this.reverseAnswer = false,
     this.starsEarned = 0,
@@ -52,8 +53,17 @@ class GameState {
   /// Permutation des indices de [effectivePool] (Fisher-Yates au départ).
   final List<int> shuffledIndices;
 
-  /// Nombre de lettres révélées par l'indice.
+  /// Nombre de lettres révélées par l'indice. Égal à `revealedPositions.length`
+  /// ; conservé comme compteur pour le scaling du coût et le calcul des
+  /// étoiles (« sans indice »).
   final int hintRevealedCount;
+
+  /// Positions (dans [expectedAnswer]) révélées par l'indice. Chaque appel à
+  /// [GameController.useHint] place une lettre correcte dans une case encore
+  /// non révélée tirée au hasard. `AnswerCells` l'affiche en aperçu fantôme
+  /// (avec une animation pop + flip) jusqu'à ce que le joueur forme
+  /// réellement la lettre dans la roue.
+  final Set<int> revealedPositions;
 
   /// Vrai juste après une validation correcte (pour déclencher le flash).
   final bool validationCorrect;
@@ -82,7 +92,7 @@ class GameState {
 
   /// Séquence de lettres attendue compte tenu du modifier `reverse`.
   /// Stockée comme String pour permettre l'égalité directe avec
-  /// [formedWord] et l'itération par indice dans [hintTileIndices].
+  /// [formedWord] et le placement des lettres par indice ([revealedPositions]).
   String get expectedAnswer => reverseAnswer
       ? String.fromCharCodes(devinette.answer.runes.toList().reversed)
       : devinette.answer;
@@ -101,36 +111,6 @@ class GameState {
 
   bool get isComplete => selectedIndices.length == devinette.answer.length;
 
-  /// Indices de tuiles (positions dans la grille shufflée) révélées par
-  /// l'indice — pour les `hintRevealedCount` premières lettres de la
-  /// réponse. Chaque entrée pointe sur la prochaine occurrence disponible
-  /// dans le pool (gestion des doublons type "FOUTOU" avec 2× O et 2× U).
-  ///
-  /// L'ancienne logique `i < hintRevealedCount` dans la grille traitait
-  /// `hintRevealedCount` comme un index sur l'ordre physique du cercle,
-  /// ce qui révélait une tuile aléatoire au lieu de pointer la prochaine
-  /// lettre de la réponse.
-  List<int> get hintTileIndices {
-    final answer = expectedAnswer;
-    final n = hintRevealedCount.clamp(0, answer.length);
-    if (n == 0) return const <int>[];
-    final used = <int>{};
-    final result = <int>[];
-    for (var k = 0; k < n; k++) {
-      final target = answer[k];
-      for (var gridIdx = 0; gridIdx < shuffledIndices.length; gridIdx++) {
-        if (used.contains(gridIdx)) continue;
-        final letter = effectivePool[shuffledIndices[gridIdx]];
-        if (letter == target) {
-          result.add(gridIdx);
-          used.add(gridIdx);
-          break;
-        }
-      }
-    }
-    return result;
-  }
-
   GameState copyWith({
     Devinette? devinette,
     List<int>? selectedIndices,
@@ -140,6 +120,7 @@ class GameState {
     List<int>? shuffledIndices,
     List<String>? effectivePool,
     int? hintRevealedCount,
+    Set<int>? revealedPositions,
     bool? validationCorrect,
     bool? reverseAnswer,
     int? starsEarned,
@@ -155,6 +136,7 @@ class GameState {
       shuffledIndices: shuffledIndices ?? this.shuffledIndices,
       effectivePool: effectivePool ?? this.effectivePool,
       hintRevealedCount: hintRevealedCount ?? this.hintRevealedCount,
+      revealedPositions: revealedPositions ?? this.revealedPositions,
       validationCorrect: validationCorrect ?? this.validationCorrect,
       reverseAnswer: reverseAnswer ?? this.reverseAnswer,
       starsEarned: starsEarned ?? this.starsEarned,
@@ -325,9 +307,11 @@ class GameController extends StateNotifier<GameState> {
   /// intra-niveau : 1er = base, 2e = base × multiplier, etc.).
   int get nextHintCost => _economy.hintCostForIndex(state.hintRevealedCount);
 
-  /// Révèle la prochaine lettre. Le coût est progressif intra-niveau
-  /// (cf. [GameEconomyConfig.hintCostMultiplier]) — 1er indice au prix
-  /// de base, suivants multipliés.
+  /// Place une lettre correcte dans une case **au hasard** parmi celles
+  /// encore non révélées, et l'affiche en aperçu dans `AnswerCells` (le
+  /// joueur doit toujours la former dans la roue pour valider). Le coût
+  /// est progressif intra-niveau (cf. [GameEconomyConfig.hintCostMultiplier])
+  /// — 1er indice au prix de base, suivants multipliés.
   void useHint() {
     if (state.phase != GamePhase.playing) return;
     if (state.hintRevealedCount >= state.devinette.answer.length) return;
@@ -340,9 +324,19 @@ class GameController extends StateNotifier<GameState> {
     final hasFreeHint = _progress.state.freeHintAvailable;
     if (!hasFreeHint && state.cauris < cost) return;
 
+    // Tire une position de la réponse encore non révélée (au hasard).
+    final answerLen = state.expectedAnswer.length;
+    final candidates = <int>[
+      for (var p = 0; p < answerLen; p++)
+        if (!state.revealedPositions.contains(p)) p,
+    ];
+    if (candidates.isEmpty) return;
+    final pos = candidates[_modifierRng.nextInt(candidates.length)];
+
     state = state.copyWith(
       cauris: hasFreeHint ? state.cauris : state.cauris - cost,
       hintRevealedCount: state.hintRevealedCount + 1,
+      revealedPositions: <int>{...state.revealedPositions, pos},
     );
 
     // Persist deduction (consomme d'abord le freebie, sinon débite).

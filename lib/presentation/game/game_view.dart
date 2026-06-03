@@ -282,6 +282,7 @@ class _GameViewState extends ConsumerState<GameView>
                 answer: gameState.expectedAnswer,
                 formedLetters: gameState.formedWord,
                 isValidated: gameState.validationCorrect,
+                revealedPositions: gameState.revealedPositions,
               ),
               const SizedBox(height: 10),
               // Circular tile grid — `Expanded` absorbe l'espace gagné par
@@ -291,7 +292,6 @@ class _GameViewState extends ConsumerState<GameView>
                   child: CircularGrid(
                     letters: gameState.displayLetters,
                     selectedIndices: gameState.selectedIndices,
-                    hintTileIndices: gameState.hintTileIndices,
                     hiddenIndices: gameState.fogHiddenIndices,
                     shuffledIndices: gameState.shuffledIndices,
                     phase: gameState.phase,

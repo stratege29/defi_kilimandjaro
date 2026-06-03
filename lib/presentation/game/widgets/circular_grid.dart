@@ -28,7 +28,6 @@ class CircularGrid extends StatefulWidget {
   const CircularGrid({
     required this.letters,
     required this.selectedIndices,
-    required this.hintTileIndices,
     required this.phase,
     required this.onTileEntered,
     required this.onDragEnd,
@@ -53,11 +52,6 @@ class CircularGrid extends StatefulWidget {
 
   /// Indices des tuiles sélectionnées.
   final List<int> selectedIndices;
-
-  /// Indices des tuiles à mettre en surbrillance « indice » — calculés
-  /// par `GameState.hintTileIndices` pour pointer la prochaine lettre
-  /// de la réponse (et non une tuile aléatoire de la grille).
-  final List<int> hintTileIndices;
 
   /// Indices des tuiles masquées par le modifier `fog`. Rendues avec
   /// opacité 0 et ignorées par le hit-test. Tournent toutes les 5 s
@@ -401,7 +395,6 @@ class _CircularGridState extends State<CircularGrid>
                   ...List<Widget>.generate(count, (i) {
                     final center = layout.centers[i];
                     final isSelected = widget.selectedIndices.contains(i);
-                    final isHint = widget.hintTileIndices.contains(i);
                     final isHidden = widget.hiddenIndices.contains(i);
                     // Clé stable : si shuffledIndices est fourni, on prend
                     // l'index du pool sous-jacent (identité de la lettre,
@@ -426,7 +419,6 @@ class _CircularGridState extends State<CircularGrid>
                         child: _Tile(
                           letter: widget.letters[i],
                           isSelected: isSelected,
-                          isHint: isHint,
                           selectionOrder: isSelected
                               ? widget.selectedIndices.indexOf(i) + 1
                               : null,
@@ -454,13 +446,11 @@ class _Tile extends StatefulWidget {
   const _Tile({
     required this.letter,
     required this.isSelected,
-    required this.isHint,
     this.selectionOrder,
   });
 
   final String letter;
   final bool isSelected;
-  final bool isHint;
   final int? selectionOrder;
 
   @override
@@ -520,13 +510,6 @@ class _TileState extends State<_Tile> with SingleTickerProviderStateMixin {
         AppColors.orJour,
       ];
       edge = AppColors.orCrepuscule;
-      textColor = AppColors.surface;
-    } else if (widget.isHint) {
-      gradient = <Color>[
-        Color.lerp(AppColors.success, AppColors.textePrimaire, 0.20)!,
-        AppColors.success,
-      ];
-      edge = AppColors.successSoft;
       textColor = AppColors.surface;
     } else {
       gradient = <Color>[

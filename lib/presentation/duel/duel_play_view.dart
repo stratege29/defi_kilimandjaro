@@ -277,7 +277,6 @@ class _GameplayContent extends StatelessWidget {
                 key: ValueKey<String>('circular-grid-${session.currentRound}'),
                 letters: session.lettersPool,
                 selectedIndices: localState.selectedIndices,
-                hintTileIndices: const <int>[],
                 phase: localState.submitted
                     ? GamePhase.won
                     : (localState.timeLeft == 0
