@@ -7,19 +7,15 @@ import 'package:flutter/material.dart';
 
 /// Écran de sign-in (public, monté quand le user n'est pas authentifié).
 ///
-/// Sur Web, on utilise `signInWithRedirect` plutôt que `signInWithPopup` :
+/// Web : `signInWithPopup` par défaut (le flux le plus fiable en Chrome/Edge ;
+/// c'est la méthode recommandée par Firebase pour les navigateurs qui bloquent
+/// le stockage tiers). `signInWithRedirect` est dispo en fallback via le toggle
+/// (affiché en cas d'erreur), mais FlutterFire web a un bug connu où
+/// getRedirectResult() peut retourner null.
 ///
-///   - signInWithPopup échoue sur localhost à cause de Cross-Origin-Opener-Policy
-///     (COOP) qui empêche la fenêtre popup OAuth de communiquer le résultat à
-///     la fenêtre parent. Symptôme : la popup s'ouvre, fait l'OAuth, puis se
-///     referme avec un "Error" générique sans connecter l'utilisateur.
-///
-///   - signInWithRedirect redirige la page entière → pas de cross-window
-///     communication → pas de problème COOP. Au retour, `getRedirectResult()`
-///     dans main() récupère le user.
-///
-/// La récupération du résultat est dans `main.dart` (cf `getRedirectResult`
-/// avant `runApp`). Le router redirect prend ensuite le relais.
+/// NB Safari : il existe un bug de pointer-events de Flutter web sur certaines
+/// versions de Safari où les clics ne sont pas dispatchés à l'app. Si rien ne
+/// réagit au clic, utiliser Chrome/Edge (l'admin console est un outil interne).
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -31,21 +27,7 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _signingIn = false;
   String? _error;
   String? _errorDetail;
-  // Popup par défaut : signInWithRedirect a un bug connu sur Flutter Web où
-  // getRedirectResult() retourne null silencieusement après le retour de
-  // Google → l'user repart sur l'écran sign-in (cf flutterfire issue #9601).
-  // Popup marche avec les headers COOP correctement set côté serveur dev :
-  //   flutter run -d chrome \
-  //     --web-header="Cross-Origin-Opener-Policy=same-origin-allow-popups" \
-  //     --web-header="Cross-Origin-Embedder-Policy=unsafe-none"
-  // Redirect par défaut sur web. Sur Safari/WebKit le POPUP est bloqué
-  // (confirmé : "rien ne s'ouvre" même en navigation privée). signInWithRedirect
-  // évite le popup-blocker (navigation pleine page) ET, comme l'authDomain est
-  // désormais same-origin (kilimandjaro-admin-dev.web.app), le helper
-  // /__/auth/handler est first-party → l'ITP de Safari ne bloque plus l'état
-  // d'auth (le redirect cross-domain, lui, était bloqué). getRedirectResult()
-  // est récupéré dans main.dart au retour.
-  bool _useRedirect = true;
+  bool _useRedirect = false;
 
   String _firebaseDiagnostic() {
     try {
@@ -79,26 +61,9 @@ class _SignInScreenState extends State<SignInScreen> {
         ..addScope('profile');
       if (kIsWeb) {
         if (_useRedirect) {
-          developer.log(
-            '[SIGN-IN] calling signInWithRedirect…',
-            name: 'admin.signin',
-          );
           await FirebaseAuth.instance.signInWithRedirect(provider);
-          developer.log(
-            '[SIGN-IN] signInWithRedirect returned (shouldnt — page should navigate)',
-            name: 'admin.signin',
-          );
         } else {
-          developer.log(
-            '[SIGN-IN] calling signInWithPopup (fallback)…',
-            name: 'admin.signin',
-          );
-          final cred =
-              await FirebaseAuth.instance.signInWithPopup(provider);
-          developer.log(
-            '[SIGN-IN] popup OK uid=${cred.user?.uid}',
-            name: 'admin.signin',
-          );
+          await FirebaseAuth.instance.signInWithPopup(provider);
         }
       } else {
         await FirebaseAuth.instance.signInWithProvider(provider);
@@ -178,19 +143,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       )
                     : const Icon(Icons.login),
                 label: Text(
-                  _signingIn
-                      ? 'Connexion…'
-                      : 'Se connecter avec Google',
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Marqueur de build (diagnostic cache) — confirme qu'on charge
-              // bien la dernière version déployée.
-              Text(
-                'build: redirect-v8 · authDomain same-origin',
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.white.withValues(alpha: 0.35),
+                  _signingIn ? 'Connexion…' : 'Se connecter avec Google',
                 ),
               ),
               if (_error != null) ...[
@@ -203,7 +156,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       color: Theme.of(context)
                           .colorScheme
                           .errorContainer
-                          .withOpacity(0.3),
+                          .withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: Theme.of(context).colorScheme.error,
@@ -253,8 +206,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   },
                   child: Text(
                     _useRedirect
-                        ? 'Essayer en mode popup (fallback)'
-                        : 'Revenir au mode redirect',
+                        ? 'Essayer en mode popup'
+                        : 'Essayer en mode redirect',
                     style: const TextStyle(fontSize: 12),
                   ),
                 ),
