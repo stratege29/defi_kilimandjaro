@@ -7,13 +7,13 @@ import 'package:equatable/equatable.dart';
 /// Persisté via shared_preferences (Phase 2.3, v1).
 /// Évolution v2 : sync Firestore quand authentifié (Phase 4 + multijoueur).
 class PlayerProgress extends Equatable {
-  PlayerProgress({
+  const PlayerProgress({
     required this.cauris,
     required this.completedLevelsByMountain,
     required this.totalLevelsCompleted,
     required this.dailyStreak,
     required this.ownedPacks,
-    PackMix? activePackMix,
+    this.activePackId,
     this.lastPlayDate,
     this.lastStreakClaimDate,
     this.installDate,
@@ -32,8 +32,7 @@ class PlayerProgress extends Equatable {
     this.lastFreeHintGrantedDate,
     this.encounteredModifiers = const <LevelModifier>{},
     this.consecutiveLossesByDevinetteId = const <String, int>{},
-  }) : activePackMix =
-           activePackMix ?? _defaultPackMix(ownedPacks, freePackChosen);
+  });
 
   /// État initial pour un nouveau joueur.
   ///
@@ -52,7 +51,6 @@ class PlayerProgress extends Equatable {
     totalLevelsCompleted: 0,
     dailyStreak: 0,
     ownedPacks: const <String>{},
-    activePackMix: _placeholderMix,
   );
 
   factory PlayerProgress.fromJson(Map<String, dynamic> json) {
@@ -62,13 +60,38 @@ class PlayerProgress extends Equatable {
             .toSet();
     final freePack = json['free_pack_chosen'] as String?;
     final parsedMix = PackMix.tryFromJson(json['pack_mix']);
+
+    // Pack actif : champ explicite v2, sinon dérivé du mix (pack dominant)
+    // ou du pack gratuit — rétrocompat des profils v1.
+    final activePackId = (json['active_pack_id'] as String?) ??
+        _dominantPackOf(parsedMix) ??
+        freePack;
+
+    // Migration v1 → v2 : avant la progression par pack, les clés de
+    // progression étaient globales (`mountainId`, `mountainId#levelIndex`).
+    // En v2 elles sont préfixées par le pack (`packId::…`). On rattache la
+    // progression existante au pack actif/gratuit (décision produit).
+    final schemaVersion = (json['schema_version'] as int?) ?? 1;
+    final migrationPack = (activePackId != null &&
+            activePackId.isNotEmpty &&
+            activePackId != packPendingSentinel)
+        ? activePackId
+        : null;
+
+    Map<String, int> readMap(String key) =>
+        ((json[key] as Map<String, dynamic>?) ?? <String, dynamic>{})
+            .map((k, v) => MapEntry(k, v as int));
+
+    Map<String, int> migrateKeys(Map<String, int> m) {
+      if (schemaVersion >= 2 || migrationPack == null || m.isEmpty) return m;
+      return m.map((k, v) => MapEntry('$migrationPack::$k', v));
+    }
+
     return PlayerProgress(
       // Tolère l'ancienne clé `coins` pour ne pas perdre le solde des
       // joueurs existants après le rebranding Cauris.
       cauris: (json['cauris'] as int?) ?? (json['coins'] as int?) ?? 120,
-      completedLevelsByMountain:
-          ((json['levels'] as Map<String, dynamic>?) ?? <String, dynamic>{})
-              .map((k, v) => MapEntry(k, v as int)),
+      completedLevelsByMountain: migrateKeys(readMap('levels')),
       totalLevelsCompleted: (json['total'] as int?) ?? 0,
       dailyStreak: (json['streak'] as int?) ?? 0,
       lastPlayDate: json['last_play'] == null
@@ -89,14 +112,9 @@ class PlayerProgress extends Equatable {
               .toList(growable: false),
       ownedPacks: ownedPacks,
       freePackChosen: freePack,
-      activePackMix:
-          parsedMix ?? _defaultPackMix(ownedPacks, freePack),
-      starsByLevel: ((json['stars_by_level'] as Map<String, dynamic>?) ??
-              <String, dynamic>{})
-          .map((k, v) => MapEntry(k, v as int)),
-      failsByLevel: ((json['fails_by_level'] as Map<String, dynamic>?) ??
-              <String, dynamic>{})
-          .map((k, v) => MapEntry(k, v as int)),
+      activePackId: activePackId,
+      starsByLevel: migrateKeys(readMap('stars_by_level')),
+      failsByLevel: migrateKeys(readMap('fails_by_level')),
       dailyChallengeStreak: (json['daily_challenge_streak'] as int?) ?? 0,
       lastDailyChallengeDate: json['last_daily_challenge_date'] == null
           ? null
@@ -140,32 +158,28 @@ class PlayerProgress extends Equatable {
     return result;
   }
 
-  /// Mix utilisé tant que l'onboarding n'a pas tranché — pointe sur un
-  /// pack-token sentinelle (`_pending_`) pour signaler "non choisi". Le
-  /// tirage doit refuser ce mix : l'app ne doit pas démarrer une partie
-  /// avant que l'utilisateur ait choisi son pack gratuit.
-  ///
-  /// Toujours préférer le getter [activePackMix] de l'instance courante
-  /// + le drapeau [hasChosenFreePack] dans la couche présentation.
-  static final PackMix _placeholderMix = PackMix.single(packPendingSentinel);
-
   /// Sentinelle utilisée par le mix par défaut avant choix du pack gratuit.
-  /// Ne doit jamais être passée à un repository de devinettes.
+  /// Le tirage doit refuser ce token : l'app ne doit pas démarrer une partie
+  /// avant que l'utilisateur ait choisi son pack gratuit. Ne doit jamais
+  /// être passée à un repository de devinettes.
   static const String packPendingSentinel = '_pending_';
 
-  /// Construit un mix par défaut cohérent à partir de l'état persisté.
-  /// Précédence : `freePackChosen` > 1er `ownedPacks` > sentinelle.
-  static PackMix _defaultPackMix(
-    Set<String> ownedPacks,
-    String? freePackChosen,
-  ) {
-    if (freePackChosen != null && freePackChosen.isNotEmpty) {
-      return PackMix.single(freePackChosen);
-    }
-    if (ownedPacks.isNotEmpty) {
-      return PackMix.single(ownedPacks.first);
-    }
-    return _placeholderMix;
+  /// Extrait le pack dominant (poids max) d'un ancien `pack_mix` persisté —
+  /// sert à dériver le `activePackId` v2 depuis un profil v1 qui ne stockait
+  /// qu'un mix pondéré. `null` si le mix est absent, vide ou sentinelle.
+  static String? _dominantPackOf(PackMix? mix) {
+    if (mix == null || mix.packIds.isEmpty) return null;
+    final weights = mix.weights;
+    String? best;
+    var bestWeight = -1.0;
+    weights.forEach((packId, weight) {
+      if (packId == packPendingSentinel) return;
+      if (weight > bestWeight) {
+        bestWeight = weight;
+        best = packId;
+      }
+    });
+    return best;
   }
 
   /// Solde de Cauris de Sagesse (cauris = monnaie shell d'Afrique de l'Ouest).
@@ -226,19 +240,48 @@ class PlayerProgress extends Equatable {
   /// n'a pas tranché.
   final String? freePackChosen;
 
-  /// Pondération active pour le tirage des devinettes.
-  /// Default = `PackMix.single(freePackChosen)` quand un pack est choisi,
-  /// sinon mix sentinelle (`_pending_`).
-  final PackMix activePackMix;
+  /// Pack **actif** (modèle « pack actif unique ») : c'est lui qui alimente
+  /// le tirage des devinettes ET la grimpe de montagnes courante. Changer de
+  /// pack actif = changer de grimpe (progression par pack). `null` tant que
+  /// l'onboarding n'a pas tranché → on retombe sur [freePackChosen].
+  final String? activePackId;
 
-  /// Étoiles obtenues par niveau (clé = `"$mountainId#$levelIndex"`, 1-3).
-  /// Garde toujours le meilleur score d'un re-run (cf. `mergeStars` dans
-  /// `PlayerProgressNotifier.recordWin`). Niveaux non joués absents de la
-  /// map.
+  /// Pack actif résolu pour la construction des clés de progression. Vide
+  /// (`''`) tant qu'aucun pack n'est choisi — aucune partie ne devrait avoir
+  /// lieu dans cet état, mais les clés restent inoffensives.
+  String get _activePackForKeys {
+    final a = activePackId;
+    if (a != null && a.isNotEmpty && a != packPendingSentinel) return a;
+    final f = freePackChosen;
+    if (f != null && f.isNotEmpty) return f;
+    if (ownedPacks.isNotEmpty) return ownedPacks.first;
+    return '';
+  }
+
+  /// Pondération active dérivée pour le tirage des devinettes — toujours
+  /// mono-pack (modèle « pack actif unique »). Retombe sur le sentinelle
+  /// `_pending_` tant qu'aucun pack n'est choisi, ce que le tirage refuse.
+  PackMix get activePackMix {
+    final resolved = _activePackForKeys;
+    return PackMix.single(resolved.isEmpty ? packPendingSentinel : resolved);
+  }
+
+  /// Clé de progression « niveaux complétés » du pack actif sur [mountainId].
+  String mountainProgressKey(String mountainId) =>
+      '$_activePackForKeys::$mountainId';
+
+  /// Clé de progression niveau (étoiles / échecs) du pack actif.
+  String levelKey(String mountainId, int levelIndex) =>
+      '$_activePackForKeys::$mountainId#$levelIndex';
+
+  /// Étoiles obtenues par niveau (clé = `"$packId::$mountainId#$levelIndex"`,
+  /// 1-3). Garde toujours le meilleur score d'un re-run (cf. `mergeStars`
+  /// dans `PlayerProgressNotifier.recordWin`). Niveaux non joués absents de
+  /// la map.
   final Map<String, int> starsByLevel;
 
   /// Compteur d'échecs **consécutifs sur le même niveau** (clé =
-  /// `"$mountainId#$levelIndex"`).
+  /// `"$packId::$mountainId#$levelIndex"`).
   ///
   /// Distinct de [consecutiveFailures] (qui est global et sert au
   /// trigger des interstitielles). Ici on suit niveau par niveau pour :
@@ -320,6 +363,9 @@ class PlayerProgress extends Equatable {
   bool get hasChosenFreePack => freePackChosen != null;
 
   Map<String, dynamic> toJson() => <String, dynamic>{
+    // v2 : progression par pack (clés `packId::…`). L'absence de ce champ
+    // au load signale un profil v1 à migrer (cf. [PlayerProgress.fromJson]).
+    'schema_version': 2,
     'cauris': cauris,
     'levels': completedLevelsByMountain,
     'total': totalLevelsCompleted,
@@ -334,6 +380,9 @@ class PlayerProgress extends Equatable {
     'recent_devinettes': recentDevinetteIds,
     'owned_packs': ownedPacks.toList(growable: false),
     if (freePackChosen != null) 'free_pack_chosen': freePackChosen,
+    if (activePackId != null) 'active_pack_id': activePackId,
+    // Conservé pour rétrocompat : une ancienne version de l'app (ou le merge
+    // cloud d'un appareil v1) lit encore `pack_mix`. Toujours mono-pack.
     'pack_mix': activePackMix.toJson(),
     if (starsByLevel.isNotEmpty) 'stars_by_level': starsByLevel,
     if (failsByLevel.isNotEmpty) 'fails_by_level': failsByLevel,
@@ -355,27 +404,35 @@ class PlayerProgress extends Equatable {
       'consecutive_losses_by_devinette': consecutiveLossesByDevinetteId,
   };
 
-  /// Combien de niveaux complétés sur cette montagne.
-  int levelsOn(String mountainId) => completedLevelsByMountain[mountainId] ?? 0;
+  /// Combien de niveaux complétés sur cette montagne **pour le pack actif**.
+  int levelsOn(String mountainId) =>
+      completedLevelsByMountain[mountainProgressKey(mountainId)] ?? 0;
 
-  /// Nombre d'étoiles obtenues sur un niveau précis (0 si jamais joué).
+  /// Nombre d'étoiles obtenues sur un niveau précis (0 si jamais joué),
+  /// **pour le pack actif**.
   int starsOnLevel({required String mountainId, required int levelIndex}) {
-    return starsByLevel['$mountainId#$levelIndex'] ?? 0;
+    return starsByLevel[levelKey(mountainId, levelIndex)] ?? 0;
   }
 
   /// Compteur d'échecs consécutifs sur ce niveau précis (0 si jamais raté
-  /// ou si déjà gagné depuis le dernier échec). Reset à 0 dans
-  /// `PlayerProgressNotifier.recordWin`.
+  /// ou si déjà gagné depuis le dernier échec), **pour le pack actif**.
+  /// Reset à 0 dans `PlayerProgressNotifier.recordWin`.
   int failsOnLevel({required String mountainId, required int levelIndex}) {
-    return failsByLevel['$mountainId#$levelIndex'] ?? 0;
+    return failsByLevel[levelKey(mountainId, levelIndex)] ?? 0;
   }
 
-  /// Somme des étoiles obtenues sur **tous** les niveaux joués. Dérivé à
-  /// la volée depuis [starsByLevel] (pas de persistance dédiée — évite la
-  /// désynchro avec le détail). Sert au système star-gate (cf.
+  /// Somme des étoiles obtenues sur tous les niveaux joués **du pack actif**.
+  /// Dérivé à la volée depuis [starsByLevel] en ne retenant que les clés
+  /// préfixées par le pack actif (pas de persistance dédiée — évite la
+  /// désynchro avec le détail). Sert au star-gate **par pack** (cf.
   /// `StarGate.computeUnlockedTier`).
-  int get totalStars =>
-      starsByLevel.values.fold<int>(0, (sum, s) => sum + s);
+  int get totalStars {
+    final prefix = '$_activePackForKeys::';
+    if (_activePackForKeys.isEmpty) return 0;
+    return starsByLevel.entries
+        .where((e) => e.key.startsWith(prefix))
+        .fold<int>(0, (sum, e) => sum + e.value);
+  }
 
   /// Nombre de défaites consécutives en cours sur une devinette donnée
   /// (0 si jamais perdu ou si reset suite à victoire/skip). Sert au
@@ -398,7 +455,7 @@ class PlayerProgress extends Equatable {
     List<String>? recentDevinetteIds,
     Set<String>? ownedPacks,
     String? freePackChosen,
-    PackMix? activePackMix,
+    String? activePackId,
     Map<String, int>? starsByLevel,
     int? dailyChallengeStreak,
     DateTime? lastDailyChallengeDate,
@@ -426,7 +483,7 @@ class PlayerProgress extends Equatable {
       recentDevinetteIds: recentDevinetteIds ?? this.recentDevinetteIds,
       ownedPacks: ownedPacks ?? this.ownedPacks,
       freePackChosen: freePackChosen ?? this.freePackChosen,
-      activePackMix: activePackMix ?? this.activePackMix,
+      activePackId: activePackId ?? this.activePackId,
       starsByLevel: starsByLevel ?? this.starsByLevel,
       failsByLevel: failsByLevel ?? this.failsByLevel,
       dailyChallengeStreak:
@@ -461,7 +518,7 @@ class PlayerProgress extends Equatable {
     recentDevinetteIds,
     ownedPacks,
     freePackChosen,
-    activePackMix,
+    activePackId,
     starsByLevel,
     failsByLevel,
     dailyChallengeStreak,

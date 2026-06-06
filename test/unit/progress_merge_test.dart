@@ -1,6 +1,5 @@
 import 'package:defi_kilimandjaro/data/sync/progress_merge.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
-import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -116,20 +115,21 @@ void main() {
       expect(mergeProgress(local, cloud).freePackChosen, 'culture_ci');
     });
 
-    test('mix : préfère un mix local valable sur les packs fusionnés', () {
+    test('pack actif : préfère un pack local valable sur les packs fusionnés',
+        () {
       final local = PlayerProgress.initial().copyWith(
         ownedPacks: {'culture_ci'},
-        activePackMix: PackMix.single('culture_ci'),
+        activePackId: 'culture_ci',
       );
       final cloud = PlayerProgress.initial().copyWith(
         ownedPacks: {'crack_nouchi'},
-        activePackMix: PackMix.single('crack_nouchi'),
+        activePackId: 'crack_nouchi',
       );
 
       final merged = mergeProgress(local, cloud);
 
       expect(merged.ownedPacks, {'culture_ci', 'crack_nouchi'});
-      expect(merged.activePackMix, PackMix.single('culture_ci'));
+      expect(merged.activePackId, 'culture_ci');
     });
 
     test('cloud vide ne régresse jamais le local', () {
@@ -137,7 +137,7 @@ void main() {
         totalLevelsCompleted: 12,
         ownedPacks: {'culture_ci'},
         freePackChosen: 'culture_ci',
-        activePackMix: PackMix.single('culture_ci'),
+        activePackId: 'culture_ci',
       );
       final cloud = PlayerProgress.initial();
 
@@ -146,7 +146,7 @@ void main() {
       expect(merged.totalLevelsCompleted, 12);
       expect(merged.cauris, 250);
       expect(merged.ownedPacks, {'culture_ci'});
-      expect(merged.activePackMix, PackMix.single('culture_ci'));
+      expect(merged.activePackId, 'culture_ci');
     });
   });
 }

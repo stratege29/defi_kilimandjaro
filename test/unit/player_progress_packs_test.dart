@@ -71,44 +71,34 @@ void main() {
       expect(notifier.state.ownedPacks, {'culture_ci', 'crack_nouchi'});
     });
 
-    test('setPackMix valide que tous les packs sont possédés', () async {
+    test('setActivePack refuse un pack non possédé', () async {
       final prefs = await SharedPreferences.getInstance();
       final notifier = PlayerProgressNotifier(PlayerProgressRepository(prefs));
       await notifier.chooseFreePack('culture_ci');
 
       expect(
-        () => notifier.setPackMix(
-          PackMix(
-            weights: const <String, double>{
-              'culture_ci': 0.5,
-              'crack_nouchi': 0.5,
-            },
-          ),
-        ),
+        () => notifier.setActivePack('crack_nouchi'),
         throwsArgumentError,
       );
+      // Le pack actif n'a pas changé.
+      expect(notifier.state.activePackId, 'culture_ci');
     });
 
-    test('setPackMix accepte un mix valide et persiste', () async {
+    test('setActivePack bascule la grimpe courante et persiste', () async {
       final prefs = await SharedPreferences.getInstance();
       final notifier = PlayerProgressNotifier(PlayerProgressRepository(prefs));
       await notifier.chooseFreePack('culture_ci');
       await notifier.grantPack('crack_nouchi');
 
-      final mix = PackMix(
-        weights: const <String, double>{
-          'culture_ci': 0.7,
-          'crack_nouchi': 0.3,
-        },
-      );
-      await notifier.setPackMix(mix);
-      expect(notifier.state.activePackMix, mix);
+      await notifier.setActivePack('crack_nouchi');
+      expect(notifier.state.activePackId, 'crack_nouchi');
+      expect(notifier.state.activePackMix, PackMix.single('crack_nouchi'));
 
       // Reload pour vérifier la persistance.
       final reloaded = PlayerProgressNotifier(
         PlayerProgressRepository(prefs),
       );
-      expect(reloaded.state.activePackMix, mix);
+      expect(reloaded.state.activePackId, 'crack_nouchi');
     });
 
     test('reset remet à zéro les packs', () async {
@@ -121,22 +111,47 @@ void main() {
       expect(notifier.state.ownedPacks, isEmpty);
       expect(notifier.state.freePackChosen, isNull);
     });
+
+    test('recordWin : progression indépendante par pack actif', () async {
+      final prefs = await SharedPreferences.getInstance();
+      final notifier = PlayerProgressNotifier(PlayerProgressRepository(prefs));
+      await notifier.chooseFreePack('culture_ci');
+      await notifier.grantPack('football_ci');
+
+      // Grimpe sur culture_ci.
+      await notifier.recordWin(
+        mountainId: 'ci_nimba',
+        caurisAwarded: 0,
+        levelIndex: 1,
+        starsEarned: 3,
+      );
+      expect(notifier.state.levelsOn('ci_nimba'), 1);
+      expect(notifier.state.starsOnLevel(mountainId: 'ci_nimba', levelIndex: 1),
+          3);
+
+      // Bascule sur football_ci → grimpe vierge (progression par pack).
+      await notifier.setActivePack('football_ci');
+      expect(notifier.state.levelsOn('ci_nimba'), 0);
+      expect(notifier.state.starsOnLevel(mountainId: 'ci_nimba', levelIndex: 1),
+          0);
+
+      // Le total honorifique est GLOBAL (somme tous packs).
+      expect(notifier.state.totalLevelsCompleted, 1);
+
+      // Re-bascule sur culture_ci → progression retrouvée intacte.
+      await notifier.setActivePack('culture_ci');
+      expect(notifier.state.levelsOn('ci_nimba'), 1);
+    });
   });
 
   group('PlayerProgress JSON roundtrip — packs', () {
-    test('toJson + fromJson conserve ownedPacks, freePack, mix', () async {
+    test('toJson + fromJson conserve ownedPacks, freePack, pack actif',
+        () async {
       final prefs = await SharedPreferences.getInstance();
       final notifier = PlayerProgressNotifier(PlayerProgressRepository(prefs));
       await notifier.chooseFreePack('culture_ci');
       await notifier.grantPack('crack_nouchi');
-      await notifier.setPackMix(
-        PackMix(
-          weights: const <String, double>{
-            'culture_ci': 0.6,
-            'crack_nouchi': 0.4,
-          },
-        ),
-      );
+      await notifier.setActivePack('crack_nouchi');
 
       final raw = prefs.getString('player_progress');
       expect(raw, isNotNull);
@@ -144,8 +159,8 @@ void main() {
       final reloaded = PlayerProgressRepository(prefs).load();
       expect(reloaded.ownedPacks, {'culture_ci', 'crack_nouchi'});
       expect(reloaded.freePackChosen, 'culture_ci');
-      expect(reloaded.activePackMix.weights['culture_ci'], closeTo(0.6, 1e-9));
-      expect(reloaded.activePackMix.weights['crack_nouchi'], closeTo(0.4, 1e-9));
+      expect(reloaded.activePackId, 'crack_nouchi');
+      expect(reloaded.activePackMix, PackMix.single('crack_nouchi'));
     });
   });
 }
