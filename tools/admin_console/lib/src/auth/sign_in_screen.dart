@@ -38,10 +38,13 @@ class _SignInScreenState extends State<SignInScreen> {
   //   flutter run -d chrome \
   //     --web-header="Cross-Origin-Opener-Policy=same-origin-allow-popups" \
   //     --web-header="Cross-Origin-Embedder-Policy=unsafe-none"
-  // Redirect par défaut sur web : Firebase recommande signInWithRedirect sur
-  // Safari/WebKit (le popup y est bloqué/peu fiable → "ne fait rien"). Combiné
-  // à un authDomain same-origin, getRedirectResult() (dans main.dart) récupère
-  // bien la session au retour. Le toggle permet de retomber sur le popup.
+  // Redirect par défaut sur web. Sur Safari/WebKit le POPUP est bloqué
+  // (confirmé : "rien ne s'ouvre" même en navigation privée). signInWithRedirect
+  // évite le popup-blocker (navigation pleine page) ET, comme l'authDomain est
+  // désormais same-origin (kilimandjaro-admin-dev.web.app), le helper
+  // /__/auth/handler est first-party → l'ITP de Safari ne bloque plus l'état
+  // d'auth (le redirect cross-domain, lui, était bloqué). getRedirectResult()
+  // est récupéré dans main.dart au retour.
   bool _useRedirect = true;
 
   String _firebaseDiagnostic() {
@@ -178,6 +181,16 @@ class _SignInScreenState extends State<SignInScreen> {
                   _signingIn
                       ? 'Connexion…'
                       : 'Se connecter avec Google',
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Marqueur de build (diagnostic cache) — confirme qu'on charge
+              // bien la dernière version déployée.
+              Text(
+                'build: redirect-v8 · authDomain same-origin',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.white.withValues(alpha: 0.35),
                 ),
               ),
               if (_error != null) ...[
