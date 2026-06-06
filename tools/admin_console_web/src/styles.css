@@ -81,6 +81,12 @@ select {
 .check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); margin-top: 16px; }
 .check input { width: auto; }
 tr.today td { background: rgba(210,162,76,.08); }
+.tabs { display: flex; gap: 4px; margin: 16px 0 4px; border-bottom: 1px solid #000; }
+.tab {
+  background: transparent; border: 0; color: var(--muted); cursor: pointer;
+  padding: 8px 14px; font-size: 13px; border-bottom: 2px solid transparent;
+}
+.tab.active { color: var(--or); border-bottom-color: var(--or); font-weight: 600; }
 
 /* Cards (moderation) */
 .cards { padding: 16px 24px; display: flex; flex-direction: column; gap: 12px; }
