@@ -8,6 +8,11 @@ import 'package:flutter/material.dart';
 ///
 /// Chaque cellule : fond doré si remplie, bord doré si vide.
 ///
+/// **Indice** : chaque indice révèle une lettre correcte à une position
+/// **au hasard** ([revealedPositions]). Tant que le joueur ne l'a pas encore
+/// formée, la case affiche cette lettre en aperçu « fantôme » (doré
+/// translucide). La case fraîchement révélée joue un **pop + flip 3D** doré.
+///
 /// **Validation correcte** : flip 3D staggéré (Wordle pattern) — chaque
 /// cellule pivote 180° sur l'axe Y avec un délai de 100 ms par index. La
 /// face arrière révèle la couleur de succès (`AppColors.success`).
@@ -18,6 +23,7 @@ class AnswerCells extends StatefulWidget {
     required this.formedLetters,
     required this.isValidated,
     this.fillFromEnd = false,
+    this.revealedPositions = const <int>{},
     super.key,
   });
 
@@ -36,12 +42,17 @@ class AnswerCells extends StatefulWidget {
   /// (`expectedAnswer` déjà inversé) — seul l'affichage change ici.
   final bool fillFromEnd;
 
+  /// Positions (dans [answer], donc déjà en espace `expectedAnswer`)
+  /// révélées par l'indice. La case correspondante affiche la lettre
+  /// correcte en aperçu fantôme tant que le joueur ne l'a pas formée.
+  final Set<int> revealedPositions;
+
   @override
   State<AnswerCells> createState() => _AnswerCellsState();
 }
 
 class _AnswerCellsState extends State<AnswerCells>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   /// Délai par cellule, en fraction du temps total. 6 cellules = 6×100 ms
   /// (`_kStaggerStep` × `_kFlipDuration`) + 400 ms de flip = ~1000 ms total.
   static const double _kStaggerStep = 0.10;
@@ -52,12 +63,21 @@ class _AnswerCellsState extends State<AnswerCells>
   /// Durée totale de la séquence pour `answer.length` cellules.
   static const Duration _kSequenceDuration = Duration(milliseconds: 1000);
 
+  /// Durée du pop + flip d'une lettre placée par l'indice.
+  static const Duration _kHintRevealDuration = Duration(milliseconds: 520);
+
   late final AnimationController _flipCtrl;
+  late final AnimationController _hintCtrl;
+
+  /// Position (espace `answer`) de la dernière case révélée à animer. `null`
+  /// tant qu'aucun indice n'a été placé dans la session courante du widget.
+  int? _animHintPos;
 
   @override
   void initState() {
     super.initState();
     _flipCtrl = AnimationController(vsync: this, duration: _kSequenceDuration);
+    _hintCtrl = AnimationController(vsync: this, duration: _kHintRevealDuration);
   }
 
   @override
@@ -66,11 +86,19 @@ class _AnswerCellsState extends State<AnswerCells>
     if (widget.isValidated && !oldWidget.isValidated) {
       _flipCtrl.forward(from: 0);
     }
+    // Nouvelle position révélée par l'indice → pop + flip sur cette case.
+    final newlyRevealed =
+        widget.revealedPositions.difference(oldWidget.revealedPositions);
+    if (newlyRevealed.isNotEmpty && !widget.isValidated) {
+      _animHintPos = newlyRevealed.first;
+      _hintCtrl.forward(from: 0);
+    }
   }
 
   @override
   void dispose() {
     _flipCtrl.dispose();
+    _hintCtrl.dispose();
     super.dispose();
   }
 
@@ -102,7 +130,7 @@ class _AnswerCellsState extends State<AnswerCells>
                   .clamp(24.0, defaultCell);
 
         return AnimatedBuilder(
-          animation: _flipCtrl,
+          animation: Listenable.merge(<Listenable>[_flipCtrl, _hintCtrl]),
           builder: (_, __) {
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -112,15 +140,36 @@ class _AnswerCellsState extends State<AnswerCells>
                 // cellule physique `i`. En mode `fillFromEnd`, la cellule la
                 // plus à droite (i == n-1) porte la 1re lettre saisie.
                 final seqPos = widget.fillFromEnd ? n - 1 - i : i;
-                final hasLetter = seqPos < widget.formedLetters.length;
-                final letter = hasLetter ? widget.formedLetters[seqPos] : '';
-                final displayLetter = widget.isValidated
-                    ? widget.answer[seqPos].toUpperCase()
-                    : letter;
-                return _FlipCell(
-                  letter: displayLetter,
-                  filled: hasLetter || widget.isValidated,
-                  flipProgress: _cellProgress(i, _flipCtrl.value),
+
+                // Victoire : flip staggéré de toutes les cases.
+                if (widget.isValidated) {
+                  return _FlipCell(
+                    letter: widget.answer[seqPos].toUpperCase(),
+                    filled: true,
+                    flipProgress: _cellProgress(i, _flipCtrl.value),
+                    size: cellSize,
+                  );
+                }
+
+                final hasPlayerLetter = seqPos < widget.formedLetters.length;
+                final isHint = !hasPlayerLetter &&
+                    widget.revealedPositions.contains(seqPos);
+                final kind = hasPlayerLetter
+                    ? _CellKind.filled
+                    : (isHint ? _CellKind.hint : _CellKind.empty);
+                final letter = hasPlayerLetter
+                    ? widget.formedLetters[seqPos]
+                    : (isHint ? widget.answer[seqPos] : '');
+                // La case révélée la plus récente joue le pop + flip tant que
+                // son controller tourne ; les autres restent statiques.
+                final animating =
+                    seqPos == _animHintPos && _hintCtrl.isAnimating;
+
+                return _PlayCell(
+                  letter: letter.toUpperCase(),
+                  kind: kind,
+                  animating: animating,
+                  revealProgress: _hintCtrl.value,
                   size: cellSize,
                 );
               }),
@@ -129,6 +178,106 @@ class _AnswerCellsState extends State<AnswerCells>
         );
       },
     );
+  }
+}
+
+/// Styles possibles d'une case pendant le jeu (hors animation de victoire).
+enum _CellKind { empty, filled, hint }
+
+/// Case affichée pendant le jeu : vide, remplie par le joueur, ou aperçu
+/// d'indice. Quand [animating], joue le pop + flip de placement (face avant
+/// vide → face arrière aperçu doré).
+class _PlayCell extends StatelessWidget {
+  const _PlayCell({
+    required this.letter,
+    required this.kind,
+    required this.animating,
+    required this.revealProgress,
+    required this.size,
+  });
+
+  final String letter;
+  final _CellKind kind;
+
+  /// Quand `false`, rendu statique selon [kind]. Quand `true`, joue le
+  /// pop + flip piloté par [revealProgress] (face vide → aperçu doré).
+  final bool animating;
+  final double revealProgress;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!animating) {
+      return _faceForKind(kind, letter, size);
+    }
+
+    final p = revealProgress.clamp(0.0, 1.0);
+    final angle = p * math.pi;
+    final showingBack = p >= 0.5;
+    final scale = _popScale(p);
+
+    final content = showingBack
+        ? Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.identity()..rotateY(math.pi),
+            child: _faceForKind(_CellKind.hint, letter, size),
+          )
+        : _faceForKind(_CellKind.empty, '', size);
+
+    return Transform.scale(
+      scale: scale,
+      child: Transform(
+        alignment: Alignment.center,
+        transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001) // perspective (1/distance)
+          ..rotateY(angle),
+        child: content,
+      ),
+    );
+  }
+
+  /// Pop avec léger dépassement : 0.6 → 1.12 (à 60 %) → 1.0.
+  static double _popScale(double p) {
+    const peak = 1.12;
+    if (p < 0.6) {
+      final t = Curves.easeOut.transform(p / 0.6);
+      return 0.6 + (peak - 0.6) * t;
+    }
+    final t = Curves.easeOut.transform((p - 0.6) / 0.4);
+    return peak + (1.0 - peak) * t;
+  }
+}
+
+/// Construit la face d'une case selon son [kind].
+Widget _faceForKind(_CellKind kind, String letter, double size) {
+  switch (kind) {
+    case _CellKind.filled:
+      return _CellFace(
+        letter: letter,
+        bg: AppColors.orJour,
+        borderColor: AppColors.orJour,
+        textColor: AppColors.surface,
+        shadowColor: AppColors.orJour,
+        size: size,
+      );
+    case _CellKind.hint:
+      // Aperçu fantôme : doré translucide, lettre dorée — se distingue d'une
+      // case réellement remplie par le joueur (or plein, lettre sombre).
+      return _CellFace(
+        letter: letter,
+        bg: AppColors.orJour.withValues(alpha: 0.16),
+        borderColor: AppColors.orJour.withValues(alpha: 0.7),
+        textColor: AppColors.orJour,
+        size: size,
+      );
+    case _CellKind.empty:
+      return _CellFace(
+        letter: letter,
+        bg: AppColors.surfaceVariant.withValues(alpha: 0.6),
+        borderColor: AppColors.orJour.withValues(alpha: 0.35),
+        textColor: AppColors.textePrimaire,
+        size: size,
+      );
   }
 }
 
