@@ -95,7 +95,7 @@ export default function Moderation() {
                 <span className="muted small">Curator : {s.curatedBy}</span>
               )}
               <span className="spacer" />
-              <button className="btn ghost" onClick={() => setStatus(s.id, 'reject')}>
+              <button className="btn danger" onClick={() => setStatus(s.id, 'reject')}>
                 Rejeter
               </button>
               <button className="btn primary" onClick={() => setStatus(s.id, 'approve')}>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions } from './firebase.js';
 import { normalize, lettersPoolFromAnswer } from './normalize.js';
@@ -11,6 +11,8 @@ export default function PackEditor({ packId, onBack }) {
   const [error, setError] = useState(null);
   const [editing, setEditing] = useState(null); // null | devinette obj | {__new:true}
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [metaOpen, setMetaOpen] = useState(false);
+  const [catalogEntry, setCatalogEntry] = useState(null);
   const [validation, setValidation] = useState(null);
   const [validating, setValidating] = useState(false);
 
@@ -26,6 +28,30 @@ export default function PackEditor({ packId, onBack }) {
       (e) => setError(`${e.code}: ${e.message}`),
     );
   }, [packId]);
+
+  // Entrée catalogue (catalog/index.packs[]) pour pré-remplir les métadonnées.
+  useEffect(() => {
+    return onSnapshot(doc(db, 'catalog', 'index'), (snap) => {
+      const list = snap.data()?.packs;
+      const entry = Array.isArray(list)
+        ? list.find((p) => p && p.id === packId)
+        : null;
+      setCatalogEntry(entry ?? null);
+    });
+  }, [packId]);
+
+  async function handleDelete(d) {
+    const note =
+      d.status === 'published'
+        ? '(déjà publiée → retirée à la prochaine publication)'
+        : '(brouillon → suppression définitive)';
+    if (!confirm(`Supprimer la devinette ${d.id} ?\n${note}`)) return;
+    try {
+      await httpsCallable(functions, 'deleteDevinette')({ packId, deviId: d.id });
+    } catch (e) {
+      alert(`Erreur suppression : ${e.code || e.name}: ${e.message}`);
+    }
+  }
 
   const nextId = useMemo(() => {
     let max = 0;
@@ -58,6 +84,9 @@ export default function PackEditor({ packId, onBack }) {
         </button>
         <h2>Pack : {packId}</h2>
         <span className="spacer" />
+        <button className="btn ghost small" onClick={() => setMetaOpen(true)}>
+          Métadonnées
+        </button>
         <button className="btn ghost small" onClick={() => setBulkOpen(true)}>
           Import JSON
         </button>
@@ -116,9 +145,12 @@ export default function PackEditor({ packId, onBack }) {
                 <td>
                   <span className={'chip ' + statusClass(d.status)}>{d.status}</span>
                 </td>
-                <td>
+                <td className="row-actions">
                   <button className="btn ghost small" onClick={() => setEditing(d)}>
                     Éditer
+                  </button>
+                  <button className="btn danger small" onClick={() => handleDelete(d)}>
+                    Supprimer
                   </button>
                 </td>
               </tr>
@@ -138,7 +170,109 @@ export default function PackEditor({ packId, onBack }) {
       {bulkOpen && (
         <BulkImport packId={packId} onClose={() => setBulkOpen(false)} />
       )}
+      {metaOpen && (
+        <MetaForm
+          packId={packId}
+          entry={catalogEntry}
+          onClose={() => setMetaOpen(false)}
+        />
+      )}
     </>
+  );
+}
+
+function MetaForm({ packId, entry, onClose }) {
+  const [visible, setVisible] = useState(entry?.visible ?? true);
+  const [ordering, setOrdering] = useState(entry?.ordering ?? 100);
+  const [price, setPrice] = useState(entry?.unlock_cost_cauris ?? 0);
+  const [color, setColor] = useState(entry?.theme_color_hex ?? '#888888');
+  const [bundled, setBundled] = useState(entry?.bundled ?? false);
+  const [freeChoice, setFreeChoice] = useState(entry?.free_choice_eligible ?? false);
+  const [minApp, setMinApp] = useState(entry?.min_app_version ?? '0.1.0');
+  const [tags, setTags] = useState((entry?.tags ?? []).join(', '));
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+
+  async function save() {
+    setBusy(true);
+    setErr(null);
+    try {
+      const patch = {
+        visible,
+        ordering: Number(ordering),
+        unlock_cost_cauris: Number(price),
+        theme_color_hex: color,
+        bundled,
+        free_choice_eligible: freeChoice,
+        min_app_version: minApp.trim(),
+        tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+      };
+      await httpsCallable(functions, 'upsertPackMeta')({ packId, patch });
+      onClose();
+    } catch (e) {
+      setErr(`${e.code || e.name}: ${e.message}`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <h3>Métadonnées — {packId}</h3>
+        {!entry && (
+          <p className="muted small">
+            Pack absent de catalog/index.packs[] — l'enregistrement échouera tant
+            qu'il n'y est pas (publier d'abord).
+          </p>
+        )}
+        <div className="grid2">
+          <label className="check">
+            <input type="checkbox" checked={visible} onChange={(e) => setVisible(e.target.checked)} />
+            Visible (store)
+          </label>
+          <label className="check">
+            <input type="checkbox" checked={bundled} onChange={(e) => setBundled(e.target.checked)} />
+            Bundlé
+          </label>
+          <label className="check">
+            <input type="checkbox" checked={freeChoice} onChange={(e) => setFreeChoice(e.target.checked)} />
+            Éligible choix gratuit
+          </label>
+        </div>
+        <div className="grid2">
+          <div>
+            <label>Ordre</label>
+            <input type="number" value={ordering} onChange={(e) => setOrdering(e.target.value)} />
+          </div>
+          <div>
+            <label>Prix (cauris, 0 = gratuit)</label>
+            <input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} />
+          </div>
+        </div>
+        <div className="grid2">
+          <div>
+            <label>Couleur thème (#RRGGBB)</label>
+            <input value={color} onChange={(e) => setColor(e.target.value)} />
+          </div>
+          <div>
+            <label>Version min app</label>
+            <input value={minApp} onChange={(e) => setMinApp(e.target.value)} />
+          </div>
+        </div>
+        <label>Tags marketing (virgules)</label>
+        <input value={tags} onChange={(e) => setTags(e.target.value)} />
+        {err && <pre className="error">{err}</pre>}
+        <div className="row actions">
+          <span className="muted small">Bump catalog_version → clients rafraîchissent</span>
+          <span className="spacer" />
+          <button className="btn ghost" onClick={onClose}>Annuler</button>
+          <button className="btn primary" disabled={busy} onClick={save}>
+            {busy ? 'Enregistrement…' : 'Enregistrer'}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 

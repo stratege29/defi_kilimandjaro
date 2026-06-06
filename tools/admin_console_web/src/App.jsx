@@ -4,6 +4,7 @@ import { auth, googleProvider } from './firebase.js';
 import Moderation from './Moderation.jsx';
 import Catalog from './Catalog.jsx';
 import PackEditor from './PackEditor.jsx';
+import DailyChallenges from './DailyChallenges.jsx';
 
 export default function App() {
   const [user, setUser] = useState(undefined); // undefined = chargement
@@ -38,6 +39,12 @@ export default function App() {
         >
           Catalogue
         </button>
+        <button
+          className={tab === 'daily' ? 'nav active' : 'nav'}
+          onClick={() => setTab('daily')}
+        >
+          Du jour
+        </button>
         <div className="rail-bottom">
           {user.photoURL && <img className="avatar" src={user.photoURL} alt="" />}
           <button className="nav" title={user.email} onClick={() => signOut(auth)}>
@@ -53,6 +60,7 @@ export default function App() {
           ) : (
             <Catalog onEdit={setEditingPack} />
           ))}
+        {tab === 'daily' && <DailyChallenges />}
       </main>
     </div>
   );

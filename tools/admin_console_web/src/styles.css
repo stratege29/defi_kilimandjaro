@@ -76,7 +76,11 @@ select {
 .btn.small { padding: 6px 12px; font-size: 13px; }
 .btn.primary { background: var(--or); color: #000; }
 .btn.primary:disabled { opacity: 0.5; cursor: default; }
-.btn.ghost { background: transparent; color: var(--red); border: 1px solid var(--red); }
+.btn.ghost { background: transparent; color: var(--text); border: 1px solid #3a352c; }
+.btn.danger { background: transparent; color: var(--red); border: 1px solid var(--red); }
+.check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); margin-top: 16px; }
+.check input { width: auto; }
+tr.today td { background: rgba(210,162,76,.08); }
 
 /* Cards (moderation) */
 .cards { padding: 16px 24px; display: flex; flex-direction: column; gap: 12px; }

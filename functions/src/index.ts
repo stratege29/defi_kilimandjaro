@@ -63,7 +63,13 @@ export { validatePackDraft } from "./admin/validatePackDraft";
 export { publishPack } from "./admin/publishPack";
 export { rollbackPack } from "./admin/rollbackPack";
 export { upsertDevinette } from "./admin/upsertDevinette";
+export { deleteDevinette } from "./admin/deleteDevinette";
 export { bulkImportDevinettes } from "./admin/bulkImportDevinettes";
+export { upsertPackMeta } from "./admin/upsertPackMeta";
+export {
+  upsertDailyChallenge,
+  deleteDailyChallenge,
+} from "./admin/dailyChallenge";
 
 // --- Wallet serveur (Phase 4) — cf docs/wallet_server_schema.md ---
 export { bootstrapWallet } from "./wallet/bootstrapWallet";
