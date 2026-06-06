@@ -38,7 +38,11 @@ class _SignInScreenState extends State<SignInScreen> {
   //   flutter run -d chrome \
   //     --web-header="Cross-Origin-Opener-Policy=same-origin-allow-popups" \
   //     --web-header="Cross-Origin-Embedder-Policy=unsafe-none"
-  bool _useRedirect = false;
+  // Redirect par défaut sur web : Firebase recommande signInWithRedirect sur
+  // Safari/WebKit (le popup y est bloqué/peu fiable → "ne fait rien"). Combiné
+  // à un authDomain same-origin, getRedirectResult() (dans main.dart) récupère
+  // bien la session au retour. Le toggle permet de retomber sur le popup.
+  bool _useRedirect = true;
 
   String _firebaseDiagnostic() {
     try {
