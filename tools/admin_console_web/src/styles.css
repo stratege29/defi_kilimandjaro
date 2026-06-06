@@ -1,0 +1,107 @@
+:root {
+  --bg: #15130f;
+  --surface: #1e1b16;
+  --surface2: #26221b;
+  --or: #d2a24c;
+  --text: #f3ece0;
+  --muted: #a99f8d;
+  --green: #4caf78;
+  --orange: #e0922f;
+  --red: #e0594c;
+  --grey: #8a8275;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.center {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.block { padding: 24px; }
+.spacer { flex: 1; }
+
+/* Sign-in */
+.signin { text-align: center; max-width: 360px; }
+.signin h1 { margin: 16px 0 4px; }
+.logo {
+  width: 56px; height: 56px; border-radius: 12px;
+  background: var(--or); color: #000; font-weight: 800; font-size: 30px;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto;
+}
+.logo.big { width: 80px; height: 80px; font-size: 44px; border-radius: 16px; }
+
+/* Layout */
+.app { display: flex; height: 100%; }
+.rail {
+  width: 92px; background: var(--surface); border-right: 1px solid #000;
+  display: flex; flex-direction: column; align-items: stretch; padding: 12px 8px; gap: 6px;
+}
+.rail .logo { margin: 4px auto 12px; width: 40px; height: 40px; font-size: 22px; }
+.rail-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; }
+.nav {
+  background: transparent; border: 0; color: var(--muted); cursor: pointer;
+  padding: 10px 6px; border-radius: 8px; font-size: 12px; text-align: center;
+}
+.nav:hover { background: var(--surface2); color: var(--text); }
+.nav.active { background: var(--surface2); color: var(--or); font-weight: 600; }
+
+.content { flex: 1; overflow: auto; }
+.topbar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 24px; border-bottom: 1px solid #000; position: sticky; top: 0;
+  background: var(--bg);
+}
+.topbar h2 { margin: 0; font-size: 20px; }
+select {
+  margin-left: auto; background: var(--surface2); color: var(--text);
+  border: 1px solid #000; border-radius: 8px; padding: 6px 10px;
+}
+
+/* Buttons */
+.btn {
+  border: 0; border-radius: 8px; padding: 9px 16px; cursor: pointer;
+  font-size: 14px; font-weight: 600;
+}
+.btn.small { padding: 6px 12px; font-size: 13px; }
+.btn.primary { background: var(--or); color: #000; }
+.btn.primary:disabled { opacity: 0.5; cursor: default; }
+.btn.ghost { background: transparent; color: var(--red); border: 1px solid var(--red); }
+
+/* Cards (moderation) */
+.cards { padding: 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+.card { background: var(--surface); border-radius: 12px; padding: 16px; }
+.row { display: flex; align-items: center; gap: 8px; }
+.row.actions { margin-top: 12px; }
+.question { font-size: 16px; margin: 12px 0 4px; }
+.answer { font-weight: 600; margin: 4px 0; }
+.proverb { font-style: italic; color: var(--muted); margin: 4px 0; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.tag { background: var(--surface2); padding: 3px 8px; border-radius: 12px; font-size: 12px; }
+
+.chip { padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+.chip.score.green { color: var(--green); border: 1px solid var(--green); }
+.chip.score.orange { color: var(--orange); border: 1px solid var(--orange); }
+.chip.score.red { color: var(--red); border: 1px solid var(--red); }
+.chip.green { color: var(--green); background: rgba(76,175,120,.15); }
+.chip.grey { color: var(--grey); background: rgba(138,130,117,.15); }
+
+/* Table (catalog) */
+.table { width: calc(100% - 48px); margin: 24px; border-collapse: collapse; background: var(--surface); border-radius: 12px; overflow: hidden; }
+.table th, .table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #000; }
+.table th { color: var(--muted); font-size: 13px; font-weight: 600; }
+.table td.num, .table th.num { text-align: right; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+
+.error { color: var(--red); white-space: pre-wrap; font-family: monospace; font-size: 12px; }
+.success { color: var(--green); }

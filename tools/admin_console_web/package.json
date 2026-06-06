@@ -1,0 +1,21 @@
+{
+  "name": "kilimandjaro-admin-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Console d'admin Kilimandjaro — React + Vite + Firebase JS SDK (remplace le Flutter web).",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "firebase": "^11.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
