@@ -190,6 +190,80 @@ async function applyDevinettesStatusTransition(
 }
 
 // ---------------------------------------------------------------------------
+// Pool de duel — miroir vers la collection racine `devinettes`
+// ---------------------------------------------------------------------------
+
+/**
+ * Mappe la difficulté numérique (format asset/v3, 1-4) vers le tier duel
+ * `easy|medium|hard`. Aligné sur `tools/scripts/seed_firestore_devinettes.mjs`
+ * (1→easy, 2→medium, 3/4→hard).
+ */
+function mapDifficultyToDuelTier(n: number): "easy" | "medium" | "hard" {
+  if (n === 1) return "easy";
+  if (n === 2) return "medium";
+  if (n === 3 || n === 4) return "hard";
+  return "medium"; // fallback défensif
+}
+
+/** Extrait la chaîne FR d'un champ multilingue (fallback 1ère langue dispo). */
+function pickFrench(field: Record<string, string> | undefined): string {
+  if (!field) return "";
+  if (typeof field.fr === "string") return field.fr;
+  const first = Object.values(field)[0];
+  return typeof first === "string" ? first : "";
+}
+
+/**
+ * Mirror les devinettes publiées vers la collection **racine** `devinettes`,
+ * source du **pool de duel** (cf `matchmaking/devinettesCache.ts`, requête
+ * `enabled_for_duel == true && status == "approved"`).
+ *
+ * Sans ça, un pack n'apparaît jamais en duel tant qu'on n'a pas relancé le
+ * seed manuel `seed_firestore_devinettes.mjs` (lequel ne lit en plus que les
+ * fichiers bundlés `starter/`, donc rate les packs OTA-only comme football_ci).
+ *
+ * Idempotent (set merge), batché par 400 (limite Firestore 500 ops/batch).
+ * Décision produit : **tous** les packs publiés sont éligibles au duel.
+ *
+ * NB : ne gère pas les suppressions (cohérent avec publishPack actuel qui ne
+ * propage pas les soft-deletes) — un retrait de devinette nécessitera un
+ * nettoyage dédié du pool.
+ */
+async function syncDuelPool(payload: DevinetteV3[]): Promise<number> {
+  const db = getFirestore();
+  const BATCH_SIZE = 400;
+  let written = 0;
+
+  for (let i = 0; i < payload.length; i += BATCH_SIZE) {
+    const batch = db.batch();
+    const chunk = payload.slice(i, i + BATCH_SIZE);
+    for (const d of chunk) {
+      const ref = db.collection("devinettes").doc(d.id);
+      batch.set(
+        ref,
+        {
+          answer: d.answer,
+          letters_pool: d.letters_pool,
+          riddle: pickFrench(d.riddle),
+          explanation: pickFrench(d.explanation),
+          proverb: "",
+          difficulty: mapDifficultyToDuelTier(d.difficulty),
+          pack: d.pack,
+          country: d.country,
+          enabled_for_duel: true,
+          status: "approved",
+        },
+        { merge: true }
+      );
+    }
+    await batch.commit();
+    written += chunk.length;
+  }
+
+  return written;
+}
+
+// ---------------------------------------------------------------------------
 // Cloud Function
 // ---------------------------------------------------------------------------
 
@@ -355,6 +429,10 @@ export const publishPack = onCall(
       uid
     );
 
+    // 7b. Mirror vers le pool de duel (collection racine `devinettes`).
+    // Sans ça, le pack n'est jamais tiré en duel (cf seed manuel historique).
+    const duelSynced = await syncDuelPool(payload);
+
     // 8. Audit log
     await packRef.collection("audit").add({
       type: "publish",
@@ -368,6 +446,7 @@ export const publishPack = onCall(
         size_bytes: artifact.sizeBytes,
         promoted_drafts: promoted,
         archived_soft_deletes: archived,
+        duel_pool_synced: duelSynced,
         warnings_count: validation.warnings.length,
       },
     });
@@ -380,6 +459,7 @@ export const publishPack = onCall(
       sizeBytes: artifact.sizeBytes,
       promoted,
       archived,
+      duelSynced,
       warnings: validation.warnings.length,
     });
 

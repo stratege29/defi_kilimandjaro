@@ -107,30 +107,35 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     int? starsEarned,
     String? devinetteId,
   }) async {
+    // Progression **par pack** : toutes les clés sont préfixées par le pack
+    // actif courant (cf. `PlayerProgress.mountainProgressKey` / `.levelKey`).
+    // La grimpe d'un pack est indépendante de celle des autres.
+    final mountainKey =
+        mountainId == null ? null : state.mountainProgressKey(mountainId);
     final levels = Map<String, int>.from(state.completedLevelsByMountain);
-    if (mountainId != null) {
+    if (mountainKey != null) {
       // On n'incrémente le compteur de niveaux complétés que si le joueur
       // pousse le front d'avancement (1er run d'un niveau). Les re-runs
       // de niveaux déjà complétés mettent à jour les étoiles uniquement.
-      final currentCompleted = levels[mountainId] ?? 0;
+      final currentCompleted = levels[mountainKey] ?? 0;
       if (levelIndex == null || levelIndex > currentCompleted) {
-        levels[mountainId] = currentCompleted + 1;
+        levels[mountainKey] = currentCompleted + 1;
       }
     }
 
     // Merge max sur le score étoile du niveau (rejouabilité).
     final stars = Map<String, int>.from(state.starsByLevel);
     if (mountainId != null && levelIndex != null && starsEarned != null) {
-      final key = '$mountainId#$levelIndex';
+      final key = state.levelKey(mountainId, levelIndex);
       final previous = stars[key] ?? 0;
       if (starsEarned > previous) {
         stars[key] = starsEarned;
       }
     }
 
-    final isFirstRun = mountainId == null ||
+    final isFirstRun = mountainKey == null ||
         levelIndex == null ||
-        levelIndex > (state.completedLevelsByMountain[mountainId] ?? 0);
+        levelIndex > (state.completedLevelsByMountain[mountainKey] ?? 0);
 
     // Reset du compteur d'échecs consécutifs **sur ce niveau** : on a
     // gagné, donc on efface l'historique de blocage. La map n'est
@@ -138,7 +143,7 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     // copies inutiles à chaque victoire.
     var fails = state.failsByLevel;
     if (mountainId != null && levelIndex != null) {
-      final key = '$mountainId#$levelIndex';
+      final key = state.levelKey(mountainId, levelIndex);
       if (fails.containsKey(key)) {
         fails = Map<String, int>.from(fails)..remove(key);
       }
@@ -226,7 +231,7 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     required String mountainId,
     required int levelIndex,
   }) async {
-    final key = '$mountainId#$levelIndex';
+    final key = state.levelKey(mountainId, levelIndex);
     final current = state.failsByLevel[key] ?? 0;
     final newCount = current + 1;
     final fails = Map<String, int>.from(state.failsByLevel)
@@ -630,7 +635,7 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
   /// Effets de bord :
   /// - ajoute `packId` à [PlayerProgress.ownedPacks] ;
   /// - définit [PlayerProgress.freePackChosen] = `packId` ;
-  /// - bascule [PlayerProgress.activePackMix] sur `PackMix.single(packId)`.
+  /// - bascule [PlayerProgress.activePackId] sur `packId`.
   Future<bool> chooseFreePack(String packId) async {
     if (state.hasChosenFreePack) return false;
     if (packId.isEmpty) {
@@ -640,7 +645,7 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     final newState = state.copyWith(
       ownedPacks: owned,
       freePackChosen: packId,
-      activePackMix: PackMix.single(packId),
+      activePackId: packId,
     );
     state = newState;
     await _repo.save(newState);
@@ -649,9 +654,9 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
 
   /// Marque un pack comme acquis (post-achat IAP ou cauris).
   ///
-  /// N'affecte PAS [PlayerProgress.activePackMix] — l'utilisateur devra
-  /// explicitement ajouter le nouveau pack à son mix via [setPackMix]
-  /// (écran "Mes packs" de la Phase 3). Idempotent.
+  /// N'affecte PAS [PlayerProgress.activePackId] — l'utilisateur devra
+  /// explicitement activer le nouveau pack via [setActivePack] (écran
+  /// "Mes packs"). Idempotent.
   Future<void> grantPack(String packId) async {
     if (packId.isEmpty) {
       throw ArgumentError.value(packId, 'packId', 'must not be empty');
@@ -664,20 +669,20 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     await _repo.save(newState);
   }
 
-  /// Met à jour la pondération active. Valide que tous les `packId` du mix
-  /// sont possédés — lève [ArgumentError] sinon (l'UI doit pré-valider avant
-  /// d'appeler ce setter).
-  Future<void> setPackMix(PackMix mix) async {
-    final unknown = mix.packIds.difference(state.ownedPacks);
-    if (unknown.isNotEmpty) {
+  /// Active un pack possédé (modèle « pack actif unique »). Changer de pack
+  /// actif change la grimpe de montagnes affichée (progression par pack).
+  /// Valide que `packId` est possédé — lève [ArgumentError] sinon (l'UI doit
+  /// pré-valider). No-op si déjà actif.
+  Future<void> setActivePack(String packId) async {
+    if (!state.ownedPacks.contains(packId)) {
       throw ArgumentError.value(
-        mix,
-        'mix',
-        'PackMix references packs not owned by the player: $unknown',
+        packId,
+        'packId',
+        'pack not owned by the player',
       );
     }
-    if (mix == state.activePackMix) return;
-    final newState = state.copyWith(activePackMix: mix);
+    if (packId == state.activePackId) return;
+    final newState = state.copyWith(activePackId: packId);
     state = newState;
     await _repo.save(newState);
   }
@@ -723,8 +728,18 @@ final hasChosenFreePackProvider = Provider<bool>((ref) {
   return ref.watch(playerProgressProvider.select((p) => p.hasChosenFreePack));
 });
 
-/// Pondération active pour le tirage des devinettes.
-/// Setter via `ref.read(playerProgressProvider.notifier).setPackMix(mix)`.
+/// Pondération active (toujours mono-pack) dérivée du pack actif — consommée
+/// par le `DevinetteSelectionService`.
 final packMixProvider = Provider<PackMix>((ref) {
   return ref.watch(playerProgressProvider.select((p) => p.activePackMix));
+});
+
+/// ID du pack **actif** (modèle « pack actif unique »). Retombe sur le pack
+/// gratuit tant qu'aucun pack n'a été activé explicitement. `null` tant que
+/// l'onboarding n'a pas tranché.
+/// Setter via `ref.read(playerProgressProvider.notifier).setActivePack(id)`.
+final activePackIdProvider = Provider<String?>((ref) {
+  return ref.watch(
+    playerProgressProvider.select((p) => p.activePackId ?? p.freePackChosen),
+  );
 });

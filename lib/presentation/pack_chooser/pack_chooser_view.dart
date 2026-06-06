@@ -5,7 +5,6 @@ import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
-import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,11 +66,10 @@ class _PackChooserViewState extends ConsumerState<PackChooserView>
     setState(() => _confirming = true);
     try {
       final notifier = ref.read(playerProgressProvider.notifier);
+      // chooseFreePack possède ET active déjà le pack (activePackId). grantPack
+      // est idempotent — appelé explicitement par souci de clarté du contrat.
       await notifier.chooseFreePack(packId);
-      // grantPack is idempotent — chooseFreePack already owns it, but the
-      // spec explicitly asks for it to be called.
       await notifier.grantPack(packId);
-      await notifier.setPackMix(PackMix.single(packId));
       if (!mounted) return;
       context.go(AppRoutes.home);
     } on Exception {

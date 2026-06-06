@@ -1,5 +1,4 @@
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
-import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
 
 /// Fusionne deux instantanés de progression selon une stratégie
@@ -49,7 +48,7 @@ PlayerProgress mergeProgress(PlayerProgress local, PlayerProgress cloud) {
     // freePackChosen est immuable une fois défini : on adopte le cloud
     // seulement si le device courant n'a pas encore tranché.
     freePackChosen: local.freePackChosen ?? cloud.freePackChosen,
-    activePackMix: _pickMix(local, cloud, ownedPacks),
+    activePackId: _pickActivePack(local, cloud, ownedPacks),
     starsByLevel: _maxByKey(local.starsByLevel, cloud.starsByLevel),
     dailyChallengeStreak: _max(
       local.dailyChallengeStreak,
@@ -75,21 +74,22 @@ PlayerProgress mergeProgress(PlayerProgress local, PlayerProgress cloud) {
   );
 }
 
-/// Préfère le mix local s'il est valable (packs possédés, pas sentinelle),
-/// sinon le mix cloud s'il l'est, sinon retombe sur le local tel quel.
-PackMix _pickMix(
+/// Préfère le pack actif local s'il est valable (possédé, pas sentinelle),
+/// sinon le pack actif cloud s'il l'est, sinon retombe sur le local tel quel.
+String? _pickActivePack(
   PlayerProgress local,
   PlayerProgress cloud,
   Set<String> ownedPacks,
 ) {
-  bool isValid(PackMix mix) =>
-      mix.packIds.isNotEmpty &&
-      !mix.packIds.contains(PlayerProgress.packPendingSentinel) &&
-      mix.packIds.difference(ownedPacks).isEmpty;
+  bool isValid(String? id) =>
+      id != null &&
+      id.isNotEmpty &&
+      id != PlayerProgress.packPendingSentinel &&
+      ownedPacks.contains(id);
 
-  if (isValid(local.activePackMix)) return local.activePackMix;
-  if (isValid(cloud.activePackMix)) return cloud.activePackMix;
-  return local.activePackMix;
+  if (isValid(local.activePackId)) return local.activePackId;
+  if (isValid(cloud.activePackId)) return cloud.activePackId;
+  return local.activePackId ?? cloud.activePackId;
 }
 
 int _max(int a, int b) => a > b ? a : b;

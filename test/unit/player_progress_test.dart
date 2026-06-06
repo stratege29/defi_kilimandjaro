@@ -79,14 +79,24 @@ void main() {
       );
     });
 
-    test('starsOnLevel lit la valeur persistée', () {
+    test('starsOnLevel lit la valeur persistée du pack actif', () {
+      // Progression par pack : clés préfixées par le pack actif.
       final p = PlayerProgress.initial().copyWith(
-        starsByLevel: const <String, int>{'ci_nimba#3': 2},
+        activePackId: 'culture_ci',
+        starsByLevel: const <String, int>{'culture_ci::ci_nimba#3': 2},
       );
       expect(
         p.starsOnLevel(mountainId: 'ci_nimba', levelIndex: 3),
         2,
       );
+    });
+
+    test('starsOnLevel ignore les étoiles d\'un autre pack', () {
+      final p = PlayerProgress.initial().copyWith(
+        activePackId: 'culture_ci',
+        starsByLevel: const <String, int>{'football_ci::ci_nimba#3': 3},
+      );
+      expect(p.starsOnLevel(mountainId: 'ci_nimba', levelIndex: 3), 0);
     });
 
     test('failsByLevel persistance round-trip', () {
@@ -114,9 +124,10 @@ void main() {
       );
     });
 
-    test('failsOnLevel lit la valeur persistée', () {
+    test('failsOnLevel lit la valeur persistée du pack actif', () {
       final p = PlayerProgress.initial().copyWith(
-        failsByLevel: const <String, int>{'ci_nimba#3': 2},
+        activePackId: 'culture_ci',
+        failsByLevel: const <String, int>{'culture_ci::ci_nimba#3': 2},
       );
       expect(
         p.failsOnLevel(mountainId: 'ci_nimba', levelIndex: 3),
@@ -124,13 +135,17 @@ void main() {
       );
     });
 
-    test('totalStars somme toutes les étoiles persistées', () {
+    test('totalStars somme les étoiles du pack actif uniquement', () {
       final p = PlayerProgress.initial().copyWith(
+        activePackId: 'culture_ci',
         starsByLevel: const <String, int>{
-          'gm_red_rocks#1': 3,
-          'gm_red_rocks#2': 2,
-          'sn_sambadougou#1': 1,
-          'sn_sambadougou#2': 3,
+          'culture_ci::gm_red_rocks#1': 3,
+          'culture_ci::gm_red_rocks#2': 2,
+          'culture_ci::sn_sambadougou#1': 1,
+          'culture_ci::sn_sambadougou#2': 3,
+          // Étoiles d'un AUTRE pack — ne doivent pas compter dans le total
+          // du pack actif (star-gate par pack).
+          'football_ci::gm_red_rocks#1': 3,
         },
       );
       expect(p.totalStars, 9);
@@ -138,6 +153,75 @@ void main() {
 
     test('totalStars = 0 sur état initial', () {
       expect(PlayerProgress.initial().totalStars, 0);
+    });
+
+    group('migration v1 → v2 (progression par pack)', () {
+      test('un profil v1 (sans schema_version) rattache sa progression '
+          'globale au pack actif/gratuit', () {
+        // JSON v1 : clés de progression GLOBALES (non préfixées), pas de
+        // schema_version, un pack gratuit choisi.
+        final v1 = <String, dynamic>{
+          'cauris': 200,
+          'free_pack_chosen': 'culture_ci',
+          'owned_packs': <String>['culture_ci'],
+          'levels': <String, dynamic>{'ci_nimba': 2},
+          'stars_by_level': <String, dynamic>{'ci_nimba#1': 3, 'ci_nimba#2': 2},
+          'fails_by_level': <String, dynamic>{'ci_nimba#2': 1},
+        };
+
+        final p = PlayerProgress.fromJson(v1);
+
+        // Le pack actif est dérivé du pack gratuit.
+        expect(p.activePackId, 'culture_ci');
+        // Les clés sont désormais préfixées → les accessors par-pack lisent.
+        expect(p.levelsOn('ci_nimba'), 2);
+        expect(p.starsOnLevel(mountainId: 'ci_nimba', levelIndex: 1), 3);
+        expect(p.failsOnLevel(mountainId: 'ci_nimba', levelIndex: 2), 1);
+        expect(p.totalStars, 5);
+        // Stockage interne préfixé.
+        expect(p.completedLevelsByMountain['culture_ci::ci_nimba'], 2);
+      });
+
+      test('un profil v1 dérive le pack actif du pack_mix dominant', () {
+        final v1 = <String, dynamic>{
+          'owned_packs': <String>['culture_ci', 'football_ci'],
+          'pack_mix': <String, dynamic>{'culture_ci': 0.7, 'football_ci': 0.3},
+          'stars_by_level': <String, dynamic>{'ci_nimba#1': 3},
+        };
+
+        final p = PlayerProgress.fromJson(v1);
+        expect(p.activePackId, 'culture_ci');
+        expect(p.starsOnLevel(mountainId: 'ci_nimba', levelIndex: 1), 3);
+      });
+
+      test('un profil v2 (schema_version: 2) ne re-migre pas les clés', () {
+        final v2 = <String, dynamic>{
+          'schema_version': 2,
+          'free_pack_chosen': 'culture_ci',
+          'owned_packs': <String>['culture_ci'],
+          'active_pack_id': 'culture_ci',
+          'stars_by_level': <String, dynamic>{'culture_ci::ci_nimba#1': 3},
+        };
+
+        final p = PlayerProgress.fromJson(v2);
+        // Pas de double-préfixe.
+        expect(p.starsByLevel['culture_ci::ci_nimba#1'], 3);
+        expect(p.starsByLevel.containsKey('culture_ci::culture_ci::ci_nimba#1'),
+            isFalse);
+        expect(p.starsOnLevel(mountainId: 'ci_nimba', levelIndex: 1), 3);
+      });
+
+      test('toJson écrit schema_version: 2 et active_pack_id', () {
+        final json = PlayerProgress.initial()
+            .copyWith(
+              ownedPacks: {'culture_ci'},
+              freePackChosen: 'culture_ci',
+              activePackId: 'culture_ci',
+            )
+            .toJson();
+        expect(json['schema_version'], 2);
+        expect(json['active_pack_id'], 'culture_ci');
+      });
     });
 
     group('encounteredModifiers', () {

@@ -10,7 +10,6 @@ import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/sync/sync_state.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
-import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:defi_kilimandjaro/presentation/my_packs/widgets/unlock_pack_dialog.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/pack_icon.dart';
@@ -22,13 +21,14 @@ import 'package:go_router/go_router.dart';
 /// Critère de tri du catalogue de packs.
 enum PackSort { recent, price, alpha }
 
-/// Écran "Mes packs" — gestion du mix de pondération + catalogue.
+/// Écran "Mes packs" — sélection du pack actif + catalogue à débloquer.
 ///
-/// Entry point : icône en haut à droite de [MountainListView] (action bar),
-/// la carte « Découvrir » de l'accueil, et [ProfileView].
+/// Entry point : chip pack actif (header carte montagnes + accueil), la carte
+/// « Découvrir » de l'accueil, et l'écran Profil.
 ///
-/// - 1 pack possédé → vue simplifiée (pack courant + catalogue à débloquer).
-/// - 2+ packs possédés → sliders de pondération + catalogue.
+/// Modèle « pack actif unique » : la liste des packs possédés permet d'activer
+/// celui qu'on veut gravir (chaque pack a sa propre progression de montagnes).
+/// Le catalogue liste les packs à débloquer.
 class MyPacksView extends ConsumerStatefulWidget {
   const MyPacksView({super.key});
 
@@ -37,13 +37,6 @@ class MyPacksView extends ConsumerStatefulWidget {
 }
 
 class _MyPacksViewState extends ConsumerState<MyPacksView> {
-  /// Poids locaux en cours d'édition (0–100, somme = 100).
-  /// Initialisés depuis [activePackMix] lors du premier build.
-  Map<String, double>? _localWeights;
-
-  /// Timer de debounce pour éviter spam I/O sur chaque pixel de drag.
-  Timer? _debounce;
-
   /// Recherche texte courante sur le catalogue.
   String _query = '';
 
@@ -51,101 +44,9 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
   PackSort _sort = PackSort.recent;
 
   @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
-  }
-
-  /// Réajuste les poids des autres packs lorsque [changedId] bouge vers
-  /// [newValue] (en pourcentages). Algorithme proportionnel :
-  /// l'excédent est redistribué proportionnellement aux poids actuels des
-  /// autres packs. Si tous les autres sont à 0, on répartit équitablement.
-  ///
-  /// Garanties :
-  /// - Somme des valeurs retournées == 100.
-  /// - Aucune valeur < 0.
-  Map<String, double> _rebalance(
-    Map<String, double> current,
-    String changedId,
-    double newValue,
-  ) {
-    final clamped = newValue.clamp(0.0, 100.0);
-    final others = Map<String, double>.from(current)..remove(changedId);
-
-    if (others.isEmpty) {
-      return {changedId: 100};
-    }
-
-    final remainder = (100 - clamped).clamp(0.0, 100.0);
-    final othersSum = others.values.fold<double>(0, (a, b) => a + b);
-
-    Map<String, double> newOthers;
-    if (othersSum <= 0) {
-      // All others are at 0 — distribute evenly.
-      final share = remainder / others.length;
-      newOthers = others.map((k, _) => MapEntry(k, share));
-    } else {
-      // Proportional redistribution.
-      newOthers = others.map(
-        (k, v) => MapEntry(k, (v / othersSum) * remainder),
-      );
-    }
-
-    return {changedId: clamped, ...newOthers};
-  }
-
-  void _onSliderChanged(String packId, double value) {
-    final current = _localWeights;
-    if (current == null) return;
-    final rebalanced = _rebalance(current, packId, value);
-    setState(() => _localWeights = rebalanced);
-
-    // Debounce the repository call (300 ms).
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () {
-      _persistMix(rebalanced);
-    });
-  }
-
-  Future<void> _persistMix(Map<String, double> percentWeights) async {
-    // Strip entries at 0 and convert to 0–1 weights.
-    final positive = <String, double>{
-      for (final entry in percentWeights.entries)
-        if (entry.value > 0) entry.key: entry.value / 100,
-    };
-    if (positive.isEmpty) return;
-
-    try {
-      final mix = PackMix.normalized(positive);
-      await ref.read(playerProgressProvider.notifier).setPackMix(mix);
-    } on Exception {
-      // Owned-pack validation failure — defensive, UI pre-validates.
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final asyncCatalog = ref.watch(packCatalogProvider);
     final ownedPacks = ref.watch(ownedPacksProvider);
-    final activeMix = ref.watch(packMixProvider);
-
-    // Initialise local weights once from the persisted mix, adding zeros for
-    // owned packs not yet in the mix (unlikely but defensive).
-    if (_localWeights == null && ownedPacks.isNotEmpty) {
-      final initial = <String, double>{};
-      for (final id in ownedPacks) {
-        final weight = activeMix.weights[id] ?? 0;
-        initial[id] = weight * 100;
-      }
-      // Normalise to 100 in case of rounding.
-      final sum = initial.values.fold<double>(0, (a, b) => a + b);
-      if (sum > 0) {
-        _localWeights = initial.map((k, v) => MapEntry(k, v / sum * 100));
-      } else if (ownedPacks.isNotEmpty) {
-        final share = 100.0 / ownedPacks.length;
-        _localWeights = {for (final id in ownedPacks) id: share};
-      }
-    }
 
     final syncState = ref.watch(manifestSyncStateProvider);
     final isSyncing = syncState is SyncStateSyncing;
@@ -228,7 +129,7 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
                         .startRefresh());
                     try {
                       await ref.read(refreshRemoteCatalogProvider.future);
-                    } catch (e) {
+                    } on Object catch (e) {
                       // Échec catalog n'est pas bloquant — l'app continue
                       // de fonctionner sur le bundle. Juste un toast discret.
                       if (mounted) {
@@ -270,17 +171,10 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
                   onQueryChanged: (q) => setState(() => _query = q),
                   onSortChanged: (s) => setState(() => _sort = s),
                 );
-                return owned.length >= 2
-                    ? _MixView(
-                        owned: owned,
-                        localWeights: _localWeights ?? {},
-                        onSliderChanged: _onSliderChanged,
-                        catalogSection: catalogSection,
-                      )
-                    : _SinglePackView(
-                        ownedPack: owned.isEmpty ? null : owned.first,
-                        catalogSection: catalogSection,
-                      );
+                return _OwnedPacksView(
+                  owned: owned,
+                  catalogSection: catalogSection,
+                );
               },
             ),
           ),
@@ -379,80 +273,109 @@ class _SyncBanner extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Multi-pack mix view (2+ packs owned)
+// Owned packs view — sélection du pack ACTIF (modèle « pack actif unique »)
 // ---------------------------------------------------------------------------
 
-class _MixView extends StatelessWidget {
-  const _MixView({
+class _OwnedPacksView extends StatelessWidget {
+  const _OwnedPacksView({
     required this.owned,
-    required this.localWeights,
-    required this.onSliderChanged,
     required this.catalogSection,
   });
 
   final List<Pack> owned;
-  final Map<String, double> localWeights;
-  final void Function(String packId, double value) onSliderChanged;
   final Widget catalogSection;
 
   @override
   Widget build(BuildContext context) {
-    final totalPercent =
-        localWeights.values.fold<double>(0, (a, b) => a + b).round();
-    final totalOk = (totalPercent - 100).abs() <= 1;
-
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.md),
       children: [
         AppSpacing.gapMd,
-        Text('my_packs.mix_title'.tr(), style: AppTypography.headingXl),
-        AppSpacing.gapXs,
-        Text(
-          'my_packs.mix_subtitle'.tr(),
-          style: AppTypography.bodySm,
-        ),
-        AppSpacing.gapLg,
-        ...owned.map(
-          (pack) => _PackSlider(
-            pack: pack,
-            percent: localWeights[pack.id] ?? 0,
-            onChanged: (v) => onSliderChanged(pack.id, v),
-          ),
-        ),
-        AppSpacing.gapMd,
-        _TotalIndicator(totalPercent: totalPercent, totalOk: totalOk),
-        AppSpacing.gapXl,
+        if (owned.isNotEmpty) ...[
+          Text('my_packs.active_title'.tr(), style: AppTypography.headingXl),
+          AppSpacing.gapXs,
+          Text('my_packs.active_subtitle'.tr(), style: AppTypography.bodySm),
+          AppSpacing.gapLg,
+          ...owned.map((pack) => _OwnedPackTile(pack: pack)),
+          AppSpacing.gapXl,
+        ],
         catalogSection,
       ],
     );
   }
 }
 
-// ---------------------------------------------------------------------------
-// Single-pack view (1 pack owned)
-// ---------------------------------------------------------------------------
+/// Tuile d'un pack possédé. Tap → active ce pack comme grimpe courante
+/// (`setActivePack`). Le pack actif est mis en avant (bordure or + check).
+class _OwnedPackTile extends ConsumerWidget {
+  const _OwnedPackTile({required this.pack});
 
-class _SinglePackView extends StatelessWidget {
-  const _SinglePackView({
-    required this.ownedPack,
-    required this.catalogSection,
-  });
-
-  final Pack? ownedPack;
-  final Widget catalogSection;
+  final Pack pack;
 
   @override
-  Widget build(BuildContext context) {
-    return ListView(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isActive = ref.watch(activePackIdProvider) == pack.id;
+    // Compteur "live" : bundle + cache OTA fusionnés. Fallback sur le
+    // compteur bundlé du `_index.json` tant que le merge n'a pas chargé.
+    final liveCount = ref
+        .watch(packLiveQuestionCountProvider(pack.id))
+        .maybeWhen(data: (n) => n, orElse: () => pack.questionCount);
+
+    Future<void> activate() async {
+      if (isActive) return;
+      // `pack` provient de la liste des packs possédés → setActivePack ne
+      // lèvera pas (il valide l'appartenance).
+      await ref.read(playerProgressProvider.notifier).setActivePack(pack.id);
+    }
+
+    final tile = Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       padding: const EdgeInsets.all(AppSpacing.md),
-      children: [
-        AppSpacing.gapMd,
-        if (ownedPack != null) ...[
-          _CurrentPackTile(pack: ownedPack!),
-          AppSpacing.gapXl,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isActive ? AppColors.orJour : AppColors.hairline,
+          width: isActive ? 1.5 : 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          PackIcon(pack: pack),
+          AppSpacing.hGapSm,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(pack.nameKey.tr(), style: AppTypography.headingMd),
+                Text(
+                  'my_packs.current_pack_label'
+                      .tr(namedArgs: {'count': '$liveCount'}),
+                  style: AppTypography.bodySm,
+                ),
+              ],
+            ),
+          ),
+          AppSpacing.hGapSm,
+          if (isActive)
+            const Icon(Icons.check_circle, color: AppColors.orJour, size: 20)
+          else
+            Text(
+              'my_packs.activate'.tr(),
+              style: AppTypography.bebas(size: 13, color: AppColors.success),
+            ),
         ],
-        catalogSection,
-      ],
+      ),
+    );
+
+    if (isActive) return tile;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: activate,
+        borderRadius: BorderRadius.circular(12),
+        child: tile,
+      ),
     );
   }
 }
@@ -658,161 +581,6 @@ class _SortChip extends StatelessWidget {
 // ---------------------------------------------------------------------------
 // Sub-widgets
 // ---------------------------------------------------------------------------
-
-class _PackSlider extends StatelessWidget {
-  const _PackSlider({
-    required this.pack,
-    required this.percent,
-    required this.onChanged,
-  });
-
-  final Pack pack;
-  final double percent;
-  final ValueChanged<double> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final displayPct = percent.round();
-    return Semantics(
-      label: '${pack.nameKey.tr()} — $displayPct%',
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                PackIcon(pack: pack, size: 28),
-                AppSpacing.hGapSm,
-                Expanded(
-                  child: Text(
-                    pack.nameKey.tr(),
-                    style: AppTypography.headingSm,
-                  ),
-                ),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 150),
-                  child: Text(
-                    '$displayPct%',
-                    key: ValueKey(displayPct),
-                    style: AppTypography.headingMd.copyWith(
-                      color: AppColors.orJour,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SliderTheme(
-              data: SliderTheme.of(context).copyWith(
-                activeTrackColor: AppColors.orJour,
-                inactiveTrackColor: AppColors.boisFonce,
-                thumbColor: AppColors.orCrepuscule,
-                overlayColor: AppColors.orJour.withValues(alpha: 0.12),
-                trackHeight: 6,
-                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
-              ),
-              child: Slider(
-                value: percent.clamp(0.0, 100.0),
-                max: 100,
-                divisions: 100,
-                onChanged: onChanged,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TotalIndicator extends StatelessWidget {
-  const _TotalIndicator({
-    required this.totalPercent,
-    required this.totalOk,
-  });
-
-  final int totalPercent;
-  final bool totalOk;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      decoration: BoxDecoration(
-        color: totalOk ? AppColors.successSoft : AppColors.warningSoft,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            totalOk ? Icons.check_circle_outline : Icons.warning_amber_outlined,
-            color: totalOk ? AppColors.success : AppColors.warning,
-            size: 18,
-          ),
-          AppSpacing.hGapSm,
-          Text(
-            totalOk
-                ? 'my_packs.total_ok'.tr()
-                : 'my_packs.total_label'
-                    .tr(namedArgs: {'total': '$totalPercent'}),
-            style: AppTypography.labelSm.copyWith(
-              color: totalOk ? AppColors.success : AppColors.warning,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CurrentPackTile extends ConsumerWidget {
-  const _CurrentPackTile({required this.pack});
-
-  final Pack pack;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Compteur "live" : bundle + cache OTA fusionnés. Fallback sur le
-    // compteur bundlé du `_index.json` tant que le merge n'a pas chargé.
-    final liveCount = ref
-        .watch(packLiveQuestionCountProvider(pack.id))
-        .maybeWhen(data: (n) => n, orElse: () => pack.questionCount);
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.orJour, width: 1.5),
-      ),
-      child: Row(
-        children: [
-          PackIcon(pack: pack),
-          AppSpacing.hGapSm,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(pack.nameKey.tr(), style: AppTypography.headingMd),
-                Text(
-                  'my_packs.current_pack_label'
-                      .tr(namedArgs: {'count': '$liveCount'}),
-                  style: AppTypography.bodySm,
-                ),
-              ],
-            ),
-          ),
-          const Icon(Icons.check_circle, color: AppColors.orJour, size: 20),
-        ],
-      ),
-    );
-  }
-}
 
 /// Carte d'un pack à débloquer. Toute la carte est cliquable et ouvre la
 /// confirmation d'achat ([UnlockPackDialog]). Le prix est affiché avec

@@ -170,6 +170,17 @@ describe("publishPack — integration emulator", () => {
         .get();
       expect(auditSnap.size).toBe(1);
       expect(auditSnap.docs[0].data().type).toBe("publish");
+
+      // Vérifie le mirror vers le pool de duel (collection racine `devinettes`).
+      const duelSnap = await db
+        .collection("devinettes")
+        .doc(`${TEST_PACK_ID}_001`)
+        .get();
+      expect(duelSnap.exists).toBe(true);
+      expect(duelSnap.data()?.enabled_for_duel).toBe(true);
+      expect(duelSnap.data()?.status).toBe("approved");
+      expect(duelSnap.data()?.pack).toBe(TEST_PACK_ID);
+      expect(duelSnap.data()?.difficulty).toBe("easy"); // difficulty 1 → easy
     }, 30_000);
 
     it("promeut les drafts en published après publish", async () => {

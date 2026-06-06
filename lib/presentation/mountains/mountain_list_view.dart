@@ -9,6 +9,7 @@ import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/altimeter_rail.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/atmosphere_layer.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
+import 'package:defi_kilimandjaro/presentation/packs/widgets/active_pack_chip.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/mountain_hero_image.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -506,26 +507,9 @@ class _SommetsHeader extends StatelessWidget {
         children: [
           Text('Sommets', style: AppTypography.headingMd),
           const Spacer(),
-          Semantics(
-            button: true,
-            label: 'my_packs.title'.tr(),
-            child: Material(
-              color: AppColors.surfaceContainer,
-              shape: const CircleBorder(),
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: () => context.push(AppRoutes.myPacks),
-                child: const Padding(
-                  padding: EdgeInsets.all(9),
-                  child: Icon(
-                    Icons.layers_outlined,
-                    color: AppColors.orJour,
-                    size: 20,
-                  ),
-                ),
-              ),
-            ),
-          ),
+          // Chip « pack actif » : indique la grimpe courante (la carte affiche
+          // la progression du pack actif) et ouvre « Mes packs » au tap.
+          const Flexible(child: ActivePackChip()),
           const SizedBox(width: 10),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

@@ -4,8 +4,8 @@ import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
-import 'package:defi_kilimandjaro/domain/entities/pack_mix.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/section_title.dart';
+import 'package:defi_kilimandjaro/presentation/packs/widgets/active_pack_chip.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,11 +28,9 @@ class PacksSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionTitle(
+        const SectionTitle(
           label: 'TES PACKS',
-          trailing: _ManageLink(
-            onTap: () => context.push(AppRoutes.myPacks),
-          ),
+          trailing: ActivePackChip(),
         ),
         SizedBox(
           height: 120,
@@ -68,45 +66,6 @@ class PacksSection extends ConsumerWidget {
   }
 }
 
-/// Lien discret « GÉRER » → écran de pondération des packs.
-class _ManageLink extends StatelessWidget {
-  const _ManageLink({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'GÉRER',
-                style: AppTypography.bebas(
-                  size: 12,
-                  color: AppColors.texteSecondaire,
-                ),
-              ),
-              const SizedBox(width: 2),
-              const Icon(
-                Icons.chevron_right_rounded,
-                size: 16,
-                color: AppColors.texteSecondaire,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 /// Carte d'un pack possédé : nom · nb de devinettes · badge ACTIF.
 /// Tap = active le pack (s'il ne l'est pas) puis va aux Sommets.
 class _OwnedPackCard extends ConsumerWidget {
@@ -116,8 +75,8 @@ class _OwnedPackCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activeMix = ref.watch(packMixProvider);
-    final isActive = activeMix.packIds.contains(pack.id);
+    final activeId = ref.watch(activePackIdProvider);
+    final isActive = activeId == pack.id;
 
     return SizedBox(
       width: 188,
@@ -183,9 +142,8 @@ class _OwnedPackCard extends ConsumerWidget {
 
   Future<void> _resume(BuildContext context, WidgetRef ref) async {
     final notifier = ref.read(playerProgressProvider.notifier);
-    final activeMix = ref.read(packMixProvider);
-    if (!activeMix.packIds.contains(pack.id)) {
-      await notifier.setPackMix(PackMix.single(pack.id));
+    if (ref.read(activePackIdProvider) != pack.id) {
+      await notifier.setActivePack(pack.id);
     }
     if (!context.mounted) return;
     context.go(AppRoutes.mountains);
