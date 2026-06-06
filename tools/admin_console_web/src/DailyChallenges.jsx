@@ -4,10 +4,10 @@ import {
   documentId,
   doc,
   getDocs,
-  limit,
   onSnapshot,
   orderBy,
   query,
+  where,
 } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions } from './firebase.js';
@@ -18,21 +18,34 @@ function todayKey() {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
+function dateKeyDaysAgo(n) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  const p = (x) => String(x).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
 export default function DailyChallenges() {
   const [items, setItems] = useState(null);
   const [error, setError] = useState(null);
   const [assignOpen, setAssignOpen] = useState(false);
 
   useEffect(() => {
-    // Docs = yyyy-MM-dd → l'ordre lexicographique sur l'id = chronologique.
+    // Docs = yyyy-MM-dd. On évite orderBy(__name__ desc) (réclame un index) :
+    // range sur le doc id (index automatique, ordre ascendant) + tri client desc.
+    const start = dateKeyDaysAgo(180);
     const q = query(
       collection(db, 'daily_challenges'),
-      orderBy(documentId(), 'desc'),
-      limit(120),
+      where(documentId(), '>=', start),
+      orderBy(documentId()),
     );
     return onSnapshot(
       q,
-      (snap) => setItems(snap.docs.map((d) => ({ date: d.id, ...d.data() }))),
+      (snap) => {
+        const arr = snap.docs.map((d) => ({ date: d.id, ...d.data() }));
+        arr.sort((a, b) => b.date.localeCompare(a.date));
+        setItems(arr);
+      },
       (e) => setError(`${e.code}: ${e.message}`),
     );
   }, []);
