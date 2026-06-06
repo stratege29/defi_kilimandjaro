@@ -3,7 +3,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions } from './firebase.js';
 
-export default function Catalog() {
+export default function Catalog({ onEdit }) {
   const [packs, setPacks] = useState(null);
   const [error, setError] = useState(null);
   const [publishing, setPublishing] = useState(null); // packId en cours
@@ -100,7 +100,10 @@ export default function Catalog() {
                 </td>
                 <td>{p.bundled ? '✓' : '—'}</td>
                 <td className="num">{p.ordering ?? 100}</td>
-                <td>
+                <td className="row-actions">
+                  <button className="btn ghost small" onClick={() => onEdit?.(p.id)}>
+                    Éditer
+                  </button>
                   <button
                     className="btn primary small"
                     disabled={publishing === p.id}

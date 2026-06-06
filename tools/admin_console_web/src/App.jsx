@@ -3,10 +3,12 @@ import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
 import { auth, googleProvider } from './firebase.js';
 import Moderation from './Moderation.jsx';
 import Catalog from './Catalog.jsx';
+import PackEditor from './PackEditor.jsx';
 
 export default function App() {
   const [user, setUser] = useState(undefined); // undefined = chargement
   const [tab, setTab] = useState('moderation');
+  const [editingPack, setEditingPack] = useState(null);
 
   useEffect(() => onAuthStateChanged(auth, setUser), []);
 
@@ -29,7 +31,10 @@ export default function App() {
         </button>
         <button
           className={tab === 'catalog' ? 'nav active' : 'nav'}
-          onClick={() => setTab('catalog')}
+          onClick={() => {
+            setTab('catalog');
+            setEditingPack(null);
+          }}
         >
           Catalogue
         </button>
@@ -41,7 +46,13 @@ export default function App() {
         </div>
       </aside>
       <main className="content">
-        {tab === 'moderation' ? <Moderation /> : <Catalog />}
+        {tab === 'moderation' && <Moderation />}
+        {tab === 'catalog' &&
+          (editingPack ? (
+            <PackEditor packId={editingPack} onBack={() => setEditingPack(null)} />
+          ) : (
+            <Catalog onEdit={setEditingPack} />
+          ))}
       </main>
     </div>
   );
