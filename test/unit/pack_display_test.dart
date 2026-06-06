@@ -24,15 +24,4 @@ void main() {
       expect(packIdFromDevinetteId(''), isNull);
     });
   });
-
-  group('packEmoji', () {
-    test('mappe les packs connus', () {
-      expect(packEmoji('culture_ci'), isNotEmpty);
-      expect(packEmoji('football_ci'), isNotEmpty);
-    });
-
-    test('fallback générique pour un pack inconnu', () {
-      expect(packEmoji('pack_inexistant'), '🃏');
-    });
-  });
 }

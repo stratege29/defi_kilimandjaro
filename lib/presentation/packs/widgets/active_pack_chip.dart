@@ -3,7 +3,7 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
-import 'package:defi_kilimandjaro/domain/services/pack_display.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/pack_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,16 +23,16 @@ class ActivePackChip extends ConsumerWidget {
     final activeId = ref.watch(activePackIdProvider);
     if (activeId == null || activeId.isEmpty) return const SizedBox.shrink();
 
-    final name = ref.watch(packCatalogProvider).maybeWhen(
+    final pack = ref.watch(packCatalogProvider).maybeWhen(
           data: (catalog) {
             for (final p in catalog) {
-              if (p.id == activeId) return p.nameKey.tr();
+              if (p.id == activeId) return p;
             }
             return null;
           },
           orElse: () => null,
         );
-    if (name == null) return const SizedBox.shrink();
+    if (pack == null) return const SizedBox.shrink();
 
     return Semantics(
       button: true,
@@ -52,11 +52,11 @@ class ActivePackChip extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(packEmoji(activeId), style: const TextStyle(fontSize: 14)),
+                PackIcon(pack: pack, size: 18),
                 const SizedBox(width: 6),
                 Flexible(
                   child: Text(
-                    name,
+                    pack.nameKey.tr(),
                     style: AppTypography.labelSm.copyWith(
                       color: AppColors.orJour,
                       fontWeight: FontWeight.w700,

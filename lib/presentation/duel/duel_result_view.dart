@@ -21,7 +21,9 @@ import 'package:defi_kilimandjaro/presentation/duel/lobby_controller.dart'
     show lobbyPreviousMatchIdProvider, lobbyRematchUidProvider;
 import 'package:defi_kilimandjaro/presentation/my_packs/widgets/unlock_pack_dialog.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/dashed_button.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/pack_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -700,10 +702,7 @@ class _UpsellCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Text(
-                packEmoji(pack.id),
-                style: const TextStyle(fontSize: 22),
-              ),
+              PackIcon(pack: pack, size: 40),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -734,10 +733,17 @@ class _UpsellCard extends StatelessWidget {
                     color: AppColors.orJour.withValues(alpha: 0.55),
                   ),
                 ),
-                child: Text(
-                  '$cost 🐚',
-                  style:
-                      AppTypography.labelSm.copyWith(color: AppColors.orJour),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '$cost',
+                      style: AppTypography.labelSm
+                          .copyWith(color: AppColors.orJour),
+                    ),
+                    const SizedBox(width: 4),
+                    const CaurisIcon(size: 14),
+                  ],
                 ),
               ),
             ],
@@ -911,12 +917,20 @@ class _RoundCard extends ConsumerWidget {
               ),
             ],
             if (pack != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                'Devinette du pack ${packEmoji(pack.id)} ${pack.nameKey.tr()}',
-                style: AppTypography.labelXs.copyWith(
-                  color: AppColors.texteTertiaire,
-                ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  PackIcon(pack: pack, size: 18),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      'Devinette du pack ${pack.nameKey.tr()}',
+                      style: AppTypography.labelXs.copyWith(
+                        color: AppColors.texteTertiaire,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ],
