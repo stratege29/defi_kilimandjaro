@@ -8,6 +8,7 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_theme.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/ads/consent_service.dart';
+import 'package:defi_kilimandjaro/data/firebase/analytics_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/app_check_setup.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
@@ -20,6 +21,7 @@ import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/firebase_options.dart';
 import 'package:defi_kilimandjaro/presentation/duel/incoming_challenge_listener.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -77,6 +79,12 @@ Future<void> main() async {
 /// Lecture des defaults garantie même si `init()` n'a pas tourné.
 final RemoteConfigService _remoteConfig = RemoteConfigService();
 
+/// Service analytics partagé — créé tôt pour pouvoir poser la user property
+/// de variante A/B dès le boot (après résolution Remote Config) et override
+/// le provider Riverpod. No-op si Firebase n'est pas initialisé.
+final AnalyticsService _analytics =
+    FirebaseAnalyticsService(FirebaseAnalytics.instance);
+
 Future<void> _bootstrap() async {
   // [BOOT] timeline via print() — visible dans Xcode console (debug + flutter run).
   // ignore: avoid_print
@@ -126,6 +134,16 @@ Future<void> _bootstrap() async {
     // Remote Config : économie + ad fréquences + killswitch. Fail-soft —
     // si le fetch échoue, les defaults baked-in restent actifs.
     await _remoteConfig.init();
+
+    // Analytics : active la collecte et tague la variante A/B du scaling
+    // des sinks (rééquilibrage cauris) en user property GA4 — base du
+    // suivi de l'experiment Firebase A/B Testing. Fail-soft, non bloquant.
+    unawaited(_analytics.init());
+    unawaited(
+      _analytics.setSinkScalingVariant(
+        enabled: _remoteConfig.current.sinkTierScalingEnabled,
+      ),
+    );
 
     // Local emulator wiring — opt-in via --dart-define USE_FIREBASE_EMULATOR=true
     // (cf. README emulator section). Doit être appelé AVANT toute requête
@@ -270,6 +288,7 @@ Future<void> _bootstrap() async {
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           remoteConfigServiceProvider.overrideWithValue(_remoteConfig),
+          analyticsServiceProvider.overrideWithValue(_analytics),
           // Phase 3 : active le catalog remote (Firestore catalog/index)
           // en override du bundle-only par défaut. Le composite fait le
           // fallback bundle si remote indisponible. Pas de fetch au boot

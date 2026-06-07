@@ -10,6 +10,7 @@ import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/ads/att_service.dart';
 import 'package:defi_kilimandjaro/data/ads/rewarded_daily_cap_service.dart';
+import 'package:defi_kilimandjaro/data/firebase/analytics_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/local/link_prompt_gate.dart';
 import 'package:defi_kilimandjaro/data/local/seen_devinette_store.dart';
@@ -791,9 +792,18 @@ class _GameViewState extends ConsumerState<GameView>
             : null,
         canAffordReveal: canAffordReveal,
         onPurchaseReveal: isPayWallActive && !answerRevealed
-            ? () => ref
-                .read(playerProgressProvider.notifier)
-                .purchaseReveal(revealCostCauris)
+            ? () {
+                // Analytics : taux d'achat de révélation par variante A/B.
+                unawaited(
+                  ref.read(analyticsServiceProvider).logAnswerRevealed(
+                        tier: config.difficultyTier,
+                        cost: revealCostCauris,
+                      ),
+                );
+                return ref
+                    .read(playerProgressProvider.notifier)
+                    .purchaseReveal(revealCostCauris);
+              }
             : null,
         onRetry: () {
           ctx.pop(); // closes dialog
