@@ -21,6 +21,7 @@
       }
     },
     "matches": {
+      ".indexOn": ["phase"],
       "$matchId": {
         ".read": "auth != null",
         // Autorise les participants existants ET le target_uid (rematch async)

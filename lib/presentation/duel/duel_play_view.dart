@@ -132,9 +132,17 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
       },
     );
 
-    final formedLetters = localState.selectedIndices
-        .map((i) => liveSession.lettersPool[i])
-        .join();
+    // Garde-fou anti-RangeError : pendant une transition de round, la sélection
+    // locale peut encore référencer l'ancien round (indices >= nouveau
+    // lettersPool) le temps que onSessionUpdated réinitialise l'état. On ignore
+    // la sélection si le round local ne correspond pas au round live, et on
+    // filtre tout index hors bornes.
+    final pool = liveSession.lettersPool;
+    final selectedForRound =
+        localState.currentRound == liveSession.currentRound
+            ? localState.selectedIndices.where((i) => i >= 0 && i < pool.length)
+            : const <int>[];
+    final formedLetters = selectedForRound.map((i) => pool[i]).join();
     final selfPlayer = liveSession.players[selfUid];
     final opponent = liveSession.opponentOf(selfUid);
 
@@ -242,6 +250,13 @@ class _GameplayContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Même garde-fou que dans le parent : ne pas exposer une sélection de
+    // l'ancien round (indices hors bornes du lettersPool courant) à la grille.
+    final safeSelected = localState.currentRound == session.currentRound
+        ? localState.selectedIndices
+            .where((i) => i >= 0 && i < session.lettersPool.length)
+            .toList()
+        : const <int>[];
     return SafeArea(
       child: Column(
         children: [
@@ -276,7 +291,7 @@ class _GameplayContent extends StatelessWidget {
               child: CircularGrid(
                 key: ValueKey<String>('circular-grid-${session.currentRound}'),
                 letters: session.lettersPool,
-                selectedIndices: localState.selectedIndices,
+                selectedIndices: safeSelected,
                 phase: localState.submitted
                     ? GamePhase.won
                     : (localState.timeLeft == 0

@@ -101,19 +101,29 @@ class GridLayout {
 /// les autres selon leur compatibilité de count.
 List<GridPattern> compatiblePatterns(int count) {
   final list = <GridPattern>[GridPattern.circle];
+  // Au-delà de ce seuil, on n'autorise QUE des formes 2D compactes (cercle,
+  // grille, clusters, scatter, jittered, spirale). Les formes 1D « larges et
+  // fines » (arc, sinusoïde/wave, V, caret, L) deviennent une longue ligne
+  // horizontale qui déborde en largeur et tasse les tuiles, alors qu'il reste
+  // plein d'espace vertical inutilisé. Cap : elles ne sont éligibles que
+  // jusqu'à `_maxWideShapeCount` lettres.
+  const maxWideShapeCount = 8;
   if (count >= 4) {
     list
       ..add(GridPattern.scatter)
-      ..add(GridPattern.jittered)
-      ..add(GridPattern.arc);
+      ..add(GridPattern.jittered);
+    if (count <= maxWideShapeCount) list.add(GridPattern.arc);
   }
   if (count >= 5) {
-    list
-      ..add(GridPattern.vShape)
-      ..add(GridPattern.caret)
-      ..add(GridPattern.lShape)
-      ..add(GridPattern.wave)
-      ..add(GridPattern.spiral);
+    // Spirale = phyllotaxie 2D compacte → reste pertinente pour tous les counts.
+    list.add(GridPattern.spiral);
+    if (count <= maxWideShapeCount) {
+      list
+        ..add(GridPattern.vShape)
+        ..add(GridPattern.caret)
+        ..add(GridPattern.lShape)
+        ..add(GridPattern.wave);
+    }
   }
   if (count == 5) list.add(GridPattern.diamond);
   if (count == 5 || count == 9) list.add(GridPattern.cross);
