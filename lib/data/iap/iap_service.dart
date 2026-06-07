@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:defi_kilimandjaro/data/firebase/analytics_service.dart';
 import 'package:defi_kilimandjaro/data/iap/cauris_pack.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/wallet/wallet_service.dart';
@@ -17,10 +18,11 @@ import 'package:logger/logger.dart';
 ///   en fallback (prix locaux statiques) — la transaction reste désactivée
 ///   tant que le catalogue n'est pas peuplé.
 class IAPService {
-  IAPService(this._iap, this._progress);
+  IAPService(this._iap, this._progress, this._analytics);
 
   final InAppPurchase _iap;
   final PlayerProgressNotifier _progress;
+  final AnalyticsService _analytics;
   final Logger _log = Logger();
 
   StreamSubscription<List<PurchaseDetails>>? _purchaseSub;
@@ -138,6 +140,19 @@ class IAPService {
     // ré-emettra, où l'idempotence serveur évitera le double-crédit).
     unawaited(_recordOnServer(purchase));
 
+    // Analytics : event ecommerce `purchase` → revenu IAP pour l'ARPDAU GA4
+    // (segmenté par variante A/B via la user property posée au boot).
+    final boughtDetails = _details[purchase.productID];
+    if (boughtDetails != null) {
+      unawaited(
+        _analytics.logIapPurchase(
+          productId: purchase.productID,
+          value: boughtDetails.rawPrice,
+          currency: boughtDetails.currencyCode,
+        ),
+      );
+    }
+
     if (purchase.productID == noAdsProductId) {
       await _progress.grantNoAds();
       _log.i('No-Ads accordé via IAP');
@@ -201,6 +216,7 @@ final iapServiceProvider = Provider<IAPService>((ref) {
   final svc = IAPService(
     ref.watch(inAppPurchaseInstanceProvider),
     ref.watch(playerProgressProvider.notifier),
+    ref.watch(analyticsServiceProvider),
   );
   ref.onDispose(svc.dispose);
   return svc;

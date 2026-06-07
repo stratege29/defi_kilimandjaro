@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
+import 'package:defi_kilimandjaro/data/firebase/analytics_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
@@ -157,8 +158,13 @@ class GameState {
 /// - Récompense finale multipliée par `args.config.caurisMultiplier`
 ///   pour valoriser les niveaux difficiles.
 class GameController extends StateNotifier<GameState> {
-  GameController(this._args, this._audio, this._progress, this._economy)
-    : super(
+  GameController(
+    this._args,
+    this._audio,
+    this._progress,
+    this._economy,
+    this._analytics,
+  ) : super(
         _initialState(_args, _progress.state.cauris),
       ) {
     _startTimer();
@@ -225,6 +231,9 @@ class GameController extends StateNotifier<GameState> {
   /// du niveau pour ne pas mutiler les invariants (cf. doc du
   /// `RemoteConfigService`).
   final GameEconomyConfig _economy;
+
+  /// Instrumentation analytics (events victoire / indice). Fail-soft.
+  final AnalyticsService _analytics;
   Timer? _timer;
   Timer? _modifierTimer;
   int _modifierTick = 0;
@@ -344,6 +353,15 @@ class GameController extends StateNotifier<GameState> {
 
     // Persist deduction (consomme d'abord le freebie, sinon débite).
     unawaited(_progress.spendOnHint(cost));
+    // Analytics : taux d'usage des indices par variante A/B (free vs payant).
+    unawaited(
+      _analytics.logHintUsed(
+        tier: _args.config.difficultyTier,
+        cost: hasFreeHint ? 0 : cost,
+        free: hasFreeHint,
+        levelIndex: _args.levelIndex,
+      ),
+    );
     // Audio: kora 2 notes douces descendantes.
     unawaited(_audio.playHintUsed());
     unawaited(HapticFeedback.lightImpact());
@@ -402,6 +420,19 @@ class GameController extends StateNotifier<GameState> {
           ),
         );
       }
+      // Analytics : métrique de gameplay/économie pour l'experiment A/B.
+      unawaited(
+        _analytics.logLevelWon(
+          tier: _args.config.difficultyTier,
+          caurisAwarded: caurisAwarded,
+          hintsUsed: state.hintRevealedCount,
+          timeLeft: state.timeLeft,
+          stars: stars,
+          isDaily: _args.isDailyChallenge,
+          levelIndex: _args.levelIndex,
+          mountainId: _args.mountainId,
+        ),
+      );
       // Audio: balafon accord 5 notes puis fanfare griot (boss ou
       // standard). La fanfare boss est plus longue et débute par 2
       // frappes djembé graves — l'attaque haptique heavy est aussi
@@ -630,5 +661,6 @@ final gameControllerProvider = StateNotifierProvider.autoDispose
         ref.read(audioControllerProvider.notifier),
         ref.read(playerProgressProvider.notifier),
         ref.read(gameEconomyConfigProvider),
+        ref.read(analyticsServiceProvider),
       ),
     );
