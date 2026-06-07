@@ -32,6 +32,7 @@ export default function DailyChallenges() {
   const [items, setItems] = useState(null);
   const [error, setError] = useState(null);
   const [assignOpen, setAssignOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
 
   useEffect(() => {
     // Docs = yyyy-MM-dd. On évite orderBy(__name__ desc) (réclame un index) :
@@ -103,6 +104,9 @@ export default function DailyChallenges() {
                   {it.source_pack ? `${it.source_pack}/${it.source_devi_id || it.id}` : it.id}
                 </td>
                 <td className="row-actions">
+                  <button className="btn ghost small" onClick={() => setEditing(it)}>
+                    Éditer
+                  </button>
                   <button className="btn danger small" onClick={() => remove(it.date)}>
                     Retirer
                   </button>
@@ -113,27 +117,36 @@ export default function DailyChallenges() {
         </table>
       )}
 
-      {assignOpen && <AssignForm onClose={() => setAssignOpen(false)} />}
+      {(assignOpen || editing) && (
+        <AssignForm
+          initial={editing}
+          onClose={() => {
+            setAssignOpen(false);
+            setEditing(null);
+          }}
+        />
+      )}
     </>
   );
 }
 
-function AssignForm({ onClose }) {
-  const [date, setDate] = useState(todayKey());
-  const [mode, setMode] = useState('source'); // 'source' | 'custom'
+function AssignForm({ onClose, initial }) {
+  const isEdit = !!initial;
+  const [date, setDate] = useState(initial?.date ?? todayKey());
+  const [mode, setMode] = useState(initial ? 'custom' : 'source'); // 'source' | 'custom'
   // mode source
   const [packs, setPacks] = useState([]);
   const [packId, setPackId] = useState('');
   const [devis, setDevis] = useState([]);
   const [deviId, setDeviId] = useState('');
   // mode custom
-  const [answer, setAnswer] = useState('');
-  const [country, setCountry] = useState('ci');
-  const [riddleFr, setRiddleFr] = useState('');
-  const [explFr, setExplFr] = useState('');
-  const [difficulty, setDifficulty] = useState(2);
-  const [estTime, setEstTime] = useState(30);
-  const [tags, setTags] = useState('');
+  const [answer, setAnswer] = useState(initial?.answer ?? '');
+  const [country, setCountry] = useState(initial?.country ?? 'ci');
+  const [riddleFr, setRiddleFr] = useState(initial?.riddle?.fr ?? '');
+  const [explFr, setExplFr] = useState(initial?.explanation?.fr ?? '');
+  const [difficulty, setDifficulty] = useState(initial?.difficulty ?? 2);
+  const [estTime, setEstTime] = useState(initial?.estimated_time_s ?? 30);
+  const [tags, setTags] = useState((initial?.tags ?? []).join(', '));
 
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
@@ -173,6 +186,9 @@ function AssignForm({ onClose }) {
           ? {
               date,
               custom: {
+                // Conserve l'id/pack d'origine en édition (sinon id par défaut).
+                ...(initial?.id ? { id: initial.id } : {}),
+                ...(initial?.pack ? { pack: initial.pack } : {}),
                 country,
                 answer,
                 riddle: { fr: riddleFr.trim() },
@@ -197,24 +213,31 @@ function AssignForm({ onClose }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h3>Assigner une devinette du jour</h3>
+        <h3>{isEdit ? `Éditer la devinette du ${date}` : 'Assigner une devinette du jour'}</h3>
         <label>Date (yyyy-MM-dd, heure locale)</label>
-        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        <input
+          type="date"
+          value={date}
+          disabled={isEdit}
+          onChange={(e) => setDate(e.target.value)}
+        />
 
-        <div className="tabs">
-          <button
-            className={mode === 'source' ? 'tab active' : 'tab'}
-            onClick={() => setMode('source')}
-          >
-            Depuis un pack
-          </button>
-          <button
-            className={mode === 'custom' ? 'tab active' : 'tab'}
-            onClick={() => setMode('custom')}
-          >
-            Personnalisée
-          </button>
-        </div>
+        {!isEdit && (
+          <div className="tabs">
+            <button
+              className={mode === 'source' ? 'tab active' : 'tab'}
+              onClick={() => setMode('source')}
+            >
+              Depuis un pack
+            </button>
+            <button
+              className={mode === 'custom' ? 'tab active' : 'tab'}
+              onClick={() => setMode('custom')}
+            >
+              Personnalisée
+            </button>
+          </div>
+        )}
 
         {mode === 'source' ? (
           <>
