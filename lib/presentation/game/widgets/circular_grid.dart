@@ -98,11 +98,6 @@ class _CircularGridState extends State<CircularGrid>
   /// Centres des tuiles en coordonnées locales (mis à jour à chaque layout).
   final List<Offset> _tileCenters = <Offset>[];
 
-  /// Taille EFFECTIVE de rendu d'une tuile (= `_tileSize`, sauf quand le layout
-  /// a été comprimé pour tenir dans l'espace dispo → réduite). Mise à jour à
-  /// chaque build depuis `layout.tileSize`. Sert au rendu ET au hit-test.
-  double _renderTileSize = _tileSize;
-
   /// Indices dont le hit-test est volontairement réduit (typiquement la
   /// tuile centrale de l'hexagone, pour éviter les captures parasites
   /// quand le doigt glisse d'une tuile à l'opposée).
@@ -261,8 +256,8 @@ class _CircularGridState extends State<CircularGrid>
   }
 
   int? _hitTest(Offset localPos) {
-    final fullRadius = _renderTileSize / 2;
-    final smallRadius = _renderTileSize * 0.40;
+    const fullRadius = _tileSize / 2;
+    const smallRadius = _tileSize * 0.40;
     for (var i = 0; i < _tileCenters.length; i++) {
       // Une tuile masquée par le fog ne capte pas le touch — le doigt
       // passe « à travers » comme si la case n'existait pas.
@@ -350,7 +345,6 @@ class _CircularGridState extends State<CircularGrid>
         _tileCenters
           ..clear()
           ..addAll(layout.centers);
-        _renderTileSize = layout.tileSize;
         _smallHitIndices = layout.smallHitIndices;
         // Garantit que les snap points du golden path sont collés aux
         // tuiles sélectionnées à chaque build, indépendamment du timing
@@ -413,10 +407,10 @@ class _CircularGridState extends State<CircularGrid>
                       key: stableKey,
                       duration: const Duration(milliseconds: 450),
                       curve: Curves.easeInOutCubic,
-                      left: center.dx - _renderTileSize / 2,
-                      top: center.dy - _renderTileSize / 2,
-                      width: _renderTileSize,
-                      height: _renderTileSize,
+                      left: center.dx - _tileSize / 2,
+                      top: center.dy - _tileSize / 2,
+                      width: _tileSize,
+                      height: _tileSize,
                       child: AnimatedOpacity(
                         // Fog : fade-out à 0 quand la tuile est masquée,
                         // re-fade-in quand elle ré-apparaît.
@@ -425,7 +419,6 @@ class _CircularGridState extends State<CircularGrid>
                         child: _Tile(
                           letter: widget.letters[i],
                           isSelected: isSelected,
-                          tileSize: _renderTileSize,
                           selectionOrder: isSelected
                               ? widget.selectedIndices.indexOf(i) + 1
                               : null,
@@ -454,13 +447,11 @@ class _Tile extends StatefulWidget {
     required this.letter,
     required this.isSelected,
     this.selectionOrder,
-    this.tileSize = 68,
   });
 
   final String letter;
   final bool isSelected;
   final int? selectionOrder;
-  final double tileSize;
 
   @override
   State<_Tile> createState() => _TileState();
@@ -559,9 +550,7 @@ class _TileState extends State<_Tile> with SingleTickerProviderStateMixin {
         child: Text(
           widget.letter,
           style: AppTypography.bebas(
-            // Police proportionnelle à la taille effective de la tuile (réduite
-            // quand le layout est comprimé) pour rester lisible sans déborder.
-            size: (28 * widget.tileSize / 68).clamp(13, 28).toDouble(),
+            size: 28,
             color: textColor,
             letterSpacing: 0,
             weight: FontWeight.w800,

@@ -82,7 +82,6 @@ class GridLayout {
     required this.centers,
     required this.size,
     this.smallHitIndices = const <int>{},
-    this.tileSize = 68,
   });
 
   /// Centres des tuiles, dans le repère local du widget.
@@ -93,12 +92,6 @@ class GridLayout {
 
   /// Indices à hit-test réduit (40 % du rayon visuel au lieu de 50 %).
   final Set<int> smallHitIndices;
-
-  /// Taille EFFECTIVE de rendu d'une tuile. Vaut la `tileSize` demandée, sauf
-  /// quand le layout a dû être comprimé pour tenir dans l'espace dispo
-  /// (`_ensureFits`) : la tuile est alors réduite du même facteur, pour que les
-  /// tuiles ne se chevauchent pas. Le widget doit rendre à CETTE taille.
-  final double tileSize;
 }
 
 /// Patterns éligibles pour [count] lettres.
@@ -108,19 +101,29 @@ class GridLayout {
 /// les autres selon leur compatibilité de count.
 List<GridPattern> compatiblePatterns(int count) {
   final list = <GridPattern>[GridPattern.circle];
+  // Au-delà de ce seuil, on n'autorise QUE des formes 2D compactes (cercle,
+  // grille, clusters, scatter, jittered, spirale). Les formes 1D « larges et
+  // fines » (arc, sinusoïde/wave, V, caret, L) deviennent une longue ligne
+  // horizontale qui déborde en largeur et tasse les tuiles, alors qu'il reste
+  // plein d'espace vertical inutilisé. Cap : elles ne sont éligibles que
+  // jusqu'à `_maxWideShapeCount` lettres.
+  const maxWideShapeCount = 8;
   if (count >= 4) {
     list
       ..add(GridPattern.scatter)
-      ..add(GridPattern.jittered)
-      ..add(GridPattern.arc);
+      ..add(GridPattern.jittered);
+    if (count <= maxWideShapeCount) list.add(GridPattern.arc);
   }
   if (count >= 5) {
-    list
-      ..add(GridPattern.vShape)
-      ..add(GridPattern.caret)
-      ..add(GridPattern.lShape)
-      ..add(GridPattern.wave)
-      ..add(GridPattern.spiral);
+    // Spirale = phyllotaxie 2D compacte → reste pertinente pour tous les counts.
+    list.add(GridPattern.spiral);
+    if (count <= maxWideShapeCount) {
+      list
+        ..add(GridPattern.vShape)
+        ..add(GridPattern.caret)
+        ..add(GridPattern.lShape)
+        ..add(GridPattern.wave);
+    }
   }
   if (count == 5) list.add(GridPattern.diamond);
   if (count == 5 || count == 9) list.add(GridPattern.cross);
@@ -439,7 +442,6 @@ GridLayout _packCanvas(
     centers: shifted,
     size: Size(w, h),
     smallHitIndices: traps,
-    tileSize: tileSize,
   );
 }
 
@@ -507,10 +509,7 @@ GridLayout _ensureFits(
     for (final p in layout.centers)
       Offset(cx + (p.dx - cx) * scale, cy + (p.dy - cy) * scale),
   ];
-  // On réduit AUSSI la tuile du même facteur : sans ça, comprimer seulement les
-  // positions rapproche les centres sous la taille fixe des tuiles → elles se
-  // chevauchent (lettres illisibles, ex. duel avec un mot long sur peu de place).
-  return _packCanvas(scaled, tileSize * scale, padding, layout.smallHitIndices);
+  return _packCanvas(scaled, tileSize, padding, layout.smallHitIndices);
 }
 
 // ---------------------------------------------------------------------------
