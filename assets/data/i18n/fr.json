@@ -106,7 +106,8 @@
     "locked_progression_cta": "TERMINE LE SOMMET PRÉCÉDENT",
     "locked_stargate_cta": "BARRIÈRE : {stars} ÉTOILES MANQUANTES",
     "locked_stargate_snackbar": "Il te manque {stars} pour franchir cette barrière. Rejoue tes niveaux à 1 pour les améliorer.",
-    "level_locked": "Termine le niveau {previous} pour débloquer"
+    "level_locked": "Termine le niveau {previous} pour débloquer",
+    "tap_to_skip": "Toucher pour passer"
   },
   "daily": {
     "title": "DÉFI DU JOUR",

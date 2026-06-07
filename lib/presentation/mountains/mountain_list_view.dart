@@ -6,6 +6,7 @@ import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
+import 'package:defi_kilimandjaro/presentation/mountains/mountain_reveal_intent.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/altimeter_rail.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/atmosphere_layer.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
@@ -40,7 +41,12 @@ const EdgeInsets _kCardPad = EdgeInsets.fromLTRB(
 /// Kilimandjaro. Le scroll vers le haut fait "monter" le joueur ; l'altimètre
 /// reste un scrubber alternatif.
 class MountainListView extends ConsumerStatefulWidget {
-  const MountainListView({super.key});
+  const MountainListView({this.revealIntent, super.key});
+
+  /// Si non-null, déclenche l'animation d'ascension à l'entrée : se poser sur
+  /// la montagne conquise puis scroller jusqu'à la suivante (cf.
+  /// [MountainRevealIntent]). Null pour les entrées normales → jump-to-current.
+  final MountainRevealIntent? revealIntent;
 
   @override
   ConsumerState<MountainListView> createState() => _MountainListViewState();
@@ -62,6 +68,19 @@ class _MountainListViewState extends ConsumerState<MountainListView>
   // rebuild. Vérifier `_pageController.page == null` ne suffit pas : dès que
   // le PageView attache le controller, `page` vaut 0.0, jamais null.
   bool _initialJumpDone = false;
+
+  // Séquence d'animation d'ascension (cf. widget.revealIntent) — one-shot.
+  bool _revealSequenceDone = false;
+
+  // Vrai pendant la séquence de reveal (pause + scroll) : affiche l'overlay
+  // de skip et l'indice « Toucher pour passer ».
+  bool _revealing = false;
+
+  // Mis à vrai par un tap pendant le reveal → on saute directement à la cible.
+  bool _revealSkipped = false;
+
+  // Index cible du reveal (la nouvelle montagne), pour le skip immédiat.
+  int? _revealToIdx;
 
   // Cache local des montagnes : `mountainsProvider` dépend de
   // `playerProgressProvider`, donc chaque fin de niveau invalide l'async et
@@ -104,6 +123,22 @@ class _MountainListViewState extends ConsumerState<MountainListView>
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(MountainListView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // go_router RÉUTILISE cette instance d'écran à chaque conquête (la page
+    // /mountains reste la racine de la pile). Sans ce réarmement, le one-shot
+    // `_revealSequenceDone` resterait à true après le 1er reveal → les reveals
+    // suivants seraient ignorés et le joueur resterait sur la montagne qu'il
+    // vient de finir. Dès qu'un NOUVEAU revealIntent arrive, on réarme : le
+    // post-frame du build suivant relancera _runRevealSequence.
+    final intent = widget.revealIntent;
+    if (intent != null && !identical(intent, oldWidget.revealIntent)) {
+      _revealSequenceDone = false;
+      _revealSkipped = false;
+    }
+  }
+
   void _onPageScroll() {
     if (!_pageController.hasClients) return;
     final page = _pageController.page ?? 0;
@@ -130,14 +165,68 @@ class _MountainListViewState extends ConsumerState<MountainListView>
     });
   }
 
-  /// Anime vers un index — utilisé pour le retap onglet "Sommets".
-  Future<void> _animateToIndex(int idx) async {
+  /// Anime vers un index — utilisé pour le retap onglet "Sommets" (450 ms par
+  /// défaut) et pour le reveal d'ascension (durée proportionnelle à la
+  /// distance, cf. [_runRevealSequence]).
+  Future<void> _animateToIndex(int idx, {Duration? duration}) async {
     if (!_pageController.hasClients) return;
     await _pageController.animateToPage(
       idx,
-      duration: const Duration(milliseconds: 450),
+      duration: duration ?? const Duration(milliseconds: 450),
       curve: Curves.easeOutCubic,
     );
+  }
+
+  /// Séquence d'animation d'ascension après une conquête : se pose sur la
+  /// montagne conquise (`fromId`), marque une pause, puis scrolle jusqu'à la
+  /// nouvelle montagne (`toId`). Skippable par un tap (cf. [_skipReveal]).
+  /// One-shot via [_revealSequenceDone].
+  Future<void> _runRevealSequence(List<Mountain> mountains) async {
+    if (_revealSequenceDone) return;
+    if (!_pageController.hasClients) return;
+    final intent = widget.revealIntent;
+    if (intent == null) return;
+    final fromIdx = mountains.indexWhere((m) => m.id == intent.fromId);
+    final toIdx = mountains.indexWhere((m) => m.id == intent.toId);
+    if (fromIdx < 0 || toIdx < 0) {
+      // Ids introuvables → fallback positionnement courant.
+      _jumpToCurrentMountain(mountains);
+      return;
+    }
+    _revealSequenceDone = true;
+    // Supprime le jump-to-current concurrent (sinon il viserait directement la
+    // nouvelle montagne et on ne verrait jamais le sommet conquis d'abord).
+    _initialJumpDone = true;
+    _revealToIdx = toIdx;
+
+    _pageController.jumpToPage(fromIdx);
+    setState(() => _revealing = true);
+
+    // Pause : laisse le joueur reconnaître le sommet qu'il vient de gravir.
+    await Future<void>.delayed(const Duration(milliseconds: 600));
+    if (!mounted || _revealSkipped || !_pageController.hasClients) {
+      if (mounted && _revealing) setState(() => _revealing = false);
+      return;
+    }
+
+    // Scroll animé vers la nouvelle montagne — durée ∝ distance (clampée).
+    final distance = (toIdx - fromIdx).abs();
+    final ms = (450 + 220 * distance).clamp(450, 1100);
+    await _animateToIndex(toIdx, duration: Duration(milliseconds: ms));
+    if (mounted && _revealing) setState(() => _revealing = false);
+  }
+
+  /// Saute immédiatement sur la nouvelle montagne (annule la séquence de
+  /// reveal). Appelé par un tap sur l'overlay pendant l'animation.
+  void _skipReveal() {
+    final idx = _revealToIdx;
+    if (idx == null) return;
+    _revealSkipped = true;
+    if (_pageController.hasClients) {
+      // `jumpToPage` interrompt nativement un `animateToPage` en cours.
+      _pageController.jumpToPage(idx);
+    }
+    setState(() => _revealing = false);
   }
 
   /// Initialise le PageController sur le sommet courant (premier non-completed).
@@ -231,10 +320,16 @@ class _MountainListViewState extends ConsumerState<MountainListView>
               return const _LoadingView();
             }
 
-            // Positionnement initial sur le sommet courant.
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) => _jumpToCurrentMountain(mountains),
-            );
+            // Positionnement initial : reveal d'ascension si demandé (atterrir
+            // sur le sommet conquis puis scroller vers le suivant), sinon jump
+            // direct sur le sommet courant.
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (widget.revealIntent != null && !_revealSequenceDone) {
+                _runRevealSequence(mountains);
+              } else {
+                _jumpToCurrentMountain(mountains);
+              }
+            });
 
             final currentPage = _pagePosition.round().clamp(
               0,
@@ -290,6 +385,30 @@ class _MountainListViewState extends ConsumerState<MountainListView>
                           onSeekToIndex: _jumpToIndex,
                         ),
                       ),
+
+                      // Skip discret du reveal d'ascension : tap n'importe où
+                      // → saut direct sur la nouvelle montagne. N'existe que
+                      // pendant la séquence (n'interfère pas avec le tap normal
+                      // pour ouvrir le détail d'une montagne).
+                      if (_revealing)
+                        Positioned.fill(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: _skipReveal,
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 24),
+                                child: Text(
+                                  'mountains.tap_to_skip'.tr(),
+                                  style: AppTypography.labelXs.copyWith(
+                                    color: AppColors.texteTertiaire,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),

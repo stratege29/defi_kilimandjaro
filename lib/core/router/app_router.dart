@@ -20,6 +20,7 @@ import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_view.dart'
 import 'package:defi_kilimandjaro/presentation/leaderboard/leaderboard_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_detail_view.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_list_view.dart';
+import 'package:defi_kilimandjaro/presentation/mountains/mountain_reveal_intent.dart';
 import 'package:defi_kilimandjaro/presentation/my_packs/my_packs_view.dart';
 import 'package:defi_kilimandjaro/presentation/onboarding/onboarding_view.dart';
 import 'package:defi_kilimandjaro/presentation/pack_chooser/pack_chooser_view.dart';
@@ -195,7 +196,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     GoRoute(
       path: AppRoutes.mountains,
       name: 'mountains',
-      builder: (_, __) => const MountainListView(),
+      // `extra` optionnel : un MountainRevealIntent déclenche l'animation
+      // d'ascension (atterrir sur le sommet conquis puis scroller vers le
+      // suivant). Toute autre valeur / null → comportement par défaut.
+      builder: (_, state) => MountainListView(
+        revealIntent: state.extra is MountainRevealIntent
+            ? state.extra! as MountainRevealIntent
+            : null,
+      ),
       routes: <RouteBase>[
         // Détail montagne niché sous Sommets. Le path est relatif
         // (`mountain`) → résout en `/mountains/mountain` (= AppRoutes.mountain).
