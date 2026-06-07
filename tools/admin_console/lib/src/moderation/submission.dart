@@ -30,10 +30,25 @@ class Submission {
       difficulty: (d['difficulty'] as num? ?? 3).toInt(),
       status: (d['status'] ?? 'pending') as String,
       score: (d['score'] as num? ?? 0).toInt(),
-      createdAt: (d['createdAt'] as Timestamp?)?.toDate(),
+      createdAt: _parseDate(d['createdAt']),
       proverb: d['proverb'] as String?,
       curatedBy: d['curatedBy'] as String?,
     );
+  }
+
+  /// Parse défensif d'un champ date Firestore.
+  ///
+  /// Accepte `Timestamp` (cas normal), `String` ISO-8601, epoch millis `int`,
+  /// ou `null`. Évite qu'un document avec une date mal typée (ex. seed écrit
+  /// avec une String) ne fasse planter tout l'écran de modération via un
+  /// `TypeError` non capturé dans `build`.
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+    return null;
   }
 
   final String id;

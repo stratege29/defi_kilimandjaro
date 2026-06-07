@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -11,6 +12,16 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Safari (WebKit/ITP) bloque le WebChannel streaming de Firestore
+  // (`Fetch API cannot load … Listen/channel due to access control checks`).
+  // L'auto-détection bascule alors sur du long-polling, qui passe sur Safari.
+  if (kIsWeb) {
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      webExperimentalAutoDetectLongPolling: true,
+    );
+  }
 
   // Récupère le résultat d'un `signInWithRedirect` (cf SignInScreen).
   // Sur Web uniquement — sur les autres plateformes l'API n'existe pas.
