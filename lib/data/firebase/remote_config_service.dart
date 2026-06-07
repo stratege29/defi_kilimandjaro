@@ -115,6 +115,11 @@ class RemoteConfigService {
         rc.getDouble(RemoteConfigKeys.hintCostMultiplier),
         d.hintCostMultiplier,
       ),
+      revealCostBase: _safePositiveInt(
+        rc.getInt(RemoteConfigKeys.revealCostBase),
+        d.revealCostBase,
+      ),
+      sinkTierScalingEnabled: rc.getBool(RemoteConfigKeys.sinkTierScaling),
       winRewardBase: _safeNonNegativeInt(
         rc.getInt(RemoteConfigKeys.winRewardBase),
         d.winRewardBase,
@@ -157,6 +162,8 @@ class RemoteConfigService {
   Map<String, dynamic> _defaultsMap(GameEconomyConfig d) => {
         RemoteConfigKeys.hintCost: d.hintCost,
         RemoteConfigKeys.hintCostMultiplier: d.hintCostMultiplier,
+        RemoteConfigKeys.revealCostBase: d.revealCostBase,
+        RemoteConfigKeys.sinkTierScaling: d.sinkTierScalingEnabled,
         RemoteConfigKeys.winRewardBase: d.winRewardBase,
         RemoteConfigKeys.speedBonusPerSecond: d.speedBonusPerSecond,
         RemoteConfigKeys.rewardedVideoBonus: d.rewardedVideoBonus,

@@ -305,7 +305,10 @@ class GameController extends StateNotifier<GameState> {
 
   /// Coût en cauris du **prochain** indice à utiliser (avec scaling
   /// intra-niveau : 1er = base, 2e = base × multiplier, etc.).
-  int get nextHintCost => _economy.hintCostForIndex(state.hintRevealedCount);
+  int get nextHintCost => _economy.hintCostForIndex(
+        state.hintRevealedCount,
+        tierMultiplier: _args.config.caurisMultiplier,
+      );
 
   /// Place une lettre correcte dans une case **au hasard** parmi celles
   /// encore non révélées, et l'affiche en aperçu dans `AnswerCells` (le

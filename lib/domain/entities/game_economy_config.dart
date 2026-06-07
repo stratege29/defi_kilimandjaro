@@ -14,6 +14,8 @@ class GameEconomyConfig extends Equatable {
   const GameEconomyConfig({
     required this.hintCost,
     required this.hintCostMultiplier,
+    required this.revealCostBase,
+    required this.sinkTierScalingEnabled,
     required this.winRewardBase,
     required this.speedBonusPerSecond,
     required this.rewardedVideoBonus,
@@ -31,11 +33,24 @@ class GameEconomyConfig extends Equatable {
   final int hintCost;
 
   /// Multiplicateur appliqué au coût des indices suivants dans le même
-  /// niveau. Exemples avec base 20 et multiplier 1.5 :
-  /// - 1er indice = 20
-  /// - 2e indice = 30
-  /// - 3e indice = 45
+  /// niveau. Exemples avec base 25 et multiplier 1.5 :
+  /// - 1er indice = 25
+  /// - 2e indice = 38
+  /// - 3e indice = 56
   final double hintCostMultiplier;
+
+  /// Coût de base de la révélation de réponse à l'écran d'échec (zone T2+).
+  /// Scalé par le multiplicateur de tier si [sinkTierScalingEnabled] est
+  /// actif (cf. [revealCost]) — un reveal coûte alors ≈ une victoire propre
+  /// au tier courant, préservant la tension en fin de progression.
+  final int revealCostBase;
+
+  /// Active le scaling des **sinks** (indices + révélation) par le
+  /// multiplicateur de tier du niveau (1.0 → 2.5), aligné sur celui des
+  /// gains. Empêche le late-game de devenir trivial : sinks plats + gains
+  /// gonflés = monnaie décorative. Flag dédié pour A/B test + rollback
+  /// instantané via Remote Config.
+  final bool sinkTierScalingEnabled;
 
   /// Base de la récompense victoire (avant bonus vitesse + multiplier tier).
   final int winRewardBase;
@@ -79,10 +94,12 @@ class GameEconomyConfig extends Equatable {
   /// Valeurs par défaut câblées en dur (fallback si Remote Config indisponible
   /// ou première installation offline).
   static const GameEconomyConfig defaults = GameEconomyConfig(
-    hintCost: 20,
+    hintCost: 25,
     hintCostMultiplier: 1.5,
-    winRewardBase: 30,
-    speedBonusPerSecond: 2,
+    revealCostBase: 40,
+    sinkTierScalingEnabled: true,
+    winRewardBase: 20,
+    speedBonusPerSecond: 1,
     rewardedVideoBonus: 50,
     rewardedDoubleEnabled: true,
     rewardedDailyCap: 5,
@@ -97,13 +114,28 @@ class GameEconomyConfig extends Equatable {
   /// - N=0 → [hintCost]
   /// - N=1 → [hintCost] × [hintCostMultiplier]
   /// - N=2 → [hintCost] × [hintCostMultiplier]^2
-  int hintCostForIndex(int hintIndex) {
-    if (hintIndex <= 0) return hintCost;
+  ///
+  /// Si [sinkTierScalingEnabled] est actif, le coût est en plus multiplié
+  /// par [tierMultiplier] (le `caurisMultiplier` du niveau, 1.0 → 2.5),
+  /// pour que les indices restent une fraction sensible des gains au tier
+  /// courant. Quand le flag est off, [tierMultiplier] est ignoré.
+  int hintCostForIndex(int hintIndex, {double tierMultiplier = 1.0}) {
     var cost = hintCost.toDouble();
     for (var i = 0; i < hintIndex; i++) {
       cost *= hintCostMultiplier;
     }
+    if (sinkTierScalingEnabled) {
+      cost *= tierMultiplier;
+    }
     return cost.round();
+  }
+
+  /// Coût de la révélation de réponse pour le tier courant. Vaut
+  /// [revealCostBase] × [tierMultiplier] si [sinkTierScalingEnabled], sinon
+  /// [revealCostBase] plat. Cible : ≈ une victoire propre au tier.
+  int revealCost({double tierMultiplier = 1.0}) {
+    final base = revealCostBase.toDouble();
+    return (sinkTierScalingEnabled ? base * tierMultiplier : base).round();
   }
 
   /// Récompense streak pour un compteur donné (1-indexé : `streakDay = 1` →
@@ -120,6 +152,8 @@ class GameEconomyConfig extends Equatable {
   GameEconomyConfig copyWith({
     int? hintCost,
     double? hintCostMultiplier,
+    int? revealCostBase,
+    bool? sinkTierScalingEnabled,
     int? winRewardBase,
     int? speedBonusPerSecond,
     int? rewardedVideoBonus,
@@ -134,6 +168,9 @@ class GameEconomyConfig extends Equatable {
     return GameEconomyConfig(
       hintCost: hintCost ?? this.hintCost,
       hintCostMultiplier: hintCostMultiplier ?? this.hintCostMultiplier,
+      revealCostBase: revealCostBase ?? this.revealCostBase,
+      sinkTierScalingEnabled:
+          sinkTierScalingEnabled ?? this.sinkTierScalingEnabled,
       winRewardBase: winRewardBase ?? this.winRewardBase,
       speedBonusPerSecond: speedBonusPerSecond ?? this.speedBonusPerSecond,
       rewardedVideoBonus: rewardedVideoBonus ?? this.rewardedVideoBonus,
@@ -154,6 +191,8 @@ class GameEconomyConfig extends Equatable {
   List<Object?> get props => [
         hintCost,
         hintCostMultiplier,
+        revealCostBase,
+        sinkTierScalingEnabled,
         winRewardBase,
         speedBonusPerSecond,
         rewardedVideoBonus,
@@ -175,6 +214,8 @@ abstract class RemoteConfigKeys {
 
   static const String hintCost = 'eco_hint_cost';
   static const String hintCostMultiplier = 'eco_hint_cost_multiplier';
+  static const String revealCostBase = 'eco_reveal_cost_base';
+  static const String sinkTierScaling = 'eco_sink_tier_scaling';
   static const String winRewardBase = 'eco_win_reward_base';
   static const String speedBonusPerSecond = 'eco_speed_bonus_per_second';
   static const String rewardedVideoBonus = 'eco_rewarded_video_bonus';
