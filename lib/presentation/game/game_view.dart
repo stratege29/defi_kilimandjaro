@@ -689,13 +689,6 @@ class _GameViewState extends ConsumerState<GameView>
     }
   }
 
-  /// Coût en cauris pour révéler la réponse à l'écran d'échec en zone
-  /// T2+. Choisi pour rester accessible (~1 victoire T3 = 1 reveal) mais
-  /// créer un vrai sink économique. Constante locale ici parce que ce
-  /// levier d'équilibrage économique ne vit que dans le flow d'échec —
-  /// à promouvoir vers Remote Config si on veut le tweaker à chaud.
-  static const int _revealCostCauris = 50;
-
   /// Seuil d'échecs consécutifs sur **un même niveau** au-delà duquel la
   /// réponse est révélée gratuitement (filet anti-blocage). Combiné au
   /// reveal payant : le joueur peut soit payer plus tôt, soit insister
@@ -748,6 +741,14 @@ class _GameViewState extends ConsumerState<GameView>
     final canTrackLevel = mountainId != null && levelIndex != null;
     final isPayWallActive = !config.revealsAnswerOnFailure && canTrackLevel;
 
+    // Coût de la révélation, scalé par le tier du niveau si activé en
+    // Remote Config (`eco_sink_tier_scaling`) : un reveal coûte ≈ une
+    // victoire propre au tier, vs un prix plat qui devient trivial en
+    // late-game. Lu une fois ici — le flow d'échec n'évolue pas en cours.
+    final revealCostCauris = ref
+        .read(gameEconomyConfigProvider)
+        .revealCost(tierMultiplier: config.caurisMultiplier);
+
     var answerRevealed = true;
     if (isPayWallActive) {
       final newFailCount = await ref
@@ -766,7 +767,7 @@ class _GameViewState extends ConsumerState<GameView>
     // donc même si le joueur dépense ailleurs entre-temps, l'achat
     // est sécurisé serveur-style.
     final canAffordReveal = ref.read(
-      playerProgressProvider.select((p) => p.cauris >= _revealCostCauris),
+      playerProgressProvider.select((p) => p.cauris >= revealCostCauris),
     );
 
     // Anti-tilt : skip gratuit proposé dès que les défaites consécutives
@@ -787,13 +788,13 @@ class _GameViewState extends ConsumerState<GameView>
         devinette: widget.args.devinette,
         answerRevealed: answerRevealed,
         revealCost: isPayWallActive && !answerRevealed
-            ? _revealCostCauris
+            ? revealCostCauris
             : null,
         canAffordReveal: canAffordReveal,
         onPurchaseReveal: isPayWallActive && !answerRevealed
             ? () => ref
                 .read(playerProgressProvider.notifier)
-                .purchaseReveal(_revealCostCauris)
+                .purchaseReveal(revealCostCauris)
             : null,
         onRetry: () {
           ctx.pop(); // closes dialog

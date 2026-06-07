@@ -2,22 +2,32 @@
   "comment": "Template Remote Config Kilimandjaro — Phase 4 monetization. Source de verite : ce fichier, deploye via 'firebase deploy --only remoteconfig --project <env>'. Modifier les valeurs ici, commit, puis deployer pour garder l'historique git aligne avec la console Firebase.",
   "parameters": {
     "eco_hint_cost": {
-      "defaultValue": { "value": "20" },
+      "defaultValue": { "value": "25" },
       "valueType": "NUMBER",
-      "description": "Cout du 1er indice dans un niveau."
+      "description": "Cout de base du 1er indice dans un niveau (scale par tier si eco_sink_tier_scaling)."
     },
     "eco_hint_cost_multiplier": {
       "defaultValue": { "value": "1.5" },
       "valueType": "NUMBER",
-      "description": "Multiplicateur sur les indices suivants du meme niveau (2e=30, 3e=45)."
+      "description": "Multiplicateur sur les indices suivants du meme niveau (2e=38, 3e=56 a base 25)."
+    },
+    "eco_reveal_cost_base": {
+      "defaultValue": { "value": "40" },
+      "valueType": "NUMBER",
+      "description": "Cout de base de la revelation de reponse a l'echec (T2+), scale par tier si eco_sink_tier_scaling. Cible: ~1 victoire propre."
+    },
+    "eco_sink_tier_scaling": {
+      "defaultValue": { "value": "true" },
+      "valueType": "BOOLEAN",
+      "description": "Scale les sinks (indices + revelation) par le multiplier de tier (1.0->2.5) pour preserver la tension en late-game. false = couts plats (rollback)."
     },
     "eco_win_reward_base": {
-      "defaultValue": { "value": "30" },
+      "defaultValue": { "value": "20" },
       "valueType": "NUMBER",
       "description": "Base recompense victoire avant bonus vitesse et multiplier tier."
     },
     "eco_speed_bonus_per_second": {
-      "defaultValue": { "value": "2" },
+      "defaultValue": { "value": "1" },
       "valueType": "NUMBER",
       "description": "Cauris bonus par seconde restante au moment de la validation."
     },
