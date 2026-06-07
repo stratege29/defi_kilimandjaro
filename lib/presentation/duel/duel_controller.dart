@@ -71,6 +71,10 @@ class DuelController extends StateNotifier<DuelLocalState> {
   final String selfUid;
   final DuelRepository repository;
   Timer? _timer;
+  // Re-signale le timeout du round tant que la phase n'a pas avance. Couvre le
+  // cas d'un adversaire injoignable (deconnecte) : le serveur ne resout qu'au
+  // bout de son delai de grace, donc un seul appel a 30s ne suffit pas.
+  Timer? _timeoutRetry;
 
   /// Appele depuis l'UI quand la session RTDB est mise a jour.
   ///
@@ -84,13 +88,19 @@ class DuelController extends StateNotifier<DuelLocalState> {
     // arreter immediatement le timer local : on n'a plus rien a faire
     // pendant les animations inter-rounds. Evite que le perdant continue
     // a decrementer son timer pendant que le round est deja termine.
-    if (!isNowActive && _timer != null) {
+    if (!isNowActive) {
       _timer?.cancel();
       _timer = null;
+      // La phase a avance (roundEnd/countdown/finished) : plus besoin de
+      // re-signaler le timeout.
+      _timeoutRetry?.cancel();
+      _timeoutRetry = null;
     }
 
     if (roundChanged && isNowActive) {
       _timer?.cancel();
+      _timeoutRetry?.cancel();
+      _timeoutRetry = null;
       state = DuelLocalState(
         selectedIndices: const <int>[],
         timeLeft: 30,
@@ -176,11 +186,33 @@ class DuelController extends StateNotifier<DuelLocalState> {
         //   - rounds 0,1 : passe a roundEnd (personne ne gagne)
         //   - round 2 (dernier) : termine le match avec calcul du gagnant
         _timer?.cancel();
-        // Idempotent : si l'autre client a deja appele, no-op cote serveur.
-        repository
-            .submitRoundTimeout(session.matchId, state.currentRound)
-            .catchError((Object _) {});
+        _submitTimeoutWithRetry();
       }
+    });
+  }
+
+  /// Signale le timeout du round, puis re-tente periodiquement tant que la
+  /// phase reste active. Indispensable si l'adversaire est injoignable : le
+  /// serveur ne resout qu'apres son delai de grace (~38s), donc le 1er appel
+  /// a 30s repond "waiting_for_opponent". onSessionUpdated annule ce timer des
+  /// que la phase avance (roundEnd/finished).
+  void _submitTimeoutWithRetry() {
+    final round = state.currentRound;
+    void fire() => repository
+        .submitRoundTimeout(session.matchId, round)
+        .catchError((Object _) => null);
+    fire();
+    _timeoutRetry?.cancel();
+    var attempts = 0;
+    _timeoutRetry = Timer.periodic(const Duration(seconds: 4), (t) {
+      attempts++;
+      if (attempts > 10) {
+        // Garde-fou : ~40s de retries. Au-dela on arrete (eviter le spam).
+        t.cancel();
+        _timeoutRetry = null;
+        return;
+      }
+      fire();
     });
   }
 
@@ -193,6 +225,7 @@ class DuelController extends StateNotifier<DuelLocalState> {
   @override
   void dispose() {
     _timer?.cancel();
+    _timeoutRetry?.cancel();
     super.dispose();
   }
 }

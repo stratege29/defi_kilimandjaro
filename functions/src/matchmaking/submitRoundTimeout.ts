@@ -33,9 +33,16 @@ interface SubmitRoundTimeoutResult {
   ok: true;
   new_phase: string;
   current_round: number;
+  /** true tant qu'on attend que l'adversaire agisse (le client doit re-tenter). */
+  waiting_for_opponent?: boolean;
 }
 
 const MIN_ELAPSED_MS = 28000; // tolerance 2s sous les 30s du round
+// Au-dela de ce delai, si l'adversaire n'a TOUJOURS ni trouve ni timeout, on
+// le considere injoignable (AWOL : deconnecte, app tuee) et on resout le round
+// quand meme — sinon le duel reste bloque a vie (pas de transition resultat).
+// 30s de round + 8s de grace : laisse le temps a un adversaire lent de timeout.
+const OPPONENT_AWOL_MS = 38000;
 
 interface RoundResult {
   progress?: number;
@@ -188,14 +195,32 @@ export const submitRoundTimeout = onCall<
     };
   }
 
-  // Si l'autre n'a ni trouve ni timeout : on attend. Le client de l'autre
-  // appellera submitRoundTimeout aussi (ou submitRoundWin s'il trouve).
+  // Si l'autre n'a ni trouve ni timeout : deux cas.
   if (!otherHasTimeout) {
-    return {
-      ok: true,
-      new_phase: freshData.phase,
-      current_round: freshData.current_round,
-    };
+    // (a) Encore dans le delai de grace : on attend que l'autre client
+    //     appelle submitRoundTimeout (ou submitRoundWin s'il trouve). Le
+    //     client appelant re-tentera tant que `waiting_for_opponent`.
+    if (elapsed < OPPONENT_AWOL_MS) {
+      return {
+        ok: true,
+        new_phase: freshData.phase,
+        current_round: freshData.current_round,
+        waiting_for_opponent: true,
+      };
+    }
+    // (b) Au-dela de la grace, l'adversaire est injoignable (AWOL) : on le
+    //     marque explicitement comme timeout et on resout le round/match,
+    //     pour ne pas bloquer le joueur present. (Le gagnant final est
+    //     calcule sur rounds_won : un adversaire AWOL n'a rien gagne.)
+    await matchRef.update({
+      [`players/${otherUid}/rounds/${round}`]: {
+        progress: 0,
+        found: false,
+        time_taken_ms: 30000,
+        awol: true,
+      },
+    });
+    // on continue vers la logique d'avancement de phase ci-dessous.
   }
 
   // --- Les 2 joueurs ont timeout : avancer la phase ---
