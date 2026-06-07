@@ -106,7 +106,8 @@
     "locked_progression_cta": "FINISH THE PREVIOUS PEAK",
     "locked_stargate_cta": "GATE: {stars} STARS MISSING",
     "locked_stargate_snackbar": "You need {stars} more to cross this gate. Replay your 1-star levels to improve them.",
-    "level_locked": "Finish level {previous} to unlock"
+    "level_locked": "Finish level {previous} to unlock",
+    "tap_to_skip": "Tap to skip"
   },
   "daily": {
     "title": "DAILY CHALLENGE",

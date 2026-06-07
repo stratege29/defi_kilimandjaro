@@ -25,6 +25,7 @@ import 'package:defi_kilimandjaro/presentation/game/widgets/answer_cells.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/circular_grid.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/griot_briefing_overlay.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/timer_bar.dart';
+import 'package:defi_kilimandjaro/presentation/mountains/mountain_reveal_intent.dart';
 import 'package:defi_kilimandjaro/presentation/result/failure_view.dart';
 import 'package:defi_kilimandjaro/presentation/result/mountain_conquest_view.dart';
 import 'package:defi_kilimandjaro/presentation/result/victory_view.dart';
@@ -598,20 +599,20 @@ class _GameViewState extends ConsumerState<GameView>
       LinkPromptTrigger.mountainComplete,
     );
     if (!mounted) return;
-    // Bascule vers le détail de la montagne suivante en RÉINITIALISANT la
-    // pile à [Sommets → détail]. `/mountain` étant niché sous `/mountains`
-    // (cf. app_router), `go()` reconstruit toute la pile en UNE opération
-    // atomique. Deux bénéfices :
-    //   1. enchaîner les conquêtes n'empile plus une cascade de /mountain
-    //      (avant : pushReplacement ne remplaçait que /game et laissait le
-    //      détail précédent dessous → « retour » traversait chaque montagne) ;
-    //   2. « retour » depuis le détail ramène toujours au hub Sommets.
+    // Bascule vers l'écran SOMMETS (pas le détail) en RÉINITIALISANT la pile à
+    // [Sommets]. `go()` remplace toute la pile en UNE opération atomique : peu
+    // importe d'où la partie a été lancée (accueil « continuer l'ascension »,
+    // défi du jour, ou /mountain), pas besoin de `pop()` préalable.
     //
-    // On NE fait PAS de `pop()` préalable : la partie peut avoir été lancée
-    // depuis l'accueil (« continuer l'ascension ») ou le défi du jour, sans
-    // `/mountain` en dessous. `go()` se moque de la pile d'origine puisqu'il
-    // la remplace intégralement.
-    context.go(AppRoutes.mountain, extra: next);
+    // Le MountainRevealIntent déclenche l'animation d'ascension : l'écran
+    // Sommets se pose sur la montagne conquise (`current`), marque une pause,
+    // puis scrolle jusqu'à la nouvelle montagne (`next`) — le joueur voit la
+    // belle UI Sommets au lieu d'atterrir directement dans le détail. Il tape
+    // ensuite lui-même la montagne pour entrer. « Retour » ramène à l'accueil.
+    context.go(
+      AppRoutes.mountains,
+      extra: MountainRevealIntent(fromId: current.id, toId: next.id),
+    );
   }
 
   /// Affiche l'overlay « TU AS CONQUIS » et attend que l'utilisateur tape
