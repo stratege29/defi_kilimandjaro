@@ -42,6 +42,7 @@ export { submitRoundTimeout } from "./matchmaking/submitRoundTimeout";
 export { advancePhase } from "./matchmaking/advancePhase";
 export { createLocalDuel } from "./matchmaking/createLocalDuel";
 export { prunePresence } from "./matchmaking/prunePresence";
+export { resolveStaleMatches } from "./matchmaking/resolveStaleMatches";
 
 // --- Social & Viral (Phase 7) ---
 export { sendChallengeNotif } from "./matchmaking/sendChallengeNotif";
