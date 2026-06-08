@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:audio_session/audio_session.dart';
@@ -95,7 +97,16 @@ class AudioEngine with WidgetsBindingObserver {
   bool _initialized = false;
   bool _suspended = false;
   bool _muted = false;
+
+  /// Pause technique (background OU interruption système type appel/Siri).
+  /// Distinct de [_suspended] (mute différé entre niveaux piloté par l'UI)
+  /// pour que les deux mécanismes ne s'écrasent pas mutuellement.
+  bool _paused = false;
+
   double _volume = 0.8;
+
+  /// Abonnement interruptions système (`audio_session`) libéré dans [dispose].
+  StreamSubscription<AudioInterruptionEvent>? _interruptionSub;
 
   /// Vrai après [init] et tant que [dispose] n'a pas été appelé.
   bool get isInitialized => _initialized;
@@ -137,11 +148,29 @@ class AudioEngine with WidgetsBindingObserver {
       );
       await session.setActive(true);
 
+      // Interruptions système (appel entrant, Siri, autre app exclusive) :
+      // begin → pause technique, end → reprise. Sans ça, la synthèse
+      // reprenait à plein volume par-dessus l'événement interrupteur.
+      _interruptionSub = session.interruptionEventStream.listen((event) {
+        _setPaused(paused: event.begin);
+      });
+
       await SoLoud.instance.init();
+      // Borne la polyphonie : évite l'empilement de voix sur taps frénétiques.
+      SoLoud.instance.setMaxActiveVoiceCount(16);
+      _activateMasterLimiter();
       WidgetsBinding.instance.addObserver(this);
-      await _preloadAll();
       _initialized = true;
-      _log.i('AudioEngine initialized — ${_sources.length} cues loaded');
+      // Préchargement NON bloquant : la synthèse PCM (CPU pur) part dans un
+      // isolate, puis loadMem (plugin) s'exécute sur le main. Le boot n'attend
+      // PAS la fin — `play()` a un fallback lazy-load si un cue est demandé
+      // avant que le préchargement n'ait terminé.
+      unawaited(
+        _preloadAll().then(
+          (_) => _log.i('AudioEngine preload done — ${_sources.length} cues'),
+        ),
+      );
+      _log.i('AudioEngine initialized (preload running in background)');
     } on Object catch (e, st) {
       _log.e('AudioEngine init failed', error: e, stackTrace: st);
       // On reste utilisable en mode silencieux : tous les `play*` deviennent
@@ -149,10 +178,28 @@ class AudioEngine with WidgetsBindingObserver {
     }
   }
 
+  /// Limiter master sur le bus global SoLoud : empêche le clipping quand
+  /// plusieurs voix se superposent (taps rapides, loop lobby + match-found,
+  /// fanfares riches). Seuil -6 dB, plafond de sortie -1 dB (true-peak).
+  /// Fail-soft : si le filtre n'est pas disponible sur la plateforme, le
+  /// moteur reste fonctionnel sans limiter.
+  void _activateMasterLimiter() {
+    try {
+      SoLoud.instance.filters.limiterFilter
+        ..activate()
+        ..threshold.value = -6.0
+        ..outputCeiling.value = -1.0;
+    } on Object catch (e) {
+      _log.w('Master limiter unavailable: $e');
+    }
+  }
+
   /// Libère toutes les ressources audio. Le moteur n'est plus utilisable.
   Future<void> dispose() async {
     if (!_initialized) return;
     WidgetsBinding.instance.removeObserver(this);
+    await _interruptionSub?.cancel();
+    _interruptionSub = null;
     for (final src in _sources.values) {
       try {
         await SoLoud.instance.disposeSource(src);
@@ -193,7 +240,7 @@ class AudioEngine with WidgetsBindingObserver {
   /// il est synthétisé et chargé à la volée. La 1ère lecture d'un cue
   /// donné prend ~50ms supplémentaires, ensuite cache.
   Future<void> play(AudioCue cue) async {
-    if (!_initialized || _suspended || _muted) return;
+    if (!_initialized || _suspended || _muted || _paused) return;
     var src = _sources[cue];
     if (src == null) {
       src = await _loadCue(cue);
@@ -226,8 +273,9 @@ class AudioEngine with WidgetsBindingObserver {
   }
 
   /// Synthèse PCM à la demande — un seul cue à la fois pour ne pas saturer
-  /// la mémoire (vs _preloadAll qui les rendait tous d'un coup).
-  Uint8List _renderCue(AudioCue cue) {
+  /// la mémoire (vs _preloadAll qui les rend tous d'un coup en isolate).
+  /// Statique et déterministe → réutilisable hors de l'isolate principal.
+  static Uint8List _renderCue(AudioCue cue) {
     switch (cue) {
       case AudioCue.letterSelect0:
         return Balafon.renderLetterNote(0);
@@ -276,18 +324,61 @@ class AudioEngine with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.paused:
       case AppLifecycleState.hidden:
-      case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
-        SoLoud.instance.setGlobalVolume(0);
+        // Vrai passage en arrière-plan → pause technique.
+        _setPaused(paused: true);
       case AppLifecycleState.resumed:
-        SoLoud.instance.setGlobalVolume(_effectiveVolume);
+        _setPaused(paused: false);
+      case AppLifecycleState.inactive:
+        // Transitoire (bannière de notif, centre de contrôle, multitâche) :
+        // on NE coupe PAS — éviter les coupures/reprises brutales.
+        break;
     }
+  }
+
+  /// Applique/lève la pause technique (background ou interruption système).
+  /// Le volume effectif est restauré uniquement si l'app n'est plus en pause.
+  void _setPaused({required bool paused}) {
+    _paused = paused;
+    if (!_initialized) return;
+    SoLoud.instance.setGlobalVolume(paused ? 0.0 : _effectiveVolume);
   }
 
   double get _effectiveVolume => _muted ? 0.0 : _volume;
 
   Future<void> _preloadAll() async {
-    final cues = <AudioCue, Uint8List>{
+    // La synthèse PCM (boucles sin/exp/pow sur des centaines de milliers
+    // d'échantillons) est déportée hors de l'isolate UI pour ne pas bloquer
+    // le 1er frame. `loadMem` (appel plugin) doit, lui, rester sur le main.
+    Map<AudioCue, Uint8List> rendered;
+    try {
+      rendered = await Isolate.run(_synthesizeAllCues);
+    } on Object catch (e) {
+      // Fallback : synthèse sur l'isolate principal (ex. plateformes sans
+      // support isolate). Plus lent mais fonctionnel.
+      _log.w('Isolate synth failed — fallback main isolate: $e');
+      rendered = _synthesizeAllCues();
+    }
+    for (final entry in rendered.entries) {
+      // Un lazy-load a pu charger ce cue entre-temps : ne pas réallouer.
+      if (_sources.containsKey(entry.key)) continue;
+      try {
+        final src = await SoLoud.instance.loadMem(
+          'kilimandjaro_${entry.key.name}.wav',
+          entry.value,
+        );
+        _sources[entry.key] = src;
+      } on Object catch (e) {
+        _log.w('Failed to load cue ${entry.key}: $e');
+      }
+    }
+  }
+
+  /// Synthétise TOUS les cues (CPU pur, sans plugin) — exécutable dans un
+  /// isolate via [Isolate.run]. Les fonctions d'instruments sont statiques et
+  /// déterministes (seed fixe), donc le résultat est identique au main.
+  static Map<AudioCue, Uint8List> _synthesizeAllCues() {
+    return <AudioCue, Uint8List>{
       AudioCue.letterSelect0: Balafon.renderLetterNote(0),
       AudioCue.letterSelect1: Balafon.renderLetterNote(1),
       AudioCue.letterSelect2: Balafon.renderLetterNote(2),
@@ -310,21 +401,10 @@ class AudioEngine with WidgetsBindingObserver {
       AudioCue.roundLost: DuelRoundEnd.renderRoundLost(),
       AudioCue.roundDraw: DuelRoundEnd.renderRoundDraw(),
     };
-    for (final entry in cues.entries) {
-      try {
-        final src = await SoLoud.instance.loadMem(
-          'kilimandjaro_${entry.key.name}.wav',
-          entry.value,
-        );
-        _sources[entry.key] = src;
-      } on Object catch (e) {
-        _log.w('Failed to load cue ${entry.key}: $e');
-      }
-    }
   }
 
   /// Mix balafon descendant + tam-tam lent pour `playFailure` (maquette p.12).
-  Uint8List _renderFailure() {
+  static Uint8List _renderFailure() {
     final balafon = Balafon.renderDescendingGraveBuffer();
     final tam = TamTam.renderSlowDouble();
     final out = WavBuffer.silence(2);

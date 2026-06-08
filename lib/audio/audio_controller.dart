@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:audio_session/audio_session.dart';
 import 'package:defi_kilimandjaro/audio/audio_engine.dart';
 import 'package:defi_kilimandjaro/audio/tempo_scheduler.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,9 +26,12 @@ class AudioState {
 ///
 /// **Toutes les méthodes `play*` sont fire-and-forget** : asynchrones,
 /// non-bloquantes, et ignorent silencieusement les erreurs (cf. spec p.12).
-class AudioController extends StateNotifier<AudioState> {
+class AudioController extends StateNotifier<AudioState>
+    with WidgetsBindingObserver {
   AudioController(this._engine) : super(AudioState.defaults()) {
+    WidgetsBinding.instance.addObserver(this);
     _loadPrefs();
+    unawaited(_subscribeBecomingNoisy());
   }
 
   static const String _keyMuted = 'audio_muted';
@@ -71,10 +76,36 @@ class AudioController extends StateNotifier<AudioState> {
   Timer? _lobbyLoopTimer;
   int _lobbyStep = 0;
 
+  /// Intention de boucler la recherche lobby : permet de relancer le loop
+  /// au retour de l'arrière-plan sans le ressusciter après un match/arrêt.
+  bool _lobbyLoopWanted = false;
+
+  /// Abonnement « sortie audio débranchée » (casque/BT).
+  StreamSubscription<void>? _noisySub;
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    unawaited(_noisySub?.cancel());
     _cancelLobbyLoop();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
+        // Annule le Timer du loop lobby : stoppe les réveils toutes les
+        // 278 ms en arrière-plan (économie batterie). L'intention
+        // [_lobbyLoopWanted] est conservée pour reprise au resume.
+        _cancelLobbyLoop();
+      case AppLifecycleState.resumed:
+        if (_lobbyLoopWanted) unawaited(playLobbySearchLoop());
+      case AppLifecycleState.inactive:
+        break;
+    }
   }
 
   /// Active/désactive le mute (persisté).
@@ -156,6 +187,7 @@ class AudioController extends StateNotifier<AudioState> {
   ///
   /// Respecte le mute global : no-op silencieux si `state.muted == true`.
   Future<void> playLobbySearchLoop() async {
+    _lobbyLoopWanted = true;
     if (state.muted) return;
     if (_lobbyLoopTimer != null) return; // idempotent
     _lobbyStep = 0;
@@ -177,6 +209,7 @@ class AudioController extends StateNotifier<AudioState> {
   ///
   /// **Safe** : peut être appelé même si aucun loop n'est actif.
   Future<void> stopLobbySearchLoop() async {
+    _lobbyLoopWanted = false;
     _cancelLobbyLoop();
     _log.d('AudioController: lobby loop stopped');
   }
@@ -189,6 +222,9 @@ class AudioController extends StateNotifier<AudioState> {
   ///
   /// Respecte le mute global.
   Future<void> playLobbyMatchFound() async {
+    // Match trouvé : la recherche est terminée — on lève l'intention pour
+    // qu'un retour d'arrière-plan ne relance pas le loop.
+    _lobbyLoopWanted = false;
     if (state.muted) return;
     // Arrêt synchrone pour éviter superposition brutale avec le loop.
     _cancelLobbyLoop();
@@ -229,6 +265,21 @@ class AudioController extends StateNotifier<AudioState> {
   }
 
   // ─── Privé ──────────────────────────────────────────────────────────────
+
+  /// S'abonne à l'événement « sortie audio débranchée » (casque/Bluetooth).
+  /// Best practice mobile : ne pas continuer à diffuser le loop continu sur
+  /// le haut-parleur. On stoppe la recherche lobby (les SFX ponctuels, eux,
+  /// restent permis — ils sont courts et déclenchés par l'utilisateur).
+  Future<void> _subscribeBecomingNoisy() async {
+    try {
+      final session = await AudioSession.instance;
+      _noisySub = session.becomingNoisyEventStream.listen((_) {
+        unawaited(stopLobbySearchLoop());
+      });
+    } on Object catch (e) {
+      _log.w('AudioController: becomingNoisy subscription failed: $e');
+    }
+  }
 
   Future<void> _loadPrefs() async {
     try {

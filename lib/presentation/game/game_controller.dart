@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
+import 'package:defi_kilimandjaro/audio/tempo_scheduler.dart';
 import 'package:defi_kilimandjaro/data/firebase/analytics_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
@@ -164,6 +165,7 @@ class GameController extends StateNotifier<GameState> {
     this._progress,
     this._economy,
     this._analytics,
+    this._tempo,
   ) : super(
         _initialState(_args, _progress.state.cauris),
       ) {
@@ -234,8 +236,16 @@ class GameController extends StateNotifier<GameState> {
 
   /// Instrumentation analytics (events victoire / indice). Fail-soft.
   final AnalyticsService _analytics;
+
+  /// Scheduler partagé pilotant la cadence du tic-tac audio (maquette p.12).
+  /// Propriété du `tempoSchedulerProvider` — NE PAS `dispose()` ici.
+  final TempoScheduler _tempo;
+
   Timer? _timer;
   Timer? _modifierTimer;
+
+  /// Abonnement aux ticks du [TempoScheduler] tant que la partie est active.
+  StreamSubscription<int>? _tempoSub;
   int _modifierTick = 0;
   final Random _modifierRng = Random();
 
@@ -375,6 +385,7 @@ class GameController extends StateNotifier<GameState> {
     final formed = state.formedWord;
     if (formed == state.expectedAnswer) {
       _timer?.cancel();
+      _stopTempo();
       // Récompense :
       // - **Mode standard** : (base + bonus vitesse × timeLeft) ×
       //   multiplier de difficulté (1.0 → 2.5 selon le tier). Base et
@@ -466,6 +477,7 @@ class GameController extends StateNotifier<GameState> {
     if (state.phase != GamePhase.playing) return;
     _timer?.cancel();
     _timer = null;
+    _stopTempo();
     _modifierTimer?.cancel();
     _modifierTimer = null;
   }
@@ -493,6 +505,7 @@ class GameController extends StateNotifier<GameState> {
   @override
   void dispose() {
     _timer?.cancel();
+    _stopTempo();
     _modifierTimer?.cancel();
     super.dispose();
   }
@@ -503,20 +516,49 @@ class GameController extends StateNotifier<GameState> {
 
   void _startTimer() {
     _timer?.cancel();
+    _startTempo();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (state.phase != GamePhase.playing) {
         _timer?.cancel();
+        _stopTempo();
         return;
       }
       if (state.timeLeft <= 1) {
         _timer?.cancel();
+        _stopTempo();
         state = state.copyWith(timeLeft: 0, phase: GamePhase.lost);
         unawaited(_audio.playFailure());
         unawaited(HapticFeedback.heavyImpact());
       } else {
         state = state.copyWith(timeLeft: state.timeLeft - 1);
+        // Accélère le tic-tac quand le temps s'épuise (60→90→140 BPM).
+        _tempo.updateForTimeLeft(state.timeLeft);
       }
     });
+  }
+
+  /// Démarre le tic-tac audio adaptatif et s'abonne aux ticks du scheduler.
+  /// Idempotent : repart toujours d'un état propre (le scheduler est partagé).
+  void _startTempo() {
+    _tempoSub?.cancel();
+    _tempo
+      ..stop()
+      ..updateForTimeLeft(state.timeLeft);
+    _tempoSub = _tempo.ticks.listen((_) {
+      // Le scheduler peut émettre un dernier tick juste après une
+      // victoire/défaite : on ne joue le tic que pendant le jeu actif.
+      if (state.phase != GamePhase.playing) return;
+      unawaited(_audio.playTimerTick(_tempo.bpm));
+    });
+    _tempo.start();
+  }
+
+  /// Stoppe le tic-tac et libère l'abonnement. NE dispose PAS le scheduler
+  /// (propriété du `tempoSchedulerProvider` partagé).
+  void _stopTempo() {
+    _tempoSub?.cancel();
+    _tempoSub = null;
+    _tempo.stop();
   }
 
   /// Timer séparé pour les effets des modifiers (wind / earthquake / fog /
@@ -662,5 +704,6 @@ final gameControllerProvider = StateNotifierProvider.autoDispose
         ref.read(playerProgressProvider.notifier),
         ref.read(gameEconomyConfigProvider),
         ref.read(analyticsServiceProvider),
+        ref.read(tempoSchedulerProvider),
       ),
     );
