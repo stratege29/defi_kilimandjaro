@@ -49,6 +49,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Pour scanner le QR code de ton ami et lancer un duel temps réel.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Le scanner de QR code, qui te permet de défier un ami en duel, s'appuie sur une bibliothèque de capture vidéo nécessitant l'accès au micro. Kilimandjaro n'enregistre jamais de son.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Autoriser le suivi pour personnaliser les pubs et soutenir le développement de Kilimandjaro. Tu peux refuser sans rien perdre du jeu.</string>
 	<key>SKAdNetworkItems</key>
