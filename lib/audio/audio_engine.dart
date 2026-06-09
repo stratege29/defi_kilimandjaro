@@ -108,6 +108,10 @@ class AudioEngine with WidgetsBindingObserver {
   /// Abonnement interruptions système (`audio_session`) libéré dans [dispose].
   StreamSubscription<AudioInterruptionEvent>? _interruptionSub;
 
+  /// Respect du switch silencieux iOS : `true` → catégorie `.ambient` (les SFX
+  /// se taisent en mode silencieux) ; `false` (défaut) → `.playback`.
+  bool _respectSilent = false;
+
   /// Vrai après [init] et tant que [dispose] n'a pas été appelé.
   bool get isInitialized => _initialized;
 
@@ -121,38 +125,22 @@ class AudioEngine with WidgetsBindingObserver {
   Future<void> init() async {
     if (_initialized) return;
     try {
-      // Configure AVAudioSession AVANT SoLoud — sans ça, miniaudio (sous
-      // flutter_soloud) hérite de la category `.ambient` par défaut sur iOS,
-      // qui se fait évincer dès que google_mobile_ads active `.playback`
-      // exclusif pour une pub. Résultat : SoLoud reste muet jusqu'à un
-      // deinit/init complet. `playback` + `mixWithOthers` laisse coexister
-      // les pubs et la synthèse sans conflit de session.
+      // Configure AVAudioSession AVANT SoLoud. Cf. [_buildSessionConfig] pour
+      // le choix de catégorie (`.playback` par défaut vs `.ambient` si le
+      // joueur a activé le respect du switch silencieux).
       final session = await AudioSession.instance;
-      await session.configure(
-        const AudioSessionConfiguration(
-          avAudioSessionCategory: AVAudioSessionCategory.playback,
-          avAudioSessionCategoryOptions:
-              AVAudioSessionCategoryOptions.mixWithOthers,
-          avAudioSessionMode: AVAudioSessionMode.defaultMode,
-          avAudioSessionRouteSharingPolicy:
-              AVAudioSessionRouteSharingPolicy.defaultPolicy,
-          avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-          androidAudioAttributes: AndroidAudioAttributes(
-            contentType: AndroidAudioContentType.music,
-            usage: AndroidAudioUsage.game,
-          ),
-          androidAudioFocusGainType:
-              AndroidAudioFocusGainType.gainTransientMayDuck,
-          androidWillPauseWhenDucked: false,
-        ),
-      );
+      await session.configure(_buildSessionConfig());
       await session.setActive(true);
 
       // Interruptions système (appel entrant, Siri, autre app exclusive) :
-      // begin → pause technique, end → reprise. Sans ça, la synthèse
-      // reprenait à plein volume par-dessus l'événement interrupteur.
+      // begin → pause technique, end → reprise. En mode `.ambient`, une pub
+      // AdMob peut avoir évincé notre session : on la ré-affirme en fin
+      // d'interruption pour ne pas rester muet.
       _interruptionSub = session.interruptionEventStream.listen((event) {
         _setPaused(paused: event.begin);
+        if (!event.begin && _respectSilent) {
+          unawaited(_reassertSession());
+        }
       });
 
       await SoLoud.instance.init();
@@ -175,6 +163,56 @@ class AudioEngine with WidgetsBindingObserver {
       _log.e('AudioEngine init failed', error: e, stackTrace: st);
       // On reste utilisable en mode silencieux : tous les `play*` deviennent
       // des no-ops car `_initialized` reste false.
+    }
+  }
+
+  /// Construit la configuration AVAudioSession / Android selon [_respectSilent].
+  ///
+  /// - `.playback` (défaut) : le son joue même quand l'iPhone est en silencieux
+  ///   et coexiste avec les pubs AdMob sans rester muet (comportement éprouvé,
+  ///   cf. historique « SoLoud muet après pub »).
+  /// - `.ambient` : respecte le switch silencieux physique (les SFX se taisent),
+  ///   `mixWithOthers` pour ne pas couper la musique d'autres apps.
+  AudioSessionConfiguration _buildSessionConfig() {
+    return AudioSessionConfiguration(
+      avAudioSessionCategory: _respectSilent
+          ? AVAudioSessionCategory.ambient
+          : AVAudioSessionCategory.playback,
+      avAudioSessionCategoryOptions:
+          AVAudioSessionCategoryOptions.mixWithOthers,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      avAudioSessionRouteSharingPolicy:
+          AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      androidAudioAttributes: const AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.music,
+        usage: AndroidAudioUsage.game,
+      ),
+      androidAudioFocusGainType:
+          AndroidAudioFocusGainType.gainTransientMayDuck,
+      androidWillPauseWhenDucked: false,
+    );
+  }
+
+  /// Active/désactive le respect du switch silencieux iOS. Reconfigure la
+  /// session audio à chaud. Fail-soft. No-op si la valeur ne change pas.
+  Future<void> setRespectSilentSwitch({required bool respect}) async {
+    if (_respectSilent == respect) return;
+    _respectSilent = respect;
+    if (!_initialized) return; // sera appliqué via le prochain init/configure
+    await _reassertSession();
+  }
+
+  /// (Ré)applique la configuration de session courante et la réactive. Utilisé
+  /// au changement de politique silencieux et après une interruption (pub) qui
+  /// a pu évincer la session en mode `.ambient`.
+  Future<void> _reassertSession() async {
+    try {
+      final session = await AudioSession.instance;
+      await session.configure(_buildSessionConfig());
+      await session.setActive(true);
+    } on Object catch (e) {
+      _log.w('AudioEngine._reassertSession failed: $e');
     }
   }
 

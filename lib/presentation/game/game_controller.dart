@@ -12,7 +12,6 @@ import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_star_rating.dart';
 import 'package:defi_kilimandjaro/domain/services/daily_challenge_service.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
-import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Phase du cycle de vie d'une partie.
@@ -281,7 +280,7 @@ class GameController extends StateNotifier<GameState> {
         selectedIndices: selected,
         validationCorrect: false,
       );
-      unawaited(HapticFeedback.selectionClick());
+      _audio.hapticDeselect();
       return;
     }
 
@@ -292,7 +291,7 @@ class GameController extends StateNotifier<GameState> {
         selectedIndices: selected,
         validationCorrect: false,
       );
-      unawaited(HapticFeedback.selectionClick());
+      _audio.hapticDeselect();
       return;
     }
 
@@ -302,10 +301,9 @@ class GameController extends StateNotifier<GameState> {
     selected.add(gridIndex);
     state = state.copyWith(selectedIndices: selected, validationCorrect: false);
 
-    // Audio: balafon note ascending (cf. maquette p.12).
+    // Audio + haptique couplés (le tick haptique est déclenché par
+    // AudioController.playLetterSelect — source unique, synchro garantie).
     unawaited(_audio.playLetterSelect(selected.length - 1));
-    // Haptique: tick discret synchronisé avec la note.
-    unawaited(HapticFeedback.selectionClick());
 
     // Auto-validate when word is complete.
     if (state.isComplete) {
@@ -374,7 +372,6 @@ class GameController extends StateNotifier<GameState> {
     );
     // Audio: kora 2 notes douces descendantes.
     unawaited(_audio.playHintUsed());
-    unawaited(HapticFeedback.lightImpact());
   }
 
   /// Valide le mot formé par les tuiles sélectionnées.
@@ -444,12 +441,11 @@ class GameController extends StateNotifier<GameState> {
           mountainId: _args.mountainId,
         ),
       );
-      // Audio: balafon accord 5 notes puis fanfare griot (boss ou
-      // standard). La fanfare boss est plus longue et débute par 2
-      // frappes djembé graves — l'attaque haptique heavy est aussi
-      // décalée pour s'aligner avec l'impact percussif.
+      // Audio + haptique couplés (déclenchés par AudioController) : accord
+      // balafon + impact moyen immédiats, puis fanfare griot (boss ou
+      // standard) + impact fort décalés de 350 ms pour s'aligner avec
+      // l'attaque percussive de la fanfare.
       unawaited(_audio.playWordComplete());
-      unawaited(HapticFeedback.mediumImpact());
       final isBoss = _args.config.isBoss;
       Future<void>.delayed(const Duration(milliseconds: 350), () {
         if (isBoss) {
@@ -457,12 +453,10 @@ class GameController extends StateNotifier<GameState> {
         } else {
           unawaited(_audio.playVictory());
         }
-        unawaited(HapticFeedback.heavyImpact());
       });
     } else {
-      // Audio: djembé ×2 + effacement.
+      // Audio + haptique couplés (djembé ×2 + impact fort) puis effacement.
       unawaited(_audio.playWrongAnswer());
-      unawaited(HapticFeedback.heavyImpact());
       state = state.copyWith(
         selectedIndices: const <int>[],
         validationCorrect: false,
@@ -527,8 +521,8 @@ class GameController extends StateNotifier<GameState> {
         _timer?.cancel();
         _stopTempo();
         state = state.copyWith(timeLeft: 0, phase: GamePhase.lost);
+        // Audio + haptique couplés (balafon descendant + tam-tam + impact fort).
         unawaited(_audio.playFailure());
-        unawaited(HapticFeedback.heavyImpact());
       } else {
         state = state.copyWith(timeLeft: state.timeLeft - 1);
         // Accélère le tic-tac quand le temps s'épuise (60→90→140 BPM).

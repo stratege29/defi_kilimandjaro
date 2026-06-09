@@ -144,16 +144,28 @@ void main() {
   });
 
   group('AudioState', () {
-    test('defaults: not muted, volume 0.8', () {
+    test('defaults: not muted, volume 0.8, haptics on, respect silent off', () {
       final s = AudioState.defaults();
       expect(s.muted, isFalse);
       expect(s.volume, 0.8);
+      expect(s.hapticsEnabled, isTrue);
+      expect(s.respectSilentSwitch, isFalse);
     });
 
     test('copyWith preserves untouched fields', () {
       final s = AudioState.defaults().copyWith(muted: true);
       expect(s.muted, isTrue);
       expect(s.volume, 0.8);
+      expect(s.hapticsEnabled, isTrue);
+      expect(s.respectSilentSwitch, isFalse);
+    });
+
+    test('copyWith updates haptics and respectSilentSwitch', () {
+      final s = AudioState.defaults()
+          .copyWith(hapticsEnabled: false, respectSilentSwitch: true);
+      expect(s.hapticsEnabled, isFalse);
+      expect(s.respectSilentSwitch, isTrue);
+      expect(s.muted, isFalse);
     });
   });
 
@@ -236,6 +248,32 @@ void main() {
       controller.suspend();
       // After suspend, stopping again should be safe.
       await expectLater(controller.stopLobbySearchLoop(), completes);
+    });
+
+    test('toggleHaptics flips the persisted flag', () async {
+      // Laisse _loadPrefs (async, lancé au constructeur) se stabiliser avant
+      // de muter l'état, sinon il écrase la valeur du toggle.
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(controller.state.hapticsEnabled, isTrue);
+      await controller.toggleHaptics();
+      expect(controller.state.hapticsEnabled, isFalse);
+      await controller.toggleHaptics();
+      expect(controller.state.hapticsEnabled, isTrue);
+    });
+
+    test('hapticDeselect never throws (haptics on or off)', () async {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      controller.hapticDeselect();
+      await controller.setHapticsEnabled(enabled: false);
+      controller.hapticDeselect();
+      expect(controller.state.hapticsEnabled, isFalse);
+    });
+
+    test('toggleRespectSilentSwitch flips without throwing', () async {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(controller.state.respectSilentSwitch, isFalse);
+      await expectLater(controller.toggleRespectSilentSwitch(), completes);
+      expect(controller.state.respectSilentSwitch, isTrue);
     });
   });
 

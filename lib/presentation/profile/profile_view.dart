@@ -177,6 +177,26 @@ class ProfileView extends ConsumerWidget {
                   ref.read(audioControllerProvider.notifier).toggleMute(),
             ),
             _SettingTile(
+              icon: audioState.hapticsEnabled
+                  ? Icons.vibration_outlined
+                  : Icons.smartphone_outlined,
+              label: 'Vibrations',
+              trailingLabel: audioState.hapticsEnabled ? 'Activé' : 'Désactivé',
+              onTap: () =>
+                  ref.read(audioControllerProvider.notifier).toggleHaptics(),
+            ),
+            _SettingTile(
+              icon: audioState.respectSilentSwitch
+                  ? Icons.notifications_off_outlined
+                  : Icons.notifications_active_outlined,
+              label: 'Respecter le mode silencieux',
+              trailingLabel:
+                  audioState.respectSilentSwitch ? 'Activé' : 'Désactivé',
+              onTap: () => ref
+                  .read(audioControllerProvider.notifier)
+                  .toggleRespectSilentSwitch(),
+            ),
+            _SettingTile(
               icon: Icons.refresh_outlined,
               label: 'Réinitialiser la progression',
               danger: true,

@@ -3,23 +3,67 @@ import 'dart:async';
 import 'package:audio_session/audio_session.dart';
 import 'package:defi_kilimandjaro/audio/audio_engine.dart';
 import 'package:defi_kilimandjaro/audio/tempo_scheduler.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// État immutable de l'audio (mute + volume).
+/// État immutable de l'audio (mute + volume + feedback haptique + politique
+/// vis-à-vis du switch silencieux iOS).
 class AudioState {
-  const AudioState({required this.muted, required this.volume});
+  const AudioState({
+    required this.muted,
+    required this.volume,
+    required this.hapticsEnabled,
+    required this.respectSilentSwitch,
+  });
 
   /// Préférences par défaut (utilisées avant chargement de SharedPreferences).
-  factory AudioState.defaults() => const AudioState(muted: false, volume: 0.8);
+  ///
+  /// - [hapticsEnabled] = true : le feedback haptique est couplé aux sons.
+  /// - [respectSilentSwitch] = false : on conserve la catégorie `.playback`
+  ///   éprouvée (coexistence avec les pubs AdMob). L'utilisateur peut activer
+  ///   le respect du mode silencieux (`.ambient`) dans les réglages.
+  factory AudioState.defaults() => const AudioState(
+        muted: false,
+        volume: 0.8,
+        hapticsEnabled: true,
+        respectSilentSwitch: false,
+      );
 
   final bool muted;
   final double volume;
+  final bool hapticsEnabled;
+  final bool respectSilentSwitch;
 
-  AudioState copyWith({bool? muted, double? volume}) =>
-      AudioState(muted: muted ?? this.muted, volume: volume ?? this.volume);
+  AudioState copyWith({
+    bool? muted,
+    double? volume,
+    bool? hapticsEnabled,
+    bool? respectSilentSwitch,
+  }) =>
+      AudioState(
+        muted: muted ?? this.muted,
+        volume: volume ?? this.volume,
+        hapticsEnabled: hapticsEnabled ?? this.hapticsEnabled,
+        respectSilentSwitch: respectSilentSwitch ?? this.respectSilentSwitch,
+      );
+}
+
+/// Intensités haptiques couplées aux cues audio du gameplay.
+enum GameHaptic {
+  /// Tick discret (sélection/désélection de lettre).
+  select,
+
+  /// Impact léger (indice).
+  light,
+
+  /// Impact moyen (mot complété).
+  medium,
+
+  /// Impact fort (victoire, mauvaise réponse, échec).
+  heavy,
 }
 
 /// API publique du système audio, exposée via [audioControllerProvider].
@@ -36,6 +80,8 @@ class AudioController extends StateNotifier<AudioState>
 
   static const String _keyMuted = 'audio_muted';
   static const String _keyVolume = 'audio_volume';
+  static const String _keyHaptics = 'audio_haptics';
+  static const String _keyRespectSilent = 'audio_respect_silent';
 
   final AudioEngine _engine;
   final Logger _log = Logger();
@@ -128,6 +174,53 @@ class AudioController extends StateNotifier<AudioState>
     await prefs.setDouble(_keyVolume, v);
   }
 
+  /// Active/désactive le feedback haptique (persisté). Indépendant du mute
+  /// sonore — un joueur peut couper le son et garder les vibrations.
+  Future<void> setHapticsEnabled({required bool enabled}) async {
+    state = state.copyWith(hapticsEnabled: enabled);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyHaptics, enabled);
+  }
+
+  /// Bascule le feedback haptique (persisté).
+  Future<void> toggleHaptics() => setHapticsEnabled(enabled: !state.hapticsEnabled);
+
+  /// Active/désactive le respect du switch silencieux iOS (persisté).
+  ///
+  /// - `true`  → catégorie `.ambient` : les SFX se taisent en mode silencieux.
+  /// - `false` → catégorie `.playback` (défaut) : le son joue toujours, et la
+  ///   session coexiste avec les pubs AdMob sans rester muette (comportement
+  ///   historique éprouvé).
+  Future<void> setRespectSilentSwitch({required bool respect}) async {
+    state = state.copyWith(respectSilentSwitch: respect);
+    await _engine.setRespectSilentSwitch(respect: respect);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyRespectSilent, respect);
+  }
+
+  /// Bascule le respect du switch silencieux (persisté).
+  Future<void> toggleRespectSilentSwitch() =>
+      setRespectSilentSwitch(respect: !state.respectSilentSwitch);
+
+  /// Déclenche le feedback haptique [kind] si activé. Couplé aux cues audio
+  /// du gameplay — source unique pour garantir la synchro son↔vibration.
+  void _fireHaptic(GameHaptic kind) {
+    if (!state.hapticsEnabled) return;
+    switch (kind) {
+      case GameHaptic.select:
+        unawaited(HapticFeedback.selectionClick());
+      case GameHaptic.light:
+        unawaited(HapticFeedback.lightImpact());
+      case GameHaptic.medium:
+        unawaited(HapticFeedback.mediumImpact());
+      case GameHaptic.heavy:
+        unawaited(HapticFeedback.heavyImpact());
+    }
+  }
+
+  /// Feedback haptique seul (sans son) — désélection d'une lettre.
+  void hapticDeselect() => _fireHaptic(GameHaptic.select);
+
   /// Suspend le moteur (entre niveaux — cf. maquette p.12).
   /// Arrête également le loop lobby si actif.
   void suspend() {
@@ -140,8 +233,9 @@ class AudioController extends StateNotifier<AudioState>
 
   // ─── API ludique (cf. maquette p.12) ────────────────────────────────────
 
-  /// Sélection d'une lettre — balafon pentatonique ascendant.
+  /// Sélection d'une lettre — balafon pentatonique ascendant + tick haptique.
   Future<void> playLetterSelect(int letterIdx) {
+    _fireHaptic(GameHaptic.select);
     final cue = switch (letterIdx % 5) {
       0 => AudioCue.letterSelect0,
       1 => AudioCue.letterSelect1,
@@ -152,26 +246,45 @@ class AudioController extends StateNotifier<AudioState>
     return _engine.play(cue);
   }
 
-  /// Mot complété — accord balafon ascendant 5 notes (70 ms espace).
-  Future<void> playWordComplete() => _engine.play(AudioCue.wordComplete);
+  /// Mot complété — accord balafon ascendant 5 notes + impact moyen.
+  Future<void> playWordComplete() {
+    _fireHaptic(GameHaptic.medium);
+    return _engine.play(AudioCue.wordComplete);
+  }
 
-  /// Indice utilisé — kora 2 notes descendantes douces.
-  Future<void> playHintUsed() => _engine.play(AudioCue.hintUsed);
+  /// Indice utilisé — kora 2 notes descendantes douces + impact léger.
+  Future<void> playHintUsed() {
+    _fireHaptic(GameHaptic.light);
+    return _engine.play(AudioCue.hintUsed);
+  }
 
-  /// Victoire — fanfare griot (balafon + kora + tam-tam).
-  Future<void> playVictory() => _engine.play(AudioCue.victory);
+  /// Victoire — fanfare griot (balafon + kora + tam-tam) + impact fort.
+  Future<void> playVictory() {
+    _fireHaptic(GameHaptic.heavy);
+    return _engine.play(AudioCue.victory);
+  }
 
   /// Victoire BOSS — fanfare enrichie (intro djembé grave + griot
-  /// élargi + queue tam-tam, ~2.8 s).
-  Future<void> playBossVictory() => _engine.play(AudioCue.bossVictory);
+  /// élargi + queue tam-tam, ~2.8 s) + impact fort.
+  Future<void> playBossVictory() {
+    _fireHaptic(GameHaptic.heavy);
+    return _engine.play(AudioCue.bossVictory);
+  }
 
-  /// Échec — balafon descendant + tam-tam lent.
-  Future<void> playFailure() => _engine.play(AudioCue.failure);
+  /// Échec — balafon descendant + tam-tam lent + impact fort.
+  Future<void> playFailure() {
+    _fireHaptic(GameHaptic.heavy);
+    return _engine.play(AudioCue.failure);
+  }
 
-  /// Mauvaise réponse — djembé x2.
-  Future<void> playWrongAnswer() => _engine.play(AudioCue.wrongAnswer);
+  /// Mauvaise réponse — djembé x2 + impact fort.
+  Future<void> playWrongAnswer() {
+    _fireHaptic(GameHaptic.heavy);
+    return _engine.play(AudioCue.wrongAnswer);
+  }
 
-  /// Tick timer — sweep tam-tam 160→60 Hz.
+  /// Tick timer — sweep tam-tam 160→60 Hz. **Pas d'haptique** : à 140 BPM le
+  /// tic-tac est trop rapide pour des vibrations (gêne + batterie).
   ///
   /// [bpm] est ignoré ici (le BPM est piloté par [TempoScheduler]) ; le
   /// paramètre est conservé pour respecter la signature de la maquette p.12.
@@ -286,10 +399,23 @@ class AudioController extends StateNotifier<AudioState>
       final prefs = await SharedPreferences.getInstance();
       final muted = prefs.getBool(_keyMuted) ?? false;
       final volume = prefs.getDouble(_keyVolume) ?? 0.8;
-      state = AudioState(muted: muted, volume: volume);
+      final haptics = prefs.getBool(_keyHaptics) ?? true;
+      final respectSilent = prefs.getBool(_keyRespectSilent) ?? false;
+      state = AudioState(
+        muted: muted,
+        volume: volume,
+        hapticsEnabled: haptics,
+        respectSilentSwitch: respectSilent,
+      );
       _engine
         ..setMuted(muted: muted)
         ..setVolume(volume);
+      // N'impose la reconfiguration de session que si l'utilisateur a opté
+      // pour le respect du silencieux (sinon on garde la config `.playback`
+      // déjà posée par AudioEngine.init() — pas de reconfig inutile).
+      if (respectSilent) {
+        await _engine.setRespectSilentSwitch(respect: true);
+      }
     } on Object catch (e) {
       _log.w('AudioController._loadPrefs failed: $e');
     }
