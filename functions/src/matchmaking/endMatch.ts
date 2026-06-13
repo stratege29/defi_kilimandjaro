@@ -31,7 +31,7 @@ interface EndMatchResult {
 }
 
 export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
-  { region: "europe-west1" },
+  { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     const callerUid = requireAuth(request.auth);
     const { matchId, winner_uid } = request.data;
@@ -94,6 +94,30 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
     if (!matchData.is_ranked) {
       // Pour les duels ami (non-ranked), ne pas modifier l'ELO.
       return { new_elo: ELO_INITIAL, delta: 0 };
+    }
+
+    // --- Idempotence (C4) : verrou anti double-application de l'ELO ---
+    // Les deux joueurs (et les retries reseau) appellent endMatch. Sans
+    // verrou, chaque appel ré-applique wins/elo (FieldValue.increment non
+    // idempotent) → inflation. Une transaction RTDB pose un flag `settled` :
+    // le premier appel gagne et applique ; les suivants renvoient le resultat
+    // depuis l'historique sans muter les profils.
+    const settledRef = rtdb.ref(`matches/${matchId}/settled`);
+    const settledTxn = await settledRef.transaction((cur) =>
+      cur === true ? undefined : true
+    );
+    if (!settledTxn.committed) {
+      const histSnap = await db
+        .collection("matches_history")
+        .doc(matchId)
+        .get();
+      const hist = histSnap.data() ?? {};
+      const changes = (hist["elo_changes"] ?? {}) as Record<string, number>;
+      const afters = (hist["elo_after"] ?? {}) as Record<string, number>;
+      return {
+        new_elo: afters[callerUid] ?? ELO_INITIAL,
+        delta: changes[callerUid] ?? 0,
+      };
     }
 
     const loserUid = players.find((p) => p !== winner_uid)!;
@@ -203,7 +227,14 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
     batch.set(winnerHistoryRef, winnerHistoryData);
     batch.set(loserHistoryRef, loserHistoryData);
 
-    await batch.commit();
+    try {
+      await batch.commit();
+    } catch (err) {
+      // Echec d'ecriture apres avoir pose le verrou : on libere `settled`
+      // pour permettre un retry propre (l'ELO n'a pas ete applique).
+      await settledRef.set(null);
+      throw err;
+    }
 
     // Retourner le résultat au caller.
     const callerIsWinner = callerUid === winner_uid;

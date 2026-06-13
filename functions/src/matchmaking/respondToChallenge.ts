@@ -36,7 +36,7 @@ export const respondToChallenge = onCall<
   RespondToChallengeData,
   Promise<RespondToChallengeResult>
 >(
-  { region: "europe-west1" },
+  { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     const callerUid = requireAuth(request.auth);
     const { matchId, accept } = request.data;

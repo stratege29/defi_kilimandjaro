@@ -19,6 +19,7 @@
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { logger } from "firebase-functions/v2";
 import { getDatabase } from "firebase-admin/database";
+import { readAnswer } from "./matchAnswers";
 
 const STALE_ACTIVE_MS = 55000; // 30s round + grâce + retries + marge
 
@@ -125,6 +126,10 @@ export const resolveStaleMatches = onSchedule(
       if (isLastRound) {
         updates.winner = computeWinner(players, uids);
       }
+
+      // Reveal de la reponse de la manche resolue (best-effort).
+      const answer = await readAnswer(matchId, round);
+      if (answer != null) updates[`rounds/${round}/answer`] = answer;
 
       await rtdb.ref(`matches/${matchId}`).update(updates);
       resolved++;

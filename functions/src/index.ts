@@ -40,6 +40,8 @@ export { endMatch } from "./matchmaking/endMatch";
 export { submitRoundWin } from "./matchmaking/submitRoundWin";
 export { submitRoundTimeout } from "./matchmaking/submitRoundTimeout";
 export { advancePhase } from "./matchmaking/advancePhase";
+export { joinDuel } from "./matchmaking/joinDuel";
+export { forfeitMatch } from "./matchmaking/forfeitMatch";
 export { createLocalDuel } from "./matchmaking/createLocalDuel";
 export { prunePresence } from "./matchmaking/prunePresence";
 export { resolveStaleMatches } from "./matchmaking/resolveStaleMatches";

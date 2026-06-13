@@ -12,6 +12,7 @@ class DuelLocalState {
     required this.timeLeft,
     required this.currentRound,
     this.submitted = false,
+    this.submitting = false,
   });
 
   factory DuelLocalState.initial() => const DuelLocalState(
@@ -26,20 +27,26 @@ class DuelLocalState {
   /// Round local observe : quand il change, le controller reset le state.
   final int currentRound;
 
-  /// True si le joueur a valide le bon mot pour le round courant.
+  /// True si le serveur a valide le bon mot pour le round courant.
   final bool submitted;
+
+  /// True pendant l'aller-retour serveur de validation du mot (C2). Verrouille
+  /// la saisie le temps de la reponse pour eviter les double-soumissions.
+  final bool submitting;
 
   DuelLocalState copyWith({
     List<int>? selectedIndices,
     int? timeLeft,
     int? currentRound,
     bool? submitted,
+    bool? submitting,
   }) {
     return DuelLocalState(
       selectedIndices: selectedIndices ?? this.selectedIndices,
       timeLeft: timeLeft ?? this.timeLeft,
       currentRound: currentRound ?? this.currentRound,
       submitted: submitted ?? this.submitted,
+      submitting: submitting ?? this.submitting,
     );
   }
 }
@@ -114,7 +121,7 @@ class DuelController extends StateNotifier<DuelLocalState> {
   }
 
   void selectTile(int gridIndex) {
-    if (state.submitted) return;
+    if (state.submitted || state.submitting) return;
     if (state.timeLeft == 0) return;
 
     final selected = List<int>.from(state.selectedIndices);
@@ -132,30 +139,54 @@ class DuelController extends StateNotifier<DuelLocalState> {
     _pushProgress();
 
     final roundData = _currentRoundData();
-    if (roundData != null && selected.length == roundData.answer.length) {
-      _validate(roundData);
+    // Mot complet = toutes les lettres du pool sont placees. La longueur vient
+    // de lettersPool (== longueur de la reponse) : le client n'a JAMAIS la
+    // reponse (C3). La validation se fait cote serveur (C2).
+    if (roundData != null &&
+        selected.length == roundData.lettersPool.length) {
+      _submitWord(roundData);
     }
   }
 
   void clearSelection() {
-    if (state.submitted) return;
+    if (state.submitted || state.submitting) return;
     state = state.copyWith(selectedIndices: const <int>[]);
     _pushProgress();
   }
 
-  void _validate(RoundData roundData) {
+  /// Soumet le mot forme au serveur pour validation (anti-cheat C2). Le serveur
+  /// compare a la reponse stockee dans /match_answers (jamais envoyee au
+  /// client) et confirme — ou rejette — la victoire de la manche.
+  void _submitWord(RoundData roundData) {
     final formed =
         state.selectedIndices.map((i) => roundData.lettersPool[i]).join();
-    if (formed == roundData.answer) {
-      state = state.copyWith(submitted: true);
-      // Fire-and-forget : on swallow l'erreur (le serveur est idempotent,
-      // si l'autre joueur a gagné en parallèle, ça retourne failed-precondition
-      // et c'est normal).
-      repository
-          .submitRoundWin(session.matchId, state.currentRound, selfUid)
-          .catchError((Object _) => '');
-    } else {
-      state = state.copyWith(selectedIndices: const <int>[]);
+    final round = state.currentRound;
+    state = state.copyWith(submitting: true);
+    unawaited(_submitWordAsync(formed, round));
+  }
+
+  Future<void> _submitWordAsync(String formed, int round) async {
+    try {
+      await repository.submitRoundWin(
+        session.matchId,
+        round,
+        selfUid,
+        formed,
+      );
+      // La manche a pu changer pendant l'aller-retour : ne pas muter un round
+      // qui n'est plus le notre.
+      if (!mounted || state.currentRound != round) return;
+      state = state.copyWith(submitted: true, submitting: false);
+    } on Object catch (_) {
+      // Mot incorrect (mauvais ordre) OU manche terminee entre-temps
+      // (adversaire gagnant/timeout). On deverrouille et on efface la
+      // selection ; si la manche est finie, le stream RTDB resettera l'etat.
+      if (!mounted || state.currentRound != round) return;
+      state = state.copyWith(
+        submitting: false,
+        submitted: false,
+        selectedIndices: const <int>[],
+      );
       _pushProgress();
     }
   }
@@ -164,7 +195,7 @@ class DuelController extends StateNotifier<DuelLocalState> {
     final roundData = _currentRoundData();
     if (roundData == null) return;
     final p = min<double>(
-      state.selectedIndices.length / max(roundData.answer.length, 1),
+      state.selectedIndices.length / max(roundData.lettersPool.length, 1),
       1,
     );
     unawaited(

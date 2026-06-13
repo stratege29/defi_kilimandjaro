@@ -21,7 +21,13 @@ import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { getDatabase, ServerValue } from "firebase-admin/database";
 import { requireAuth } from "../utils/auth";
 import { ELO_INITIAL } from "./elo";
-import { _loadDevinettesCache, _pickThreeRounds } from "./devinettesCache";
+import {
+  _loadDevinettesCache,
+  _pickThreeRounds,
+  answersFromRounds,
+  toPublicRound,
+} from "./devinettesCache";
+import { buildAnswersNode, matchAnswersPath } from "./matchAnswers";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -44,7 +50,7 @@ interface RequestMatchResult {
 // ---------------------------------------------------------------------------
 
 export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>>(
-  { region: "europe-west1" },
+  { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     const uid = requireAuth(request.auth);
     const { request_id, expansion_step = 0 } = request.data;
@@ -164,10 +170,12 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
         is_ranked: true,
         current_round: 0,
         total_rounds: 3,
+        // Anti-cheat (C3) : payload public sans `answer`. Les réponses vont
+        // dans le nœud serveur-only /match_answers, révélées en fin de manche.
         rounds: {
-          0: rounds[0],
-          1: rounds[1],
-          2: rounds[2],
+          0: toPublicRound(rounds[0]),
+          1: toPublicRound(rounds[1]),
+          2: toPublicRound(rounds[2]),
         },
         players: {
           [uid]: {
@@ -193,6 +201,9 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
       // valeur de retour, donc son entree lobby peut etre supprimee.
       const updates: Record<string, unknown> = {
         [`matches/${matchId}`]: matchData,
+        [matchAnswersPath(matchId)]: buildAnswersNode(
+          answersFromRounds(rounds)
+        ),
         [`lobby/${uid}`]: null,
         [`lobby/${opponentUid}/matched_to`]: matchId,
       };

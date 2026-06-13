@@ -38,7 +38,7 @@ interface AdvancePhaseResult {
 const MIN_ELAPSED_MS = 2000; // tolerance 1s sous les 3s d'animation client
 
 export const advancePhase = onCall<AdvancePhaseData, Promise<AdvancePhaseResult>>(
-  { region: "europe-west1" },
+  { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     const callerUid = requireAuth(request.auth);
     const { match_id } = request.data;

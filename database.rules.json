@@ -23,32 +23,49 @@
     "matches": {
       ".indexOn": ["phase"],
       "$matchId": {
-        ".read": "auth != null",
-        // Autorise les participants existants ET le target_uid (rematch async)
-        // ET le createur (QR local) a ecrire sur le match. Couvre joinOpen
-        // (ecrit players + phase + phase_started_at en transaction atomique).
-        // Anti-cheat : les transitions de phase non triviales (active, finished)
-        // restent gerees par les Cloud Functions cote serveur via Admin SDK.
+        // C3 — Lecture restreinte aux participants : un tiers ne peut plus
+        // enumerer les duels en cours ni lire leur contenu.
+        ".read": "auth != null && (data.child('players').child(auth.uid).exists() || data.child('target_uid').val() === auth.uid || data.child('created_by').val() === auth.uid)",
+        // C1 — Ecriture top-level reservee aux participants (sert au
+        // deleteIfOwner du createur). Les writes de progression passent par la
+        // regle enfant players/$uid. TOUS les champs sensibles (winner, phase,
+        // rounds, current_round, is_ranked, secret...) sont verrouilles par le
+        // `$other: {".validate": false}` ci-dessous : seul le serveur (Admin
+        // SDK, qui bypass les rules) peut les ecrire. Le join, les transitions
+        // de phase et le forfait passent desormais par des Cloud Functions
+        // (joinDuel, advancePhase, submitRoundWin/Timeout, forfeitMatch).
         ".write": "auth != null && (data.child('players').child(auth.uid).exists() || data.child('target_uid').val() === auth.uid || data.child('created_by').val() === auth.uid)",
         "players": {
           "$uid": {
             ".write": "auth != null && auth.uid === $uid",
+            // Le client ne peut ecrire QUE sa progression (barre adverse).
+            // rounds_won / total_time_ms / found / finished_at sont serveur-only.
             "progress": {
               ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
-            },
-            "found": {
-              ".validate": "newData.isBoolean()"
             },
             "rounds": {
               "$roundIndex": {
                 "progress": {
                   ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1"
-                }
+                },
+                "$otherRoundField": { ".validate": false }
               }
-            }
+            },
+            "$otherPlayerField": { ".validate": false }
           }
-        }
+        },
+        // Tout champ du match non explicitement autorise ci-dessus est
+        // refuse en ecriture client (Admin SDK bypass pour les CFs).
+        "$otherMatchField": { ".validate": false }
       }
+    },
+    "match_answers": {
+      // C2/C3 — Reponses des duels, serveur-only. Aucune regle d'acces =>
+      // refuse cote client par defaut ; lu/ecrit uniquement par les Cloud
+      // Functions via l'Admin SDK. Revele dans /matches/.../rounds/{i}/answer
+      // seulement en fin de manche.
+      ".read": false,
+      ".write": false
     },
     "pending_challenges": {
       "$uid": {

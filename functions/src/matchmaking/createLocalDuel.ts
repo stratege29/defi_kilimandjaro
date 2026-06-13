@@ -16,7 +16,13 @@
 
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { getDatabase } from "firebase-admin/database";
-import { _loadDevinettesCache, _pickThreeRounds } from "./devinettesCache";
+import {
+  _loadDevinettesCache,
+  _pickThreeRounds,
+  answersFromRounds,
+  toPublicRound,
+} from "./devinettesCache";
+import { buildAnswersNode, matchAnswersPath } from "./matchAnswers";
 
 const REGION = "europe-west1";
 
@@ -42,7 +48,7 @@ function _generateSecret(): string {
 }
 
 export const createLocalDuel = onCall(
-  { region: REGION },
+  { region: REGION, enforceAppCheck: true },
   async (request) => {
     const uid = request.auth?.uid;
     if (!uid) {
@@ -65,10 +71,11 @@ export const createLocalDuel = onCall(
       is_ranked: false,
       current_round: 0,
       total_rounds: 3,
+      // Anti-cheat (C3) : payload public sans `answer` (réponses serveur-only).
       rounds: {
-        0: rounds[0],
-        1: rounds[1],
-        2: rounds[2],
+        0: toPublicRound(rounds[0]),
+        1: toPublicRound(rounds[1]),
+        2: toPublicRound(rounds[2]),
       },
       players: {
         [uid]: {
@@ -82,7 +89,10 @@ export const createLocalDuel = onCall(
     };
 
     const rtdb = getDatabase();
-    await rtdb.ref(`matches/${matchId}`).set(matchData);
+    await rtdb.ref().update({
+      [`matches/${matchId}`]: matchData,
+      [matchAnswersPath(matchId)]: buildAnswersNode(answersFromRounds(rounds)),
+    });
 
     return { matchId, secret };
   },
