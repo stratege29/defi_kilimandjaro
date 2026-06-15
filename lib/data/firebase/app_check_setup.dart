@@ -13,31 +13,24 @@ import 'package:flutter/foundation.dart';
 /// authentifié. Sans cela, Cloud Functions / Firestore / RTDB rejettent les
 /// requêtes en mode "enforced".
 Future<void> activateAppCheck() async {
-  // firebase_app_check 0.4.x has both the deprecated `appleProvider`
-  // (defaulting to `AppleProvider.deviceCheck`) and the new `providerApple`
-  // (defaulting to `AppleDeviceCheckProvider()`). Both get forwarded to the
-  // native delegate, and DeviceCheck takes precedence on simulator/older
-  // devices unless we explicitly opt-into debug on the legacy param too.
-  await FirebaseAppCheck.instance.activate(
-    androidProvider: kDebugMode
-        ? AndroidProvider.debug
-        : AndroidProvider.playIntegrity,
-    appleProvider: kDebugMode
-        ? AppleProvider.debug
-        : AppleProvider.deviceCheck,
-    providerAndroid: kDebugMode
-        ? const AndroidDebugProvider()
-        : const AndroidPlayIntegrityProvider(),
-    providerApple: kDebugMode
-        ? const AppleDebugProvider(
-            // Hardcoded debug UUID — must be allow-listed in Firebase
-            // Console > App Check > Apps > iOS > ⋮ > Manage debug tokens.
-            // This avoids relying on FIRAAppCheckDebugToken Xcode scheme env
-            // vars which `flutter run` doesn't forward to the simulator.
-            debugToken: '8aeb4a3e-9c6f-47d1-993e-1cc9168104de',
-          )
-        : const AppleDeviceCheckProvider(),
-  );
+  // iOS/macOS : le provider App Check est configuré NATIVEMENT dans
+  // AppDelegate.swift — `AppCheckDebugProviderFactory` + `FIRAAppCheckDebugToken`
+  // (setenv AVANT `FirebaseApp.configure()`) en `#if DEBUG`, et
+  // `DeviceCheckProviderFactory` en release. On NE rappelle donc PAS
+  // `activate()` côté Dart sur iOS : le plugin réécrirait le provider factory
+  // natif et, sur SIMULATEUR, retombe sur DeviceCheck (« DeviceCheckProvider is
+  // not supported on current platform ») → aucun jeton App Check valide → les
+  // callables `enforceAppCheck` rejettent tout (unauthenticated).
+  //
+  // Android n'a pas d'équivalent natif ici : la sélection du provider passe
+  // par `activate()` côté Dart.
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    await FirebaseAppCheck.instance.activate(
+      providerAndroid: kDebugMode
+          ? const AndroidDebugProvider()
+          : const AndroidPlayIntegrityProvider(),
+    );
+  }
   // Token auto-refresh: laisser activé en prod. Désactiver localement si tu
   // veux un token fixe par run de debug.
   await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
@@ -60,7 +53,7 @@ Future<void> activateAppCheck() async {
         '(JWT, allow-list the debug UUID printed by native plugin in '
         'Firebase Console > App Check > Apps > ⋮ > Manage debug tokens)',
       );
-    } catch (e) {
+    } on Object catch (e) {
       // ignore: avoid_print
       print('🛡️ App Check getToken failed: $e');
     }
