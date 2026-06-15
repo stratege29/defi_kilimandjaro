@@ -73,11 +73,10 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
       setState(() => _eloLoading = false);
       return;
     }
+    // winner vide => match NUL : on appelle quand même endMatch (E3). Le
+    // serveur est autoritaire, applique l'ELO de nul aux deux joueurs et
+    // écrit l'historique (avant, le nul n'était jamais réglé).
     final winnerUid = widget.session.winner ?? '';
-    if (winnerUid.isEmpty) {
-      setState(() => _eloLoading = false);
-      return;
-    }
     try {
       final delta = await ref
           .read(matchmakingRepositoryProvider)

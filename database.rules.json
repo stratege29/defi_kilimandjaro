@@ -26,15 +26,21 @@
         // C3 — Lecture restreinte aux participants : un tiers ne peut plus
         // enumerer les duels en cours ni lire leur contenu.
         ".read": "auth != null && (data.child('players').child(auth.uid).exists() || data.child('target_uid').val() === auth.uid || data.child('created_by').val() === auth.uid)",
-        // C1 — Ecriture top-level reservee aux participants (sert au
-        // deleteIfOwner du createur). Les writes de progression passent par la
-        // regle enfant players/$uid. TOUS les champs sensibles (winner, phase,
-        // rounds, current_round, is_ranked, secret...) sont verrouilles par le
-        // `$other: {".validate": false}` ci-dessous : seul le serveur (Admin
-        // SDK, qui bypass les rules) peut les ecrire. Le join, les transitions
-        // de phase et le forfait passent desormais par des Cloud Functions
-        // (joinDuel, advancePhase, submitRoundWin/Timeout, forfeitMatch).
-        ".write": "auth != null && (data.child('players').child(auth.uid).exists() || data.child('target_uid').val() === auth.uid || data.child('created_by').val() === auth.uid)",
+        // C1 — Ecriture top-level reservee aux participants. Les writes de
+        // progression passent par la regle enfant players/$uid. TOUS les champs
+        // sensibles (winner, phase, rounds, current_round, is_ranked, secret...)
+        // sont verrouilles par le `$otherMatchField: {".validate": false}`
+        // ci-dessous : seul le serveur (Admin SDK, qui bypass les rules) peut
+        // les ecrire. Join, transitions de phase et forfait passent par des
+        // Cloud Functions (joinDuel, advancePhase, submitRoundWin/Timeout,
+        // forfeitMatch).
+        //
+        // Anti-grief (suppression) : la SUPPRESSION du noeud (newData null) est
+        // limitee au CREATEUR et UNIQUEMENT en phase `waiting` (cas legitime
+        // deleteIfOwner : nettoyer un duel QR que personne n'a rejoint). Un
+        // participant ne peut donc PAS supprimer un duel en cours pour priver
+        // l'adversaire de sa victoire. Les suppressions serveur (CF) bypassent.
+        ".write": "auth != null && (data.child('players').child(auth.uid).exists() || data.child('target_uid').val() === auth.uid || data.child('created_by').val() === auth.uid) && (newData.exists() || (data.child('created_by').val() === auth.uid && (!data.child('phase').exists() || data.child('phase').val() === 'waiting')))",
         "players": {
           "$uid": {
             ".write": "auth != null && auth.uid === $uid",

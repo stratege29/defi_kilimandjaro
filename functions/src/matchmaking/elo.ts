@@ -58,3 +58,38 @@ export function calculateElo(
     loserDelta,
   };
 }
+
+export interface DrawEloResult {
+  newEloA: number;
+  newEloB: number;
+  deltaA: number;
+  deltaB: number;
+}
+
+/**
+ * Calcule les nouveaux ELOs après un match NUL (score réel 0.5 pour chacun).
+ *
+ *   delta = round(K * (0.5 - expected))
+ *
+ * Le joueur le mieux classé perd quelques points, le moins bien classé en
+ * gagne quelques-uns (régression vers la moyenne). Si les deux ELOs sont
+ * égaux, les deltas valent 0.
+ */
+export function calculateDrawElo(
+  eloA: number,
+  eloB: number,
+  k: number = ELO_K
+): DrawEloResult {
+  const expectedA = 1 / (1 + Math.pow(10, (eloB - eloA) / 400));
+  const expectedB = 1 - expectedA;
+
+  const deltaA = Math.round(k * (0.5 - expectedA));
+  const deltaB = Math.round(k * (0.5 - expectedB));
+
+  return {
+    newEloA: Math.max(0, eloA + deltaA),
+    newEloB: Math.max(0, eloB + deltaB),
+    deltaA,
+    deltaB,
+  };
+}

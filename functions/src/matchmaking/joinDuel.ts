@@ -18,6 +18,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { getDatabase } from "firebase-admin/database";
 import { requireAuth } from "../utils/auth";
+import { requireDuelProtocol } from "./protocol";
 
 interface JoinDuelData {
   matchId: string;
@@ -34,6 +35,7 @@ export const joinDuel = onCall<JoinDuelData, Promise<JoinDuelResult>>(
   { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     const uid = requireAuth(request.auth);
+    requireDuelProtocol(request.data);
     const { matchId, secret } = request.data;
 
     if (!matchId || typeof matchId !== "string") {

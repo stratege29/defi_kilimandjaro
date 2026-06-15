@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
+import 'package:defi_kilimandjaro/core/constants/duel_protocol.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/matchmaking_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
@@ -366,6 +367,21 @@ class LobbyController extends StateNotifier<LobbyState> {
       }
       // MatchmakingWaiting → continuer a attendre.
     } on Exception catch (e) {
+      // Gate version : le serveur a rejeté ce client (trop ancien pour le
+      // contrat duel courant). Inutile de re-poller — on stoppe et on affiche
+      // un message « mets à jour ».
+      if (e.toString().contains(kDuelOutdatedCode)) {
+        _cancelled = true;
+        _pollTimer?.cancel();
+        _tickTimer?.cancel();
+        unawaited(_matchedToSub?.cancel());
+        unawaited(audioController.stopLobbySearchLoop());
+        state = state.copyWith(
+          phase: LobbyPhase.noOpponent,
+          errorMessage: 'outdated',
+        );
+        return;
+      }
       _log.e('Erreur matchmaking poll', error: e);
     }
   }

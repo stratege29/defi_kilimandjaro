@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:defi_kilimandjaro/core/constants/duel_protocol.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -73,6 +74,7 @@ class DuelRepository {
     await callable.call<Map<Object?, Object?>>(<String, dynamic>{
       'matchId': matchId,
       if (secret.isNotEmpty) 'secret': secret,
+      'protocol_version': kDuelProtocolVersion,
     });
     _log.i('Duel rejoint (CF): $matchId');
   }
@@ -174,6 +176,7 @@ class DuelRepository {
     final callable = functions.httpsCallable('joinDuel');
     final result = await callable.call<Map<Object?, Object?>>(<String, dynamic>{
       'matchId': matchId,
+      'protocol_version': kDuelProtocolVersion,
     });
     final data = result.data.cast<String, dynamic>();
     final matchData = (data['matchData'] as Map).cast<String, dynamic>();
