@@ -3,20 +3,33 @@ import 'package:defi_kilimandjaro/data/repositories/auth_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/sync/progress_sync_service.dart';
 import 'package:defi_kilimandjaro/data/wallet/wallet_sync.dart';
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/logger.dart';
 
 /// État UI transient des actions de compte (liaison, déconnexion, suppression).
 ///
 /// Le fournisseur lié et le flag anonyme proviennent de [authStateProvider] —
 /// cet état ne porte que le statut d'action en cours et les messages.
 class AccountUiState {
-  const AccountUiState({this.isBusy = false, this.error, this.notice});
+  const AccountUiState({
+    this.isBusy = false,
+    this.error,
+    this.errorDetail,
+    this.notice,
+  });
 
   /// Action réseau en cours (désactive les boutons + spinner).
   final bool isBusy;
 
-  /// Message d'erreur à afficher, ou `null`.
+  /// Message d'erreur à afficher (clé i18n), ou `null`.
   final String? error;
+
+  /// Code technique brut de l'échec (ex: `credential-already-in-use`,
+  /// `google_sign_in_failed`, `app-check-token-invalid`). Affiché entre
+  /// parenthèses après le message traduit pour rendre l'échec diagnosticable
+  /// (capture d'écran reviewer + logs). `null` si pas d'erreur.
+  final String? errorDetail;
 
   /// Notice informative (ex: bascule vers un compte existant), ou `null`.
   final String? notice;
@@ -24,11 +37,13 @@ class AccountUiState {
   AccountUiState copyWith({
     bool? isBusy,
     String? Function()? error,
+    String? Function()? errorDetail,
     String? Function()? notice,
   }) {
     return AccountUiState(
       isBusy: isBusy ?? this.isBusy,
       error: error != null ? error() : this.error,
+      errorDetail: errorDetail != null ? errorDetail() : this.errorDetail,
       notice: notice != null ? notice() : this.notice,
     );
   }
@@ -47,6 +62,7 @@ class AccountController extends StateNotifier<AccountUiState> {
 
   final AuthRepository _auth;
   final Ref _ref;
+  final Logger _log = Logger();
 
   Future<void> linkWithGoogle() => _runLink(_auth.linkWithGoogle);
 
@@ -54,7 +70,12 @@ class AccountController extends StateNotifier<AccountUiState> {
 
   Future<void> _runLink(Future<LinkOutcome> Function() action) async {
     if (state.isBusy) return;
-    state = state.copyWith(isBusy: true, error: () => null, notice: () => null);
+    state = state.copyWith(
+      isBusy: true,
+      error: () => null,
+      errorDetail: () => null,
+      notice: () => null,
+    );
     try {
       final outcome = await action();
       switch (outcome) {
@@ -78,15 +99,26 @@ class AccountController extends StateNotifier<AccountUiState> {
         case LinkOutcome.cancelled:
           state = state.copyWith(isBusy: false);
       }
-    } on AuthException {
+    } on AuthException catch (e, st) {
+      _log.e('account link failed', error: e, stackTrace: st);
       state = state.copyWith(
         isBusy: false,
         error: () => 'profile.account.link_error',
+        errorDetail: () => e.code,
       );
-    } on Object {
+    } on PlatformException catch (e, st) {
+      _log.e('account link failed (platform)', error: e, stackTrace: st);
       state = state.copyWith(
         isBusy: false,
         error: () => 'profile.account.link_error',
+        errorDetail: () => e.code,
+      );
+    } on Object catch (e, st) {
+      _log.e('account link failed (unexpected)', error: e, stackTrace: st);
+      state = state.copyWith(
+        isBusy: false,
+        error: () => 'profile.account.link_error',
+        errorDetail: () => e.runtimeType.toString(),
       );
     }
   }
@@ -142,7 +174,11 @@ class AccountController extends StateNotifier<AccountUiState> {
   }
 
   void clearMessages() {
-    state = state.copyWith(error: () => null, notice: () => null);
+    state = state.copyWith(
+      error: () => null,
+      errorDetail: () => null,
+      notice: () => null,
+    );
   }
 }
 

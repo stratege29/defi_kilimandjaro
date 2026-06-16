@@ -77,8 +77,12 @@ class _LinkAccountSheet extends ConsumerWidget {
       // Réutilise le contrôleur de compte pour le feedback (erreur/bascule).
       ..listen<AccountUiState>(accountControllerProvider, (prev, next) {
         if (next.error != null) {
+          final detail = next.errorDetail;
+          final msg = (detail != null && detail.isNotEmpty)
+              ? '${next.error!.tr()} ($detail)'
+              : next.error!.tr();
           ScaffoldMessenger.of(context)
-              .showSnackBar(_snack(next.error!.tr(), isError: true));
+              .showSnackBar(_snack(msg, isError: true));
           ref.read(accountControllerProvider.notifier).clearMessages();
         } else if (next.notice != null) {
           ScaffoldMessenger.of(context).showSnackBar(_snack(next.notice!.tr()));
