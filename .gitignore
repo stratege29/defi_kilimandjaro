@@ -116,3 +116,13 @@ artifacts/
 .claude/settings.local.json
 CLAUDE.local.md
 .claude/cache/
+
+# Generated / junk (added by tooling)
+**/__pycache__/
+tools/admin_console_web/*.timestamp-*.mjs
+docs/instagram_assets/photo_demo/
+
+# Large regenerable IG media (kept local; reproducible via functions/scripts + already in Storage)
+docs/instagram_assets/ai/
+docs/instagram_assets/mosaic/
+docs/instagram_assets/reels/

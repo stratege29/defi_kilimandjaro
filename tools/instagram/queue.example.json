@@ -1,0 +1,22 @@
+[
+  {
+    "date": "2026-06-15",
+    "type": "carousel",
+    "label": "J1 lancement",
+    "urls": [
+      "https://FIREBASE_STORAGE/J01_teaser_1.png",
+      "https://FIREBASE_STORAGE/J01_teaser_2.png",
+      "https://FIREBASE_STORAGE/J01_teaser_3.png"
+    ],
+    "caption": "🏔️ Prépare-toi à grimper.\n\nDéfi Kilimandjaro, c'est un jeu de mots où chaque montagne est un défi…\n\n#DéfiKilimandjaro #JeuDeMots #Défi #Quiz",
+    "posted": false
+  },
+  {
+    "date": "2026-06-17",
+    "type": "image",
+    "label": "J3 énigme Culture 225",
+    "url": "https://FIREBASE_STORAGE/J03_devinette1.png",
+    "caption": "🍤 ÉNIGME #1 — Pack Culture 225.\n\nSemoule de manioc fermentée… Qui suis-je ?\nTa réponse en commentaire 👇\n\n#Énigme #Quiz #DéfiKilimandjaro",
+    "posted": false
+  }
+]

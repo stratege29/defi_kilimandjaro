@@ -38,6 +38,32 @@ service cloud.firestore {
         && request.auth.token.role == 'admin';
     }
 
+    // Propriétaire de la page Instagram (tableau de bord croissance).
+    function isPageOwner() {
+      return isSignedIn()
+        && request.auth.token.email == 'arnaudkossea@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    // File de publication Instagram — gérée par le tableau de bord (propriétaire)
+    // et par les Cloud Functions (Admin SDK). Aucun autre accès.
+    match /instagram_queue/{postId} {
+      allow read, write: if isPageOwner() || isAdmin();
+    }
+
+    // Galerie d'images IA générées (écrite par Cloud Function / Admin SDK).
+    match /ai_images/{imgId} {
+      allow read: if isPageOwner() || isAdmin();
+      allow write: if false;
+    }
+
+    // Réglages Instagram (ex. autopilote on/pause) — lu par le dashboard,
+    // écrit uniquement par Cloud Function (igSetAutopilot, Admin SDK).
+    match /instagram_meta/{docId} {
+      allow read: if isPageOwner() || isAdmin();
+      allow write: if false;
+    }
+
     // -------------------------------------------------------------------------
     // Profils joueurs — PR-4
     // -------------------------------------------------------------------------
