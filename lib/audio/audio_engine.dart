@@ -258,16 +258,26 @@ class AudioEngine with WidgetsBindingObserver {
   /// Mute global piloté par `AudioController` (persisté).
   void setMuted({required bool muted}) {
     _muted = muted;
-    if (_initialized) {
-      SoLoud.instance.setGlobalVolume(_effectiveVolume);
-    }
+    _applyGlobalVolume(_effectiveVolume);
   }
 
   /// Volume global piloté par `AudioController` (persisté, [0,1]).
   void setVolume(double volume) {
     _volume = volume.clamp(0.0, 1.0);
-    if (_initialized) {
-      SoLoud.instance.setGlobalVolume(_effectiveVolume);
+    _applyGlobalVolume(_effectiveVolume);
+  }
+
+  /// Pousse un volume global vers SoLoud de façon fail-soft. No-op si le moteur
+  /// n'est pas initialisé. Le natif peut lever (interruption système, état
+  /// incohérent après une pub) : on avale pour ne pas crasher un listener de
+  /// Stream / un callback lifecycle (cf. [_setPaused] et l'écoute des
+  /// interruptions système dans [init]).
+  void _applyGlobalVolume(double volume) {
+    if (!_initialized) return;
+    try {
+      SoLoud.instance.setGlobalVolume(volume);
+    } on Object catch (e) {
+      _log.w('AudioEngine.setGlobalVolume failed: $e');
     }
   }
 
@@ -378,8 +388,7 @@ class AudioEngine with WidgetsBindingObserver {
   /// Le volume effectif est restauré uniquement si l'app n'est plus en pause.
   void _setPaused({required bool paused}) {
     _paused = paused;
-    if (!_initialized) return;
-    SoLoud.instance.setGlobalVolume(paused ? 0.0 : _effectiveVolume);
+    _applyGlobalVolume(paused ? 0.0 : _effectiveVolume);
   }
 
   double get _effectiveVolume => _muted ? 0.0 : _volume;
@@ -398,6 +407,10 @@ class AudioEngine with WidgetsBindingObserver {
       rendered = _synthesizeAllCues();
     }
     for (final entry in rendered.entries) {
+      // Le préchargement est non-bloquant : `dispose()` (deinit SoLoud) a pu
+      // survenir pendant la synthèse en isolate. Charger sur un moteur deinit
+      // lèverait — on s'arrête net.
+      if (!_initialized) return;
       // Un lazy-load a pu charger ce cue entre-temps : ne pas réallouer.
       if (_sources.containsKey(entry.key)) continue;
       try {

@@ -430,6 +430,9 @@ class AudioController extends StateNotifier<AudioState>
 
   /// Déclenche le cue correspondant au [_lobbyStep] courant.
   Future<void> _fireLobbyStep() async {
+    // `Timer.cancel()` n'empêche pas un tick déjà mis en file de s'exécuter.
+    // Lire `state` après dispose lève `StateNotifierDisposedException`.
+    if (!mounted) return;
     if (state.muted) return;
     final hit = _lobbyPattern[_lobbyStep];
     if (hit == 0) {
