@@ -150,7 +150,7 @@
       "sign_out": "Se déconnecter",
       "delete_account": "Supprimer le compte",
       "linked_success": "Compte lié — ta progression est désormais sauvegardée.",
-      "switched_notice": "Connecté à un compte existant. La progression locale de cet appareil n'a pas été fusionnée.",
+      "switched_notice": "✓ Connexion réussie à ton compte existant. (La progression locale de cet appareil n'a pas été fusionnée.)",
       "link_error": "Échec de la connexion. Réessaie.",
       "signout_error": "Échec de la déconnexion. Réessaie.",
       "delete_error": "Échec de la suppression. Réessaie.",

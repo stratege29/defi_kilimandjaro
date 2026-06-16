@@ -5,6 +5,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:crypto/crypto.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
@@ -92,10 +93,23 @@ class AuthRepository {
   // ---- Liaison Google -----------------------------------------------------
 
   Future<LinkOutcome> linkWithGoogle() async {
-    final account = await _googleSignIn.signIn();
-    if (account == null) return LinkOutcome.cancelled;
+    final GoogleSignInAccount? account;
+    final GoogleSignInAuthentication auth;
+    try {
+      account = await _googleSignIn.signIn();
+      if (account == null) return LinkOutcome.cancelled;
+      auth = await account.authentication;
+    } on PlatformException catch (e, st) {
+      // Erreur native du SDK Google (config CLIENT_ID manquante, anchor de
+      // présentation iPad, etc.) — sans ce wrap elle remonte en exception
+      // opaque et l'UI affiche un message générique non diagnosticable.
+      _log.e('google signIn failed', error: e, stackTrace: st);
+      throw AuthException(
+        code: 'google_${e.code}',
+        message: e.message ?? 'Google Sign-In error',
+      );
+    }
 
-    final auth = await account.authentication;
     final credential = GoogleAuthProvider.credential(
       accessToken: auth.accessToken,
       idToken: auth.idToken,

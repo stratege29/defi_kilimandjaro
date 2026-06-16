@@ -24,7 +24,11 @@ class AccountSection extends ConsumerWidget {
     ref.listen<AccountUiState>(accountControllerProvider, (prev, next) {
       final messenger = ScaffoldMessenger.of(context);
       if (next.error != null) {
-        messenger.showSnackBar(_snack(next.error!.tr(), isError: true));
+        final detail = next.errorDetail;
+        final msg = (detail != null && detail.isNotEmpty)
+            ? '${next.error!.tr()} ($detail)'
+            : next.error!.tr();
+        messenger.showSnackBar(_snack(msg, isError: true));
         ref.read(accountControllerProvider.notifier).clearMessages();
       } else if (next.notice != null) {
         messenger.showSnackBar(_snack(next.notice!.tr()));
