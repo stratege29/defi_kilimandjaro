@@ -204,7 +204,8 @@ class _DuelIntroOverlayState extends ConsumerState<DuelIntroOverlay>
                 child: DuelRoundPill(
                   currentRound: widget.session.currentRound,
                   totalRounds: widget.session.totalRounds,
-                  difficulty: widget.session.currentRoundData?.difficulty ?? 'easy',
+                  difficulty:
+                      widget.session.currentRoundData?.difficulty ?? 'easy',
                 ),
               ),
             ),
