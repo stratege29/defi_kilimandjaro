@@ -150,7 +150,7 @@
       "sign_out": "Sign out",
       "delete_account": "Delete account",
       "linked_success": "Account linked — your progress is now backed up.",
-      "switched_notice": "Signed in to an existing account. Local progress on this device was not merged.",
+      "switched_notice": "✓ Signed in to your existing account. (Local progress on this device was not merged.)",
       "link_error": "Sign-in failed. Please try again.",
       "signout_error": "Sign-out failed. Please try again.",
       "delete_error": "Deletion failed. Please try again.",
