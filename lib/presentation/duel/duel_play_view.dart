@@ -281,7 +281,13 @@ class _GameplayContent extends StatelessWidget {
             // changent — sans key, les animations gardent l'état du round
             // précédent et causent RangeError sur des tuiles inexistantes).
             key: ValueKey<String>('answer-cells-${session.currentRound}'),
-            answer: session.answer,
+            // Anti-cheat (C3) : la reponse n'est jamais envoyee au client
+            // pendant la manche. On dimensionne les cellules sur la longueur
+            // du pool (== longueur de la reponse). A la victoire confirmee par
+            // le serveur, on affiche le mot forme (qui est la bonne reponse).
+            answer: localState.submitted
+                ? formedLetters
+                : ''.padRight(session.lettersPool.length),
             formedLetters: formedLetters,
             isValidated: localState.submitted,
           ),
@@ -297,7 +303,7 @@ class _GameplayContent extends StatelessWidget {
                     : (localState.timeLeft == 0
                           ? GamePhase.lost
                           : GamePhase.playing),
-                seed: session.answer,
+                seed: session.matchId,
                 onTileEntered: controller.selectTile,
                 onDragEnd: () {},
               ),

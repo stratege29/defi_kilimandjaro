@@ -5,6 +5,7 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
+import 'package:defi_kilimandjaro/presentation/duel/widgets/duel_pack_badge.dart';
 import 'package:defi_kilimandjaro/presentation/duel/widgets/duel_versus_scene.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -177,6 +178,7 @@ class _DuelCountdownOverlayState extends ConsumerState<DuelCountdownOverlay>
               digit: _currentDigit,
               showGo: _showGo,
               pulse: _digitCtrl,
+              devinetteId: widget.session.currentRoundData?.devinetteId,
             ),
           ),
         ],
@@ -194,11 +196,13 @@ class _CountdownIndicator extends StatelessWidget {
     required this.digit,
     required this.showGo,
     required this.pulse,
+    required this.devinetteId,
   });
 
   final int digit;
   final bool showGo;
   final Animation<double> pulse;
+  final String? devinetteId;
 
   @override
   Widget build(BuildContext context) {
@@ -245,6 +249,9 @@ class _CountdownIndicator extends StatelessWidget {
               );
             },
           ),
+        const SizedBox(height: 18),
+        // Catégorie (pack) de la manche, sous le décompte.
+        DuelPackBadge(devinetteId: devinetteId),
       ],
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:defi_kilimandjaro/core/constants/duel_protocol.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -63,6 +64,7 @@ class MatchmakingRepository {
       final result = await _fn('requestMatch').call<dynamic>(<String, dynamic>{
         'request_id': requestId,
         'expansion_step': expansionStep,
+        'protocol_version': kDuelProtocolVersion,
       });
 
       final data = (result.data as Map).cast<String, dynamic>();
@@ -116,6 +118,7 @@ class MatchmakingRepository {
       final result = await _fn('requestRematch').call<dynamic>(<String, dynamic>{
         'previousMatchId': previousMatchId,
         'opponentUid': opponentUid,
+        'protocol_version': kDuelProtocolVersion,
       });
 
       final data = (result.data as Map).cast<String, dynamic>();
@@ -161,12 +164,14 @@ class MatchmakingRepository {
   /// Clôture un match ranked et déclenche le calcul ELO côté serveur.
   ///
   /// [matchId] : identifiant du match terminé.
-  /// [winnerUid] : UID du gagnant déclaré.
+  /// [winnerUid] : UID du gagnant déclaré (cross-check). Vide => match NUL :
+  /// le serveur est autoritaire (lit le `winner` enregistré) et applique
+  /// l'ELO de nul aux deux joueurs.
   ///
   /// Retourne le nouvel ELO et le delta pour le joueur appelant.
   Future<EloDelta> endMatch({
     required String matchId,
-    required String winnerUid,
+    String winnerUid = '',
   }) async {
     try {
       final result = await _fn('endMatch').call<dynamic>(<String, dynamic>{

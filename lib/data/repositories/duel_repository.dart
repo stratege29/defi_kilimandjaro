@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:defi_kilimandjaro/core/constants/duel_protocol.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -45,7 +46,9 @@ class DuelRepository {
   /// le QR code.
   Future<({String matchId, String secret})> createDuel() async {
     final callable = functions.httpsCallable('createLocalDuel');
-    final result = await callable.call<Map<Object?, Object?>>();
+    final result = await callable.call<Map<Object?, Object?>>(<String, dynamic>{
+      'protocol_version': kDuelProtocolVersion,
+    });
     final data = result.data.cast<String, dynamic>();
     final matchId = data['matchId'] as String?;
     final secret = data['secret'] as String?;
@@ -66,38 +69,16 @@ class DuelRepository {
     required String matchId,
     String secret = '',
   }) async {
-    final uid = currentUid;
-    final ref = _matchRef(matchId);
-    final snapshot = await ref.get();
-    if (!snapshot.exists) {
-      throw StateError('Duel introuvable');
-    }
-    final data = (snapshot.value! as Map).cast<String, dynamic>();
-    if (secret.isNotEmpty && data['secret'] != secret) {
-      throw StateError('Secret invalide');
-    }
-    if (data['created_by'] == uid) {
-      return;
-    }
-    final players =
-        (data['players'] as Map?)?.cast<String, dynamic>() ??
-            <String, dynamic>{};
-    if (players.length >= 2 && !players.containsKey(uid)) {
-      throw StateError('Duel complet');
-    }
-
-    await ref.update(<String, Object?>{
-      'players/$uid': <String, dynamic>{
-        'progress': 0,
-        'found': false,
-        'rounds_won': 0,
-        'total_time_ms': 0,
-        'rounds': <String, dynamic>{},
-      },
-      'phase': DuelPhase.countdown.name,
-      'phase_started_at': DateTime.now().millisecondsSinceEpoch,
+    // Anti-cheat (C1) : l'ajout du joueur + bascule phase=countdown passent
+    // par la Cloud Function joinDuel (Admin SDK). Le client ne peut plus
+    // ecrire `phase` directement en RTDB.
+    final callable = functions.httpsCallable('joinDuel');
+    await callable.call<Map<Object?, Object?>>(<String, dynamic>{
+      'matchId': matchId,
+      if (secret.isNotEmpty) 'secret': secret,
+      'protocol_version': kDuelProtocolVersion,
     });
-    _log.i('Duel rejoint: $matchId par $uid');
+    _log.i('Duel rejoint (CF): $matchId');
   }
 
   /// Stream live de la session.
@@ -138,12 +119,16 @@ class DuelRepository {
     String matchId,
     int round,
     String winnerUid,
+    String word,
   ) async {
     final callable = functions.httpsCallable('submitRoundWin');
     final result = await callable.call<Map<String, dynamic>>(<String, dynamic>{
       'match_id': matchId,
       'round': round,
       'winner_uid': winnerUid,
+      // Anti-cheat (C2) : le mot forme est valide cote serveur contre la
+      // reponse stockee dans /match_answers (jamais envoyee au client).
+      'word': word,
     });
     return result.data['next_phase'] as String? ?? 'finished';
   }
@@ -174,68 +159,31 @@ class DuelRepository {
     });
   }
 
-  /// Forfait — declare l'autre joueur gagnant si present.
+  /// Forfait — declare l'autre joueur gagnant via Cloud Function.
+  ///
+  /// Anti-cheat (C1) : le client ne peut plus ecrire `winner`/`phase`
+  /// directement en RTDB. forfeitMatch (Admin SDK) designe l'adversaire
+  /// vainqueur et bascule la phase.
   Future<void> forfeit(String matchId) async {
-    final uid = currentUid;
-    final ref = _matchRef(matchId);
-    final snapshot = await ref.get();
-    if (!snapshot.exists) return;
-    final data = (snapshot.value! as Map).cast<String, dynamic>();
-    final phase = data['phase'] as String? ?? 'waiting';
-    if (phase == DuelPhase.finished.name) return;
-
-    final players =
-        (data['players'] as Map?)?.cast<String, dynamic>() ??
-            <String, dynamic>{};
-    final otherUid =
-        players.keys.firstWhere((k) => k != uid, orElse: () => '');
-    await ref.update(<String, Object?>{
-      'phase': DuelPhase.finished.name,
-      'phase_started_at': DateTime.now().millisecondsSinceEpoch,
-      if (otherUid.isNotEmpty) 'winner': otherUid,
+    final callable = functions.httpsCallable('forfeitMatch');
+    await callable.call<Map<Object?, Object?>>(<String, dynamic>{
+      'matchId': matchId,
     });
   }
 
   /// Rejoint un match ouvert (deep link / share) sans verification de secret.
+  ///
+  /// Anti-cheat (C1) : delegue a la Cloud Function joinDuel (Admin SDK).
   Future<DuelSession> joinOpen(String matchId) async {
-    final uid = currentUid;
-    final ref = _matchRef(matchId);
-    final snapshot = await ref.get();
-    if (!snapshot.exists) {
-      throw Exception('duel_not_found');
-    }
-    final data = (snapshot.value! as Map).cast<String, dynamic>();
-    final phase = data['phase'] as String? ?? 'waiting';
-    if (phase == DuelPhase.finished.name) {
-      throw Exception('duel_expired');
-    }
-    final players =
-        (data['players'] as Map?)?.cast<String, dynamic>() ??
-            <String, dynamic>{};
-    if (players.length >= 2 && !players.containsKey(uid)) {
-      throw Exception('duel_full');
-    }
-
-    if (!players.containsKey(uid)) {
-      await ref.update(<String, Object?>{
-        'players/$uid': <String, dynamic>{
-          'progress': 0,
-          'found': false,
-          'rounds_won': 0,
-          'total_time_ms': 0,
-          'rounds': <String, dynamic>{},
-        },
-        'phase': DuelPhase.countdown.name,
-        'phase_started_at': DateTime.now().millisecondsSinceEpoch,
-      });
-    }
-    _log.i('joinOpen: $matchId par $uid');
-
-    final updated = await ref.get();
-    return DuelSession.fromJson(
-      matchId,
-      (updated.value! as Map).cast<String, dynamic>(),
-    );
+    final callable = functions.httpsCallable('joinDuel');
+    final result = await callable.call<Map<Object?, Object?>>(<String, dynamic>{
+      'matchId': matchId,
+      'protocol_version': kDuelProtocolVersion,
+    });
+    final data = result.data.cast<String, dynamic>();
+    final matchData = (data['matchData'] as Map).cast<String, dynamic>();
+    _log.i('joinOpen (CF): $matchId');
+    return DuelSession.fromJson(matchId, matchData);
   }
 
   /// Supprime la session (createur seulement).

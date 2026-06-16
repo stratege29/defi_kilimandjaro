@@ -30,6 +30,14 @@ jest.mock("firebase-functions/v2/https", () => ({
   },
 }));
 
+// matchAnswers : la reponse serveur-only est mockee a "MOT" ; la validation
+// du mot soumis (C2) compare word.trim().toUpperCase() a cette valeur.
+jest.mock("../matchAnswers", () => ({
+  readAnswer: jest.fn().mockResolvedValue("MOT"),
+  normalizeWord: (w: unknown) =>
+    typeof w === "string" ? w.trim().toUpperCase() : "",
+}));
+
 // ---------------------------------------------------------------------------
 // Helpers : construit un MatchState RTDB minimal.
 // ---------------------------------------------------------------------------
@@ -93,10 +101,12 @@ async function callSubmitRoundWin(data: {
   match_id: string;
   round: number;
   winner_uid: string;
+  word?: string;
 }) {
   return submitRoundWin({
     auth: { uid: data.winner_uid },
-    data,
+    // word par defaut == reponse mockee ("MOT") pour valider la victoire.
+    data: { word: "MOT", ...data },
   });
 }
 

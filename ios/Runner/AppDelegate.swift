@@ -15,18 +15,26 @@ import UserNotifications
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    #if DEBUG
-    // FIRAAppCheckDebugToken doit être set AVANT FirebaseApp.configure().
-    // Le SDK le lit au launch, pas au runtime — c'est pourquoi le setenv
-    // que fait le plugin Dart au moment de activate() arrive trop tard et
-    // l'AppCheckDebugProvider tombe sur le fallback DeviceCheckProvider.
-    // UUID à allow-lister : Firebase Console > App Check > iOS > Manage
-    // debug tokens. Ne PAS commiter cette valeur en prod.
+    // ⚠️ Le flag Swift `DEBUG` n'est PAS défini pour la config Debug du target
+    // Runner de ce projet (seul le target RunnerTests le définit). Un `#if
+    // DEBUG` seul tombait donc TOUJOURS sur le `#else` (DeviceCheck), ce qui
+    // casse le simulateur (« DeviceCheckProvider is not supported on current
+    // platform ») → aucun jeton App Check → callables enforceAppCheck rejetées.
+    //
+    // On gate donc explicitement le SIMULATEUR via `targetEnvironment(simulator)`
+    // (compile-time, indépendant de DEBUG) pour forcer le debug provider.
+    //
+    // FIRAAppCheckDebugToken doit être set AVANT `FirebaseApp.configure()` (lu
+    // au launch). UUID à allow-lister : Firebase Console > App Check > iOS >
+    // Manage debug tokens. Jamais de debug provider en release sur device.
+    #if targetEnvironment(simulator)
+    setenv("FIRAAppCheckDebugToken", "8aeb4a3e-9c6f-47d1-993e-1cc9168104de", 1)
+    AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
+    #elseif DEBUG
     setenv("FIRAAppCheckDebugToken", "8aeb4a3e-9c6f-47d1-993e-1cc9168104de", 1)
     AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
     #else
-    // Release: DeviceCheckProviderFactory handles App Attest on iOS 14+ and
-    // falls back to DeviceCheck on older devices.
+    // Release / device réel : DeviceCheck (App Attest iOS 14+, fallback DeviceCheck).
     AppCheck.setAppCheckProviderFactory(DeviceCheckProviderFactory())
     #endif
 

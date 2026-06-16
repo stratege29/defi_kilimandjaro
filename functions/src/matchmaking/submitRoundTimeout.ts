@@ -23,6 +23,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { getDatabase } from "firebase-admin/database";
 import { requireAuth } from "../utils/auth";
+import { readAnswer } from "./matchAnswers";
 
 interface SubmitRoundTimeoutData {
   match_id: string;
@@ -74,7 +75,7 @@ function _getRoundResult(
 export const submitRoundTimeout = onCall<
   SubmitRoundTimeoutData,
   Promise<SubmitRoundTimeoutResult>
->({ region: "europe-west1" }, async (request) => {
+>({ region: "europe-west1", enforceAppCheck: true }, async (request) => {
   const callerUid = requireAuth(request.auth);
   const { match_id, round } = request.data;
 
@@ -141,6 +142,12 @@ export const submitRoundTimeout = onCall<
   const totalRounds = data.total_rounds ?? 3;
   const isLastRound = round >= totalRounds - 1;
 
+  // Reveal de la reponse de la manche courante (la manche se termine quand on
+  // bascule en roundEnd/finished). Fragment vide si introuvable (best-effort).
+  const answer = await readAnswer(match_id, round);
+  const reveal: Record<string, unknown> =
+    answer != null ? { [`rounds/${round}/answer`]: answer } : {};
+
   // --- Marquer ce joueur comme timeout (found=false explicite) ---
   await matchRef.update({
     [`players/${callerUid}/rounds/${round}`]: {
@@ -177,6 +184,7 @@ export const submitRoundTimeout = onCall<
       phase: "finished",
       phase_started_at: now,
       winner: null,
+      ...reveal,
     });
     return { ok: true, new_phase: "finished", current_round: round };
   }
@@ -229,6 +237,7 @@ export const submitRoundTimeout = onCall<
     await matchRef.update({
       phase: "roundEnd",
       phase_started_at: now,
+      ...reveal,
     });
     return { ok: true, new_phase: "roundEnd", current_round: round };
   }
@@ -258,6 +267,7 @@ export const submitRoundTimeout = onCall<
     phase: "finished",
     phase_started_at: now,
     winner: finalWinner,
+    ...reveal,
   });
 
   return { ok: true, new_phase: "finished", current_round: round };

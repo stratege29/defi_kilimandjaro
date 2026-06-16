@@ -105,6 +105,8 @@ class _LobbyViewState extends ConsumerState<LobbyView>
                           isRematch: lobbyState.isRematch,
                           wasDeclined:
                               lobbyState.errorMessage == 'declined',
+                          isOutdated:
+                              lobbyState.errorMessage == 'outdated',
                         ),
                       },
                     ),
@@ -513,6 +515,7 @@ class _NoOpponentBody extends ConsumerWidget {
     required this.slideCtrl,
     required this.isRematch,
     this.wasDeclined = false,
+    this.isOutdated = false,
     super.key,
   });
 
@@ -522,7 +525,14 @@ class _NoOpponentBody extends ConsumerWidget {
   /// True quand l'adversaire a explicitement refuse le rematch (vs timeout).
   final bool wasDeclined;
 
+  /// True quand le serveur a rejeté ce client (build trop ancien pour le
+  /// contrat duel — barrière de version).
+  final bool isOutdated;
+
   String _bodyText() {
+    if (isOutdated) {
+      return "Cette version de l'app n'est plus compatible avec le Défi en ligne.\nMets-la à jour pour rejouer !";
+    }
     if (wasDeclined) {
       return "Ton adversaire n'a pas accepté ce duel.\nPropose-en un autre !";
     }
@@ -548,7 +558,11 @@ class _NoOpponentBody extends ConsumerWidget {
           FadeTransition(
             opacity: slideCtrl,
             child: Text(
-              wasDeclined ? 'DÉFI REFUSÉ' : 'PERSONNE DISPONIBLE',
+              isOutdated
+                  ? 'MISE À JOUR REQUISE'
+                  : wasDeclined
+                      ? 'DÉFI REFUSÉ'
+                      : 'PERSONNE DISPONIBLE',
               style: AppTypography.bebas(size: 22, color: AppColors.orSoleil),
             ),
           ),

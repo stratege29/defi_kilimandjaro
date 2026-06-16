@@ -21,7 +21,14 @@ import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { getDatabase, ServerValue } from "firebase-admin/database";
 import { requireAuth } from "../utils/auth";
 import { ELO_INITIAL } from "./elo";
-import { _loadDevinettesCache, _pickThreeRounds } from "./devinettesCache";
+import {
+  _loadDevinettesCache,
+  _pickThreeRounds,
+  answersFromRounds,
+  toPublicRound,
+} from "./devinettesCache";
+import { buildAnswersNode, matchAnswersPath } from "./matchAnswers";
+import { requireDuelProtocol } from "./protocol";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -44,9 +51,12 @@ interface RequestMatchResult {
 // ---------------------------------------------------------------------------
 
 export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>>(
-  { region: "europe-west1" },
+  { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     const uid = requireAuth(request.auth);
+    // Gate version : refuse les clients antérieurs au contrat C2/C3 (sinon duel
+    // injouable). Cf. protocol.ts.
+    requireDuelProtocol(request.data);
     const { request_id, expansion_step = 0 } = request.data;
 
     if (!request_id || typeof request_id !== "string") {
@@ -126,9 +136,31 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
     const eloMin = myElo - bandRadius;
     const eloMax = myElo + bandRadius;
 
+    // --- Présence (M3) : filtrer les adversaires fantômes ---
+    // Un joueur peut rester dans /lobby alors qu'il est déconnecté (app tuée,
+    // réseau coupé). L'apparier crée un duel mort jusqu'au filet
+    // resolveStaleMatches. On exige donc une présence FRAÎCHE (heartbeat client
+    // ~45s). Fenêtre 90s < TTL prune (120s) pour ne pas matcher un ghost en
+    // sursis. On nettoie au passage les entrées lobby périmées rencontrées.
+    const PRESENCE_FRESH_MS = 90000;
+    const presenceSnap = await rtdb.ref("presence").get();
+    const presenceData = (presenceSnap.val() ?? {}) as Record<
+      string,
+      { ts?: number } | unknown
+    >;
+    const isFresh = (candidateUid: string): boolean => {
+      const entry = presenceData[candidateUid];
+      const ts =
+        typeof entry === "object" && entry !== null && "ts" in entry
+          ? (entry as { ts?: number }).ts
+          : undefined;
+      return typeof ts === "number" && now - ts < PRESENCE_FRESH_MS;
+    };
+
     // --- Scanner le lobby ---
     const lobbySnap = await rtdb.ref("lobby").get();
     let opponentUid: string | null = null;
+    const staleLobby: string[] = [];
 
     if (lobbySnap.exists()) {
       const lobbyData = lobbySnap.val() as Record<
@@ -136,12 +168,25 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
         { mmr: number; ts: number; request_id: string; matched_to?: string }
       >;
       for (const [candidateUid, entry] of Object.entries(lobbyData)) {
+        if (candidateUid === "stats") continue; // /lobby/stats n'est pas un joueur
         if (candidateUid === uid) continue;
         if (entry.matched_to) continue;
         if (entry.mmr < eloMin || entry.mmr > eloMax) continue;
+        if (!isFresh(candidateUid)) {
+          staleLobby.push(candidateUid);
+          continue;
+        }
         opponentUid = candidateUid;
         break;
       }
+    }
+
+    // Nettoyage best-effort des entrées lobby fantômes (rien d'autre ne purge
+    // /lobby — prunePresence ne touche que /presence).
+    if (staleLobby.length > 0) {
+      const cleanup: Record<string, unknown> = {};
+      for (const ghost of staleLobby) cleanup[`lobby/${ghost}`] = null;
+      await rtdb.ref().update(cleanup);
     }
 
     // --- Match trouve ---
@@ -164,10 +209,12 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
         is_ranked: true,
         current_round: 0,
         total_rounds: 3,
+        // Anti-cheat (C3) : payload public sans `answer`. Les réponses vont
+        // dans le nœud serveur-only /match_answers, révélées en fin de manche.
         rounds: {
-          0: rounds[0],
-          1: rounds[1],
-          2: rounds[2],
+          0: toPublicRound(rounds[0]),
+          1: toPublicRound(rounds[1]),
+          2: toPublicRound(rounds[2]),
         },
         players: {
           [uid]: {
@@ -193,6 +240,9 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
       // valeur de retour, donc son entree lobby peut etre supprimee.
       const updates: Record<string, unknown> = {
         [`matches/${matchId}`]: matchData,
+        [matchAnswersPath(matchId)]: buildAnswersNode(
+          answersFromRounds(rounds)
+        ),
         [`lobby/${uid}`]: null,
         [`lobby/${opponentUid}/matched_to`]: matchId,
       };

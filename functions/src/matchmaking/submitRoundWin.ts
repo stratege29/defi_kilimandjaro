@@ -16,11 +16,14 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { getDatabase } from "firebase-admin/database";
 import { requireAuth } from "../utils/auth";
+import { normalizeWord, readAnswer } from "./matchAnswers";
 
 interface SubmitRoundWinData {
   match_id: string;
   round: number;
   winner_uid: string;
+  /** Mot formé par le joueur — validé serveur-side contre la réponse. */
+  word: string;
 }
 
 interface SubmitRoundWinResult {
@@ -52,10 +55,10 @@ interface MatchState {
 }
 
 export const submitRoundWin = onCall<SubmitRoundWinData, Promise<SubmitRoundWinResult>>(
-  { region: "europe-west1" },
+  { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     const callerUid = requireAuth(request.auth);
-    const { match_id, round, winner_uid } = request.data;
+    const { match_id, round, winner_uid, word } = request.data;
 
     // --- Validation des inputs ---
     if (!match_id || typeof match_id !== "string") {
@@ -128,6 +131,21 @@ export const submitRoundWin = onCall<SubmitRoundWinData, Promise<SubmitRoundWinR
       };
     }
 
+    // --- Anti-cheat (C2) : VALIDATION SERVEUR du mot soumis ---
+    // La reponse est stockee dans le noeud serveur-only /match_answers ; le
+    // client ne la voit jamais pendant la manche. On compare le mot forme
+    // (normalise) a la reponse. Un mot incorrect (ou absent) = pas de victoire.
+    const answer = await readAnswer(match_id, round);
+    if (answer == null) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Reponse de la manche introuvable cote serveur."
+      );
+    }
+    if (normalizeWord(word) !== answer.toUpperCase()) {
+      throw new HttpsError("permission-denied", "Mot incorrect.");
+    }
+
     const now = Date.now();
     const phaseStartedAt = matchData.phase_started_at ?? matchData.created_at;
     const timeTakenMs = now - phaseStartedAt;
@@ -147,6 +165,8 @@ export const submitRoundWin = onCall<SubmitRoundWinData, Promise<SubmitRoundWinR
       await matchRef.update({
         phase: "roundEnd",
         phase_started_at: now,
+        // Reveal de la reponse (la manche est finie) pour l'overlay/resultat.
+        [`rounds/${round}/answer`]: answer,
         [`players/${winner_uid}/rounds_won`]: newRoundsWon,
         [`players/${winner_uid}/total_time_ms`]: newTotalTime,
         [`players/${winner_uid}/found`]: true,
@@ -185,6 +205,8 @@ export const submitRoundWin = onCall<SubmitRoundWinData, Promise<SubmitRoundWinR
       phase: "finished",
       phase_started_at: now,
       winner: finalWinner,
+      // Reveal de la reponse de la derniere manche pour l'ecran resultat.
+      [`rounds/${round}/answer`]: answer,
       [`players/${winner_uid}/rounds_won`]: newRoundsWon,
       [`players/${winner_uid}/total_time_ms`]: newTotalTime,
       [`players/${winner_uid}/found`]: true,

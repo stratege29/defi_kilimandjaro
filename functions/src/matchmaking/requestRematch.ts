@@ -21,7 +21,14 @@ import { getFirestore } from "firebase-admin/firestore";
 import { requireAuth } from "../utils/auth";
 import { ELO_INITIAL } from "./elo";
 import * as logger from "firebase-functions/logger";
-import { _loadDevinettesCache, _pickThreeRounds } from "./devinettesCache";
+import {
+  _loadDevinettesCache,
+  _pickThreeRounds,
+  answersFromRounds,
+  toPublicRound,
+} from "./devinettesCache";
+import { buildAnswersNode, matchAnswersPath } from "./matchAnswers";
+import { requireDuelProtocol } from "./protocol";
 
 interface RequestRematchData {
   previousMatchId: string;
@@ -62,9 +69,10 @@ export const requestRematch = onCall<
   RequestRematchData,
   Promise<RequestRematchResult>
 >(
-  { region: "europe-west1" },
+  { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     const callerUid = requireAuth(request.auth);
+    requireDuelProtocol(request.data);
     const { previousMatchId, opponentUid } = request.data;
 
     if (!previousMatchId || typeof previousMatchId !== "string") {
@@ -147,10 +155,11 @@ export const requestRematch = onCall<
       is_ranked: true,
       current_round: 0,
       total_rounds: 3,
+      // Anti-cheat (C3) : payload public sans `answer` (réponses serveur-only).
       rounds: {
-        0: rounds[0],
-        1: rounds[1],
-        2: rounds[2],
+        0: toPublicRound(rounds[0]),
+        1: toPublicRound(rounds[1]),
+        2: toPublicRound(rounds[2]),
       },
       // target_uid declenche sendChallengeNotif → notif FCM a l'adversaire.
       target_uid: opponentUid,
@@ -174,6 +183,9 @@ export const requestRematch = onCall<
     // tray. Pattern Discord game invite / chess.com challenge.
     const updates: Record<string, unknown> = {
       [`matches/${newMatchId}`]: matchData,
+      [matchAnswersPath(newMatchId)]: buildAnswersNode(
+        answersFromRounds(rounds)
+      ),
       [`pending_challenges/${opponentUid}`]: {
         matchId: newMatchId,
         fromUid: callerUid,

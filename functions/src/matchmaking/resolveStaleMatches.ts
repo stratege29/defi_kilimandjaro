@@ -19,8 +19,12 @@
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { logger } from "firebase-functions/v2";
 import { getDatabase } from "firebase-admin/database";
+import { readAnswer } from "./matchAnswers";
 
 const STALE_ACTIVE_MS = 55000; // 30s round + grâce + retries + marge
+// Animation countdown/roundEnd = 3s. Au-delà de ce seuil, le match est
+// abandonné (un client présent serait déjà repassé en `active`). On finalise.
+const STALE_TRANSITION_MS = 120000; // 2 min
 
 interface RoundResult {
   progress?: number;
@@ -82,17 +86,17 @@ export const resolveStaleMatches = onSchedule(
     const rtdb = getDatabase();
     const now = Date.now();
 
+    let resolved = 0;
+
+    // --- 1) Matchs bloqués en phase `active` (round jamais signalé) ---
     const snap = await rtdb
       .ref("matches")
       .orderByChild("phase")
       .equalTo("active")
       .get();
-    if (!snap.exists()) {
-      return;
-    }
-
-    const matches = snap.val() as Record<string, MatchData>;
-    let resolved = 0;
+    const matches = snap.exists()
+      ? (snap.val() as Record<string, MatchData>)
+      : {};
 
     for (const [matchId, data] of Object.entries(matches)) {
       const startedAt = data.phase_started_at ?? data.created_at ?? now;
@@ -126,6 +130,10 @@ export const resolveStaleMatches = onSchedule(
         updates.winner = computeWinner(players, uids);
       }
 
+      // Reveal de la reponse de la manche resolue (best-effort).
+      const answer = await readAnswer(matchId, round);
+      if (answer != null) updates[`rounds/${round}/answer`] = answer;
+
       await rtdb.ref(`matches/${matchId}`).update(updates);
       resolved++;
       logger.warn("resolveStaleMatches: match bloqué résolu", {
@@ -134,6 +142,44 @@ export const resolveStaleMatches = onSchedule(
         isLastRound,
         ageMs: now - startedAt,
       });
+    }
+
+    // --- 2) Matchs bloqués en TRANSITION (countdown/roundEnd) ---
+    // Le filet ci-dessus ne couvre que `active`. Un match figé en countdown ou
+    // roundEnd au-delà de STALE_TRANSITION_MS est abandonné : on le finalise
+    // (gagnant calculé sur rounds_won) pour qu'un éventuel observateur reçoive
+    // un résultat ; purgeMatches supprimera ensuite le nœud.
+    for (const stuckPhase of ["countdown", "roundEnd"] as const) {
+      const tSnap = await rtdb
+        .ref("matches")
+        .orderByChild("phase")
+        .equalTo(stuckPhase)
+        .get();
+      if (!tSnap.exists()) continue;
+      const tMatches = tSnap.val() as Record<string, MatchData>;
+      for (const [matchId, data] of Object.entries(tMatches)) {
+        const startedAt = data.phase_started_at ?? data.created_at ?? now;
+        if (now - startedAt < STALE_TRANSITION_MS) continue;
+
+        const players = data.players ?? {};
+        const uids = Object.keys(players);
+        const round = data.current_round ?? 0;
+        const updates: Record<string, unknown> = {
+          phase: "finished",
+          phase_started_at: now,
+          winner: computeWinner(players, uids),
+        };
+        const answer = await readAnswer(matchId, round);
+        if (answer != null) updates[`rounds/${round}/answer`] = answer;
+
+        await rtdb.ref(`matches/${matchId}`).update(updates);
+        resolved++;
+        logger.warn("resolveStaleMatches: transition bloquée résolue", {
+          matchId,
+          phase: stuckPhase,
+          ageMs: now - startedAt,
+        });
+      }
     }
 
     if (resolved > 0) {

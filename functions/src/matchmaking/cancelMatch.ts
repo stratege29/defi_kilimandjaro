@@ -16,7 +16,7 @@ interface CancelMatchResult {
 }
 
 export const cancelMatch = onCall<void, Promise<CancelMatchResult>>(
-  { region: "europe-west1" },
+  { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     const uid = requireAuth(request.auth);
 

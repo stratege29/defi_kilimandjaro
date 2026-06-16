@@ -681,7 +681,9 @@ class _NextRoundHint extends StatelessWidget {
         _ => roundData.difficulty,
       };
 
-  int get _letterCount => roundData.answer.length;
+  // La reponse de la manche suivante n'est pas encore revelee (anti-cheat C3) ;
+  // la longueur vient du pool de lettres (== longueur de la reponse).
+  int get _letterCount => roundData.lettersPool.length;
 
   @override
   Widget build(BuildContext context) {

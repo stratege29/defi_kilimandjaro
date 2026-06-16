@@ -18,11 +18,16 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { getDatabase } from "firebase-admin/database";
 import { requireAuth } from "../utils/auth";
-import { calculateElo, ELO_INITIAL } from "./elo";
+import { calculateElo, calculateDrawElo, ELO_INITIAL } from "./elo";
 
 interface EndMatchData {
   matchId: string;
-  winner_uid: string;
+  /**
+   * Optionnel : le gagnant déclaré par le client. Le serveur reste
+   * autoritaire (lit `matchData.winner`) ; ce champ ne sert que de
+   * cross-check. Absent/vide => match nul (E3).
+   */
+  winner_uid?: string;
 }
 
 interface EndMatchResult {
@@ -31,16 +36,13 @@ interface EndMatchResult {
 }
 
 export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
-  { region: "europe-west1" },
+  { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     const callerUid = requireAuth(request.auth);
     const { matchId, winner_uid } = request.data;
 
     if (!matchId || typeof matchId !== "string") {
       throw new HttpsError("invalid-argument", "matchId requis.");
-    }
-    if (!winner_uid || typeof winner_uid !== "string") {
-      throw new HttpsError("invalid-argument", "winner_uid requis.");
     }
 
     const rtdb = getDatabase();
@@ -67,8 +69,18 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
       );
     }
 
-    // Anti-cheat : vérifier que le winner déclaré correspond à la DB.
-    if (matchData.winner !== winner_uid) {
+    // Le serveur est AUTORITAIRE sur le gagnant : on lit `matchData.winner`
+    // (posé par submitRoundWin/Timeout, verrouillé côté client par les règles
+    // RTDB). `winner` absent/vide => match NUL (E3).
+    const recordedWinner =
+      typeof matchData.winner === "string" && matchData.winner.length > 0
+        ? matchData.winner
+        : null;
+    const isDraw = recordedWinner === null;
+
+    // Cross-check optionnel (défense en profondeur) : si le client déclare un
+    // gagnant, il doit correspondre à l'enregistré.
+    if (!isDraw && winner_uid && winner_uid !== recordedWinner) {
       throw new HttpsError(
         "permission-denied",
         "Le winner déclaré ne correspond pas au résultat enregistré."
@@ -89,6 +101,12 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
         "Le match nécessite 2 joueurs."
       );
     }
+    if (!isDraw && !players.includes(recordedWinner)) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Le gagnant enregistré n'est pas un participant."
+      );
+    }
 
     // Vérifier que le match est ranked.
     if (!matchData.is_ranked) {
@@ -96,11 +114,137 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
       return { new_elo: ELO_INITIAL, delta: 0 };
     }
 
-    const loserUid = players.find((p) => p !== winner_uid)!;
+    // --- Idempotence (C4) : verrou anti double-application de l'ELO ---
+    // Les deux joueurs (et les retries reseau) appellent endMatch. Sans
+    // verrou, chaque appel ré-applique wins/elo (FieldValue.increment non
+    // idempotent) → inflation. Une transaction RTDB pose un flag `settled` :
+    // le premier appel gagne et applique ; les suivants renvoient le resultat
+    // depuis l'historique sans muter les profils.
+    const settledRef = rtdb.ref(`matches/${matchId}/settled`);
+    const settledTxn = await settledRef.transaction((cur) =>
+      cur === true ? undefined : true
+    );
+    if (!settledTxn.committed) {
+      const histSnap = await db
+        .collection("matches_history")
+        .doc(matchId)
+        .get();
+      const hist = histSnap.data() ?? {};
+      const changes = (hist["elo_changes"] ?? {}) as Record<string, number>;
+      const afters = (hist["elo_after"] ?? {}) as Record<string, number>;
+      return {
+        new_elo: afters[callerUid] ?? ELO_INITIAL,
+        delta: changes[callerUid] ?? 0,
+      };
+    }
+
+    // --- Match NUL (E3) : ELO de nul appliqué aux deux joueurs ---
+    if (isDraw) {
+      const [uidA, uidB] = players;
+      const [snapA, snapB] = await Promise.all([
+        db.collection("profiles").doc(uidA).get(),
+        db.collection("profiles").doc(uidB).get(),
+      ]);
+      const eloA =
+        (snapA.data()?.["elo"] as number | undefined) ?? ELO_INITIAL;
+      const eloB =
+        (snapB.data()?.["elo"] as number | undefined) ?? ELO_INITIAL;
+      const { newEloA, newEloB, deltaA, deltaB } = calculateDrawElo(
+        eloA,
+        eloB
+      );
+      const nowTs = FieldValue.serverTimestamp();
+      const batch = db.batch();
+      const refA = db.collection("profiles").doc(uidA);
+      const refB = db.collection("profiles").doc(uidB);
+
+      batch.set(
+        refA,
+        {
+          elo: newEloA,
+          draws: FieldValue.increment(1),
+          totalDuels: FieldValue.increment(1),
+          lastDuelAt: nowTs,
+        },
+        { merge: true }
+      );
+      batch.set(
+        refB,
+        {
+          elo: newEloB,
+          draws: FieldValue.increment(1),
+          totalDuels: FieldValue.increment(1),
+          lastDuelAt: nowTs,
+        },
+        { merge: true }
+      );
+      if (newEloA > ((snapA.data()?.["peakElo"] as number) ?? 0)) {
+        batch.update(refA, { peakElo: newEloA });
+      }
+      if (newEloB > ((snapB.data()?.["peakElo"] as number) ?? 0)) {
+        batch.update(refB, { peakElo: newEloB });
+      }
+
+      batch.set(db.collection("matches_history").doc(matchId), {
+        players,
+        winner: null,
+        is_draw: true,
+        elo_changes: { [uidA]: deltaA, [uidB]: deltaB },
+        elo_before: { [uidA]: eloA, [uidB]: eloB },
+        elo_after: { [uidA]: newEloA, [uidB]: newEloB },
+        finished_at: nowTs,
+      });
+
+      const nameA =
+        (snapA.data()?.["display_name"] as string | undefined) ??
+        "Grimpeur anonyme";
+      const nameB =
+        (snapB.data()?.["display_name"] as string | undefined) ??
+        "Grimpeur anonyme";
+      batch.set(
+        db.collection("profiles").doc(uidA).collection("duel_history").doc(matchId),
+        {
+          opponent_uid: uidB,
+          opponent_name: nameB,
+          did_win: false,
+          is_draw: true,
+          elo_delta: deltaA,
+          finished_at: nowTs,
+        }
+      );
+      batch.set(
+        db.collection("profiles").doc(uidB).collection("duel_history").doc(matchId),
+        {
+          opponent_uid: uidA,
+          opponent_name: nameA,
+          did_win: false,
+          is_draw: true,
+          elo_delta: deltaB,
+          finished_at: nowTs,
+        }
+      );
+
+      try {
+        await batch.commit();
+      } catch (err) {
+        await settledRef.set(null);
+        throw err;
+      }
+
+      const callerIsA = callerUid === uidA;
+      return {
+        new_elo: callerIsA ? newEloA : newEloB,
+        delta: callerIsA ? deltaA : deltaB,
+      };
+    }
+
+    // --- Victoire / défaite ---
+    const winnerUid = recordedWinner!;
+    const loserUid = players.find((p) => p !== winnerUid)!;
 
     // --- Lire les ELOs depuis Firestore ---
     const [winnerSnap, loserSnap] = await Promise.all([
-      db.collection("profiles").doc(winner_uid).get(),
+      db.collection("profiles").doc(winnerUid).get(),
       db.collection("profiles").doc(loserUid).get(),
     ]);
 
@@ -118,7 +262,7 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
     // --- Mettre à jour les profils (Admin SDK — ne passe jamais par le client) ---
     const batch = db.batch();
 
-    const winnerRef = db.collection("profiles").doc(winner_uid);
+    const winnerRef = db.collection("profiles").doc(winnerUid);
     batch.set(
       winnerRef,
       {
@@ -154,17 +298,17 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
     const historyRef = db.collection("matches_history").doc(matchId);
     batch.set(historyRef, {
       players,
-      winner: winner_uid,
+      winner: winnerUid,
       elo_changes: {
-        [winner_uid]: winnerDelta,
+        [winnerUid]: winnerDelta,
         [loserUid]: loserDelta,
       },
       elo_before: {
-        [winner_uid]: winnerElo,
+        [winnerUid]: winnerElo,
         [loserUid]: loserElo,
       },
       elo_after: {
-        [winner_uid]: newWinnerElo,
+        [winnerUid]: newWinnerElo,
         [loserUid]: newLoserElo,
       },
       finished_at: now,
@@ -175,7 +319,7 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
     // contenant la vue de son duel : opponent, result, delta, timestamp.
     const winnerHistoryRef = db
       .collection("profiles")
-      .doc(winner_uid)
+      .doc(winnerUid)
       .collection("duel_history")
       .doc(matchId);
     const loserHistoryRef = db
@@ -193,7 +337,7 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
     };
 
     const loserHistoryData = {
-      opponent_uid: winner_uid,
+      opponent_uid: winnerUid,
       opponent_name: winnerSnap.data()?.["display_name"] as string | undefined ?? "Grimpeur anonyme",
       did_win: false,
       elo_delta: loserDelta,
@@ -203,10 +347,17 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
     batch.set(winnerHistoryRef, winnerHistoryData);
     batch.set(loserHistoryRef, loserHistoryData);
 
-    await batch.commit();
+    try {
+      await batch.commit();
+    } catch (err) {
+      // Echec d'ecriture apres avoir pose le verrou : on libere `settled`
+      // pour permettre un retry propre (l'ELO n'a pas ete applique).
+      await settledRef.set(null);
+      throw err;
+    }
 
     // Retourner le résultat au caller.
-    const callerIsWinner = callerUid === winner_uid;
+    const callerIsWinner = callerUid === winnerUid;
     return {
       new_elo: callerIsWinner ? newWinnerElo : newLoserElo,
       delta: callerIsWinner ? winnerDelta : loserDelta,

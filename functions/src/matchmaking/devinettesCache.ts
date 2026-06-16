@@ -213,3 +213,26 @@ export function _pickThreeRounds(cache: DifficultyCache): RoundPayload[] {
     devinette_id: d.id,
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Anti-cheat (C3) : séparation payload public / réponses serveur-only.
+// ---------------------------------------------------------------------------
+
+/**
+ * Payload public d'une manche : tout SAUF la réponse. Le client a besoin de
+ * `letters_pool` (dont la longueur == longueur de la réponse) pour rendre la
+ * grille, mais ne doit jamais recevoir `answer` pendant la manche.
+ */
+export function toPublicRound(r: RoundPayload): Omit<RoundPayload, "answer"> {
+  // Déstructuration explicite pour garantir qu'`answer` ne fuite pas.
+  const { answer: _omit, ...publicFields } = r;
+  void _omit;
+  return publicFields;
+}
+
+/** Map des réponses indexée par numéro de manche (pour match_answers). */
+export function answersFromRounds(
+  rounds: RoundPayload[]
+): Record<number, string> {
+  return { 0: rounds[0].answer, 1: rounds[1].answer, 2: rounds[2].answer };
+}

@@ -73,11 +73,10 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
       setState(() => _eloLoading = false);
       return;
     }
+    // winner vide => match NUL : on appelle quand même endMatch (E3). Le
+    // serveur est autoritaire, applique l'ELO de nul aux deux joueurs et
+    // écrit l'historique (avant, le nul n'était jamais réglé).
     final winnerUid = widget.session.winner ?? '';
-    if (winnerUid.isEmpty) {
-      setState(() => _eloLoading = false);
-      return;
-    }
     try {
       final delta = await ref
           .read(matchmakingRepositoryProvider)
@@ -180,12 +179,16 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
     final opponent = widget.session.opponentOf(myUid);
     final selfScore = self?.roundsWon ?? 0;
     final opponentScore = opponent?.roundsWon ?? 0;
+    // 3 issues : nul (winner null), victoire, défaite.
+    final isDraw = widget.session.winner == null;
     final won = widget.session.winner == myUid;
 
     // Bordure sémantique du héros (maquette `.pp.win` / `.pp.lose`).
-    final heroBorder = won
-        ? AppColors.vertClair.withValues(alpha: 0.4)
-        : AppColors.error.withValues(alpha: 0.4);
+    final heroBorder = isDraw
+        ? AppColors.orJour.withValues(alpha: 0.4)
+        : won
+            ? AppColors.vertClair.withValues(alpha: 0.4)
+            : AppColors.error.withValues(alpha: 0.4);
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -224,7 +227,13 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                if (won)
+                                if (isDraw)
+                                  const Icon(
+                                    Icons.handshake,
+                                    size: 80,
+                                    color: AppColors.orJour,
+                                  )
+                                else if (won)
                                   Image.asset(
                                     AppAssets.duelTrophy,
                                     width: 80,
@@ -237,21 +246,29 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                                     color: AppColors.error,
                                   ),
                                 const SizedBox(height: 10),
-                                // Eyebrow VICTOIRE / DÉFAITE (success / error).
+                                // Eyebrow MATCH NUL / VICTOIRE / DÉFAITE.
                                 Text(
-                                  won ? 'VICTOIRE' : 'DÉFAITE',
+                                  isDraw
+                                      ? 'MATCH NUL'
+                                      : won
+                                          ? 'VICTOIRE'
+                                          : 'DÉFAITE',
                                   style: AppTypography.bebas(
                                     size: 30,
-                                    color: won
-                                        ? AppColors.vertClair
-                                        : AppColors.error,
+                                    color: isDraw
+                                        ? AppColors.orJour
+                                        : won
+                                            ? AppColors.vertClair
+                                            : AppColors.error,
                                   ).copyWith(letterSpacing: 2),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  won
-                                      ? 'Tu as été le plus fort !'
-                                      : 'Ton adversaire a été plus fort.',
+                                  isDraw
+                                      ? 'Égalité — personne ne cède le sommet.'
+                                      : won
+                                          ? 'Tu as été le plus fort !'
+                                          : 'Ton adversaire a été plus fort.',
                                   textAlign: TextAlign.center,
                                   style: AppTypography.crimson(
                                     size: 14,
@@ -264,6 +281,7 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                                   selfUid: myUid,
                                   opponentUid: opponent?.uid ?? '',
                                   won: won,
+                                  isDraw: isDraw,
                                 ),
                                 const SizedBox(height: 16),
                                 Semantics(
@@ -398,11 +416,13 @@ class _PlayerVsBanner extends ConsumerWidget {
     required this.selfUid,
     required this.opponentUid,
     required this.won,
+    this.isDraw = false,
   });
 
   final String selfUid;
   final String opponentUid;
   final bool won;
+  final bool isDraw;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -421,7 +441,7 @@ class _PlayerVsBanner extends ConsumerWidget {
             uid: selfUid,
             profile: selfProfile,
             fallbackLabel: 'Toi',
-            highlighted: won,
+            highlighted: !isDraw && won,
             alignEnd: true,
           ),
         ),
@@ -450,7 +470,7 @@ class _PlayerVsBanner extends ConsumerWidget {
             uid: opponentUid,
             profile: opponentProfile,
             fallbackLabel: 'Adversaire',
-            highlighted: !won,
+            highlighted: !isDraw && !won,
             alignEnd: false,
           ),
         ),
