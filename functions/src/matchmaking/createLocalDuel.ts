@@ -23,6 +23,7 @@ import {
   toPublicRound,
 } from "./devinettesCache";
 import { buildAnswersNode, matchAnswersPath } from "./matchAnswers";
+import { requireDuelProtocol } from "./protocol";
 
 const REGION = "europe-west1";
 
@@ -54,6 +55,7 @@ export const createLocalDuel = onCall(
     if (!uid) {
       throw new HttpsError("unauthenticated", "Auth requise");
     }
+    requireDuelProtocol(request.data);
 
     const matchId = _generateMatchId();
     const secret = _generateSecret();

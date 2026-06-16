@@ -118,6 +118,7 @@ class MatchmakingRepository {
       final result = await _fn('requestRematch').call<dynamic>(<String, dynamic>{
         'previousMatchId': previousMatchId,
         'opponentUid': opponentUid,
+        'protocol_version': kDuelProtocolVersion,
       });
 
       final data = (result.data as Map).cast<String, dynamic>();

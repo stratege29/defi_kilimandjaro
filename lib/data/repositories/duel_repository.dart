@@ -46,7 +46,9 @@ class DuelRepository {
   /// le QR code.
   Future<({String matchId, String secret})> createDuel() async {
     final callable = functions.httpsCallable('createLocalDuel');
-    final result = await callable.call<Map<Object?, Object?>>();
+    final result = await callable.call<Map<Object?, Object?>>(<String, dynamic>{
+      'protocol_version': kDuelProtocolVersion,
+    });
     final data = result.data.cast<String, dynamic>();
     final matchId = data['matchId'] as String?;
     final secret = data['secret'] as String?;

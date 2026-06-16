@@ -28,6 +28,7 @@ import {
   toPublicRound,
 } from "./devinettesCache";
 import { buildAnswersNode, matchAnswersPath } from "./matchAnswers";
+import { requireDuelProtocol } from "./protocol";
 
 interface RequestRematchData {
   previousMatchId: string;
@@ -71,6 +72,7 @@ export const requestRematch = onCall<
   { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     const callerUid = requireAuth(request.auth);
+    requireDuelProtocol(request.data);
     const { previousMatchId, opponentUid } = request.data;
 
     if (!previousMatchId || typeof previousMatchId !== "string") {
