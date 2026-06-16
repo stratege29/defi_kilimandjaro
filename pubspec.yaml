@@ -1,7 +1,7 @@
 name: defi_kilimandjaro
 description: "Word Connect culturel africain — Sagesse Ivoirienne"
 publish_to: 'none'
-version: 0.1.0+18
+version: 1.0.0+19
 
 environment:
   sdk: ^3.10.1
@@ -106,6 +106,19 @@ flutter:
     - assets/images/shop/
     - assets/images/duel/
     - assets/images/avatars/
+
+  # Polices bundlées (variables) — chargées localement, plus aucun fetch
+  # réseau google_fonts au runtime. Flutter mappe `fontWeight` sur l'axe
+  # `wght` de la police variable, donc un fichier couvre tous les poids.
+  fonts:
+    - family: Fraunces
+      fonts:
+        - asset: assets/fonts/Fraunces-Variable.ttf
+        - asset: assets/fonts/Fraunces-Italic-Variable.ttf
+          style: italic
+    - family: Hanken Grotesk
+      fonts:
+        - asset: assets/fonts/HankenGrotesk-Variable.ttf
 
 # ----------------------------------------------------------------------------
 # App icon (run: dart run flutter_launcher_icons)
