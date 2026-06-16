@@ -83,3 +83,25 @@ export { syncWallet } from "./wallet/syncWallet";
 
 // --- Compte joueur (RGPD / suppression) ---
 export { deleteAccount } from "./account/deleteAccount";
+
+// --- Autopilote Instagram (social) — cf docs/instagram_cloud_function.md ---
+export {
+  publishScheduledInstagramPost,
+  igPublishDueNow,
+  igPublishPost,
+  igPublishMosaicRow,
+  igSetAutopilot,
+  igSetCampaign,
+} from "./social/publishInstagram";
+export { igInsights } from "./social/igInsights";
+export { igGenerateImages } from "./social/genImages";
+export { igRenderCard } from "./social/renderCard";
+export {
+  adminFindPlayers,
+  adminRecentPlayers,
+  adminGetPlayer,
+  adminAdjustCauris,
+  adminSetBan,
+  adminDeletePlayer,
+} from "./admin/players";
+export { mergeAccounts } from "./account/mergeAccounts";

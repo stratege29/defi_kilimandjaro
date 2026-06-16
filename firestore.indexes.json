@@ -1,6 +1,14 @@
 {
   "indexes": [
     {
+      "collectionGroup": "instagram_queue",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "posted", "order": "ASCENDING" },
+        { "fieldPath": "date", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "submissions",
       "queryScope": "COLLECTION",
       "fields": [

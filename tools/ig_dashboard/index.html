@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Défi Kilimandjaro — Croissance Instagram</title>
+<style>
+:root{--canvas:#0C1712;--s1:#15241C;--s2:#1E3328;--hair:#2C4034;--gold:#E9B949;--gold2:#C18A2A;--kola:#F0533B;--ok:#28C76F;--t1:#F4ECD8;--t2:#A6AE9C;--t3:#717A6C}
+*{box-sizing:border-box}
+body{margin:0;background:var(--canvas);color:var(--t1);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.5}
+a{color:var(--gold)}
+header{display:flex;align-items:center;gap:14px;padding:18px 24px;border-bottom:1px solid var(--hair);position:sticky;top:0;background:var(--canvas);z-index:10}
+header h1{font-size:18px;margin:0;color:var(--gold);letter-spacing:.2px}
+header .sp{margin-left:auto}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:10px;padding:9px 16px;font-weight:700;font-size:14px}
+.btn-gold{background:var(--gold);color:#1a1206}
+.btn-ghost{background:transparent;color:var(--gold);border:1.5px solid var(--gold)}
+.btn-soft{background:var(--s2);color:var(--t1);border:1px solid var(--hair)}
+.btn-kola{background:var(--kola);color:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab{background:var(--s1);color:var(--t2);border:1px solid var(--hair);border-radius:999px;padding:8px 18px}
+.tab.active{background:var(--gold);color:#1a1206}
+.hidden{display:none}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--s1);border:1px solid var(--hair);border-radius:16px;padding:18px}
+.kpi .v{font-size:34px;font-weight:800;color:var(--gold);line-height:1}
+.kpi .l{color:var(--t2);font-size:13px;margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.mcard{background:var(--s1);border:1px solid var(--hair);border-radius:12px;overflow:hidden}
+.mcard img{width:100%;height:150px;object-fit:cover;display:block;background:#0a130f}
+.mcard .mi{padding:8px 10px;font-size:12px;color:var(--t2);display:flex;gap:12px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--hair);font-size:14px;vertical-align:top}
+th{color:var(--t3);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+.badge{font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.b-reel{background:rgba(240,83,59,.15);color:var(--kola)}
+.b-car{background:rgba(233,185,73,.15);color:var(--gold)}
+.b-img{background:var(--s2);color:var(--t2)}
+.s-done{color:var(--ok)}.s-soon{color:var(--t2)}.s-late{color:var(--kola)}
+.cap{color:var(--t2);font-size:13px;max-width:380px}
+.row-actions{display:flex;gap:6px;flex-wrap:wrap}
+.row-actions button{padding:5px 10px;font-size:12px;border-radius:8px}
+input,select,textarea{width:100%;background:var(--s1);border:1px solid var(--hair);color:var(--t1);border-radius:10px;padding:10px;font-family:inherit;font-size:14px}
+textarea{min-height:120px;resize:vertical}
+label{display:block;font-size:12px;color:var(--t2);margin:12px 0 5px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50}
+.modal .box{background:var(--s1);border:1px solid var(--hair);border-radius:18px;padding:24px;max-width:560px;width:100%;max-height:90vh;overflow:auto}
+.gate{max-width:420px;margin:90px auto;text-align:center;background:var(--s1);border:1px solid var(--hair);border-radius:20px;padding:40px 28px}
+.note{color:var(--t3);font-size:13px}
+.play li{margin:10px 0}
+.muted{color:var(--t3);font-size:12px}
+.pill{display:inline-block;background:var(--s2);border:1px solid var(--hair);border-radius:8px;padding:3px 8px;font-size:12px;margin:2px}
+h2{font-size:20px;margin:6px 0 14px}
+h3{color:var(--gold);font-size:15px;margin:18px 0 6px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏔️ Défi Kilimandjaro — Croissance</h1>
+  <div class="sp"></div>
+  <span id="who" class="note"></span>
+  <button id="signout" class="btn-soft hidden">Déconnexion</button>
+</header>
+
+<!-- Gate -->
+<div id="gate" class="gate hidden">
+  <h2>Tableau de bord</h2>
+  <p class="note">Connecte-toi avec le compte propriétaire de la page pour gérer le calendrier et suivre la croissance.</p>
+  <button id="signin" class="btn-gold" style="margin-top:14px">Se connecter avec Google</button>
+  <p id="gateMsg" class="note" style="margin-top:14px;color:var(--kola)"></p>
+</div>
+
+<!-- App -->
+<div id="app" class="wrap hidden">
+  <div class="tabs">
+    <div class="tab active" data-tab="stats">📈 Stats</div>
+    <div class="tab" data-tab="sched">🗓️ Calendrier</div>
+    <div class="tab" data-tab="play">🚀 Playbook croissance</div>
+  </div>
+
+  <!-- STATS -->
+  <section id="tab-stats">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <h2 style="margin:0">Vue d'ensemble</h2>
+      <button id="refreshStats" class="btn-ghost" style="margin-left:auto">↻ Rafraîchir les stats</button>
+    </div>
+    <div class="kpis" id="kpis">
+      <div class="kpi"><div class="v" id="kFollowers">—</div><div class="l">Abonnés</div></div>
+      <div class="kpi"><div class="v" id="kPosts">—</div><div class="l">Publications</div></div>
+      <div class="kpi"><div class="v" id="kQueued">—</div><div class="l">Programmés à venir</div></div>
+      <div class="kpi"><div class="v" id="kEng">—</div><div class="l">Engagement moyen / post</div></div>
+    </div>
+    <p id="statsNote" class="note"></p>
+    <h3>Publications récentes (live Instagram)</h3>
+    <div class="grid" id="mediaGrid"><p class="note">Clique « Rafraîchir les stats ».</p></div>
+  </section>
+
+  <!-- SCHEDULER -->
+  <section id="tab-sched" class="hidden">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <h2 style="margin:0">Calendrier de publication</h2>
+      <button id="addBtn" class="btn-gold" style="margin-left:auto">+ Nouveau post</button>
+    </div>
+    <p class="muted">Publication automatique chaque jour à 19h30 (Paris). Modifie, ajoute, ou publie tout de suite.</p>
+    <table>
+      <thead><tr><th>Date</th><th>Format</th><th>Statut</th><th>Légende</th><th>Actions</th></tr></thead>
+      <tbody id="schedBody"></tbody>
+    </table>
+  </section>
+
+  <!-- PLAYBOOK -->
+  <section id="tab-play" class="hidden">
+    <h2>Playbook croissance (audit expert)</h2>
+    <h3>Le ratio qui marche en 2026</h3>
+    <p>Vise <b>50-60% Reels</b>, 25-30% carrousels, 15% images. Les Reels sont le seul format qui ramène des non-abonnés (≈55% de leurs vues). Rythme régulier : <b>4-7 posts/semaine</b>.</p>
+    <h3>Les 100 premiers abonnés (amorçage manuel)</h3>
+    <ul class="play">
+      <li>Commente utile/drôle sur <b>15-20 comptes/jour</b> dans 3 niches : food ivoirien, nouchi/humour 225, foot africain.</li>
+      <li>Active ton réseau réel (amis, famille, groupes WhatsApp diaspora) — les 30-50 premiers.</li>
+      <li>Poste les Reels foot <b>les jours de match</b> du Mondial (audience ×100).</li>
+    </ul>
+    <h3>Hooks & engagement</h3>
+    <ul class="play">
+      <li>1re ligne = défi identitaire / controverse chiffrée ("80% se trompent") / tag-bait.</li>
+      <li>Conçois pour le <b>partage en DM</b> (×3-5 vs likes) : "envoie ça à quelqu'un qui…".</li>
+      <li>Carrousels "save-bait" (listes) → sauvegardes = portée durable.</li>
+    </ul>
+    <h3>Hashtags (3-5 ciblés)</h3>
+    <div><span class="pill">#DéfiKilimandjaro</span><span class="pill">#Nouchi</span><span class="pill">#Culture225</span><span class="pill">#CôteDIvoire</span><span class="pill">#CoupeDuMonde2026</span><span class="pill">#VillesDAfrique</span></div>
+    <h3>Collabs à viser (0→100)</h3>
+    <ul class="play">
+      <li>Micro-créateurs diaspora / humour 225 (5-50k) → shoutout ou post <b>Collab</b>.</li>
+      <li>Comptes food ivoirien → Reel "devine le plat" co-publié.</li>
+      <li>Pages foot africain → pendant le Mondial.</li>
+    </ul>
+  </section>
+</div>
+
+<!-- Edit/Add modal -->
+<div id="modal" class="modal hidden"><div class="box">
+  <h2 id="modalTitle">Post</h2>
+  <input type="hidden" id="fId" />
+  <label>Date (YYYY-MM-DD)</label><input id="fDate" type="date" />
+  <label>Format</label>
+  <select id="fType"><option value="image">Image</option><option value="carousel">Carrousel</option><option value="reel">Reel</option></select>
+  <label>URL média (image ou vidéo reel)</label><input id="fUrl" placeholder="https://…" />
+  <label>URLs carrousel (séparées par des virgules)</label><input id="fUrls" placeholder="https://…, https://…" />
+  <label>Cover (reel, optionnel)</label><input id="fCover" placeholder="https://…" />
+  <label>Légende</label><textarea id="fCaption"></textarea>
+  <label><input type="checkbox" id="fPosted" style="width:auto;margin-right:6px" /> Déjà publié</label>
+  <div style="display:flex;gap:10px;margin-top:18px">
+    <button id="saveBtn" class="btn-gold">Enregistrer</button>
+    <button id="cancelBtn" class="btn-soft">Annuler</button>
+    <button id="delBtn" class="btn-kola" style="margin-left:auto">Supprimer</button>
+  </div>
+</div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: 'AIzaSyAbFTn3FiASP2PsjizyWuZfMGs3UBTTz38',
+  authDomain: 'kilimandjaro-dev.firebaseapp.com',
+  projectId: 'kilimandjaro-dev',
+  storageBucket: 'kilimandjaro-dev.firebasestorage.app',
+  messagingSenderId: '526025535286',
+  appId: '1:526025535286:web:288f90dcaa34f98e1a0d97',
+};
+const OWNER_EMAIL = 'arnaudkossea@gmail.com';
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const fns = firebase.app().functions('europe-west1');
+const provider = new firebase.auth.GoogleAuthProvider();
+
+const $ = (id) => document.getElementById(id);
+const todayISO = () => new Date().toISOString().slice(0,10);
+
+// --- Auth ---
+$('signin').onclick = () => auth.signInWithPopup(provider).catch(e => $('gateMsg').textContent = e.message);
+$('signout').onclick = () => auth.signOut();
+auth.onAuthStateChanged(user => {
+  if (user && user.email === OWNER_EMAIL) {
+    $('gate').classList.add('hidden'); $('app').classList.remove('hidden');
+    $('signout').classList.remove('hidden'); $('who').textContent = user.email;
+    loadSchedule();
+  } else if (user) {
+    auth.signOut(); $('gate').classList.remove('hidden'); $('app').classList.add('hidden');
+    $('gateMsg').textContent = "Ce compte n'est pas autorisé.";
+  } else {
+    $('gate').classList.remove('hidden'); $('app').classList.add('hidden');
+    $('signout').classList.add('hidden'); $('who').textContent = '';
+  }
+});
+
+// --- Tabs ---
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  ['stats','sched','play'].forEach(s => $('tab-'+s).classList.toggle('hidden', s !== t.dataset.tab));
+});
+
+// --- Scheduler ---
+function statusOf(d){
+  if (d.posted) return '<span class="s-done">● Publié</span>';
+  if ((d.date||'') < todayISO()) return '<span class="s-late">● En retard</span>';
+  return '<span class="s-soon">○ Programmé</span>';
+}
+function badge(t){ return t==='reel'?'<span class="badge b-reel">🎬 Reel</span>':t==='carousel'?'<span class="badge b-car">🖼 Carrousel</span>':'<span class="badge b-img">Image</span>'; }
+let CACHE = {};
+function loadSchedule(){
+  db.collection('instagram_queue').orderBy('date').onSnapshot(snap => {
+    const body = $('schedBody'); body.innerHTML = ''; CACHE = {};
+    let queued = 0;
+    snap.forEach(doc => {
+      const d = doc.data(); CACHE[doc.id] = d;
+      if (!d.posted) queued++;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${d.date||''}</td><td>${badge(d.type)}</td><td>${statusOf(d)}</td>
+        <td class="cap">${(d.caption||'').slice(0,90)}…</td>
+        <td><div class="row-actions">
+          <button class="btn-soft" onclick="editPost('${doc.id}')">Éditer</button>
+          ${d.posted?'':`<button class="btn-gold" onclick="publishNow('${doc.id}')">Publier</button>`}
+        </div></td>`;
+      body.appendChild(tr);
+    });
+    $('kQueued').textContent = queued;
+  });
+}
+window.editPost = (id) => openModal(id, CACHE[id]);
+window.publishNow = async (id) => {
+  if (!confirm('Publier ce post maintenant sur Instagram ?')) return;
+  try { const r = await fns.httpsCallable('igPublishPost')({id}); alert('Publié ✅ (media '+r.data.id+')'); }
+  catch(e){ alert('Erreur : '+ (e.message||e)); }
+};
+
+// --- Modal ---
+function openModal(id, d){
+  d = d || {type:'image', date: todayISO(), posted:false, caption:''};
+  $('fId').value = id||''; $('fDate').value = d.date||todayISO(); $('fType').value = d.type||'image';
+  $('fUrl').value = d.url||''; $('fUrls').value = (d.urls||[]).join(', '); $('fCover').value = d.cover||'';
+  $('fCaption').value = d.caption||''; $('fPosted').checked = !!d.posted;
+  $('delBtn').style.display = id ? '' : 'none';
+  $('modal').classList.remove('hidden');
+}
+$('addBtn').onclick = () => openModal(null, null);
+$('cancelBtn').onclick = () => $('modal').classList.add('hidden');
+$('saveBtn').onclick = async () => {
+  const id = $('fId').value;
+  const type = $('fType').value;
+  const doc = { date:$('fDate').value, type, caption:$('fCaption').value, posted:$('fPosted').checked };
+  if (type==='carousel') doc.urls = $('fUrls').value.split(',').map(s=>s.trim()).filter(Boolean);
+  else doc.url = $('fUrl').value.trim();
+  if (type==='reel' && $('fCover').value.trim()) doc.cover = $('fCover').value.trim();
+  try {
+    if (id) await db.collection('instagram_queue').doc(id).set(doc, {merge:true});
+    else await db.collection('instagram_queue').add(doc);
+    $('modal').classList.add('hidden');
+  } catch(e){ alert('Erreur : '+e.message); }
+};
+$('delBtn').onclick = async () => {
+  const id = $('fId').value; if(!id) return;
+  if(!confirm('Supprimer ce post ?')) return;
+  await db.collection('instagram_queue').doc(id).delete();
+  $('modal').classList.add('hidden');
+};
+
+// --- Stats ---
+$('refreshStats').onclick = async () => {
+  $('statsNote').textContent = 'Chargement…';
+  try {
+    const r = await fns.httpsCallable('igInsights')({});
+    const a = r.data.account || {};
+    $('kFollowers').textContent = a.followers_count ?? '—';
+    $('kPosts').textContent = a.media_count ?? '—';
+    const media = r.data.media || [];
+    let eng = 0, k = 0;
+    const grid = $('mediaGrid'); grid.innerHTML = '';
+    media.forEach(m => {
+      const likes = m.like_count||0, com = m.comments_count||0; eng += likes+com; k++;
+      const img = m.media_type==='VIDEO' ? (m.thumbnail_url||m.media_url) : m.media_url;
+      const el = document.createElement('div'); el.className='mcard';
+      el.innerHTML = `<a href="${m.permalink}" target="_blank"><img src="${img||''}" /></a>
+        <div class="mi"><span>❤ ${likes}</span><span>💬 ${com}</span></div>`;
+      grid.appendChild(el);
+    });
+    if (!media.length) grid.innerHTML = '<p class="note">Aucune publication récupérée (ou compte tout neuf).</p>';
+    $('kEng').textContent = k ? Math.round(eng/k) : '—';
+    $('statsNote').textContent = a.error ? ('Stats compte indisponibles : '+a.error) : ('Dernière mise à jour : '+ new Date(r.data.fetchedAt).toLocaleString('fr-FR'));
+  } catch(e){ $('statsNote').textContent = 'Erreur : '+(e.message||e); }
+};
+</script>
+</body>
+</html>

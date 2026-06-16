@@ -167,12 +167,34 @@ class AuthRepository {
       if (e.code == 'credential-already-in-use' ||
           e.code == 'email-already-in-use') {
         // Le credential pointe sur un compte permanent déjà existant.
+        // On capture le token de l'uid anonyme AVANT le switch pour pouvoir
+        // fusionner sa progression (pseudo, stats, cauris) vers le compte gardé.
+        String? fromToken;
+        try {
+          fromToken = await user?.getIdToken();
+        } on Object catch (_) {}
         await _auth.signInWithCredential(e.credential ?? credential);
         _log.w('credential already in use → switched to existing account');
+        await _mergeFrom(fromToken);
         return LinkOutcome.switchedToExisting;
       }
       _log.e('linkWithCredential error', error: e);
       throw AuthException.fromFirebase(e);
+    }
+  }
+
+  /// Fusionne la progression de l'ancien uid (token capturé avant un switch)
+  /// vers l'uid courant via la Cloud Function `mergeAccounts`. Non bloquant :
+  /// un échec ne doit pas empêcher la connexion.
+  Future<void> _mergeFrom(String? fromToken) async {
+    if (fromToken == null) return;
+    try {
+      await _functions
+          .httpsCallable('mergeAccounts')
+          .call<dynamic>(<String, dynamic>{'fromIdToken': fromToken});
+      _log.i('account merged → uid=${_auth.currentUser?.uid}');
+    } on Object catch (e) {
+      _log.w('mergeAccounts failed (ignoré): $e');
     }
   }
 

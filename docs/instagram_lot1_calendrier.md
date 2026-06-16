@@ -1,7 +1,7 @@
 # Instagram @kilimandjaro — Lot 1 : 2 semaines de contenu
 
 > **Contexte : la page démarre à 0 abonné.** Objectif de ce premier lot : exister, donner envie, et amorcer une petite communauté avant le lancement du jeu. Phase **teasing**.
-> Handle proposé : `@kilimandjaro.jeu` (à ajuster selon dispo). Visuels fournis dans `docs/instagram_assets/`.
+> Handle : `@defi_kilimandjaro`. Visuels fournis dans `docs/instagram_assets/`.
 
 ---
 
