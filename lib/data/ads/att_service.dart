@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -75,11 +77,53 @@ class AttService {
     if (_status != TrackingStatus.notDetermined) return;
 
     try {
+      // iOS ne présente le dialog ATT que si l'app est ACTIVE. Au cold
+      // start, le premier post-frame peut survenir avant l'état `resumed`
+      // → `requestTrackingAuthorization` renvoie alors `notDetermined`
+      // SANS jamais afficher le dialog. On attend donc l'état resumed puis
+      // un court délai de stabilisation avant de demander.
+      await _waitUntilResumed();
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+
       _status = await AppTrackingTransparency.requestTrackingAuthorization();
       _log.i('ATT prompt result: $_status');
-      await _prefs.setBool(_kPromptDoneKey, true);
+
+      // Ne marquer « prompted » QUE si l'utilisateur a réellement répondu.
+      // Si on est toujours `notDetermined` (dialog non affiché), on laisse
+      // le flag à false pour re-tenter au prochain lancement.
+      if (_status != TrackingStatus.notDetermined) {
+        await _prefs.setBool(_kPromptDoneKey, true);
+      } else {
+        _log.w('ATT stayed notDetermined (dialog not shown) — will retry');
+      }
     } on Object catch (e) {
       _log.w('ATT request failed: $e');
+    }
+  }
+
+  /// Attend (borné) que l'app atteigne `AppLifecycleState.resumed` — requis
+  /// pour qu'iOS affiche le dialog ATT. Retourne immédiatement si déjà
+  /// resumed, sinon écoute les transitions de cycle de vie (timeout 5 s).
+  Future<void> _waitUntilResumed() async {
+    final binding = WidgetsBinding.instance;
+    if (binding.lifecycleState == AppLifecycleState.resumed) return;
+
+    final completer = Completer<void>();
+    late final AppLifecycleListener listener;
+    listener = AppLifecycleListener(
+      onStateChange: (state) {
+        if (state == AppLifecycleState.resumed && !completer.isCompleted) {
+          completer.complete();
+        }
+      },
+    );
+    try {
+      await completer.future.timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {},
+      );
+    } finally {
+      listener.dispose();
     }
   }
 }
