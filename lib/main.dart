@@ -7,6 +7,7 @@ import 'package:defi_kilimandjaro/core/deep_links.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_theme.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
+import 'package:defi_kilimandjaro/data/ads/att_service.dart';
 import 'package:defi_kilimandjaro/data/ads/consent_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/analytics_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/app_check_setup.dart';
@@ -365,6 +366,12 @@ class _BootGateState extends ConsumerState<_BootGate> {
 
       // UMP consent before AdMob (RGPD UE compliance).
       await ref.read(consentServiceProvider).requestConsent();
+      if (!mounted) return;
+      // App Tracking Transparency (iOS) — DOIT précéder l'init AdMob :
+      // Apple (Guideline 2.1) exige le prompt avant toute collecte de
+      // données traçables. Awaité pour que le SDK pub démarre seulement
+      // après la réponse utilisateur. No-op Android / si déjà répondu.
+      await ref.read(attServiceProvider).ensureRequested();
       if (!mounted) return;
       unawaited(ref.read(adsServiceProvider).init());
 

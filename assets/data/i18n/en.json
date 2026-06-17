@@ -149,6 +149,7 @@
       "linked_via": "Signed in via {}",
       "sign_out": "Sign out",
       "delete_account": "Delete account",
+      "delete_data_note": "Permanently deletes your account and data (progress, cauris, duels) from our servers — available even without a linked account.",
       "linked_success": "Account linked — your progress is now backed up.",
       "switched_notice": "✓ Signed in to your existing account. (Local progress on this device was not merged.)",
       "link_error": "Sign-in failed. Please try again.",

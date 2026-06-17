@@ -9,10 +9,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Coordonne la demande d'autorisation **App Tracking Transparency**
 /// (iOS 14.5+) pour AdMob.
 ///
-/// **Pourquoi pas au boot** : le prompt système ATT est l'un des plus
-/// rejetés sur l'App Store (~30-50 % d'opt-in à froid contre 50-70 %
-/// quand demandé après engagement). On attend que l'utilisateur ait
-/// vraiment essayé le jeu (2 victoires) pour maximiser le taux d'opt-in.
+/// **Au démarrage, AVANT l'init AdMob** : Apple exige (Guideline 2.1) que
+/// le prompt ATT apparaisse *avant* toute collecte de données traçables —
+/// donc avant que le SDK Google Mobile Ads ne charge la moindre pub.
+/// `ensureRequested()` est appelé dans `main.dart` juste avant
+/// `AdsService.init()`. (Auparavant le prompt était repoussé à la 2e
+/// victoire pour maximiser l'opt-in : rejet App Store car le reviewer ne
+/// le voyait jamais ET des pubs se chargeaient avant.)
 ///
 /// **Effet de l'opt-in** : eCPM rewarded et interstitial AdMob × ~2.
 /// L'opt-out fait fonctionner les pubs en mode non-personnalisé, lower
@@ -39,7 +42,7 @@ class AttService {
   TrackingStatus _status = TrackingStatus.notDetermined;
   TrackingStatus get status => _status;
 
-  /// True dès que [maybePromptAfterEngagement] a été appelé une fois
+  /// True dès que [ensureRequested] a été appelé une fois
   /// avec succès (peu importe la réponse user). Persiste cross-session.
   bool get hasPromptedOnce => _prefs.getBool(_kPromptDoneKey) ?? false;
 
@@ -62,9 +65,10 @@ class AttService {
   /// - Statut courant `notDetermined` (jamais prompted)
   /// - Pas déjà tenté dans cette installation (`hasPromptedOnce` false)
   ///
-  /// À appeler après un moment d'engagement (ex: 2e victoire — cf.
-  /// `_advanceAfterVictory`). Idempotent et fail-soft.
-  Future<void> maybePromptAfterEngagement() async {
+  /// **À appeler au démarrage, avant `AdsService.init()`** (cf. `main.dart`)
+  /// pour que le prompt précède tout chargement de pub. Idempotent et
+  /// fail-soft. Doit être awaité afin que l'init AdMob attende la réponse.
+  Future<void> ensureRequested() async {
     if (!Platform.isIOS) return;
     if (!_initialized) await init();
     if (hasPromptedOnce) return;

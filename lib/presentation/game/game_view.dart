@@ -8,7 +8,6 @@ import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
-import 'package:defi_kilimandjaro/data/ads/att_service.dart';
 import 'package:defi_kilimandjaro/data/ads/rewarded_daily_cap_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/analytics_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
@@ -494,15 +493,8 @@ class _GameViewState extends ConsumerState<GameView>
     // avant de tap SUIVANT, sa victoire compte quand même.
     ref.read(adsServiceProvider).noteVictory();
 
-    // ATT prompt (iOS) — déclenché à partir de la 2e victoire cumulée
-    // (joueur engagé). Idempotent, no-op si déjà prompted ou Android.
-    final totalVictories =
-        ref.read(playerProgressProvider).totalLevelsCompleted;
-    if (totalVictories >= 2) {
-      unawaited(
-        ref.read(attServiceProvider).maybePromptAfterEngagement(),
-      );
-    }
+    // (ATT est désormais demandé au démarrage, avant l'init AdMob —
+    // cf. main.dart / AttService.ensureRequested. Plus de gate victoire.)
 
     showDialog<void>(
       context: ctx,

@@ -94,6 +94,24 @@ class _Anonymous extends ConsumerWidget {
           fullWidth: true,
           onPressed: busy ? null : notifier.linkWithApple,
         ),
+        const SizedBox(height: 20),
+        Divider(color: AppColors.texteTertiaire.withValues(alpha: 0.2)),
+        const SizedBox(height: 8),
+        // Suppression de compte toujours accessible, même anonyme
+        // (App Store Guideline 5.1.1(v)). Purge les données serveur de
+        // l'uid courant via la Cloud Function deleteAccount.
+        Text(
+          'profile.account.delete_data_note'.tr(),
+          style: AppTypography.bodySm.copyWith(color: AppColors.texteSecondaire),
+        ),
+        const SizedBox(height: 8),
+        AppButton(
+          label: 'profile.account.delete_account'.tr(),
+          variant: AppButtonVariant.danger,
+          fullWidth: true,
+          onPressed:
+              busy ? null : () => _confirmDeleteAccount(context, notifier),
+        ),
         if (busy) ...[
           const SizedBox(height: 16),
           const Center(
@@ -163,7 +181,8 @@ class _Linked extends ConsumerWidget {
           label: 'profile.account.delete_account'.tr(),
           variant: AppButtonVariant.danger,
           fullWidth: true,
-          onPressed: busy ? null : () => _confirmDelete(context, notifier),
+          onPressed:
+              busy ? null : () => _confirmDeleteAccount(context, notifier),
         ),
         if (busy) ...[
           const SizedBox(height: 16),
@@ -183,7 +202,7 @@ class _Linked extends ConsumerWidget {
     BuildContext context,
     AccountController notifier,
   ) async {
-    final ok = await _confirmDialog(
+    final ok = await _confirmActionDialog(
       context,
       title: 'profile.account.sign_out_confirm_title'.tr(),
       body: 'profile.account.sign_out_confirm_body'.tr(),
@@ -191,61 +210,66 @@ class _Linked extends ConsumerWidget {
     );
     if (ok) await notifier.signOut();
   }
+}
 
-  Future<void> _confirmDelete(
-    BuildContext context,
-    AccountController notifier,
-  ) async {
-    final ok = await _confirmDialog(
-      context,
-      title: 'profile.account.delete_confirm_title'.tr(),
-      body: 'profile.account.delete_confirm_body'.tr(),
-      cta: 'profile.account.delete_account'.tr(),
-    );
-    if (ok) await notifier.deleteAccount();
-  }
+/// Confirme puis supprime définitivement le compte + les données serveur.
+/// Partagé par l'état anonyme ET lié : la suppression doit toujours être
+/// accessible (App Store Guideline 5.1.1(v)). `deleteAccount()` appelle la
+/// Cloud Function `deleteAccount` qui purge le profil/wallet/duels de l'uid
+/// courant (anonyme ou permanent), puis re-signe en anonyme vierge.
+Future<void> _confirmDeleteAccount(
+  BuildContext context,
+  AccountController notifier,
+) async {
+  final ok = await _confirmActionDialog(
+    context,
+    title: 'profile.account.delete_confirm_title'.tr(),
+    body: 'profile.account.delete_confirm_body'.tr(),
+    cta: 'profile.account.delete_account'.tr(),
+  );
+  if (ok) await notifier.deleteAccount();
+}
 
-  Future<bool> _confirmDialog(
-    BuildContext context, {
-    required String title,
-    required String body,
-    required String cta,
-  }) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surfaceContainer,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: BorderSide(color: AppColors.error.withValues(alpha: 0.5)),
-        ),
-        title: Text(
-          title,
-          style: AppTypography.headingMd.copyWith(color: AppColors.error),
-        ),
-        content: Text(
-          body,
-          style: AppTypography.bodyMd.copyWith(color: AppColors.textePrimaire),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(
-              'common.cancel'.tr(),
-              style: AppTypography.headingSm
-                  .copyWith(color: AppColors.texteSecondaire),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(
-              cta,
-              style: AppTypography.headingSm.copyWith(color: AppColors.error),
-            ),
-          ),
-        ],
+Future<bool> _confirmActionDialog(
+  BuildContext context, {
+  required String title,
+  required String body,
+  required String cta,
+}) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: AppColors.surfaceContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: AppColors.error.withValues(alpha: 0.5)),
       ),
-    );
-    return confirmed ?? false;
-  }
+      title: Text(
+        title,
+        style: AppTypography.headingMd.copyWith(color: AppColors.error),
+      ),
+      content: Text(
+        body,
+        style: AppTypography.bodyMd.copyWith(color: AppColors.textePrimaire),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: Text(
+            'common.cancel'.tr(),
+            style: AppTypography.headingSm
+                .copyWith(color: AppColors.texteSecondaire),
+          ),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: Text(
+            cta,
+            style: AppTypography.headingSm.copyWith(color: AppColors.error),
+          ),
+        ),
+      ],
+    ),
+  );
+  return confirmed ?? false;
 }
