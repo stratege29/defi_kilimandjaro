@@ -10,7 +10,7 @@
 const fs = require("fs"), path = require("path"), crypto = require("crypto");
 const REPO = path.resolve(__dirname, "..", "..");
 const COMMIT = process.argv.includes("--commit");
-const GROUP = process.argv.find((a) => a.startsWith("carousel_"));
+const GROUP = process.argv.find((a) => a.startsWith("carousel_") || a.startsWith("pack_"));
 const di = process.argv.indexOf("--date");
 const DATE = di >= 0 ? process.argv[di + 1] : new Date(Date.now() + 864e5).toISOString().slice(0, 10);
 const PROJECT = process.env.GOOGLE_CLOUD_PROJECT || "kilimandjaro-dev";

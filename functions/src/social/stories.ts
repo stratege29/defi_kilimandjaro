@@ -57,9 +57,10 @@ async function publishOldestDueStory(force = false): Promise<string> {
   return publishStoryDoc(due[0].id);
 }
 
-/** Cron : matin 07:30 + soir 20:30 (Abidjan). Publie 1 story due si storiesAuto=ON. */
+/** Cron : 07:30 (énigme) + 13:30 (Coupe du Monde) + 20:30 (réponse), Abidjan.
+ *  Publie 1 story due (la plus ancienne) à chaque créneau si storiesAuto=ON. */
 export const igPublishDueStories = onSchedule(
-  { schedule: "30 7,20 * * *", timeZone: "Africa/Abidjan", region: "europe-west1", secrets: [IG_ACCESS_TOKEN], timeoutSeconds: 300 },
+  { schedule: "30 7,13,20 * * *", timeZone: "Africa/Abidjan", region: "europe-west1", secrets: [IG_ACCESS_TOKEN], timeoutSeconds: 300 },
   async () => {
     const c = (await getFirestore().doc("instagram_meta/config").get()).data() as { storiesAuto?: boolean } | undefined;
     if (!c || c.storiesAuto !== true) { logger.info("stories: auto OFF, no-op."); return; }
