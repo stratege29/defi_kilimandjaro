@@ -54,7 +54,7 @@ def letter_rows(phrase):
 
 
 # Réponses exclues du pool public (trop crues pour un compte Instagram grand public).
-BLOCK = {"DJOSS", "DJANDJOU", "WOUBI"}
+BLOCK = {"DJOSS", "DJANDJOU", "WOUBI", "BANGALA", "GNAMAKODE", "BLEDARD", "BABTOU", "COXER", "FARADJE"}
 ONLY = None
 if "--rows" in sys.argv:
     _i = sys.argv.index("--rows")

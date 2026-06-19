@@ -138,11 +138,14 @@ def encode(render, name):
         print("ffmpeg ERR", name, r.stderr[-300:])
 
 
-def build(count):
-    devs = GP.load_devinettes()
+BLOCK = {"DJOSS", "DJANDJOU", "WOUBI", "BANGALA", "GNAMAKODE", "BLEDARD", "BABTOU", "COXER", "FARADJE"}
+
+
+def build(count, offset=0):
+    devs = [d for d in GP.load_devinettes() if d["answer"].upper() not in BLOCK]
     plan = []
     for i in range(count):
-        dv = devs[i % len(devs)]
+        dv = devs[(offset + i) % len(devs)]
         cat, accent = GP.PACKS[dv["pack"]]
         lets = _letters(dv["answer"])
         encode(lambda t: enigme_frame(cat, accent, dv["riddle"], lets, t), f"enigme_{i}")
@@ -154,4 +157,7 @@ def build(count):
 
 
 if __name__ == "__main__":
-    build(int(sys.argv[1]) if len(sys.argv) > 1 else 7)
+    oi = sys.argv.index("--offset") if "--offset" in sys.argv else -1
+    off = int(sys.argv[oi + 1]) if oi >= 0 else 0
+    cnt = int(sys.argv[1]) if len(sys.argv) > 1 and not sys.argv[1].startswith("--") else 7
+    build(cnt, off)

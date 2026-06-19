@@ -29,12 +29,21 @@ PACKS = {"nouchi": ("crack_nouchi", "Crack Nouchi", GP.ACC["nouchi"]),
          "culture": ("culture_ci", "Culture 225", GP.ACC["culture"])}
 
 
+BLOCK = {"DJOSS", "DJANDJOU", "WOUBI", "BANGALA", "GNAMAKODE", "BLEDARD", "BABTOU", "COXER", "FARADJE"}
+
+
 def load(pack):
     p = os.path.join(DEV, pack + ".json")
     return [{"answer": (x.get("answer") or "").strip(),
              "riddle": (x.get("riddle") or {}).get("fr", ""),
              "expl": (x.get("explanation") or {}).get("fr", "")}
-            for x in json.load(open(p, encoding="utf-8"))]
+            for x in json.load(open(p, encoding="utf-8"))
+            if (x.get("answer") or "").strip().upper() not in BLOCK]
+
+
+def load_cdm():
+    """Set Coupe du Monde 2026 (liste plate {answer, riddle, expl})."""
+    return json.load(open(os.path.join(HERE, "cdm2026.json"), encoding="utf-8"))
 
 
 def letters_of(ans):
@@ -96,15 +105,18 @@ def encode(render, mp4):
         print("ffmpeg ERR", r.stderr[-300:])
 
 
-def build(theme, count):
-    if theme not in PACKS:
-        print("Thèmes:", ", ".join(PACKS)); return
-    pack, cat, accent = PACKS[theme]
-    devs = load(pack)
+def build(theme, count, offset=0):
+    if theme == "cdm":
+        cat, accent, devs = "Coupe du Monde 2026", GP.ACC["foot"], load_cdm()
+    elif theme in PACKS:
+        _, cat, accent = PACKS[theme]
+        devs = load(PACKS[theme][0])
+    else:
+        print("Thèmes:", ", ".join(list(PACKS) + ["cdm"])); return
     os.makedirs(OUT, exist_ok=True)
     plan = []
     for i in range(count):
-        dv = devs[i % len(devs)]
+        dv = devs[(offset + i) % len(devs)]
         lets = letters_of(dv["answer"])
         encode(lambda t: frame(cat, accent, dv["riddle"], lets, dv["expl"], t), os.path.join(OUT, f"REEL_{theme}_{i}.mp4"))
         frame(cat, accent, dv["riddle"], lets, dv["expl"], 0.20).save(os.path.join(OUT, f"COVER_{theme}_{i}.png"))
@@ -119,5 +131,7 @@ def build(theme, count):
 
 if __name__ == "__main__":
     theme = sys.argv[1] if len(sys.argv) > 1 else "nouchi"
-    count = int(sys.argv[2]) if len(sys.argv) > 2 else 4
-    build(theme, count)
+    count = int(sys.argv[2]) if len(sys.argv) > 2 and not sys.argv[2].startswith("--") else 4
+    oi = sys.argv.index("--offset") if "--offset" in sys.argv else -1
+    off = int(sys.argv[oi + 1]) if oi >= 0 else 0
+    build(theme, count, off)

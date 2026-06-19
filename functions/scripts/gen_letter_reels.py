@@ -38,10 +38,12 @@ def bg():
     return img
 
 
-def render(ch, fps=30, dur=3.5):
+def render(ch, fps=30, dur=3.5, outdir=None, name=None):
+    od = outdir or OUT
+    nm = name if name is not None else ch
     frames = int(fps * dur)
     base = bg()
-    tmp = os.path.join(OUT, f"_f_{ch if ch.isalnum() else 'x'}")
+    tmp = os.path.join(od, f"_f_{nm}")
     os.makedirs(tmp, exist_ok=True)
     S = 560
     cy_t = VH * 0.45
@@ -58,8 +60,8 @@ def render(ch, fps=30, dur=3.5):
             s = int(S * (1 + 0.02 * math.sin((t - 0.38) * math.pi * 3)))
         C.big_tile(d, (VW - s) / 2, cy - s / 2, s, ch)
         img.save(os.path.join(tmp, f"f{i:03d}.png"))
-    mp4 = os.path.join(OUT, f"REEL_{ch}.mp4")
-    cover = os.path.join(OUT, f"COVER_{ch}.png")
+    mp4 = os.path.join(od, f"REEL_{nm}.mp4")
+    cover = os.path.join(od, f"COVER_{nm}.png")
     C.s_lettre(ch, "Akwaba · la phrase cachée").save(cover)
     cmd = ["ffmpeg", "-y", "-framerate", str(fps), "-i", os.path.join(tmp, "f%03d.png"),
            "-f", "lavfi", "-t", str(dur), "-i", "anullsrc=channel_layout=stereo:sample_rate=44100",

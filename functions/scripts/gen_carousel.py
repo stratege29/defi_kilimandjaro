@@ -34,13 +34,18 @@ THEMES = {
 }
 
 
+# Mots exclus des contenus publics (trop crus / sensibles).
+BLOCK = {"DJOSS", "DJANDJOU", "WOUBI", "BANGALA", "GNAMAKODE", "BLEDARD", "BABTOU", "COXER", "FARADJE"}
+
+
 def load(pack):
     p = os.path.join(DEV, pack + ".json")
     out = []
     for x in json.load(open(p, encoding="utf-8")):
-        out.append({"answer": (x.get("answer") or "").strip(),
-                    "expl": (x.get("explanation") or {}).get("fr", ""),
-                    "tags": x.get("tags") or []})
+        a = (x.get("answer") or "").strip()
+        if a.upper() in BLOCK:
+            continue
+        out.append({"answer": a, "expl": (x.get("explanation") or {}).get("fr", ""), "tags": x.get("tags") or []})
     return out
 
 
@@ -86,12 +91,12 @@ def cta(t):
     return img
 
 
-def build(theme, count):
+def build(theme, count, offset=0):
     if theme not in THEMES:
         print("Thèmes:", ", ".join(THEMES)); return
     t = THEMES[theme]
     pool = [d for d in load(t["pack"]) if (t["tag"] is None or t["tag"] in d["tags"])]
-    items = pool[:count]
+    items = pool[offset:offset + count]
     n = len(items)
     if n < 3:
         print(f"Pas assez de devinettes ({n}) pour {theme}."); return
@@ -114,5 +119,7 @@ def build(theme, count):
 
 if __name__ == "__main__":
     theme = sys.argv[1] if len(sys.argv) > 1 else "nouchi"
-    count = int(sys.argv[2]) if len(sys.argv) > 2 else 5
-    build(theme, count)
+    count = int(sys.argv[2]) if len(sys.argv) > 2 and not sys.argv[2].startswith("--") else 5
+    oi = sys.argv.index("--offset") if "--offset" in sys.argv else -1
+    off = int(sys.argv[oi + 1]) if oi >= 0 else 0
+    build(theme, count, off)
