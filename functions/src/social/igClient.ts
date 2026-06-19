@@ -66,6 +66,23 @@ export async function publishImage(
   return igPost(cfg, `${cfg.userId}/media_publish`, { creation_id: container.id });
 }
 
+/**
+ * Publie une STORY (image ou vidéo 9:16, plein écran, expire après 24 h).
+ * Pas de caption ni de stickers via l'API (limite Instagram).
+ */
+export async function publishStory(
+  cfg: IgConfig,
+  url: string,
+  isVideo = false,
+): Promise<{ id: string }> {
+  const params: Record<string, string> = { media_type: "STORIES" };
+  if (isVideo) params.video_url = url;
+  else params.image_url = url;
+  const container = await igPost(cfg, `${cfg.userId}/media`, params);
+  await waitContainerReady(cfg, container.id);
+  return igPost(cfg, `${cfg.userId}/media_publish`, { creation_id: container.id });
+}
+
 /** Publie un carrousel (2 à 10 images). */
 export async function publishCarousel(
   cfg: IgConfig,

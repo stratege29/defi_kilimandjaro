@@ -69,6 +69,7 @@ export default function Instagram() {
         <button className={sub === 'sched' ? 'tab active' : 'tab'} onClick={() => setSub('sched')}>🗓️ Calendrier</button>
         <button className={sub === 'grid' ? 'tab active' : 'tab'} onClick={() => setSub('grid')}>▦ Grille</button>
         <button className={sub === 'mosaic' ? 'tab active' : 'tab'} onClick={() => setSub('mosaic')}>🧩 Mosaïque</button>
+        <button className={sub === 'stories' ? 'tab active' : 'tab'} onClick={() => setSub('stories')}>📲 Stories</button>
         <button className={sub === 'ia' ? 'tab active' : 'tab'} onClick={() => setSub('ia')}>🎨 Images IA</button>
         <button className={sub === 'play' ? 'tab active' : 'tab'} onClick={() => setSub('play')}>🚀 Playbook</button>
       </div>
@@ -76,6 +77,7 @@ export default function Instagram() {
       {sub === 'sched' && <Scheduler />}
       {sub === 'grid' && <Grid />}
       {sub === 'mosaic' && <Mosaic />}
+      {sub === 'stories' && <Stories />}
       {sub === 'ia' && <AiImages />}
       {sub === 'play' && <Playbook />}
     </>
@@ -753,6 +755,77 @@ function AiImages() {
         })}
       </div>
       {adding !== undefined && <PostForm initial={adding} onClose={() => setAdding(undefined)} />}
+    </>
+  );
+}
+
+function Stories() {
+  const [items, setItems] = useState(null);
+  const [auto, setAuto] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+  const [viewing, setViewing] = useState(null);
+
+  useEffect(() => {
+    const q = query(collection(db, 'instagram_stories'), orderBy('storyAt', 'asc'));
+    return onSnapshot(q, (snap) => setItems(snap.docs.map((d) => ({ id: d.id, ...d.data() }))), (e) => setErr(`${e.code}: ${e.message}`));
+  }, []);
+  useEffect(() => onSnapshot(doc(db, 'instagram_meta', 'config'), (s) => setAuto(s.data()?.storiesAuto === true)), []);
+
+  const fmt = (ts) => { const d = ts?.toDate?.(); return d ? d.toLocaleString('fr-FR', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—'; };
+  async function call(name, data) {
+    setBusy(true); setErr(null);
+    try { await httpsCallable(functions, name, { timeout: 300000 })(data); }
+    catch (e) { setErr(`${e.code || e.name}: ${e.message}`); } finally { setBusy(false); }
+  }
+
+  return (
+    <>
+      <header className="topbar"><h2>Stories</h2><span className="spacer" /></header>
+      <div className="card block" style={{ padding: 14, marginBottom: 12 }}>
+        <div className="row" style={{ alignItems: 'center', gap: 12 }}>
+          <strong>Autopilote stories : {auto ? <span className="chip green">ON</span> : <span className="chip">OFF</span>}</strong>
+          <span className="spacer" />
+          <button className={auto ? 'btn ghost' : 'btn primary'} disabled={busy} onClick={() => call('igSetStoriesAuto', { enabled: !auto })}>
+            {busy ? '…' : auto ? 'Mettre en pause' : 'Activer'}
+          </button>
+        </div>
+        <p className="muted small" style={{ marginBottom: 0 }}>
+          Publie automatiquement 2 stories/jour : <b>énigme à 07:30</b>, <b>réponse à 20:30</b> (heure d'Abidjan).
+          Limite API Instagram : pas de sondage, sticker ou lien (à faire à la main). Génère/recharge la file avec <code>gen_stories.py</code> + <code>add_stories.js</code>.
+        </p>
+      </div>
+      {err && <p className="error block">{err}</p>}
+      {items === null && <p className="muted block">Chargement…</p>}
+      {items && items.length === 0 && <p className="muted block">Aucune story en file. Lance <code>node functions/scripts/add_stories.js --commit</code>.</p>}
+      {items && items.length > 0 && (
+        <table className="table">
+          <thead><tr><th></th><th>Quand</th><th>Type</th><th>Contenu</th><th>Statut</th><th></th></tr></thead>
+          <tbody>
+            {items.map((s) => (
+              <tr key={s.id}>
+                <td onClick={() => setViewing(s)} style={{ cursor: 'pointer' }}>
+                  <div style={{ position: 'relative', width: 38, height: 67, borderRadius: 4, overflow: 'hidden', background: '#0a130f' }}>
+                    {s.url && (s.mediaType === 'video'
+                      ? <video src={s.url} muted playsInline preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : <img src={s.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />)}
+                    {s.mediaType === 'video' && <span style={{ position: 'absolute', bottom: 1, right: 2, fontSize: 9 }}>🎬</span>}
+                  </div>
+                </td>
+                <td className="mono small">{fmt(s.storyAt)}</td>
+                <td>{s.kind === 'enigme' ? 'Énigme' : s.kind === 'reponse' ? 'Réponse' : s.kind}</td>
+                <td className="small truncate">{s.label || s.answer || ''}</td>
+                <td>{s.posted ? <span className="chip green">Publiée</span> : <span className="chip">Programmée</span>}</td>
+                <td className="row-actions">
+                  <button className="btn ghost small" onClick={() => setViewing(s)}>Voir</button>
+                  {!s.posted && <button className="btn primary small" disabled={busy} onClick={() => confirm('Publier cette story maintenant ?') && call('igPublishStoryNow', { id: s.id })}>Publier</button>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {viewing && <Viewer post={{ ...viewing, type: viewing.mediaType === 'video' ? 'reel' : 'image', date: fmt(viewing.storyAt), caption: viewing.label }} onClose={() => setViewing(null)} />}
     </>
   );
 }

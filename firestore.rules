@@ -64,6 +64,13 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Stories Instagram (file dédiée) — lue par le dashboard, écrite uniquement
+    // via Cloud Function / Admin SDK (seed + publication).
+    match /instagram_stories/{storyId} {
+      allow read: if isPageOwner() || isAdmin();
+      allow write: if false;
+    }
+
     // -------------------------------------------------------------------------
     // Profils joueurs — PR-4
     // -------------------------------------------------------------------------
