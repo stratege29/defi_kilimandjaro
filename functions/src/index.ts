@@ -96,6 +96,7 @@ export {
 export { igInsights } from "./social/igInsights";
 export { igGenerateImages } from "./social/genImages";
 export { igRenderCard } from "./social/renderCard";
+export { igPublishDueStories, igPublishStoryNow, igSetStoriesAuto } from "./social/stories";
 export {
   adminFindPlayers,
   adminRecentPlayers,

@@ -126,3 +126,7 @@ docs/instagram_assets/photo_demo/
 docs/instagram_assets/ai/
 docs/instagram_assets/mosaic/
 docs/instagram_assets/reels/
+
+# Médias éditoriaux régénérables (stories/carrousels générés)
+docs/instagram_assets/stories/
+docs/instagram_assets/carousels/carousel_*/
