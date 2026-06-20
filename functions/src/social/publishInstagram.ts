@@ -79,11 +79,19 @@ async function publishDuePost(force = false): Promise<string> {
   // On récupère un petit lot et on ignore les posts « mosaïque » : ils ne doivent
   // JAMAIS partir à l'unité via l'autopilote (sinon la grille du profil se décale).
   const snap = await query.orderBy("date", "asc").limit(25).get();
-  const doc = snap.docs.find((d) => !(d.data() as Record<string, unknown>).mosaic);
-
-  if (!doc) {
-    logger.info("instagram: aucun post (non-mosaïque) dû aujourd'hui, no-op.");
+  if (snap.empty) {
+    logger.info("instagram: aucun post dû aujourd'hui, no-op.");
     return "no-op";
+  }
+  const doc = snap.docs[0];
+  // Mosaïque INTÉGRÉE au planning : si le plus ancien dû est une rangée mosaïque,
+  // on publie la RANGÉE entière (3 posts) pour garder l'alignement de la grille,
+  // puis le planning reprend normalement les jours suivants.
+  const mz = (doc.data() as Record<string, { group: string; row: number }>).mosaic;
+  if (mz) {
+    const ids = await publishRowOf(mz.group, mz.row);
+    logger.info(`instagram: rangée mosaïque ${mz.group} r${mz.row} publiée (${ids.length} posts)`, { ids });
+    return ids[0] ?? "no-op";
   }
 
   const item = doc.data() as QueueItem;
@@ -125,21 +133,16 @@ export const publishScheduledInstagramPost = onSchedule(
     timeZone: "Europe/Paris",
     region: "europe-west1",
     secrets: [IG_ACCESS_TOKEN],
-    timeoutSeconds: 300,
+    timeoutSeconds: 540,
   },
   async () => {
     const snap = await getFirestore().doc("instagram_meta/config").get();
-    const cfg = (snap.exists ? snap.data() : {}) as { autopilotEnabled?: boolean; mosaicAuto?: boolean };
-    // Mode campagne : publie automatiquement la prochaine rangée mosaïque (3 posts).
-    if (cfg.mosaicAuto === true) {
-      const res = await publishNextMosaicRowGlobal();
-      logger.info("instagram: mosaïque auto", res ?? { result: "no-op" });
-      return;
-    }
+    const cfg = (snap.exists ? snap.data() : {}) as { autopilotEnabled?: boolean };
     if (cfg.autopilotEnabled === false) {
       logger.info("instagram: autopilote en pause, no-op.");
       return;
     }
+    // Mosaïque intégrée : publishDuePost publie une rangée mosaïque quand elle est due.
     await publishDuePost();
   },
 );
@@ -188,18 +191,6 @@ async function publishMosaicRow(group: string): Promise<{ count: number; ids: st
   return { count: ids.length, ids, row: maxRow };
 }
 
-/** Auto : prochaine rangée mosaïque GLOBALE = le post mosaïque non publié le plus ancien (date min). */
-async function publishNextMosaicRowGlobal(): Promise<{ group: string; row: number; ids: string[] } | null> {
-  const db = getFirestore();
-  const snap = await db.collection(QUEUE)
-    .where("posted", "==", false).orderBy("date", "asc").limit(100).get();
-  const next = snap.docs.find((d) => (d.data() as Record<string, unknown>).mosaic);
-  if (!next) return null;
-  const m = (next.data() as Record<string, { group: string; row: number }>).mosaic;
-  const ids = await publishRowOf(m.group, m.row);
-  return { group: m.group, row: m.row, ids };
-}
-
 export const igPublishMosaicRow = onCall(
   { region: "europe-west1", enforceAppCheck: false, cors: true, secrets: [IG_ACCESS_TOKEN], timeoutSeconds: 540 },
   async (req): Promise<{ ok: true; count: number; ids: string[]; row: number }> => {
@@ -233,10 +224,11 @@ export const igSetCampaign = onCall(
   { region: "europe-west1", enforceAppCheck: false, cors: true },
   async (req): Promise<{ ok: true; campaignActive: boolean }> => {
     assertOwner(req.auth);
-    const active = req.data?.active === true;
+    // Déprécié : la mosaïque est désormais intégrée au planning auto (publiée à
+    // sa date par l'autopilote). On garde le feed en marche, on neutralise l'ancien mode.
     await getFirestore().doc("instagram_meta/config")
-      .set({ autopilotEnabled: !active, mosaicAuto: active }, { merge: true });
-    return { ok: true, campaignActive: active };
+      .set({ autopilotEnabled: true, mosaicAuto: false }, { merge: true });
+    return { ok: true, campaignActive: false };
   },
 );
 
