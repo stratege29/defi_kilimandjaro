@@ -24,6 +24,8 @@
     "test:all": "jest --runInBand"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
+    "@google/genai": "^1.52.0",
     "@napi-rs/canvas": "^1.0.0",
     "firebase-admin": "^12.7.0",
     "firebase-functions": "^6.1.0",

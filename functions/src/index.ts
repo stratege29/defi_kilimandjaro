@@ -106,3 +106,15 @@ export {
   adminDeletePlayer,
 } from "./admin/players";
 export { mergeAccounts } from "./account/mergeAccounts";
+
+// --- Pack Creator (pipeline contenu IA) — cf docs/pack_creator.md ---
+export { createPackJob, cancelPackJob, retryPackJob } from "./admin/packJobs";
+export { generateResearchPlan, approveResearchPlan } from "./admin/packPlan";
+export {
+  approveCandidate,
+  rejectCandidate,
+  updateCandidate,
+} from "./admin/packReview";
+export { setPackTopup } from "./admin/packTopup";
+export { drainPackJobs } from "./ai/drainPackJobs";
+export { weeklyPackTopup } from "./ai/weeklyPackTopup";
