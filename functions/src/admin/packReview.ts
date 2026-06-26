@@ -35,21 +35,15 @@ const CandRef = z.object({
   candId: z.string().min(3).max(60),
 });
 
-/** Calcule le prochain id `<packId>_NNN` (max existant + 1, padding 3). */
-async function nextDevinetteId(packId: string): Promise<string> {
-  const snap = await db()
-    .collection("packs")
-    .doc(packId)
-    .collection("devinettes")
-    .get();
+/** Prochain id `<packId>_NNN` à partir des ids déjà présents (max + 1). */
+function computeNextDeviId(packId: string, deviIds: string[]): string {
   const re = new RegExp(`^${packId}_(\\d+)$`);
   let max = 0;
-  for (const d of snap.docs) {
-    const m = d.id.match(re);
+  for (const id of deviIds) {
+    const m = id.match(re);
     if (m) max = Math.max(max, parseInt(m[1], 10));
   }
-  const n = max + 1;
-  return `${packId}_${String(n).padStart(3, "0")}`;
+  return `${packId}_${String(max + 1).padStart(3, "0")}`;
 }
 
 export const approveCandidate = onCall(
@@ -71,42 +65,55 @@ export const approveCandidate = onCall(
 
     const packId = cand.packId;
     const packRef = db().collection("packs").doc(packId);
+    const metaRef = packRef.collection("meta").doc("doc");
 
-    const metaSnap = await packRef.collection("meta").doc("doc").get();
-    const nextDraftVersion =
-      (metaSnap.data()?.next_draft_version as number | undefined) ?? 1;
+    // Allocation de l'id + écritures dans UNE transaction : deux approbations
+    // concurrentes ne peuvent pas attribuer le même `<packId>_NNN` (collision
+    // → perte d'un candidat). Firestore re-tente la transaction en cas de conflit.
+    const deviId = await db().runTransaction(async (tx) => {
+      const candCur = await tx.get(candDocRef);
+      const curData = candCur.data() as CandidateData | undefined;
+      if (curData?.reviewStatus === "approved" && curData.promotedDeviId) {
+        return curData.promotedDeviId; // déjà promu (idempotent)
+      }
+      const deviSnap = await tx.get(packRef.collection("devinettes").select());
+      const metaSnap = await tx.get(metaRef);
+      const nextDraftVersion =
+        (metaSnap.data()?.next_draft_version as number | undefined) ?? 1;
+      const id = computeNextDeviId(
+        packId,
+        deviSnap.docs.map((d) => d.id)
+      );
+      const now = FieldValue.serverTimestamp();
 
-    const deviId = await nextDevinetteId(packId);
-    const now = FieldValue.serverTimestamp();
-    const payload = devinetteFromCandidate(
-      cand,
-      deviId,
-      uid,
-      nextDraftVersion,
-      now,
-      null
-    );
-
-    await packRef.collection("devinettes").doc(deviId).set(payload, { merge: true });
-    await packRef.collection("meta").doc("doc").set(
-      {
-        id: packId,
-        pending_changes: FieldValue.increment(1),
-        next_draft_version: nextDraftVersion,
-        updated_at: now,
-        updated_by: uid,
-      },
-      { merge: true }
-    );
-    await candDocRef.set(
-      {
-        reviewStatus: "approved",
-        reviewedBy: uid,
-        reviewedAt: now,
-        promotedDeviId: deviId,
-      },
-      { merge: true }
-    );
+      tx.set(
+        packRef.collection("devinettes").doc(id),
+        devinetteFromCandidate(cand, id, uid, nextDraftVersion, now, null),
+        { merge: true }
+      );
+      tx.set(
+        metaRef,
+        {
+          id: packId,
+          pending_changes: FieldValue.increment(1),
+          next_draft_version: nextDraftVersion,
+          updated_at: now,
+          updated_by: uid,
+        },
+        { merge: true }
+      );
+      tx.set(
+        candDocRef,
+        {
+          reviewStatus: "approved",
+          reviewedBy: uid,
+          reviewedAt: now,
+          promotedDeviId: id,
+        },
+        { merge: true }
+      );
+      return id;
+    });
 
     logger.info("approveCandidate", { uid, jobId, candId, packId, deviId });
     return { ok: true, deviId };

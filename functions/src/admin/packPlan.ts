@@ -4,7 +4,12 @@ import { FieldValue } from "firebase-admin/firestore";
 import { z } from "zod";
 
 import { requireAdmin } from "../utils/auth";
-import { jobRef, db, DEFAULT_BATCH_SIZE, type ResearchPlan } from "./packJobsShared";
+import {
+  jobRef,
+  loadTagsWhitelist,
+  DEFAULT_BATCH_SIZE,
+  type ResearchPlan,
+} from "./packJobsShared";
 import { generateStructured, AI_SECRETS } from "../ai/provider";
 import { logUsage } from "../ai/usage";
 import {
@@ -34,13 +39,6 @@ const SECRET_OPTS = {
 };
 
 const JobIdInput = z.object({ jobId: z.string().min(3).max(120) });
-
-async function loadTagsWhitelist(): Promise<string[]> {
-  const snap = await db().collection("catalog").doc("tags_whitelist").get();
-  const raw = snap.exists ? snap.data() : null;
-  const list = Array.isArray(raw?.tags) ? raw!.tags : [];
-  return list.filter((t: unknown) => typeof t === "string");
-}
 
 type PlanResult = {
   subThemes: Array<{ name: string; targetCount: number; tags: string[] }>;

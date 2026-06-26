@@ -30,7 +30,8 @@ import {
   db,
   batchRef,
   candidatesRef,
-  loadForbiddenAnswers,
+  loadPackAnswerSet,
+  loadTagsWhitelist,
   isValidAnswer,
   riddleHidesAnswer,
   estimatedTimeForDifficulty,
@@ -48,15 +49,11 @@ type GenQuestion = {
   tags: string[];
 };
 
-const LEASE_MS = 8 * 60 * 1000;
+// Le lease DOIT dépasser le timeout de la fonction (540 s) pour qu'un lot
+// encore en cours ne soit pas re-réclamé par le tick suivant (sinon double
+// écriture des candidats avec un curseur `generated` périmé).
+const LEASE_MS = 12 * 60 * 1000;
 const CRITICAL_ERRORS = 5;
-
-async function loadTagsWhitelist(): Promise<string[]> {
-  const snap = await db().collection("catalog").doc("tags_whitelist").get();
-  const raw = snap.exists ? snap.data() : null;
-  const list = Array.isArray(raw?.tags) ? raw!.tags : [];
-  return list.filter((t: unknown) => typeof t === "string");
-}
 
 /** Tente de réserver le lot batchIndex (lease transactionnel). */
 async function claimBatch(jobId: string, batchIndex: number): Promise<boolean> {
@@ -160,7 +157,13 @@ async function processBatch(jobId: string): Promise<string> {
 
   try {
     const tags = await loadTagsWhitelist();
-    const forbidden = await loadForbiddenAnswers(packId, jobId);
+    // Réponses interdites = devinettes déjà publiées du pack + réponses déjà
+    // générées dans ce job (suivies sur le job, pas de re-scan des candidats).
+    const packAnswers = await loadPackAnswerSet(packId);
+    const usedAnswers: string[] = Array.isArray(progress.usedAnswers)
+      ? progress.usedAnswers
+      : [];
+    const forbidden = new Set<string>([...packAnswers, ...usedAnswers]);
     const forbiddenSample = Array.from(forbidden).slice(-400);
     const genStat: Record<string, number> = progress.genByDifficulty ?? {};
 
@@ -206,6 +209,7 @@ async function processBatch(jobId: string): Promise<string> {
     // 3. Vérification / sourcing (Wikipedia → grounding).
     let verifications: VerifyResult[] = [];
     let verifyUsage: AiUsage | null = null;
+    let verifyCalls = 0;
     if (accepted.length > 0) {
       const items = accepted.map((q, i) => ({
         index: i,
@@ -216,6 +220,7 @@ async function processBatch(jobId: string): Promise<string> {
       const v = await verifyBatch(items);
       verifications = v.results;
       verifyUsage = v.usage;
+      verifyCalls = v.calls;
       logUsage(`verify:${jobId}:${batchIndex}`, v.usage);
     }
     const verdictByIndex = new Map<number, VerifyResult>();
@@ -267,27 +272,35 @@ async function processBatch(jobId: string): Promise<string> {
       newGenByDifficulty[d] = (newGenByDifficulty[d] ?? 0) + (genDelta[d] ?? 0);
     }
     const newGenerated = generated + accepted.length;
+    const acceptedNorms = accepted.map((q) => normalize(q.answer));
     const totalUsd =
       gen.usage.estUsd + (verifyUsage?.estUsd ?? 0);
     const totalIn = gen.usage.inputTokens + (verifyUsage?.inputTokens ?? 0);
     const totalOut = gen.usage.outputTokens + (verifyUsage?.outputTokens ?? 0);
-    const callCount = verifyUsage ? 2 : 1;
+    // 1 appel génération + N appels vérification (verifyHybrid peut en faire 2
+    // : structuré + repli grounding).
+    const callCount = 1 + verifyCalls;
+
+    const progressUpdate: Record<string, unknown> = {
+      batchesDone: batchesDone + 1,
+      generated: newGenerated,
+      nextIndex: newGenerated,
+      verified: FieldValue.increment(verifiedPass),
+      rejectedAuto: FieldValue.increment(rejectedAuto),
+      duplicatesDropped: FieldValue.increment(duplicatesDropped),
+      genByDifficulty: newGenByDifficulty,
+      lastBatchAt: FieldValue.serverTimestamp(),
+      lastError: null,
+      consecutiveErrors: 0,
+    };
+    if (acceptedNorms.length > 0) {
+      progressUpdate.usedAnswers = FieldValue.arrayUnion(...acceptedNorms);
+    }
 
     await ref.set(
       {
         status: "generating",
-        progress: {
-          batchesDone: batchesDone + 1,
-          generated: newGenerated,
-          nextIndex: newGenerated,
-          verified: FieldValue.increment(verifiedPass),
-          rejectedAuto: FieldValue.increment(rejectedAuto),
-          duplicatesDropped: FieldValue.increment(duplicatesDropped),
-          genByDifficulty: newGenByDifficulty,
-          lastBatchAt: FieldValue.serverTimestamp(),
-          lastError: null,
-          consecutiveErrors: 0,
-        },
+        progress: progressUpdate,
         usage: {
           claudeCalls: FieldValue.increment(callCount),
           inputTokens: FieldValue.increment(totalIn),

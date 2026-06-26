@@ -1,14 +1,16 @@
 /**
  * Sélecteur de provider IA pour le Pack Creator.
  *
- * Moteur par défaut : **Gemini 2.5 Flash** (free tier) pour la génération +
- * vérification hybride Wikipedia→grounding → coût quasi nul.
- * Moteur premium optionnel : Claude Opus 4.8 (qualité max, payant) via le
- * paramètre `PACK_AI_ENGINE=claude` (nécessite d'ajouter ANTHROPIC_API_KEY à
- * AI_SECRETS et de poser le secret).
+ * Moteur par défaut : **Gemini 2.5 Flash** (free tier) pour la génération.
+ * La **vérification** est TOUJOURS Wikipedia→grounding (Gemini) quel que soit
+ * le moteur : `PACK_AI_ENGINE=claude` ne change QUE la génération, donc le
+ * moteur claude nécessite AUSSI `GEMINI_API_KEY`.
+ * Moteur premium optionnel : Claude Opus 4.8 via `PACK_AI_ENGINE=claude`
+ * (nécessite d'ajouter ANTHROPIC_API_KEY à AI_SECRETS + poser le secret).
  *
  * Les CFs qui génèrent attachent `AI_SECRETS`.
  */
+import { HttpsError } from "firebase-functions/v2/https";
 import { defineString } from "firebase-functions/params";
 import { type AiUsage } from "./usage";
 import { type SystemBlock, callStructured } from "./claudeClient";
@@ -36,6 +38,17 @@ export async function generateStructured<T>(params: {
   maxTokens?: number;
 }): Promise<{ data: T; usage: AiUsage }> {
   if (PACK_AI_ENGINE.value() === "claude") {
+    // Le secret Claude n'est attaché que si on l'a ajouté à AI_SECRETS : sans
+    // ça, `ANTHROPIC_API_KEY.value()` lèverait une erreur opaque. On détecte
+    // l'absence (variable d'env non injectée) et on rend l'erreur actionnable.
+    if (!process.env.ANTHROPIC_API_KEY) {
+      throw new HttpsError(
+        "failed-precondition",
+        "PACK_AI_ENGINE=claude mais ANTHROPIC_API_KEY n'est pas attaché : " +
+          "ajoutez ANTHROPIC_API_KEY à AI_SECRETS (provider.ts), posez le secret " +
+          "et redéployez, ou repassez PACK_AI_ENGINE=gemini."
+      );
+    }
     return callStructured<T>({
       system: params.system,
       user: params.user,
@@ -55,6 +68,6 @@ export async function generateStructured<T>(params: {
 /** Vérification + sourcing (Wikipedia d'abord, puis grounding). */
 export async function verifyBatch(
   items: VerifyItem[]
-): Promise<{ results: VerifyResult[]; usage: AiUsage }> {
+): Promise<{ results: VerifyResult[]; usage: AiUsage; calls: number }> {
   return verifyHybrid(items);
 }

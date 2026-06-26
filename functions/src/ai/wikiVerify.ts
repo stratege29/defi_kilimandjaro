@@ -96,8 +96,9 @@ const VERIFY_SYSTEM =
 
 export async function verifyHybrid(
   items: VerifyItem[]
-): Promise<{ results: VerifyResult[]; usage: AiUsage }> {
-  if (items.length === 0) return { results: [], usage: EMPTY_USAGE };
+): Promise<{ results: VerifyResult[]; usage: AiUsage; calls: number }> {
+  if (items.length === 0) return { results: [], usage: EMPTY_USAGE, calls: 0 };
+  let calls = 0;
 
   // 1. Wikipedia.
   const evidence = await mapLimit(items, 5, (q) => wikiLookup(q.answer));
@@ -113,6 +114,7 @@ export async function verifyHybrid(
 
   let usage = EMPTY_USAGE;
   let results: VerifyResult[] = [];
+  calls += 1; // appel de vérification structurée
   try {
     const out = await geminiStructured<{ results: VerifyResult[] }>({
       system: [{ text: VERIFY_SYSTEM }],
@@ -151,6 +153,7 @@ export async function verifyHybrid(
   });
 
   if (fallbackItems.length > 0) {
+    calls += 1; // appel grounding de repli
     try {
       const list = fallbackItems
         .map(
@@ -180,5 +183,5 @@ export async function verifyHybrid(
     }
   }
 
-  return { results: Array.from(byIndex.values()), usage };
+  return { results: Array.from(byIndex.values()), usage, calls };
 }

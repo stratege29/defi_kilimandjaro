@@ -122,35 +122,37 @@ export function riddleHidesAnswer(riddleFr: string, answer: string): boolean {
 }
 
 /**
- * Charge l'ensemble des réponses (normalisées) déjà prises pour un pack :
- *   1. devinettes existantes `packs/{packId}/devinettes`
- *   2. candidats déjà acceptés/en attente de ce job
+ * Réponses (normalisées) déjà publiées/en draft pour un pack
+ * (`packs/{packId}/devinettes`). Les réponses déjà générées dans le job sont
+ * suivies à part dans `progress.usedAnswers` (évite de re-scanner la collection
+ * de candidats à chaque lot — cf drainPackJobs).
  */
-export async function loadForbiddenAnswers(
-  packId: string,
-  jobId: string
-): Promise<Set<string>> {
+export async function loadPackAnswerSet(packId: string): Promise<Set<string>> {
   const set = new Set<string>();
-
   const deviSnap = await db()
     .collection("packs")
     .doc(packId)
     .collection("devinettes")
+    .select("answer_normalized")
     .get();
   for (const d of deviSnap.docs) {
     const norm = d.data().answer_normalized as string | undefined;
     if (norm) set.add(norm);
   }
-
-  const candSnap = await candidatesRef(jobId)
-    .where("reviewStatus", "in", ["pending", "approved"])
-    .get();
-  for (const c of candSnap.docs) {
-    const norm = c.data().answerNormalized as string | undefined;
-    if (norm) set.add(norm);
-  }
-
   return set;
+}
+
+/** Tags whitelistés (`catalog/tags_whitelist.tags`), cache mémoire 60 s. */
+let _tagsCache: { tags: string[]; expiresAt: number } | null = null;
+export async function loadTagsWhitelist(): Promise<string[]> {
+  const now = Date.now();
+  if (_tagsCache && _tagsCache.expiresAt > now) return _tagsCache.tags;
+  const snap = await db().collection("catalog").doc("tags_whitelist").get();
+  const raw = snap.exists ? snap.data() : null;
+  const list = Array.isArray(raw?.tags) ? raw!.tags : [];
+  const tags = list.filter((t: unknown): t is string => typeof t === "string");
+  _tagsCache = { tags, expiresAt: now + 60_000 };
+  return tags;
 }
 
 /** Construit le payload devinette v3 (status=draft) à partir d'un candidat. */

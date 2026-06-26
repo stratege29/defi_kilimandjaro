@@ -73,6 +73,8 @@ function toGeminiSchema(s: any): any {
     }
     return { type: "STRING" };
   }
+  // Gemini ne contraint pas les enums d'entiers : on laisse `INTEGER` libre et
+  // on valide la plage (ex. difficulty ∈ 1..4) côté serveur (drainPackJobs).
   if (t === "integer") return { type: "INTEGER" };
   if (t === "number") return { type: "NUMBER" };
   if (t === "boolean") return { type: "BOOLEAN" };

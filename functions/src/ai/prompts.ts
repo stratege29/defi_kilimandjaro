@@ -184,29 +184,6 @@ export function verifySchema(): Record<string, unknown> {
   };
 }
 
-export function verifySystemPrompt(): string {
-  return [
-    "Tu es vérificateur factuel pour un jeu de culture ivoirienne.",
-    "Pour chaque question (answer + riddleFr + explanationFr), vérifie via la",
-    "recherche web que la réponse et l'explication sont factuellement exactes et",
-    "que l'énigme désigne bien cette réponse.",
-    "Rends un verdict par index : `pass` (exact, sourcé), `uncertain` (douteux),",
-    "`fail` (faux/non vérifiable). Donne 1 à 3 sources (titre + URL réelles) et",
-    "une note courte. Sois strict : en cas de doute → `uncertain`.",
-  ].join("\n");
-}
-
-export function verifyUserPrompt(
-  items: Array<{ index: number; answer: string; riddleFr: string; explanationFr: string }>
-): string {
-  const list = items
-    .map(
-      (q) =>
-        `#${q.index} — réponse: ${q.answer} | énigme: ${q.riddleFr} | explication: ${q.explanationFr}`
-    )
-    .join("\n");
-  return [
-    "Vérifie chacune de ces questions et renvoie { results: [...] } avec un objet par index :",
-    list,
-  ].join("\n");
-}
+// Le system prompt + le format du prompt de vérification vivent dans
+// `wikiVerify.ts` (vérification hybride Wikipedia→grounding), qui construit son
+// propre contexte avec les extraits Wikipedia. Seul `verifySchema` est partagé.
