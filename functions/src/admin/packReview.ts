@@ -76,6 +76,9 @@ export const approveCandidate = onCall(
       if (curData?.reviewStatus === "approved" && curData.promotedDeviId) {
         return curData.promotedDeviId; // déjà promu (idempotent)
       }
+      // Contenu le plus frais lu dans la transaction (un updateCandidate
+      // concurrent peut avoir édité la réponse entre la lecture initiale et ici).
+      const source = curData ?? cand;
       const deviSnap = await tx.get(packRef.collection("devinettes").select());
       const metaSnap = await tx.get(metaRef);
       const nextDraftVersion =
@@ -88,7 +91,7 @@ export const approveCandidate = onCall(
 
       tx.set(
         packRef.collection("devinettes").doc(id),
-        devinetteFromCandidate(cand, id, uid, nextDraftVersion, now, null),
+        devinetteFromCandidate(source, id, uid, nextDraftVersion, now, null),
         { merge: true }
       );
       tx.set(
