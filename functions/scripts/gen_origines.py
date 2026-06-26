@@ -15,6 +15,7 @@ from PIL import ImageDraw
 import generate as G
 import compose_styles as C
 import gen_reels_theme as GRT
+import gen_hook as GH
 
 VW, VH = 1080, 1920
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -69,7 +70,8 @@ def build(count, offset=0):
     for i in range(count):
         o = data[(offset + i) % len(data)]
         w, org = o["word"], o["origin"]
-        GRT.encode(lambda t, W=w, O=org: frame(W, O, t), os.path.join(OUT, f"REEL_origine_{i}.mp4"))
+        GH.encode_hooked(lambda t, W=w, O=org: frame(W, O, t), os.path.join(OUT, f"REEL_origine_{i}.mp4"),
+                         GH.HOOKS["origine"][i % len(GH.HOOKS["origine"])], G.GOLD, GRT.FPS, GRT.DUR)
         frame(w, org, 0.20).save(os.path.join(OUT, f"COVER_origine_{i}.png"))
         cap = (f"D'où vient le mot {w} ? 🤯\n{org}\n\nTu savais ? Tag un pote qui sait pas 👇\n"
                f"#DéfiKilimandjaro #LeSaviezVous #Étymologie #CultureG")

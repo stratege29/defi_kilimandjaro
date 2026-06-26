@@ -17,6 +17,7 @@ from PIL import ImageDraw
 import generate as G
 import gen_phrase as GP
 import gen_reels_theme as GRT
+import gen_hook as GH
 
 VW, VH = 1080, 1920
 FPS, DUR = 30, 7.0
@@ -89,7 +90,8 @@ def build(count, offset=0):
     for i in range(count):
         o = data[(offset + i) % len(data)]
         sent, ans, tag = o["sentence"], o["answer"], o.get("tag", "Nouchi")
-        encode(lambda t, S=sent, A=ans, T=tag: frame(S, A, T, t), os.path.join(OUT, f"REEL_complete_{i}.mp4"))
+        GH.encode_hooked(lambda t, S=sent, A=ans, T=tag: frame(S, A, T, t), os.path.join(OUT, f"REEL_complete_{i}.mp4"),
+                         GH.HOOKS["complete"][i % len(GH.HOOKS["complete"])], G.GOLD, FPS, DUR)
         frame(sent, ans, tag, 0.6).save(os.path.join(OUT, f"COVER_complete_{i}.png"))
         htag = "#Nouchi #Abidjan" if tag in ("Nouchi", "Au maquis") else "#Culture225 #CôteDivoire"
         cap = (f"Complète : « {sent} » 👇\nDis ta réponse en commentaire — et tag un pote qui sèche.\n"
