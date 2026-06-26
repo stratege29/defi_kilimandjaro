@@ -5,18 +5,18 @@
  * `temperature`/`top_p`/`budget_tokens` (400 sur Opus 4.8). Streaming +
  * `.finalMessage()` pour éviter les timeouts sur les gros `max_tokens`.
  *
- * Clé en secret Firebase : ANTHROPIC_API_KEY (à attacher aux CFs qui appellent
- * ces helpers via `secrets: [ANTHROPIC_API_KEY]`).
+ * Clé : lue depuis `process.env.ANTHROPIC_API_KEY` (résolution par défaut de
+ * l'SDK). On N'appelle PAS `defineSecret` au chargement du module : sinon le
+ * déploiement du stack gratuit (Gemini) réclamerait ce secret inutilement.
+ * Pour le moteur premium claude : ajouter le nom "ANTHROPIC_API_KEY" à
+ * AI_SECRETS (provider.ts) et poser le secret.
  *
  * Les types de l'SDK peuvent être en retard sur les champs récents
  * (`output_config`, `web_search_20260209`, thinking adaptatif) : on construit le
  * corps en objet libre et on caste à l'appel — le runtime transmet les champs.
  */
 import Anthropic from "@anthropic-ai/sdk";
-import { defineSecret } from "firebase-functions/params";
 import { addUsage, EMPTY_USAGE, type AiUsage } from "./usage";
-
-export const ANTHROPIC_API_KEY = defineSecret("ANTHROPIC_API_KEY");
 
 /** Modèle par défaut — voir docs claude-api : ne jamais suffixer de date. */
 export const CLAUDE_MODEL = "claude-opus-4-8";
@@ -49,7 +49,8 @@ function usageFromMessage(msg: { usage?: Record<string, number> }): AiUsage {
 let _client: Anthropic | null = null;
 function client(): Anthropic {
   if (!_client) {
-    _client = new Anthropic({ apiKey: ANTHROPIC_API_KEY.value() });
+    // L'SDK lit ANTHROPIC_API_KEY depuis l'env (injecté si le secret est attaché).
+    _client = new Anthropic();
   }
   return _client;
 }

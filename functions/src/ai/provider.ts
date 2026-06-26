@@ -23,7 +23,8 @@ export const PACK_AI_ENGINE = defineString("PACK_AI_ENGINE", {
 
 /**
  * Secrets à attacher aux CFs IA. Par défaut : GEMINI uniquement (stack gratuit).
- * Pour activer le moteur Claude : ajouter ANTHROPIC_API_KEY ici + poser le secret.
+ * Pour activer le moteur Claude : ajouter le nom de secret "ANTHROPIC_API_KEY"
+ * ici (v2 accepte les chaînes), puis `firebase functions:secrets:set` + redéployer.
  */
 export const AI_SECRETS = [GEMINI_API_KEY];
 
@@ -38,9 +39,9 @@ export async function generateStructured<T>(params: {
   maxTokens?: number;
 }): Promise<{ data: T; usage: AiUsage }> {
   if (PACK_AI_ENGINE.value() === "claude") {
-    // Le secret Claude n'est attaché que si on l'a ajouté à AI_SECRETS : sans
-    // ça, `ANTHROPIC_API_KEY.value()` lèverait une erreur opaque. On détecte
-    // l'absence (variable d'env non injectée) et on rend l'erreur actionnable.
+    // Le secret Claude n'est attaché (donc injecté en env) que si on l'a ajouté
+    // à AI_SECRETS. On détecte son absence et on rend l'erreur actionnable
+    // plutôt que de laisser l'SDK échouer sans clé.
     if (!process.env.ANTHROPIC_API_KEY) {
       throw new HttpsError(
         "failed-precondition",
