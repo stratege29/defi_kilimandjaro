@@ -17,6 +17,7 @@ from PIL import ImageDraw
 import generate as G
 import gen_phrase as GP
 import gen_reels_theme as GRT
+import gen_hook as GH
 
 VW, VH = 1080, 1920
 FPS, DUR = 30, 7.0
@@ -74,7 +75,8 @@ def build(count, offset=0):
     for i in range(count):
         o = data[(offset + i) % len(data)]
         nou = o["nouchi"]
-        encode(lambda t, N=nou: frame(N, t), os.path.join(OUT, f"REEL_explique_{i}.mp4"))
+        GH.encode_hooked(lambda t, N=nou: frame(N, t), os.path.join(OUT, f"REEL_explique_{i}.mp4"),
+                         GH.HOOKS["explique"][i % len(GH.HOOKS["explique"])], GP.ACC["nouchi"], FPS, DUR)
         frame(nou, 0.6).save(os.path.join(OUT, f"COVER_explique_{i}.png"))
         cap = (f"Ta daronne a reçu ce message 😅\n« {nou} »\nTraduis-lui en commentaire 👇 et tag un pote bilingue.\n\n"
                f"#Nouchi #Abidjan #CôteDivoire #DéfiKilimandjaro #225")
