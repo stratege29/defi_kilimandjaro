@@ -83,6 +83,17 @@ class _DuelCreateViewState extends ConsumerState<DuelCreateView> {
                         style: AppTypography.crimson(),
                         textAlign: TextAlign.center,
                       ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () => setState(() {
+                          _creation =
+                              ref.read(duelRepositoryProvider).createDuel();
+                        }),
+                        child: Text(
+                          'Réessayer',
+                          style: AppTypography.bebas(),
+                        ),
+                      ),
                     ],
                   ),
                 ),
