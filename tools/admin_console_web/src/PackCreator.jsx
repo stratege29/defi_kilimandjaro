@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   collection,
+  collectionGroup,
   query,
   where,
   orderBy,
@@ -33,6 +34,7 @@ export default function PackCreator() {
   const [selectedId, setSelectedId] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
   const [packIds, setPackIds] = useState([]);
+  const [mode, setMode] = useState('jobs'); // 'jobs' | 'bypack'
 
   useEffect(() => {
     const q = query(collection(db, 'pack_jobs'), orderBy('createdAt', 'desc'));
@@ -62,6 +64,20 @@ export default function PackCreator() {
     <>
       <header className="topbar">
         <h2>Pack Creator</h2>
+        <div className="tabs" style={{ margin: 0, border: 0 }}>
+          <button
+            className={mode === 'jobs' ? 'tab active' : 'tab'}
+            onClick={() => setMode('jobs')}
+          >
+            Jobs
+          </button>
+          <button
+            className={mode === 'bypack' ? 'tab active' : 'tab'}
+            onClick={() => setMode('bypack')}
+          >
+            En attente par pack
+          </button>
+        </div>
         <span className="spacer" />
         <button className="btn primary" onClick={() => setShowCreate(true)}>
           Nouveau pack
@@ -69,28 +85,34 @@ export default function PackCreator() {
       </header>
 
       {error && <p className="error block">Accès refusé / erreur : {error}</p>}
-      {!error && jobs === null && <p className="muted block">Chargement…</p>}
 
-      <div className="row" style={{ alignItems: 'flex-start', gap: 16 }}>
-        <div style={{ flex: '0 0 360px' }}>
-          {jobs?.length === 0 && <p className="muted block">Aucun job.</p>}
-          {jobs?.map((j) => (
-            <JobRow
-              key={j.id}
-              job={j}
-              active={j.id === selectedId}
-              onClick={() => setSelectedId(j.id)}
-            />
-          ))}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {selected ? (
-            <JobDetail job={selected} packIds={packIds} />
-          ) : (
-            <p className="muted block">Sélectionne un job.</p>
-          )}
-        </div>
-      </div>
+      {mode === 'bypack' ? (
+        <PackReview packIds={packIds} />
+      ) : (
+        <>
+          {!error && jobs === null && <p className="muted block">Chargement…</p>}
+          <div className="row" style={{ alignItems: 'flex-start', gap: 16 }}>
+            <div style={{ flex: '0 0 360px' }}>
+              {jobs?.length === 0 && <p className="muted block">Aucun job.</p>}
+              {jobs?.map((j) => (
+                <JobRow
+                  key={j.id}
+                  job={j}
+                  active={j.id === selectedId}
+                  onClick={() => setSelectedId(j.id)}
+                />
+              ))}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {selected ? (
+                <JobDetail job={selected} packIds={packIds} />
+              ) : (
+                <p className="muted block">Sélectionne un job.</p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       {showCreate && <CreateModal onClose={() => setShowCreate(false)} />}
     </>
@@ -398,10 +420,12 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(cand);
   const [busy, setBusy] = useState(false);
-  const [targetPack, setTargetPack] = useState(cand.packId);
+  const effPack = cand.effectivePackId || cand.packId;
+  const [targetPack, setTargetPack] = useState(effPack);
 
   // Options du sélecteur : packs existants + le pack du candidat (toujours présent).
-  const packOptions = Array.from(new Set([cand.packId, ...packIds])).filter(Boolean);
+  const packOptions = Array.from(new Set([cand.packId, effPack, ...packIds])).filter(Boolean);
+  const moved = targetPack && targetPack !== effPack;
 
   const act = async (name, data) => {
     setBusy(true);
@@ -460,6 +484,10 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
         </p>
       )}
 
+      {effPack !== cand.packId && (
+        <p className="muted small">en attente sous le pack <b>{effPack}</b></p>
+      )}
+
       {cand.reviewStatus !== 'approved' && (
         <div className="row" style={{ marginTop: 8, gap: 6 }}>
           <span className="muted small">Pack :</span>
@@ -475,6 +503,18 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
               </option>
             ))}
           </select>
+          {moved && (
+            <button
+              className="btn ghost"
+              disabled={busy}
+              title="Déplace la question (toujours en attente) vers ce pack"
+              onClick={() =>
+                act('reassignCandidate', { jobId, candId: cand.candId, targetPackId: targetPack })
+              }
+            >
+              Réaffecter
+            </button>
+          )}
         </div>
       )}
 
@@ -524,9 +564,7 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
               act('approveCandidate', {
                 jobId,
                 candId: cand.candId,
-                ...(targetPack && targetPack !== cand.packId
-                  ? { targetPackId: targetPack }
-                  : {}),
+                ...(targetPack ? { targetPackId: targetPack } : {}),
               })
             }
           >
@@ -535,6 +573,88 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
               : 'Approuver'}
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+function PackReview({ packIds }) {
+  const [pack, setPack] = useState('');
+  const [filter, setFilter] = useState('pending');
+  const [cands, setCands] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!pack) {
+      setCands(null);
+      return undefined;
+    }
+    setCands(null);
+    setError(null);
+    // Agrège tous les jobs : candidats dont le pack de destination = pack choisi.
+    const q = query(
+      collectionGroup(db, 'candidates'),
+      where('effectivePackId', '==', pack),
+      where('reviewStatus', '==', filter),
+    );
+    return onSnapshot(
+      q,
+      (snap) =>
+        setCands(
+          snap.docs
+            .map((d) => ({
+              id: d.id,
+              jobId: d.ref.parent.parent?.id,
+              ...d.data(),
+            }))
+            .sort((a, b) => (a.candId || '').localeCompare(b.candId || '')),
+        ),
+      (e) => {
+        setCands([]);
+        setError(`${e.code}: ${e.message}`);
+      },
+    );
+  }, [pack, filter]);
+
+  return (
+    <div style={{ padding: '0 24px' }}>
+      <div className="row" style={{ marginTop: 16, gap: 8 }}>
+        <span className="muted small">Pack :</span>
+        <select
+          value={pack}
+          onChange={(e) => setPack(e.target.value)}
+          style={{ margin: 0, maxWidth: 260 }}
+        >
+          <option value="">— choisir un pack —</option>
+          {packIds.map((p) => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
+        <select value={filter} onChange={(e) => setFilter(e.target.value)} style={{ margin: 0 }}>
+          <option value="pending">En attente</option>
+          <option value="approved">Approuvées</option>
+          <option value="rejected">Rejetées</option>
+        </select>
+      </div>
+
+      {!pack && (
+        <p className="muted block">Choisis un pack pour voir ses questions en revue.</p>
+      )}
+      {pack && error && <p className="error block">Erreur : {error}</p>}
+      {pack && !error && cands === null && <p className="muted block">Chargement…</p>}
+      {pack && !error && cands?.length === 0 && (
+        <p className="muted block">Aucune question ({filter}) destinée à {pack}.</p>
+      )}
+
+      <div className="cards">
+        {cands?.map((c) => (
+          <CandidateCard
+            key={`${c.jobId}_${c.id}`}
+            jobId={c.jobId}
+            cand={c}
+            packIds={packIds}
+          />
+        ))}
       </div>
     </div>
   );

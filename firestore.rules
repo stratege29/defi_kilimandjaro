@@ -306,6 +306,13 @@ service cloud.firestore {
       }
     }
 
+    // Lecture collectionGroup des candidats (vue « En attente par pack »,
+    // agrège tous les jobs). Écriture serveur uniquement.
+    match /{path=**}/candidates/{candId} {
+      allow read: if isEditor();
+      allow write: if false;
+    }
+
     // Config de ré-approvisionnement hebdomadaire par pack (CF setPackTopup).
     match /pack_topup/{packId} {
       allow read: if isEditor();

@@ -73,7 +73,11 @@ export type CandidateData = {
     notes: string;
   };
   reviewStatus: "pending" | "approved" | "rejected";
+  /** Pack de destination courant (= packId, ou autre pack si réaffectée). */
+  effectivePackId?: string;
+  targetPackId?: string | null;
   promotedDeviId?: string | null;
+  promotedPackId?: string | null;
   rejectionReason?: string | null;
   reviewedBy?: string | null;
 };

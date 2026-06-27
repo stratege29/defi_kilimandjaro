@@ -68,10 +68,11 @@ export const approveCandidate = onCall(
       return { ok: true, deviId: cand.promotedDeviId };
     }
 
-    // Pack cible : le pack du job, ou un autre pack si réaffectation. Dans ce
-    // cas on s'assure que le pack existe au catalogue avant de promouvoir.
-    const packId = targetPackId ?? cand.packId;
-    if (targetPackId && targetPackId !== cand.packId) {
+    // Pack cible : explicite (param), sinon la destination déjà fixée par une
+    // réaffectation (effectivePackId), sinon le pack du job. On s'assure que le
+    // pack existe au catalogue s'il diffère du pack du job.
+    const packId = targetPackId ?? cand.effectivePackId ?? cand.packId;
+    if (packId !== cand.packId) {
       await ensurePackInCatalog(packId, uid);
     }
     const packRef = db().collection("packs").doc(packId);
@@ -132,6 +133,55 @@ export const approveCandidate = onCall(
 
     logger.info("approveCandidate", { uid, jobId, candId, packId, deviId });
     return { ok: true, deviId };
+  }
+);
+
+const ReassignInput = z.object({
+  jobId: z.string().min(3).max(120),
+  candId: z.string().min(3).max(60),
+  targetPackId: z.string().regex(PACK_ID_RE, "targetPackId invalide"),
+});
+
+/**
+ * Réaffecte une question EN ATTENTE vers un autre pack (sans l'approuver) :
+ * la question reste `pending` mais apparaît désormais dans la revue du pack
+ * cible (`effectivePackId`). Elle n'entre dans aucun draft publiable tant
+ * qu'elle n'est pas approuvée.
+ */
+export const reassignCandidate = onCall(
+  OPTS,
+  async (req): Promise<{ ok: true; effectivePackId: string }> => {
+    const uid = requireEditor(req.auth);
+    const parsed = ReassignInput.safeParse(req.data);
+    if (!parsed.success) {
+      throw new HttpsError("invalid-argument", parsed.error.message);
+    }
+    const { jobId, candId, targetPackId } = parsed.data;
+    const ref = candidatesRef(jobId).doc(candId);
+    const snap = await ref.get();
+    if (!snap.exists) throw new HttpsError("not-found", "Candidat introuvable.");
+    const cand = snap.data() as CandidateData;
+    if (cand.reviewStatus === "approved") {
+      throw new HttpsError(
+        "failed-precondition",
+        "Question déjà approuvée — réaffectation impossible."
+      );
+    }
+    if (targetPackId !== cand.packId) {
+      await ensurePackInCatalog(targetPackId, uid);
+    }
+    await ref.set(
+      {
+        targetPackId,
+        effectivePackId: targetPackId,
+        reviewStatus: "pending",
+        reviewedBy: uid,
+        reviewedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+    logger.info("reassignCandidate", { uid, jobId, candId, targetPackId });
+    return { ok: true, effectivePackId: targetPackId };
   }
 );
 

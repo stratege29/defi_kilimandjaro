@@ -20,6 +20,12 @@ sourcée, revue humaine, publication, puis ré-approvisionnement hebdomadaire.
 5. **Revue** — chaque question est éditable / approuvable / rejetable. Approuver
    copie le candidat dans `packs/{packId}/devinettes` (status `draft`,
    `letters_pool`/`answer_normalized` recalculés).
+   - **Réaffectation** (`reassignCandidate`) : une question EN ATTENTE peut être
+     déplacée vers un autre pack (`effectivePackId`) — elle reste `pending` et
+     apparaît dans la revue de ce pack. Tant qu'elle n'est pas approuvée, elle
+     n'entre dans AUCUN draft → republier le pack cible ne la pousse pas.
+   - **Vue « En attente par pack »** (onglet) : agrège via `collectionGroup` les
+     candidats de tous les jobs destinés à un pack donné (filtre statut).
 6. **Publication** — bouton « Publier le pack » → `publishPack` existant
    (versioning + OTA + mirroir pool duel inchangés).
 7. **Ré-appro hebdo** — `setPackTopup` active `pack_topup/{packId}` ; le cron
@@ -65,8 +71,9 @@ défaut `gemini`).
    ```sh
    cd functions && npm run build
    firebase deploy --only functions:createPackJob,functions:cancelPackJob,functions:retryPackJob,functions:generateResearchPlan,functions:approveResearchPlan,functions:approveCandidate,functions:rejectCandidate,functions:updateCandidate,functions:setPackTopup,functions:drainPackJobs,functions:weeklyPackTopup
-   firebase deploy --only firestore:rules
+   firebase deploy --only firestore:rules,firestore:indexes
    ```
+   (l'index `collectionGroup` sur `candidates` est requis pour la vue « par pack ».)
    (Le cron `drainPackJobs` ne consomme l'API que s'il y a un job actif.)
 3. **Console admin** : `cd tools/admin_console_web && npm run build` puis
    `firebase deploy --only hosting` (site `kilimandjaro-admin-dev`).

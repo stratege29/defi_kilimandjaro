@@ -240,6 +240,7 @@ async function processBatch(jobId: string): Promise<string> {
         candId,
         jobId,
         packId,
+        effectivePackId: packId, // pack de destination (modifiable par réaffectation)
         batchIndex,
         country: q.country || "ci",
         answer: q.answer,
