@@ -3,6 +3,7 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
+import 'package:defi_kilimandjaro/presentation/duel/duel_errors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -64,10 +65,26 @@ class _DuelCreateViewState extends ConsumerState<DuelCreateView> {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
-                  child: Text(
-                    'Erreur création du duel : ${snap.error}',
-                    style: AppTypography.crimson(),
-                    textAlign: TextAlign.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        friendlyDuelError(snap.error),
+                        style: AppTypography.crimson(),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () => setState(() {
+                          _creation =
+                              ref.read(duelRepositoryProvider).createDuel();
+                        }),
+                        child: Text(
+                          'Réessayer',
+                          style: AppTypography.bebas(),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );

@@ -3,6 +3,7 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
+import 'package:defi_kilimandjaro/presentation/duel/duel_errors.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -66,7 +67,7 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Connexion impossible : $e',
+            friendlyDuelError(e),
             style: AppTypography.bebas(),
           ),
           backgroundColor: AppColors.rouge,
@@ -263,7 +264,7 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Connexion impossible : $e',
+            friendlyDuelError(e),
             style: AppTypography.bebas(),
           ),
           backgroundColor: AppColors.rouge,
