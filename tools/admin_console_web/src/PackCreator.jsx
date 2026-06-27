@@ -469,14 +469,23 @@ function CandidateCard({ jobId, cand }) {
 
 function CreateModal({ onClose }) {
   const [packId, setPackId] = useState('');
+  const [idTouched, setIdTouched] = useState(false);
   const [topic, setTopic] = useState('');
   const [targetTotal, setTargetTotal] = useState(500);
   const [busy, setBusy] = useState(false);
 
+  const idValid = /^[a-z][a-z0-9_]{1,31}$/.test(packId);
+
+  const onTopic = (v) => {
+    setTopic(v);
+    if (!idTouched) setPackId(slugifyPackId(v)); // auto-dérive l'id tant qu'il n'est pas édité
+  };
+
   const submit = async () => {
+    if (!idValid) return;
     setBusy(true);
     try {
-      await call('createPackJob', { packId: packId.trim(), topic: topic.trim(), targetTotal: Number(targetTotal) });
+      await call('createPackJob', { packId, topic: topic.trim(), targetTotal: Number(targetTotal) });
       onClose();
     } catch (e) {
       alert(`${e.code || ''} ${e.message}`);
@@ -488,22 +497,53 @@ function CreateModal({ onClose }) {
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h3>Nouveau pack</h3>
-        <label className="muted small">Identifiant (snake_case)</label>
-        <input value={packId} onChange={(e) => setPackId(e.target.value)} placeholder="ex: histoire_ci" />
         <label className="muted small">Sujet / thème</label>
-        <input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="ex: Histoire de la Côte d'Ivoire" />
+        <input
+          value={topic}
+          onChange={(e) => onTopic(e.target.value)}
+          placeholder="ex: Histoire de la Côte d'Ivoire"
+          autoFocus
+        />
+        <label className="muted small">Identifiant (snake_case)</label>
+        <input
+          value={packId}
+          onChange={(e) => {
+            setIdTouched(true);
+            setPackId(slugifyPackId(e.target.value));
+          }}
+          placeholder="ex: histoire_ci"
+        />
+        <div className="muted small" style={{ marginTop: 4 }}>
+          {packId
+            ? idValid
+              ? `Sera créé : ${packId}`
+              : 'Min. 2 caractères, commence par une lettre.'
+            : 'Généré depuis le sujet, éditable.'}
+        </div>
         <label className="muted small">Nombre de questions</label>
         <input type="number" value={targetTotal} onChange={(e) => setTargetTotal(e.target.value)} />
         <div className="row actions" style={{ marginTop: 12 }}>
           <span className="spacer" />
           <button className="btn ghost" onClick={onClose}>Annuler</button>
-          <button className="btn primary" disabled={busy || !packId || !topic} onClick={submit}>
+          <button className="btn primary" disabled={busy || !idValid || !topic.trim()} onClick={submit}>
             {busy ? 'Création…' : 'Créer'}
           </button>
         </div>
       </div>
     </div>
   );
+}
+
+/** Transforme un texte libre en identifiant snake_case (^[a-z][a-z0-9_]{1,31}$). */
+function slugifyPackId(input) {
+  return (input || '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '') // retire les accents
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_') // non-alphanumérique → _
+    .replace(/_+/g, '_') // collapse les _ multiples
+    .replace(/^[^a-z]+/, '') // doit commencer par une lettre
+    .slice(0, 32);
 }
 
 function normalizePlan(plan) {
