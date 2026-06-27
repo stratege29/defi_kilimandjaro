@@ -6,7 +6,8 @@ import { z } from "zod";
 import { requireAdmin } from "../utils/auth";
 import {
   jobRef,
-  db,
+  ensurePackInCatalog,
+  PACK_ID_RE,
   DEFAULT_TARGET_TOTAL,
   DEFAULT_BATCH_SIZE,
   DEFAULT_CAPS,
@@ -23,8 +24,6 @@ import {
  * Guard : requireAdmin.
  */
 
-const PACK_ID_RE = /^[a-z][a-z0-9_]{1,31}$/;
-
 const CreateInput = z.object({
   packId: z.string().regex(PACK_ID_RE, "packId invalide"),
   topic: z.string().min(3).max(160),
@@ -38,37 +37,6 @@ const CreateInput = z.object({
     })
     .optional(),
 });
-
-/** Garantit la présence d'une entrée pack (cachée) dans catalog/index.packs[]. */
-async function ensurePackInCatalog(packId: string, uid: string): Promise<void> {
-  const ref = db().collection("catalog").doc("index");
-  await db().runTransaction(async (tx) => {
-    const snap = await tx.get(ref);
-    const data = snap.exists ? snap.data() ?? {} : {};
-    const packs: Array<Record<string, unknown>> = Array.isArray(data.packs)
-      ? [...data.packs]
-      : [];
-    if (packs.some((p) => p && p.id === packId)) return;
-    packs.push({
-      id: packId,
-      visible: false,
-      bundled: false,
-      ordering: packs.length + 100,
-      free_choice_eligible: false,
-      unlock_cost_cauris: 0,
-    });
-    tx.set(
-      ref,
-      {
-        packs,
-        catalog_version: ((data.catalog_version as number | undefined) ?? 0) + 1,
-        updated_at: FieldValue.serverTimestamp(),
-        updated_by: uid,
-      },
-      { merge: true }
-    );
-  });
-}
 
 export const createPackJob = onCall(
   { region: "europe-west1", enforceAppCheck: false, cors: true },

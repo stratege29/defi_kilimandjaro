@@ -10,9 +10,11 @@ import {
   candidatesRef,
   db,
   devinetteFromCandidate,
+  ensurePackInCatalog,
   estimatedTimeForDifficulty,
   isValidAnswer,
   riddleHidesAnswer,
+  PACK_ID_RE,
   type CandidateData,
 } from "./packJobsShared";
 
@@ -33,6 +35,9 @@ const OPTS = { region: "europe-west1" as const, enforceAppCheck: false, cors: tr
 const CandRef = z.object({
   jobId: z.string().min(3).max(120),
   candId: z.string().min(3).max(60),
+  // Réaffectation optionnelle : promeut la question dans un AUTRE pack
+  // (qui la verra alors dans ses drafts / sa publication).
+  targetPackId: z.string().regex(PACK_ID_RE, "targetPackId invalide").optional(),
 });
 
 /** Prochain id `<packId>_NNN` à partir des ids déjà présents (max + 1). */
@@ -54,7 +59,7 @@ export const approveCandidate = onCall(
     if (!parsed.success) {
       throw new HttpsError("invalid-argument", parsed.error.message);
     }
-    const { jobId, candId } = parsed.data;
+    const { jobId, candId, targetPackId } = parsed.data;
     const candDocRef = candidatesRef(jobId).doc(candId);
     const candSnap = await candDocRef.get();
     if (!candSnap.exists) throw new HttpsError("not-found", "Candidat introuvable.");
@@ -63,7 +68,12 @@ export const approveCandidate = onCall(
       return { ok: true, deviId: cand.promotedDeviId };
     }
 
-    const packId = cand.packId;
+    // Pack cible : le pack du job, ou un autre pack si réaffectation. Dans ce
+    // cas on s'assure que le pack existe au catalogue avant de promouvoir.
+    const packId = targetPackId ?? cand.packId;
+    if (targetPackId && targetPackId !== cand.packId) {
+      await ensurePackInCatalog(packId, uid);
+    }
     const packRef = db().collection("packs").doc(packId);
     const metaRef = packRef.collection("meta").doc("doc");
 
@@ -78,7 +88,8 @@ export const approveCandidate = onCall(
       }
       // Contenu le plus frais lu dans la transaction (un updateCandidate
       // concurrent peut avoir édité la réponse entre la lecture initiale et ici).
-      const source = curData ?? cand;
+      // `packId` forcé au pack cible pour le champ `pack` + le préfixe d'id.
+      const source = { ...(curData ?? cand), packId };
       const deviSnap = await tx.get(packRef.collection("devinettes").select());
       const metaSnap = await tx.get(metaRef);
       const nextDraftVersion =
@@ -112,6 +123,7 @@ export const approveCandidate = onCall(
           reviewedBy: uid,
           reviewedAt: now,
           promotedDeviId: id,
+          promotedPackId: packId,
         },
         { merge: true }
       );

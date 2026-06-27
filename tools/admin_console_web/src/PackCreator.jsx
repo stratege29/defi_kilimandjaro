@@ -5,6 +5,8 @@ import {
   where,
   orderBy,
   onSnapshot,
+  doc,
+  getDoc,
 } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions } from './firebase.js';
@@ -30,6 +32,7 @@ export default function PackCreator() {
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [packIds, setPackIds] = useState([]);
 
   useEffect(() => {
     const q = query(collection(db, 'pack_jobs'), orderBy('createdAt', 'desc'));
@@ -38,6 +41,16 @@ export default function PackCreator() {
       (snap) => setJobs(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
       (e) => setError(`${e.code}: ${e.message}`),
     );
+  }, []);
+
+  // Liste des packs existants (catalog/index) pour la réaffectation des questions.
+  useEffect(() => {
+    getDoc(doc(db, 'catalog', 'index'))
+      .then((s) => {
+        const packs = Array.isArray(s.data()?.packs) ? s.data().packs : [];
+        setPackIds(packs.map((p) => p.id).filter(Boolean).sort());
+      })
+      .catch(() => setPackIds([]));
   }, []);
 
   const selected = useMemo(
@@ -72,7 +85,7 @@ export default function PackCreator() {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           {selected ? (
-            <JobDetail job={selected} />
+            <JobDetail job={selected} packIds={packIds} />
           ) : (
             <p className="muted block">Sélectionne un job.</p>
           )}
@@ -109,7 +122,7 @@ function JobRow({ job, active, onClick }) {
   );
 }
 
-function JobDetail({ job }) {
+function JobDetail({ job, packIds }) {
   const [busy, setBusy] = useState(null);
 
   const run = async (label, fn) => {
@@ -186,7 +199,7 @@ function JobDetail({ job }) {
       )}
 
       {['generating', 'review', 'ready', 'published'].includes(job.status) && (
-        <CandidateReview job={job} />
+        <CandidateReview job={job} packIds={packIds} />
       )}
     </div>
   );
@@ -308,7 +321,7 @@ function PlanEditor({ job }) {
   }
 }
 
-function CandidateReview({ job }) {
+function CandidateReview({ job, packIds }) {
   const [filter, setFilter] = useState('pending');
   const [cands, setCands] = useState(null);
   const [error, setError] = useState(null);
@@ -374,17 +387,21 @@ function CandidateReview({ job }) {
 
       <div className="cards">
         {cands?.map((c) => (
-          <CandidateCard key={c.id} jobId={job.id} cand={c} />
+          <CandidateCard key={c.id} jobId={job.id} cand={c} packIds={packIds} />
         ))}
       </div>
     </div>
   );
 }
 
-function CandidateCard({ jobId, cand }) {
+function CandidateCard({ jobId, cand, packIds = [] }) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(cand);
   const [busy, setBusy] = useState(false);
+  const [targetPack, setTargetPack] = useState(cand.packId);
+
+  // Options du sélecteur : packs existants + le pack du candidat (toujours présent).
+  const packOptions = Array.from(new Set([cand.packId, ...packIds])).filter(Boolean);
 
   const act = async (name, data) => {
     setBusy(true);
@@ -434,7 +451,32 @@ function CandidateCard({ jobId, cand }) {
         </div>
       )}
       {v.notes && <p className="muted small">Note : {v.notes}</p>}
-      {cand.promotedDeviId && <p className="muted small">→ {cand.promotedDeviId}</p>}
+      {cand.promotedDeviId && (
+        <p className="muted small">
+          → {cand.promotedDeviId}
+          {cand.promotedPackId && cand.promotedPackId !== cand.packId
+            ? ` (pack ${cand.promotedPackId})`
+            : ''}
+        </p>
+      )}
+
+      {cand.reviewStatus !== 'approved' && (
+        <div className="row" style={{ marginTop: 8, gap: 6 }}>
+          <span className="muted small">Pack :</span>
+          <select
+            value={targetPack}
+            onChange={(e) => setTargetPack(e.target.value)}
+            style={{ margin: 0, maxWidth: 220 }}
+          >
+            {packOptions.map((p) => (
+              <option key={p} value={p}>
+                {p}
+                {p === cand.packId ? ' (ce job)' : ''}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="row actions" style={{ marginTop: 8, gap: 8 }}>
         {!editing ? (
@@ -478,9 +520,19 @@ function CandidateCard({ jobId, cand }) {
           <button
             className="btn primary"
             disabled={busy}
-            onClick={() => act('approveCandidate', { jobId, candId: cand.candId })}
+            onClick={() =>
+              act('approveCandidate', {
+                jobId,
+                candId: cand.candId,
+                ...(targetPack && targetPack !== cand.packId
+                  ? { targetPackId: targetPack }
+                  : {}),
+              })
+            }
           >
-            Approuver
+            {targetPack && targetPack !== cand.packId
+              ? `Approuver → ${targetPack}`
+              : 'Approuver'}
           </button>
         )}
       </div>

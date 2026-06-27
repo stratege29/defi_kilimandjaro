@@ -10,8 +10,10 @@
  * `packs/{packId}/devinettes` : le staging garde le chemin publishPack intact
  * et découple l'id mutable de l'id final `<packId>_NNN`.
  */
-import { getFirestore } from "firebase-admin/firestore";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { normalize, lettersPoolFromAnswer } from "../utils/normalize";
+
+export const PACK_ID_RE = /^[a-z][a-z0-9_]{1,31}$/;
 
 export const JOBS = "pack_jobs";
 export const CANDIDATES = "candidates";
@@ -140,6 +142,40 @@ export async function loadPackAnswerSet(packId: string): Promise<Set<string>> {
     if (norm) set.add(norm);
   }
   return set;
+}
+
+/** Garantit la présence d'une entrée pack (cachée) dans catalog/index.packs[]. */
+export async function ensurePackInCatalog(
+  packId: string,
+  uid: string
+): Promise<void> {
+  const ref = db().collection("catalog").doc("index");
+  await db().runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const data = snap.exists ? snap.data() ?? {} : {};
+    const packs: Array<Record<string, unknown>> = Array.isArray(data.packs)
+      ? [...data.packs]
+      : [];
+    if (packs.some((p) => p && p.id === packId)) return;
+    packs.push({
+      id: packId,
+      visible: false,
+      bundled: false,
+      ordering: packs.length + 100,
+      free_choice_eligible: false,
+      unlock_cost_cauris: 0,
+    });
+    tx.set(
+      ref,
+      {
+        packs,
+        catalog_version: ((data.catalog_version as number | undefined) ?? 0) + 1,
+        updated_at: FieldValue.serverTimestamp(),
+        updated_by: uid,
+      },
+      { merge: true }
+    );
+  });
 }
 
 /** Tags whitelistés (`catalog/tags_whitelist.tags`), cache mémoire 60 s. */
