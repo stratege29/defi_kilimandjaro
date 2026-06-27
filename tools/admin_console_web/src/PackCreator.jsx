@@ -176,8 +176,13 @@ function JobDetail({ job }) {
         )}
       </div>
 
-      {(job.status === 'plan_review' || job.status === 'plan_approved') && (
-        <PlanEditor job={job} />
+      {job.status === 'plan_review' && <PlanEditor job={job} />}
+
+      {job.status === 'plan_approved' && (
+        <p className="success block">
+          Plan validé ✓ — la génération démarre au prochain passage du cron
+          (≤ 2 min). Le statut passera à « Génération… ».
+        </p>
       )}
 
       {['generating', 'review', 'ready', 'published'].includes(job.status) && (
