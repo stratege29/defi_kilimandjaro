@@ -311,16 +311,29 @@ function PlanEditor({ job }) {
 function CandidateReview({ job }) {
   const [filter, setFilter] = useState('pending');
   const [cands, setCands] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     setCands(null);
+    setError(null);
+    // Pas d'orderBy serveur (éviterait un index composite avec le where) :
+    // on trie par candId côté client.
     const q = query(
       collection(db, 'pack_jobs', job.id, 'candidates'),
       where('reviewStatus', '==', filter),
-      orderBy('candId'),
     );
-    return onSnapshot(q, (snap) =>
-      setCands(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
+    return onSnapshot(
+      q,
+      (snap) =>
+        setCands(
+          snap.docs
+            .map((d) => ({ id: d.id, ...d.data() }))
+            .sort((a, b) => (a.candId || '').localeCompare(b.candId || '')),
+        ),
+      (e) => {
+        setCands([]);
+        setError(`${e.code}: ${e.message}`);
+      },
     );
   }, [job.id, filter]);
 
@@ -353,8 +366,11 @@ function CandidateReview({ job }) {
         vérifiées OK : {counts.verified ?? 0} · généré {counts.generated ?? 0}
       </div>
 
-      {cands === null && <p className="muted block">Chargement…</p>}
-      {cands?.length === 0 && <p className="muted block">Aucun candidat ({filter}).</p>}
+      {error && <p className="error block">Erreur : {error}</p>}
+      {!error && cands === null && <p className="muted block">Chargement…</p>}
+      {!error && cands?.length === 0 && (
+        <p className="muted block">Aucun candidat ({filter}).</p>
+      )}
 
       <div className="cards">
         {cands?.map((c) => (
