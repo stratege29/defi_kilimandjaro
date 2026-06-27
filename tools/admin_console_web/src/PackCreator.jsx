@@ -206,7 +206,7 @@ function PlanEditor({ job }) {
           subThemes: plan.subThemes.map((t) => ({
             name: t.name,
             targetCount: Number(t.targetCount) || 0,
-            tags: t.tags,
+            tags: t.tags.slice(0, 20),
           })),
           difficultyDistribution: {
             1: Number(plan.difficultyDistribution['1']) || 0,

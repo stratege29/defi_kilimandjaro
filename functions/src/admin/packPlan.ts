@@ -130,7 +130,7 @@ const ApproveInput = z.object({
         z.object({
           name: z.string().min(1),
           targetCount: z.number().int().min(0).max(1000),
-          tags: z.array(z.string()).max(10),
+          tags: z.array(z.string()).max(20),
         })
       )
       .min(1)
