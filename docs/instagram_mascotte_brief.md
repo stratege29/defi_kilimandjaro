@@ -64,16 +64,20 @@ Typo wordmark : serif **Lora** + sans **Poppins** (charte existante).
 > illustrateur·rice (ou retoucher à la main). Coller dans Gemini (AI Studio / app).
 > Itérer en ajoutant « make it cuter / bolder / simpler / more mischievous ».
 
-### A. Kacou Ananzè — personnage principal
+### A. Kacou Ananzè — personnage principal ✅ DIRECTION RETENUE (kawaii sticker)
+> Validé après itérations (2026-06) : version **« adorable kawaii »** — gros yeux
+> pétillants + cils + joues roses = mignonnerie universelle (filles incluses). Pattes en
+> mode peluche (signature « 8 pattes » assumée plus douce). L'image générée retenue =
+> **réf à vectoriser proprement** par l'illustrateur. Prévoir une variante **clin d'œil /
+> sourire en coin** dans la planche d'expressions pour garder la malice du trickster.
 ```
-Cute, mischievous West African spider mascot named "Ananzè" for a culture-quiz mobile
-game. Flat vector illustration, modern app-mascot style, bold clean shapes, thick even
-outlines, minimal flat shading, sticker-ready. Round friendly body (NOT scary), big
-expressive eyes, one raised eyebrow, sly half-smile; eight tidy legs. Subtle Akan/kente
-pattern accent. Colors: warm gold #E9B949 and ember orange-red #F0533B on the character,
-cream #F4ECD8 highlights, deep midnight-green background #0C1712. Centered full body,
-generous padding, high contrast, playful and premium, hand-crafted look. No 3D, no
-realism, no photographic texture, no creepy spider, no clutter, no text.
+Adorable kawaii chibi spider mascot "Ananzè". Flat vector sticker, thick cream outline.
+Big round head, huge sparkly eyes with eyelashes and big highlights, soft rosy blush,
+tiny sweet smile, curious raised brows. Eight short rounded plush legs, four per side,
+evenly spaced and symmetric. Clean geometric kente headband (stripes, no letters). Warm
+gold #E9B949 body, cream #F4ECD8 highlights, soft coral #F0533B blush, deep green
+#0C1712 background. Wholesome, universally lovable, 100% flat, no gloss except eyes,
+no sparkles, no text.
 ```
 
 ### B. Ananzè — logo-mark (emblème)
@@ -84,15 +88,14 @@ recognizable at tiny size and as a solid silhouette. Vector, thick consistent st
 no gradients, no text, lots of negative space.
 ```
 
-### C. Le Margouillat « Mago » — personnage
+### C. Le Margouillat « Mago » — personnage (assorti au style kawaii d'Ananzè)
 ```
-Cute Ivorian wall gecko (agama lizard) mascot named "Mago", sitting on a wall, tilting
-its head as if nodding "I knew it". Flat vector illustration, modern app-mascot style,
-bold clean shapes, thick outlines, minimal shading, sticker-ready, very expressive and
-meme-able. Plump friendly body, big eyes, cheeky grin. Bright orange-red head #F0533B,
-blue-grey body, cream #F4ECD8 belly; gold #E9B949 accent; deep midnight-green background
-#0C1712. Centered, generous padding, hand-crafted look. No realism, no 3D, no scary, no
-clutter, no text.
+Adorable kawaii Ivorian wall gecko (agama lizard) mascot named "Mago", sitting on a wall,
+tilting its head as if nodding "I knew it". Flat vector sticker, thick cream outline.
+Huge sparkly eyes with big highlights, soft rosy blush, cheeky sweet grin — matching the
+cuteness of the Ananzè spider mascot. Plump friendly body. Bright orange-red head #F0533B,
+blue-grey body, cream #F4ECD8 belly, gold #E9B949 accent, deep green #0C1712 background.
+Wholesome, expressive and meme-able, 100% flat, no gloss except eyes, no sparkles, no text.
 ```
 
 ### D. Planche d'expressions (par perso)
