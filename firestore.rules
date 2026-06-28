@@ -319,6 +319,13 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // File « Question du jour » — lecture editor, écriture serveur (CF
+    // assignCandidateToDaily + cron fillDailyQueue).
+    match /daily_queue/{itemId} {
+      allow read: if isEditor();
+      allow write: if false;
+    }
+
     // -------------------------------------------------------------------------
     // Users inventory (Phase 4 — wallet serveur cauris-only)
     // -------------------------------------------------------------------------

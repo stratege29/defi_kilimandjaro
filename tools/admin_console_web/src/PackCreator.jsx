@@ -423,7 +423,7 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
   const [busy, setBusy] = useState(false);
   const effPack = cand.effectivePackId || cand.packId;
   const [targetPack, setTargetPack] = useState(effPack);
-  const [dailyDate, setDailyDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [dailyDate, setDailyDate] = useState(''); // vide → file d'attente
   const isDaily = targetPack === '__daily__';
 
   // Options du sélecteur : packs existants + le pack du candidat (toujours présent).
@@ -482,6 +482,8 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
         <p className="muted small">
           {cand.promotedPackId === 'daily'
             ? `→ 📅 Question du jour ${cand.promotedDailyDate || ''}`
+            : cand.promotedPackId === 'daily_queue'
+            ? '→ 📅 File « Question du jour »'
             : `→ ${cand.promotedDeviId}${
                 cand.promotedPackId && cand.promotedPackId !== cand.packId
                   ? ` (pack ${cand.promotedPackId})`
@@ -511,12 +513,16 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
             ))}
           </select>
           {isDaily && (
-            <input
-              type="date"
-              value={dailyDate}
-              onChange={(e) => setDailyDate(e.target.value)}
-              style={{ margin: 0, maxWidth: 160 }}
-            />
+            <>
+              <input
+                type="date"
+                value={dailyDate}
+                onChange={(e) => setDailyDate(e.target.value)}
+                style={{ margin: 0, maxWidth: 160 }}
+                title="Laisser vide → ajoute à la file (planifiée auto)"
+              />
+              <span className="muted small">vide → file</span>
+            </>
           )}
           {moved && (
             <button
@@ -577,7 +583,11 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
             disabled={busy}
             onClick={() =>
               isDaily
-                ? act('assignCandidateToDaily', { jobId, candId: cand.candId, date: dailyDate })
+                ? act('assignCandidateToDaily', {
+                    jobId,
+                    candId: cand.candId,
+                    ...(dailyDate ? { date: dailyDate } : {}),
+                  })
                 : act('approveCandidate', {
                     jobId,
                     candId: cand.candId,
@@ -586,7 +596,9 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
             }
           >
             {isDaily
-              ? `Affecter au jour ${dailyDate}`
+              ? dailyDate
+                ? `Affecter au jour ${dailyDate}`
+                : 'Ajouter à la file du jour'
               : targetPack && targetPack !== cand.packId
                 ? `Approuver → ${targetPack}`
                 : 'Approuver'}

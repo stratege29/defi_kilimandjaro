@@ -204,19 +204,44 @@ export const reassignCandidate = onCall(
 const DailyInput = z.object({
   jobId: z.string().min(3).max(120),
   candId: z.string().min(3).max(60),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "date attendue yyyy-MM-dd"),
+  // Date précise (yyyy-MM-dd) OU rien → ajoute à la file `daily_queue`.
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "date attendue yyyy-MM-dd").optional(),
 });
 
+/** Champs Devinette v3 (sans id/pack) d'un candidat — pour le jour ou la file. */
+export function dailyCoreFromCandidate(
+  cand: CandidateData
+): Record<string, unknown> {
+  const answerUpper = (cand.answer || "").toUpperCase();
+  const answerNormalized = normalize(answerUpper);
+  return {
+    country: cand.country || "ci",
+    answer: answerUpper,
+    answer_normalized: answerNormalized,
+    letters_pool: lettersPoolFromAnswer(answerNormalized.toUpperCase()),
+    riddle: { fr: cand.riddleFr },
+    explanation: { fr: cand.explanationFr },
+    difficulty: cand.difficulty,
+    estimated_time_s: cand.estimatedTimeS,
+    tags: (cand.tags ?? []).map((t) => String(t).toLowerCase()),
+    format_version: 3,
+    source: "remotePack",
+    source_job: cand.jobId,
+  };
+}
+
 /**
- * Affecte une question (candidat) comme **devinette du jour** d'une date donnée
- * (`daily_challenges/{date}`), et marque le candidat traité. Le doc du jour est
- * une Devinette v3 complète embarquée (même format que upsertDailyChallenge).
+ * Affecte une question (candidat) comme **devinette du jour** :
+ *  - avec `date` → écrit `daily_challenges/{date}` (jour précis) ;
+ *  - sans `date` → ajoute à la **file** `daily_queue` (planifiée auto par le
+ *    cron fillDailyQueue sur les prochains jours libres).
+ * Marque le candidat traité dans les deux cas.
  *
  * Guard : requireEditor.
  */
 export const assignCandidateToDaily = onCall(
   OPTS,
-  async (req): Promise<{ ok: true; date: string; deviId: string }> => {
+  async (req): Promise<{ ok: true; date: string | null; queued: boolean }> => {
     const uid = requireEditor(req.auth);
     const parsed = DailyInput.safeParse(req.data);
     if (!parsed.success) {
@@ -227,50 +252,59 @@ export const assignCandidateToDaily = onCall(
     const snap = await candRef.get();
     if (!snap.exists) throw new HttpsError("not-found", "Candidat introuvable.");
     const cand = snap.data() as CandidateData;
-
-    const answerUpper = (cand.answer || "").toUpperCase();
-    if (!isValidAnswer(answerUpper)) {
+    if (!isValidAnswer((cand.answer || "").toUpperCase())) {
       throw new HttpsError("failed-precondition", `Réponse « ${cand.answer} » invalide.`);
     }
-    const answerNormalized = normalize(answerUpper);
-    const lettersPool = lettersPoolFromAnswer(answerNormalized.toUpperCase());
-    const deviId = `daily_${date.replace(/-/g, "")}`;
+
+    const core = dailyCoreFromCandidate(cand);
     const now = FieldValue.serverTimestamp();
 
-    await db().collection("daily_challenges").doc(date).set({
-      id: deviId,
-      pack: "daily",
-      country: cand.country || "ci",
-      answer: answerUpper,
-      answer_normalized: answerNormalized,
-      letters_pool: lettersPool,
-      riddle: { fr: cand.riddleFr },
-      explanation: { fr: cand.explanationFr },
-      difficulty: cand.difficulty,
-      estimated_time_s: cand.estimatedTimeS,
-      tags: (cand.tags ?? []).map((t) => String(t).toLowerCase()),
-      format_version: 3,
-      source: "remotePack",
-      assigned_at: now,
-      assigned_by: uid,
-      custom: true,
-      source_job: cand.jobId,
-    });
+    if (date) {
+      const deviId = `daily_${date.replace(/-/g, "")}`;
+      await db().collection("daily_challenges").doc(date).set({
+        ...core,
+        id: deviId,
+        pack: "daily",
+        assigned_at: now,
+        assigned_by: uid,
+        custom: true,
+      });
+      await candRef.set(
+        {
+          reviewStatus: "approved",
+          reviewedBy: uid,
+          reviewedAt: now,
+          promotedDeviId: deviId,
+          promotedPackId: "daily",
+          promotedDailyDate: date,
+        },
+        { merge: true }
+      );
+      logger.info("assignCandidateToDaily:date", { uid, jobId, candId, date });
+      return { ok: true, date, queued: false };
+    }
 
+    // Pas de date → file d'attente.
+    const qref = await db().collection("daily_queue").add({
+      ...core,
+      status: "queued",
+      created_at: now,
+      created_by: uid,
+      used_date: null,
+    });
     await candRef.set(
       {
         reviewStatus: "approved",
         reviewedBy: uid,
         reviewedAt: now,
-        promotedDeviId: deviId,
-        promotedPackId: "daily",
-        promotedDailyDate: date,
+        promotedDeviId: qref.id,
+        promotedPackId: "daily_queue",
+        promotedDailyDate: null,
       },
       { merge: true }
     );
-
-    logger.info("assignCandidateToDaily", { uid, jobId, candId, date });
-    return { ok: true, date, deviId };
+    logger.info("assignCandidateToDaily:queue", { uid, jobId, candId, queueId: qref.id });
+    return { ok: true, date: null, queued: true };
   }
 );
 
