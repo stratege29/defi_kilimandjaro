@@ -106,3 +106,6 @@ export {
   adminDeletePlayer,
 } from "./admin/players";
 export { mergeAccounts } from "./account/mergeAccounts";
+
+// --- Contenu : broadcast FCM sur changement de catalogue (nouveaux packs) ---
+export { notifyPackUpdate } from "./content/notifyPackUpdate";

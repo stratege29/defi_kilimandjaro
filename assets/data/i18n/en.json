@@ -461,5 +461,16 @@
     "get_cauris": "Get cauris",
     "unlock_cta": "Unlock",
     "cancel": "Cancel"
+  },
+  "pack_notifications": {
+    "new_eyebrow": "NEW",
+    "new_title_multi": "{count} new packs",
+    "new_body_multi": "New packs just landed. Go check them out!",
+    "discover": "Discover",
+    "later": "Later",
+    "updates_title": "{count} pack(s) to update",
+    "updates_subtitle": "New content is ready to download.",
+    "update_cta": "Update",
+    "generic_pack_description": "A new riddle pack to discover."
   }
 }

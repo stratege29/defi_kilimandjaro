@@ -2,8 +2,8 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
 import 'package:defi_kilimandjaro/domain/services/pack_display.dart';
+import 'package:defi_kilimandjaro/presentation/packs/pack_display.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/pack_icon.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -64,7 +64,7 @@ class DuelPackBadge extends ConsumerWidget {
           const SizedBox(width: 10),
           Flexible(
             child: Text(
-              pack.nameKey.tr().toUpperCase(),
+              pack.displayName.toUpperCase(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: AppTypography.labelSm.copyWith(

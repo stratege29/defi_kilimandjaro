@@ -5,10 +5,12 @@ import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/local/link_prompt_gate.dart';
 import 'package:defi_kilimandjaro/data/repositories/composite_daily_challenge_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/pack_notification_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/services/daily_streak_service.dart';
 import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
+import 'package:defi_kilimandjaro/domain/entities/pack.dart';
 import 'package:defi_kilimandjaro/presentation/auth/link_account_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/continue_ascent_card.dart';
@@ -17,6 +19,7 @@ import 'package:defi_kilimandjaro/presentation/home/widgets/home_access_tiles.da
 import 'package:defi_kilimandjaro/presentation/home/widgets/home_header.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/packs_section.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
+import 'package:defi_kilimandjaro/presentation/my_packs/widgets/new_packs_dialog.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,6 +47,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
   /// via la bottom nav après l'avoir vu.
   bool _streakDialogShown = false;
 
+  /// True une fois la modale « nouveau pack » traitée sur cette session.
+  bool _newPacksDialogShown = false;
+
   @override
   void initState() {
     super.initState();
@@ -56,9 +62,38 @@ class _HomeViewState extends ConsumerState<HomeView> {
   Future<void> _onHomeOpened() async {
     await _maybeShowStreak();
     if (!mounted) return;
+    await _maybeShowNewPacks();
+    if (!mounted) return;
     final streak = await ref.read(dailyStreakProvider.future);
     if (!mounted || streak < 2) return;
     await maybeShowLinkAccountPrompt(context, ref, LinkPromptTrigger.streak);
+  }
+
+  /// Annonce les nouveaux packs disponibles, une fois par session. Détection
+  /// sans réseau (catalogue en cache) — cf [newPacksProvider]. « Découvrir »
+  /// marque les packs comme vus et ouvre Mes packs ; « Plus tard » reporte la
+  /// relance sans marquer vu. Le téléchargement n'est jamais déclenché ici.
+  Future<void> _maybeShowNewPacks() async {
+    if (_newPacksDialogShown) return;
+    if (!mounted) return;
+    final List<Pack> packs;
+    try {
+      packs = await ref.read(newPacksProvider.future);
+    } on Object {
+      // Best-effort : une détection ratée ne doit pas casser l'accueil.
+      return;
+    }
+    if (!mounted || packs.isEmpty) return;
+    _newPacksDialogShown = true;
+    final repo = ref.read(packNotificationRepositoryProvider);
+    final action = await NewPacksDialog.show(context, packs: packs);
+    if (action == NewPacksDialogAction.discover) {
+      await repo.markSeen(packs.map((p) => p.id));
+      if (!mounted) return;
+      await context.push<void>(AppRoutes.myPacks);
+    } else {
+      await repo.snooze(DateTime.now().add(kNewPackSnoozeDuration));
+    }
   }
 
   /// Affiche le popup streak escalier si claimable et pas déjà montré
