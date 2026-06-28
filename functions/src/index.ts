@@ -70,6 +70,7 @@ export { upsertDevinette } from "./admin/upsertDevinette";
 export { deleteDevinette } from "./admin/deleteDevinette";
 export { bulkImportDevinettes } from "./admin/bulkImportDevinettes";
 export { upsertPackMeta } from "./admin/upsertPackMeta";
+export { addTagsToWhitelist } from "./admin/tagsWhitelist";
 export {
   upsertDailyChallenge,
   deleteDailyChallenge,

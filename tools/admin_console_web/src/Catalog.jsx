@@ -7,7 +7,29 @@ export default function Catalog({ onEdit }) {
   const [packs, setPacks] = useState(null);
   const [error, setError] = useState(null);
   const [publishing, setPublishing] = useState(null); // packId en cours
-  const [result, setResult] = useState(null); // {packId, msg, ok}
+  const [result, setResult] = useState(null); // {packId, msg, ok, errors}
+  const [fixing, setFixing] = useState(null); // clé de l'erreur en cours de fix
+
+  async function fixError(er, action) {
+    setFixing(er.deviId + er.code);
+    try {
+      if (action === 'delete') {
+        await httpsCallable(functions, 'deleteDevinette')({
+          packId: result.packId,
+          deviId: er.deviId,
+        });
+      } else if (action === 'allowTags') {
+        const tags = parseTags(er.message);
+        if (!tags.length) throw new Error('Tags introuvables dans le message.');
+        await httpsCallable(functions, 'addTagsToWhitelist')({ tags });
+      }
+      setResult((r) => ({ ...r, errors: (r.errors || []).filter((x) => x !== er) }));
+    } catch (e) {
+      alert(`${e.code || ''} ${e.message}`);
+    } finally {
+      setFixing(null);
+    }
+  }
 
   useEffect(() => {
     return onSnapshot(
@@ -68,20 +90,70 @@ export default function Catalog({ onEdit }) {
             {result.ok ? '✅' : '❌'} {result.packId} — {result.msg}
           </p>
           {result.errors && (
-            <table className="table" style={{ width: 'auto', margin: '8px 0' }}>
-              <thead>
-                <tr><th>Devinette</th><th>Code</th><th>Détail</th></tr>
-              </thead>
-              <tbody>
-                {result.errors.slice(0, 50).map((er, i) => (
-                  <tr key={i}>
-                    <td className="mono">{er.deviId}</td>
-                    <td className="mono">{er.code}</td>
-                    <td className="small">{er.message}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <>
+              {result.errors.length === 0 ? (
+                <p className="success">
+                  Toutes les erreurs sont corrigées — clique « Republier ».
+                </p>
+              ) : (
+                <table className="table" style={{ width: 'auto', margin: '8px 0' }}>
+                  <thead>
+                    <tr><th>Devinette</th><th>Code</th><th>Détail</th><th>Action rapide</th></tr>
+                  </thead>
+                  <tbody>
+                    {result.errors.slice(0, 50).map((er, i) => {
+                      const key = er.deviId + er.code;
+                      return (
+                        <tr key={i}>
+                          <td className="mono">{er.deviId}</td>
+                          <td className="mono">{er.code}</td>
+                          <td className="small">{er.message}</td>
+                          <td className="row-actions">
+                            {er.code === 'DUPLICATE_ANSWER' && (
+                              <button
+                                className="btn danger small"
+                                disabled={fixing === key}
+                                onClick={() => {
+                                  if (confirm(`Supprimer ${er.deviId} (doublon) ?`)) fixError(er, 'delete');
+                                }}
+                              >
+                                Supprimer le doublon
+                              </button>
+                            )}
+                            {er.code === 'TAGS_NOT_WHITELISTED' && (
+                              <>
+                                <button
+                                  className="btn primary small"
+                                  disabled={fixing === key}
+                                  onClick={() => fixError(er, 'allowTags')}
+                                >
+                                  Autoriser {parseTags(er.message).join(', ')}
+                                </button>
+                                <button className="btn ghost small" onClick={() => onEdit?.(result.packId)}>
+                                  Éditer
+                                </button>
+                              </>
+                            )}
+                            {!['DUPLICATE_ANSWER', 'TAGS_NOT_WHITELISTED'].includes(er.code) && (
+                              <button className="btn ghost small" onClick={() => onEdit?.(result.packId)}>
+                                Éditer
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+              <button
+                className="btn primary small"
+                disabled={publishing === result.packId}
+                onClick={() => publish(result.packId)}
+              >
+                {publishing === result.packId ? 'Publication…' : 'Republier'}
+              </button>
+            </>
           )}
         </div>
       )}
@@ -147,6 +219,12 @@ export default function Catalog({ onEdit }) {
       )}
     </>
   );
+}
+
+/** Extrait les tags d'un message « tags hors whitelist: [a, b]. ». */
+function parseTags(msg) {
+  const m = String(msg || '').match(/\[([^\]]+)\]/);
+  return m ? m[1].split(',').map((s) => s.trim()).filter(Boolean) : [];
 }
 
 function fmtDate(v) {
