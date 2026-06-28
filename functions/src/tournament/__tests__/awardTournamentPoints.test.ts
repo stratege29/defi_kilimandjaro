@@ -3,6 +3,12 @@
  * d'arène aux 2 joueurs. Firestore est mocké (transaction + refs).
  */
 
+// Force le traitement en module ES (isolation du scope top-level) : sans
+// import/export, `tsc` projet-wide voit ce fichier comme un script global et
+// ses déclarations top-level (TID, setParticipant…) entrent en collision avec
+// les autres fichiers de test require-only.
+export {};
+
 // --- Mock firebase-admin/firestore ---
 type FakeRef = { path: string; collection: (c: string) => FakeRef; doc: (d: string) => FakeRef };
 function makeRef(path: string): FakeRef {

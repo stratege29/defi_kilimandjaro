@@ -3,6 +3,10 @@
  * RTDB et Firestore mockés ; devinettesCache mocké pour éviter Firestore.
  */
 
+// Force le traitement en module ES (cf awardTournamentPoints.test.ts) pour
+// isoler le scope top-level lors du build `tsc` projet-wide.
+export {};
+
 // --- RTDB mock (arbre clé->valeur par path exact) ---
 const rtdbData = new Map<string, unknown>();
 const updateCalls: Array<Record<string, unknown>> = [];
