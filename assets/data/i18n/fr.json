@@ -420,6 +420,10 @@
     "football_ci": {
       "name": "Football Ivoirien",
       "description": "Éléphants, joueurs cultes et trophées des Verts"
+    },
+    "enfants_ci": {
+      "name": "Les Petits Génies",
+      "description": "Mots simples pour les enfants : animaux, fruits, famille et nature"
     }
   },
   "pack_chooser": {
