@@ -70,6 +70,8 @@ export default function Catalog({ onEdit }) {
               <th>Statut</th>
               <th className="num">Devinettes</th>
               <th className="num">Version</th>
+              <th>Dernière publication</th>
+              <th>Par</th>
               <th className="num">Prix (♦)</th>
               <th>Bundle</th>
               <th className="num">Ordre</th>
@@ -93,6 +95,8 @@ export default function Catalog({ onEdit }) {
                 </td>
                 <td className="num">{p.count ?? 0}</td>
                 <td className="num">v{p.current_version ?? 1}</td>
+                <td className="muted small">{fmtDate(p.last_published_at)}</td>
+                <td className="muted small truncate">{p.last_published_by || '—'}</td>
                 <td className="num">
                   {(p.unlock_cost_cauris ?? 0) === 0
                     ? 'Gratuit'
@@ -119,4 +123,15 @@ export default function Catalog({ onEdit }) {
       )}
     </>
   );
+}
+
+function fmtDate(v) {
+  if (!v) return '—';
+  let d;
+  if (typeof v?.toDate === 'function') d = v.toDate();
+  else if (typeof v === 'string') d = new Date(v);
+  else if (typeof v === 'number') d = new Date(v);
+  else if (typeof v?.seconds === 'number') d = new Date(v.seconds * 1000);
+  else return '—';
+  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString('fr-FR');
 }
