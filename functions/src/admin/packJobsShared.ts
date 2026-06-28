@@ -218,7 +218,8 @@ export function devinetteFromCandidate(
     explanation: { fr: cand.explanationFr },
     difficulty: cand.difficulty,
     estimated_time_s: cand.estimatedTimeS,
-    tags: cand.tags ?? [],
+    // Tags en minuscules (la whitelist est en minuscules) — évite « Boisson ».
+    tags: (cand.tags ?? []).map((t) => String(t).toLowerCase()),
     format_version: 3,
     status: "draft",
     draft_version: nextDraftVersion,

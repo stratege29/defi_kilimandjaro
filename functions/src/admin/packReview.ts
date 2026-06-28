@@ -91,10 +91,26 @@ export const approveCandidate = onCall(
       // concurrent peut avoir édité la réponse entre la lecture initiale et ici).
       // `packId` forcé au pack cible pour le champ `pack` + le préfixe d'id.
       const source = { ...(curData ?? cand), packId };
-      const deviSnap = await tx.get(packRef.collection("devinettes").select());
+      const deviSnap = await tx.get(
+        packRef.collection("devinettes").select("answer_normalized")
+      );
       const metaSnap = await tx.get(metaRef);
       const nextDraftVersion =
         (metaSnap.data()?.next_draft_version as number | undefined) ?? 1;
+
+      // Déduplication contre le PACK CIBLE : refuse de promouvoir une réponse
+      // déjà présente (évite les DUPLICATE_ANSWER bloquant la publication).
+      const candNorm = normalize((source.answer || "").toUpperCase());
+      const existing = deviSnap.docs.find(
+        (d) => (d.data().answer_normalized as string | undefined) === candNorm
+      );
+      if (existing) {
+        throw new HttpsError(
+          "failed-precondition",
+          `Réponse « ${source.answer} » déjà présente dans le pack ${packId} (${existing.id}) — doublon.`
+        );
+      }
+
       const id = computeNextDeviId(
         packId,
         deviSnap.docs.map((d) => d.id)
