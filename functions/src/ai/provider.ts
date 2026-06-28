@@ -15,7 +15,12 @@ import { defineString } from "firebase-functions/params";
 import { type AiUsage } from "./usage";
 import { type SystemBlock, callStructured } from "./claudeClient";
 import { GEMINI_API_KEY, geminiStructured } from "./geminiClient";
-import { verifyHybrid, type VerifyItem, type VerifyResult } from "./wikiVerify";
+import {
+  verifyHybrid,
+  verifyWikipediaOnly,
+  type VerifyItem,
+  type VerifyResult,
+} from "./wikiVerify";
 
 export const PACK_AI_ENGINE = defineString("PACK_AI_ENGINE", {
   default: "gemini",
@@ -66,9 +71,14 @@ export async function generateStructured<T>(params: {
   });
 }
 
-/** Vérification + sourcing (Wikipedia d'abord, puis grounding). */
+/**
+ * Vérification + sourcing.
+ * - normal : Wikipedia d'abord, puis grounding Gemini (qualité max).
+ * - eco    : Wikipedia uniquement, 0 appel Gemini (économie de quota).
+ */
 export async function verifyBatch(
-  items: VerifyItem[]
+  items: VerifyItem[],
+  eco = false
 ): Promise<{ results: VerifyResult[]; usage: AiUsage; calls: number }> {
-  return verifyHybrid(items);
+  return eco ? verifyWikipediaOnly(items) : verifyHybrid(items);
 }

@@ -159,7 +159,10 @@ export const approveResearchPlan = onCall(
     if (!snap.exists) throw new HttpsError("not-found", "Job introuvable.");
 
     const targetTotal = plan.targetTotal;
-    const batchesTotal = Math.ceil(targetTotal / DEFAULT_BATCH_SIZE);
+    // Conserve la taille de lot du job (50 en mode éco quota, sinon défaut).
+    const batchSize =
+      (snap.data()?.progress?.batchSize as number | undefined) ?? DEFAULT_BATCH_SIZE;
+    const batchesTotal = Math.ceil(targetTotal / batchSize);
 
     await ref.set(
       {

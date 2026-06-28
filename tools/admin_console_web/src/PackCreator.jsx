@@ -176,6 +176,7 @@ function JobDetail({ job, packIds }) {
       <div className="muted small">
         pack: {job.packId} · généré {p.generated ?? 0}/{p.targetTotal ?? 0} ·
         rejetés {p.rejectedAuto ?? 0} · doublons {p.duplicatesDropped ?? 0}
+        {job.ecoQuota ? ' · ⚡ éco quota' : ''}
       </div>
       {p.lastError && <p className="error block">Dernière erreur : {p.lastError}</p>}
 
@@ -665,6 +666,7 @@ function CreateModal({ onClose }) {
   const [idTouched, setIdTouched] = useState(false);
   const [topic, setTopic] = useState('');
   const [targetTotal, setTargetTotal] = useState(500);
+  const [eco, setEco] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const idValid = /^[a-z][a-z0-9_]{1,31}$/.test(packId);
@@ -678,7 +680,12 @@ function CreateModal({ onClose }) {
     if (!idValid) return;
     setBusy(true);
     try {
-      await call('createPackJob', { packId, topic: topic.trim(), targetTotal: Number(targetTotal) });
+      await call('createPackJob', {
+        packId,
+        topic: topic.trim(),
+        targetTotal: Number(targetTotal),
+        ecoQuota: eco,
+      });
       onClose();
     } catch (e) {
       alert(`${e.code || ''} ${e.message}`);
@@ -715,6 +722,15 @@ function CreateModal({ onClose }) {
         </div>
         <label className="muted small">Nombre de questions</label>
         <input type="number" value={targetTotal} onChange={(e) => setTargetTotal(e.target.value)} />
+        <label className="check" style={{ marginTop: 12 }}>
+          <input type="checkbox" checked={eco} onChange={(e) => setEco(e.target.checked)} />
+          Mode éco quota (free tier Gemini)
+        </label>
+        <div className="muted small" style={{ marginTop: 4 }}>
+          Lots de 50 + vérification Wikipedia seule (0 appel IA en vérif) → ~11
+          appels pour 500 questions, dans la limite des 20/jour. Les questions
+          arrivent en « à valider » (pas d'auto-vérification IA).
+        </div>
         <div className="row actions" style={{ marginTop: 12 }}>
           <span className="spacer" />
           <button className="btn ghost" onClick={onClose}>Annuler</button>

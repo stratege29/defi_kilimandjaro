@@ -24,10 +24,14 @@ import {
  * Guard : requireAdmin.
  */
 
+/** Lots plus gros + vérif Wikipedia-only en mode éco (tient dans 20 req/jour). */
+const ECO_BATCH_SIZE = 50;
+
 const CreateInput = z.object({
   packId: z.string().regex(PACK_ID_RE, "packId invalide"),
   topic: z.string().min(3).max(160),
   targetTotal: z.number().int().min(50).max(1000).optional(),
+  ecoQuota: z.boolean().optional(),
   langs: z.array(z.string().length(2)).optional(),
   caps: z
     .object({
@@ -49,12 +53,14 @@ export const createPackJob = onCall(
     }
     const { packId, topic } = parsed.data;
     const targetTotal = parsed.data.targetTotal ?? DEFAULT_TARGET_TOTAL;
+    const ecoQuota = parsed.data.ecoQuota === true;
+    const batchSize = ecoQuota ? ECO_BATCH_SIZE : DEFAULT_BATCH_SIZE;
     const langs = parsed.data.langs ?? ["fr"];
     const caps = { ...DEFAULT_CAPS, ...(parsed.data.caps ?? {}) };
 
     await ensurePackInCatalog(packId, uid);
 
-    const batchesTotal = Math.ceil(targetTotal / DEFAULT_BATCH_SIZE);
+    const batchesTotal = Math.ceil(targetTotal / batchSize);
     const now = FieldValue.serverTimestamp();
     const ref = jobRef(`${packId}_${Date.now()}`);
 
@@ -62,12 +68,13 @@ export const createPackJob = onCall(
       packId,
       topic,
       langs,
+      ecoQuota,
       status: "queued",
       phase: "plan",
       plan: null,
       progress: {
         targetTotal,
-        batchSize: DEFAULT_BATCH_SIZE,
+        batchSize,
         nextIndex: 0,
         generated: 0,
         verified: 0,

@@ -217,7 +217,7 @@ async function processBatch(jobId: string): Promise<string> {
         riddleFr: q.riddleFr,
         explanationFr: q.explanationFr,
       }));
-      const v = await verifyBatch(items);
+      const v = await verifyBatch(items, job.ecoQuota === true);
       verifications = v.results;
       verifyUsage = v.usage;
       verifyCalls = v.calls;

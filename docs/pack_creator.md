@@ -57,6 +57,13 @@ défaut `gemini`).
 - Garde-fous : caps par job (`maxClaudeCallsPerJob`, `maxUsd`, `maxCandidates`),
   circuit breaker (`consecutiveErrors >= 5` → `failed`), usage tokens tracé
   (`estUsd` = tarifs Flash, ≈ 0 sur free tier).
+- **Quota free tier** : les 429 / `RESOURCE_EXHAUSTED` sont des erreurs *douces*
+  (pas de circuit breaker, le lot repasse en `pending`, reprise auto quand le
+  quota se libère). Free tier Gemini = **20 req/jour** par modèle.
+- **Mode éco quota** (`ecoQuota` à la création) : lots de **50** + vérification
+  **Wikipedia uniquement** (0 appel Gemini en vérif) → ~11 appels pour 500
+  questions, tient dans 20/jour. Les questions arrivent en `uncertain`
+  (validation humaine en revue, source Wikipedia attachée si trouvée).
 
 ## Setup manuel (console / CLI) — à faire avant usage
 

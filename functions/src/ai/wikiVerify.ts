@@ -94,6 +94,32 @@ const VERIFY_SYSTEM =
   "(faux). En cas de doute → `uncertain`. Donne une note courte. Le champ " +
   "sources peut rester vide (il sera complété côté serveur).";
 
+/**
+ * Vérification « éco quota » : Wikipedia uniquement, ZÉRO appel Gemini.
+ * Chaque question est marquée `uncertain` (à valider en revue humaine), avec la
+ * source Wikipedia attachée quand un article correspond. Économise le quota IA
+ * (free tier 20 req/jour) : seule la génération consomme des appels.
+ */
+export async function verifyWikipediaOnly(
+  items: VerifyItem[]
+): Promise<{ results: VerifyResult[]; usage: AiUsage; calls: number }> {
+  if (items.length === 0) return { results: [], usage: EMPTY_USAGE, calls: 0 };
+  const evidence = await mapLimit(items, 5, (q) => wikiLookup(q.answer));
+  const results: VerifyResult[] = items.map((q, i) => {
+    const ev = evidence[i];
+    return {
+      index: q.index,
+      verdict: "uncertain",
+      confidence: ev ? 0.5 : 0,
+      notes: ev
+        ? "Mode éco : source Wikipedia trouvée — à valider en revue."
+        : "Mode éco : aucune source Wikipedia — à valider en revue.",
+      sources: ev ? [{ title: "Wikipedia", url: ev.url }] : [],
+    };
+  });
+  return { results, usage: EMPTY_USAGE, calls: 0 };
+}
+
 export async function verifyHybrid(
   items: VerifyItem[]
 ): Promise<{ results: VerifyResult[]; usage: AiUsage; calls: number }> {
