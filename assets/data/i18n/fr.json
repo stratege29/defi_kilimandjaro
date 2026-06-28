@@ -73,6 +73,9 @@
   "result": {
     "victory": {
       "cauris_earned": "+{cauris} Cauris de Sagesse",
+      "freehand_bonus": "À main levée : +{cauris} inclus",
+      "double_cta": "Pub : +{cauris} cauris",
+      "double_done": "+{cauris} cauris bonus !",
       "next": "SUIVANT →"
     },
     "failure": {

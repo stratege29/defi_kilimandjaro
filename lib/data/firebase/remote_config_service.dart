@@ -128,6 +128,18 @@ class RemoteConfigService {
         rc.getInt(RemoteConfigKeys.speedBonusPerSecond),
         d.speedBonusPerSecond,
       ),
+      freehandBonusBase: _safeNonNegativeInt(
+        rc.getInt(RemoteConfigKeys.freehandBonusBase),
+        d.freehandBonusBase,
+      ),
+      freehandBonusPerLetter: _safeNonNegativeInt(
+        rc.getInt(RemoteConfigKeys.freehandBonusPerLetter),
+        d.freehandBonusPerLetter,
+      ),
+      freehandMinLength: _safePositiveInt(
+        rc.getInt(RemoteConfigKeys.freehandMinLength),
+        d.freehandMinLength,
+      ),
       rewardedVideoBonus: _safePositiveInt(
         rc.getInt(RemoteConfigKeys.rewardedVideoBonus),
         d.rewardedVideoBonus,
@@ -166,6 +178,9 @@ class RemoteConfigService {
         RemoteConfigKeys.sinkTierScaling: d.sinkTierScalingEnabled,
         RemoteConfigKeys.winRewardBase: d.winRewardBase,
         RemoteConfigKeys.speedBonusPerSecond: d.speedBonusPerSecond,
+        RemoteConfigKeys.freehandBonusBase: d.freehandBonusBase,
+        RemoteConfigKeys.freehandBonusPerLetter: d.freehandBonusPerLetter,
+        RemoteConfigKeys.freehandMinLength: d.freehandMinLength,
         RemoteConfigKeys.rewardedVideoBonus: d.rewardedVideoBonus,
         RemoteConfigKeys.rewardedDoubleEnabled: d.rewardedDoubleEnabled,
         RemoteConfigKeys.rewardedDailyCap: d.rewardedDailyCap,
