@@ -38,7 +38,13 @@ export default function Catalog({ onEdit }) {
         )} Ko · catalog v${r.catalogVersion}`,
       });
     } catch (e) {
-      setResult({ packId, ok: false, msg: `${e.code || e.name}: ${e.message}` });
+      const errs = e?.details?.validationErrors;
+      setResult({
+        packId,
+        ok: false,
+        msg: `${e.code || e.name}: ${e.message}`,
+        errors: Array.isArray(errs) ? errs : null,
+      });
     } finally {
       setPublishing(null);
     }
@@ -57,9 +63,27 @@ export default function Catalog({ onEdit }) {
       )}
 
       {result && (
-        <p className={result.ok ? 'success block' : 'error block'}>
-          {result.ok ? '✅' : '❌'} {result.packId} — {result.msg}
-        </p>
+        <div className="block">
+          <p className={result.ok ? 'success' : 'error'}>
+            {result.ok ? '✅' : '❌'} {result.packId} — {result.msg}
+          </p>
+          {result.errors && (
+            <table className="table" style={{ width: 'auto', margin: '8px 0' }}>
+              <thead>
+                <tr><th>Devinette</th><th>Code</th><th>Détail</th></tr>
+              </thead>
+              <tbody>
+                {result.errors.slice(0, 50).map((er, i) => (
+                  <tr key={i}>
+                    <td className="mono">{er.deviId}</td>
+                    <td className="mono">{er.code}</td>
+                    <td className="small">{er.message}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       )}
 
       {packs?.length > 0 && (
