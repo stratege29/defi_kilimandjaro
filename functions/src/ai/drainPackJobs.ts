@@ -327,11 +327,29 @@ async function processBatch(jobId: string): Promise<string> {
     return "ok";
   } catch (e) {
     const msg = (e as Error).message;
-    const errors = (progress.consecutiveErrors ?? 0) + 1;
+    // Erreur de quota / rate-limit IA : « douce ». On NE déclenche PAS le circuit
+    // breaker — le quota se libère (par minute ou par jour) et le tick suivant
+    // rejoue le même lot. Le job reste en génération au lieu d'échouer.
+    const isRate = /429|resource_exhausted|quota|rate.?limit/i.test(msg);
     await batchRef(jobId, batchIndex).set(
-      { state: "failed", leaseUntil: null, error: msg },
+      { state: isRate ? "pending" : "failed", leaseUntil: null, error: msg },
       { merge: true }
     );
+    if (isRate) {
+      await ref.set(
+        {
+          status: "generating",
+          progress: {
+            lastError: `Quota IA atteint — reprise auto. ${msg.slice(0, 160)}`,
+          },
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+      logger.warn("drainPackJobs:rate-limited", { jobId, batchIndex });
+      return "rate-limited";
+    }
+    const errors = (progress.consecutiveErrors ?? 0) + 1;
     await ref.set(
       {
         status: errors >= CRITICAL_ERRORS ? "failed" : "generating",
