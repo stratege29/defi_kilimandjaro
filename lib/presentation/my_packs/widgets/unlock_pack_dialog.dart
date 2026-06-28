@@ -5,6 +5,7 @@ import 'package:defi_kilimandjaro/data/repositories/composite_devinette_reposito
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/wallet/wallet_service.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
+import 'package:defi_kilimandjaro/presentation/packs/pack_display.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/pack_icon.dart';
@@ -89,7 +90,7 @@ class _UnlockPackDialogState extends ConsumerState<UnlockPackDialog> {
         SnackBar(
           backgroundColor: Colors.green.shade700,
           content: Text(
-            'Pack "${widget.pack.nameKey.tr()}" débloqué — '
+            'Pack "${widget.pack.displayName}" débloqué — '
             'solde : ${result.cauris} cauris',
           ),
         ),
@@ -159,7 +160,7 @@ class _UnlockPackDialogState extends ConsumerState<UnlockPackDialog> {
                 PackIcon(pack: widget.pack, size: 72),
                 const SizedBox(height: 14),
                 Text(
-                  widget.pack.nameKey.tr(),
+                  widget.pack.displayName,
                   style: AppTypography.headingLg,
                   textAlign: TextAlign.center,
                 ),
@@ -167,7 +168,7 @@ class _UnlockPackDialogState extends ConsumerState<UnlockPackDialog> {
                 _QuestionCountChip(count: liveCount),
                 const SizedBox(height: 12),
                 Text(
-                  widget.pack.descriptionKey.tr(),
+                  widget.pack.displayDescription,
                   textAlign: TextAlign.center,
                   style: AppTypography.bodySm.copyWith(
                     color: AppColors.texteSecondaire,

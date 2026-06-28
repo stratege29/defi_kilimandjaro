@@ -461,5 +461,16 @@
     "get_cauris": "Obtenir des cauris",
     "unlock_cta": "Débloquer",
     "cancel": "Annuler"
+  },
+  "pack_notifications": {
+    "new_eyebrow": "NOUVEAU",
+    "new_title_multi": "{count} nouveaux packs",
+    "new_body_multi": "De nouveaux packs viennent d'arriver. Va les découvrir !",
+    "discover": "Découvrir",
+    "later": "Plus tard",
+    "updates_title": "{count} pack(s) à mettre à jour",
+    "updates_subtitle": "Du nouveau contenu est prêt à télécharger.",
+    "update_cta": "Mettre à jour",
+    "generic_pack_description": "Un nouveau pack de devinettes à découvrir."
   }
 }

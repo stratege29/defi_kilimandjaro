@@ -147,12 +147,13 @@ void main() {
           _wrap(DuelIntroOverlay(session: session)),
         );
 
-        // Les deux labels de joueurs doivent être présents.
-        expect(find.text('Moi'), findsOneWidget);
-        expect(find.text('Adversaire'), findsOneWidget);
+        // Les deux labels de joueurs doivent être présents (rendus en
+        // capitales par DuelFighterPortrait).
+        expect(find.text('TOI'), findsOneWidget);
+        expect(find.text('ADVERSAIRE'), findsOneWidget);
 
-        // Label de manche en haut.
-        expect(find.textContaining('Manche 1'), findsWidgets);
+        // Label de manche en haut (DuelRoundPill, libellé en capitales).
+        expect(find.textContaining('MANCHE 1'), findsWidgets);
       },
     );
 
@@ -187,35 +188,32 @@ void main() {
 
   group('DuelCountdownOverlay', () {
     testWidgets(
-      'affiche le cadenas sur la grille et le premier chiffre',
+      'affiche le décompte (label + premier chiffre) quand phase == countdown',
       (tester) async {
         final session = _makeSession(phase: DuelPhase.countdown);
 
         await tester.pumpWidget(
-          _wrap(
-            DuelCountdownOverlay(
-              session: session,
-              gameContent: const ColoredBox(
-                color: Colors.green,
-                child: SizedBox.expand(),
-              ),
-              riddleContent: const Text('Instrument a 21 cordes'),
-            ),
-          ),
+          _wrap(DuelCountdownOverlay(session: session)),
         );
 
-        // Premier pump — le chiffre initial doit être visible.
-        expect(find.byIcon(Icons.lock_outline), findsOneWidget);
+        // Le bandeau de décompte et le premier chiffre (3) sont visibles.
+        expect(find.text('LE DUEL COMMENCE DANS'), findsOneWidget);
+        expect(find.text('3'), findsOneWidget);
 
-        // La devinette doit être visible.
-        expect(find.text('Instrument a 21 cordes'), findsOneWidget);
+        // Draine la chaîne d'animation du décompte (3→2→1→GO) pour éviter les
+        // erreurs « pending timer » à la fin du test.
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pump(const Duration(seconds: 1));
       },
     );
 
     testWidgets(
-      'affiche GO! après que le timer atteint zéro',
+      'affiche GO après que le timer atteint zéro',
       (tester) async {
-        // phaseStartedAtMs dans le passé pour simuler un countdown écoulé.
+        // phaseStartedAtMs dans le passé => countdown déjà écoulé : showGo dès
+        // le premier frame, aucune chaîne d'animation en cours.
         final session = DuelSession(
           matchId: 'TEST02',
           secret: 'sec',
@@ -239,25 +237,15 @@ void main() {
           players: const {},
           isRanked: false,
           // 5 secondes dans le passé => countdown déjà écoulé.
-          phaseStartedAtMs:
-              DateTime.now().millisecondsSinceEpoch - 5000,
+          phaseStartedAtMs: DateTime.now().millisecondsSinceEpoch - 5000,
         );
 
         await tester.pumpWidget(
-          _wrap(
-            DuelCountdownOverlay(
-              session: session,
-              gameContent: const SizedBox.shrink(),
-              riddleContent: const Text('Riddle'),
-            ),
-          ),
+          _wrap(DuelCountdownOverlay(session: session)),
         );
+        await tester.pump();
 
-        // Laisse les animations se résoudre.
-        await tester.pump(const Duration(milliseconds: 200));
-        await tester.pumpAndSettle(const Duration(seconds: 2));
-
-        expect(find.text('GO !'), findsOneWidget);
+        expect(find.text('GO'), findsOneWidget);
       },
     );
   });
