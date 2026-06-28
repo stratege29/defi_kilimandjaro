@@ -82,7 +82,13 @@ catalog/index                     ← catalogue enrichi pour l'app (Phase 3) et 
         available_from: <ts|null>,
         available_until: <ts|null>,
         min_app_version: "0.1.0",
-        theme_color_hex: "#FFAA00",
+        theme_color_hex: "#FFAA00",     ← legacy : teinte d'icône fallback uniquement
+        theme_id: "terre_baoule",       ← preset de skin bundlé (cf. PackThemes). null = skin par convention d'id de pack, sinon défaut « Vert Nuit »
+        theme_overrides: {              ← override couleur du skin sans release (optionnel)
+          accent: "#E9B949",            ←   rôles : background, background_end, tile, tile_edge,
+          path: "#35E0C8",              ←   tile_selected, tile_selected_edge, tile_text, accent,
+          sommets_tint: "#1F8A4C"       ←   on_accent, path, validation, sommets_tint (hex #RRGGBB/#AARRGGBB)
+        },
         icon_url: "gs://.../icons/culture_ci.png",
         tags: ["culture", "tradition"],  ← tags marketing du pack (≠ tags devinettes)
         updated_at: <ts>,

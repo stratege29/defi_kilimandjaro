@@ -139,3 +139,6 @@ tr.today td { background: rgba(210,162,76,.08); }
 .modal textarea { resize: vertical; font-family: inherit; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .grid2 select, .grid2 input { width: 100%; }
+.modal hr.sep { border: 0; border-top: 1px solid #000; margin: 16px 0 4px; }
+.theme-role { display: flex; flex-direction: column; gap: 2px; }
+.theme-role input[type="color"] { border: 1px solid #000; border-radius: 6px; background: var(--surface2); cursor: pointer; }

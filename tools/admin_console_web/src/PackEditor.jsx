@@ -3,8 +3,21 @@ import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions';
 import { db, functions } from './firebase.js';
 import { normalize, lettersPoolFromAnswer } from './normalize.js';
+import {
+  THEME_PRESETS,
+  THEME_ROLES,
+  MOTIF_OPTIONS,
+  TILE_SHAPE_OPTIONS,
+} from './packThemes.js';
 
 const COUNTRIES = ['ci', 'sn', 'ml', 'cm', 'bj'];
+
+/** `#RRGGBB` valide pour `<input type="color">` (ignore l'alpha 8-digits). */
+function colorInputValue(hex) {
+  if (typeof hex !== 'string') return '#000000';
+  const v = hex.replace('#', '');
+  return v.length >= 6 ? `#${v.slice(0, 6)}` : '#000000';
+}
 
 export default function PackEditor({ packId, onBack }) {
   const [devis, setDevis] = useState(null);
@@ -190,8 +203,23 @@ function MetaForm({ packId, entry, onClose }) {
   const [freeChoice, setFreeChoice] = useState(entry?.free_choice_eligible ?? false);
   const [minApp, setMinApp] = useState(entry?.min_app_version ?? '0.1.0');
   const [tags, setTags] = useState((entry?.tags ?? []).join(', '));
+  const [themeId, setThemeId] = useState(entry?.theme_id ?? '');
+  const [motif, setMotif] = useState(entry?.theme_motif ?? '');
+  const [tileShape, setTileShape] = useState(entry?.theme_tile_shape ?? '');
+  const [overrides, setOverrides] = useState(entry?.theme_overrides ?? {});
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
+
+  // Met à jour un rôle d'override ; une valeur vide retire la clé (= pas
+  // d'override → le client garde la couleur du preset).
+  function setRole(key, value) {
+    setOverrides((prev) => {
+      const next = { ...prev };
+      if (value && value.trim()) next[key] = value.trim();
+      else delete next[key];
+      return next;
+    });
+  }
 
   async function save() {
     setBusy(true);
@@ -202,6 +230,12 @@ function MetaForm({ packId, entry, onClose }) {
         ordering: Number(ordering),
         unlock_cost_cauris: Number(price),
         theme_color_hex: color,
+        // Skin de pack : preset + overrides couleur (appliqués au runtime
+        // par le client, sans release). '' / objet vide = effacé.
+        theme_id: themeId || null,
+        theme_motif: motif || null,
+        theme_tile_shape: tileShape || null,
+        theme_overrides: Object.keys(overrides).length ? overrides : null,
         bundled,
         free_choice_eligible: freeChoice,
         min_app_version: minApp.trim(),
@@ -262,6 +296,81 @@ function MetaForm({ packId, entry, onClose }) {
         </div>
         <label>Tags marketing (virgules)</label>
         <input value={tags} onChange={(e) => setTags(e.target.value)} />
+
+        <hr className="sep" />
+        <h4 style={{ margin: '8px 0 4px' }}>Skin du pack</h4>
+        <p className="muted small" style={{ marginTop: 0 }}>
+          Preset = structure bundlée (motif, forme des tuiles). Les overrides
+          couleur s’appliquent par-dessus, au runtime, sans build.
+        </p>
+        <label>Preset de skin</label>
+        <select value={themeId} onChange={(e) => setThemeId(e.target.value)}>
+          {THEME_PRESETS.map((p) => (
+            <option key={p.id} value={p.id}>{p.label}</option>
+          ))}
+        </select>
+
+        <div className="grid2">
+          <div>
+            <label>Motif de fond</label>
+            <select value={motif} onChange={(e) => setMotif(e.target.value)}>
+              {MOTIF_OPTIONS.map((m) => (
+                <option key={m.id} value={m.id}>{m.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label>Forme des tuiles</label>
+            <select
+              value={tileShape}
+              onChange={(e) => setTileShape(e.target.value)}
+            >
+              {TILE_SHAPE_OPTIONS.map((s) => (
+                <option key={s.id} value={s.id}>{s.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <label style={{ marginTop: 8 }}>
+          Overrides couleur (vide = couleur du preset)
+        </label>
+        <div className="grid2">
+          {THEME_ROLES.map((role) => {
+            const val = overrides[role.key] ?? '';
+            return (
+              <div className="theme-role" key={role.key}>
+                <span className="muted small">{role.label}</span>
+                <div className="row" style={{ gap: 6, alignItems: 'center' }}>
+                  <input
+                    type="color"
+                    value={colorInputValue(val || '#000000')}
+                    onChange={(e) => setRole(role.key, e.target.value)}
+                    style={{ width: 34, height: 28, padding: 0 }}
+                    title={role.key}
+                  />
+                  <input
+                    value={val}
+                    placeholder="—"
+                    onChange={(e) => setRole(role.key, e.target.value)}
+                    style={{ flex: 1 }}
+                  />
+                  {val && (
+                    <button
+                      type="button"
+                      className="btn ghost"
+                      onClick={() => setRole(role.key, '')}
+                      title="Retirer l’override"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
         {err && <pre className="error">{err}</pre>}
         <div className="row actions">
           <span className="muted small">Bump catalog_version → clients rafraîchissent</span>

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/domain/entities/pack_theme.dart';
 import 'package:flutter/material.dart';
 
 /// Rangée de cellules dorées 42×42 px affichant le mot en cours de formation.
@@ -24,10 +25,15 @@ class AnswerCells extends StatefulWidget {
     required this.isValidated,
     this.fillFromEnd = false,
     this.revealedPositions = const <int>{},
+    this.theme = PackThemes.defaultTheme,
     super.key,
   });
 
   final String answer;
+
+  /// Skin de pack appliqué aux cellules (accent + validation). Défaut =
+  /// « Vert Nuit ».
+  final PackTheme theme;
 
   /// Lettres formées jusqu'à présent (longueur <= answer.length).
   final String formedLetters;
@@ -77,7 +83,10 @@ class _AnswerCellsState extends State<AnswerCells>
   void initState() {
     super.initState();
     _flipCtrl = AnimationController(vsync: this, duration: _kSequenceDuration);
-    _hintCtrl = AnimationController(vsync: this, duration: _kHintRevealDuration);
+    _hintCtrl = AnimationController(
+      vsync: this,
+      duration: _kHintRevealDuration,
+    );
   }
 
   @override
@@ -87,8 +96,9 @@ class _AnswerCellsState extends State<AnswerCells>
       _flipCtrl.forward(from: 0);
     }
     // Nouvelle position révélée par l'indice → pop + flip sur cette case.
-    final newlyRevealed =
-        widget.revealedPositions.difference(oldWidget.revealedPositions);
+    final newlyRevealed = widget.revealedPositions.difference(
+      oldWidget.revealedPositions,
+    );
     if (newlyRevealed.isNotEmpty && !widget.isValidated) {
       _animHintPos = newlyRevealed.first;
       _hintCtrl.forward(from: 0);
@@ -126,8 +136,10 @@ class _AnswerCellsState extends State<AnswerCells>
             widget.answer.length * (defaultCell + horizontalMargin);
         final cellSize = wantedWidth <= maxWidth
             ? defaultCell
-            : (maxWidth / widget.answer.length - horizontalMargin)
-                  .clamp(24.0, defaultCell);
+            : (maxWidth / widget.answer.length - horizontalMargin).clamp(
+                24.0,
+                defaultCell,
+              );
 
         return AnimatedBuilder(
           animation: Listenable.merge(<Listenable>[_flipCtrl, _hintCtrl]),
@@ -148,11 +160,13 @@ class _AnswerCellsState extends State<AnswerCells>
                     filled: true,
                     flipProgress: _cellProgress(i, _flipCtrl.value),
                     size: cellSize,
+                    theme: widget.theme,
                   );
                 }
 
                 final hasPlayerLetter = seqPos < widget.formedLetters.length;
-                final isHint = !hasPlayerLetter &&
+                final isHint =
+                    !hasPlayerLetter &&
                     widget.revealedPositions.contains(seqPos);
                 final kind = hasPlayerLetter
                     ? _CellKind.filled
@@ -171,6 +185,7 @@ class _AnswerCellsState extends State<AnswerCells>
                   animating: animating,
                   revealProgress: _hintCtrl.value,
                   size: cellSize,
+                  theme: widget.theme,
                 );
               }),
             );
@@ -194,6 +209,7 @@ class _PlayCell extends StatelessWidget {
     required this.animating,
     required this.revealProgress,
     required this.size,
+    required this.theme,
   });
 
   final String letter;
@@ -204,11 +220,12 @@ class _PlayCell extends StatelessWidget {
   final bool animating;
   final double revealProgress;
   final double size;
+  final PackTheme theme;
 
   @override
   Widget build(BuildContext context) {
     if (!animating) {
-      return _faceForKind(kind, letter, size);
+      return _faceForKind(kind, letter, size, theme);
     }
 
     final p = revealProgress.clamp(0.0, 1.0);
@@ -220,9 +237,9 @@ class _PlayCell extends StatelessWidget {
         ? Transform(
             alignment: Alignment.center,
             transform: Matrix4.identity()..rotateY(math.pi),
-            child: _faceForKind(_CellKind.hint, letter, size),
+            child: _faceForKind(_CellKind.hint, letter, size, theme),
           )
-        : _faceForKind(_CellKind.empty, '', size);
+        : _faceForKind(_CellKind.empty, '', size, theme);
 
     return Transform.scale(
       scale: scale,
@@ -248,33 +265,40 @@ class _PlayCell extends StatelessWidget {
   }
 }
 
-/// Construit la face d'une case selon son [kind].
-Widget _faceForKind(_CellKind kind, String letter, double size) {
+/// Construit la face d'une case selon son [kind], teintée par le skin [theme].
+Widget _faceForKind(
+  _CellKind kind,
+  String letter,
+  double size,
+  PackTheme theme,
+) {
+  final accent = theme.accent;
   switch (kind) {
     case _CellKind.filled:
       return _CellFace(
         letter: letter,
-        bg: AppColors.orJour,
-        borderColor: AppColors.orJour,
-        textColor: AppColors.surface,
-        shadowColor: AppColors.orJour,
+        bg: accent,
+        borderColor: accent,
+        textColor: theme.onAccent,
+        shadowColor: accent,
         size: size,
       );
     case _CellKind.hint:
-      // Aperçu fantôme : doré translucide, lettre dorée — se distingue d'une
-      // case réellement remplie par le joueur (or plein, lettre sombre).
+      // Aperçu fantôme : accent translucide, lettre accent — se distingue
+      // d'une case réellement remplie par le joueur (accent plein, texte
+      // contrasté).
       return _CellFace(
         letter: letter,
-        bg: AppColors.orJour.withValues(alpha: 0.16),
-        borderColor: AppColors.orJour.withValues(alpha: 0.7),
-        textColor: AppColors.orJour,
+        bg: accent.withValues(alpha: 0.16),
+        borderColor: accent.withValues(alpha: 0.7),
+        textColor: accent,
         size: size,
       );
     case _CellKind.empty:
       return _CellFace(
         letter: letter,
         bg: AppColors.surfaceVariant.withValues(alpha: 0.6),
-        borderColor: AppColors.orJour.withValues(alpha: 0.35),
+        borderColor: accent.withValues(alpha: 0.35),
         textColor: AppColors.textePrimaire,
         size: size,
       );
@@ -291,6 +315,7 @@ class _FlipCell extends StatelessWidget {
     required this.letter,
     required this.filled,
     required this.flipProgress,
+    required this.theme,
     this.size = 42,
   });
 
@@ -298,6 +323,7 @@ class _FlipCell extends StatelessWidget {
   final bool filled;
   final double flipProgress;
   final double size;
+  final PackTheme theme;
 
   @override
   Widget build(BuildContext context) {
@@ -310,19 +336,23 @@ class _FlipCell extends StatelessWidget {
             transform: Matrix4.identity()..rotateY(math.pi),
             child: _CellFace(
               letter: letter,
-              bg: AppColors.success,
-              borderColor: AppColors.success,
+              bg: theme.validation,
+              borderColor: theme.validation,
               textColor: AppColors.textePrimaire,
-              shadowColor: AppColors.success,
+              shadowColor: theme.validation,
               size: size,
             ),
           )
         : _CellFace(
             letter: letter,
-            bg: filled ? AppColors.orJour : AppColors.surfaceVariant.withValues(alpha: 0.6),
-            borderColor: filled ? AppColors.orJour : AppColors.orJour.withValues(alpha: 0.35),
-            textColor: filled ? AppColors.surface : AppColors.textePrimaire,
-            shadowColor: filled ? AppColors.orJour : null,
+            bg: filled
+                ? theme.accent
+                : AppColors.surfaceVariant.withValues(alpha: 0.6),
+            borderColor: filled
+                ? theme.accent
+                : theme.accent.withValues(alpha: 0.35),
+            textColor: filled ? theme.onAccent : AppColors.textePrimaire,
+            shadowColor: filled ? theme.accent : null,
             size: size,
           );
 

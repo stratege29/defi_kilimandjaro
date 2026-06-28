@@ -34,13 +34,11 @@ class RemoteCatalogSnapshot {
   final DateTime fetchedAt;
 
   Map<String, dynamic> toJson() => {
-        'schema_version': schemaVersion,
-        'catalog_version': catalogVersion,
-        'fetched_at': fetchedAt.toIso8601String(),
-        'packs': packs
-            .map((p) => _packToCacheMap(p))
-            .toList(),
-      };
+    'schema_version': schemaVersion,
+    'catalog_version': catalogVersion,
+    'fetched_at': fetchedAt.toIso8601String(),
+    'packs': packs.map((p) => _packToCacheMap(p)).toList(),
+  };
 
   static RemoteCatalogSnapshot? fromCachedJson(Map<String, dynamic> json) {
     try {
@@ -49,8 +47,9 @@ class RemoteCatalogSnapshot {
         catalogVersion: (json['catalog_version'] as num?)?.toInt() ?? 0,
         fetchedAt: DateTime.parse(json['fetched_at'] as String),
         packs: (json['packs'] as List<dynamic>)
-            .map((p) =>
-                Pack.fromCatalogEntry(Map<String, dynamic>.from(p as Map)))
+            .map(
+              (p) => Pack.fromCatalogEntry(Map<String, dynamic>.from(p as Map)),
+            )
             .toList(),
       );
     } catch (_) {
@@ -59,18 +58,22 @@ class RemoteCatalogSnapshot {
   }
 
   static Map<String, dynamic> _packToCacheMap(Pack p) => {
-        'id': p.id,
-        'visible': p.visible,
-        'ordering': p.ordering,
-        'count': p.questionCount,
-        'free_choice_eligible': p.freeChoiceEligible,
-        'unlock_cost_cauris': p.unlockCostCauris ?? p.priceCauris,
-        'theme_color_hex': p.themeColorHex,
-        'icon_url': p.iconUrl,
-        'min_app_version': p.minAppVersion,
-        'available_from': p.availableFrom?.toIso8601String(),
-        'available_until': p.availableUntil?.toIso8601String(),
-      };
+    'id': p.id,
+    'visible': p.visible,
+    'ordering': p.ordering,
+    'count': p.questionCount,
+    'free_choice_eligible': p.freeChoiceEligible,
+    'unlock_cost_cauris': p.unlockCostCauris ?? p.priceCauris,
+    'theme_color_hex': p.themeColorHex,
+    'theme_id': p.themeId,
+    'theme_overrides': p.themeOverrides,
+    'theme_motif': p.themeMotif,
+    'theme_tile_shape': p.themeTileShape,
+    'icon_url': p.iconUrl,
+    'min_app_version': p.minAppVersion,
+    'available_from': p.availableFrom?.toIso8601String(),
+    'available_until': p.availableUntil?.toIso8601String(),
+  };
 }
 
 /// Source de vérité Firestore pour le catalogue distant.
@@ -88,8 +91,8 @@ class RemoteCatalogDatasource {
   RemoteCatalogDatasource({
     FirebaseFirestore? firestore,
     Future<SharedPreferences> Function()? prefsFactory,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _prefsFactory = prefsFactory ?? SharedPreferences.getInstance;
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _prefsFactory = prefsFactory ?? SharedPreferences.getInstance;
 
   final FirebaseFirestore _firestore;
   final Future<SharedPreferences> Function() _prefsFactory;
@@ -115,12 +118,12 @@ class RemoteCatalogDatasource {
     final packsRaw = data['packs'] as List<dynamic>?;
     if (packsRaw == null) return null;
 
-    final packs = packsRaw
-        .whereType<Map<dynamic, dynamic>>()
-        .map((m) =>
-            Pack.fromCatalogEntry(Map<String, dynamic>.from(m)))
-        .toList()
-      ..sort((a, b) => a.ordering.compareTo(b.ordering));
+    final packs =
+        packsRaw
+            .whereType<Map<dynamic, dynamic>>()
+            .map((m) => Pack.fromCatalogEntry(Map<String, dynamic>.from(m)))
+            .toList()
+          ..sort((a, b) => a.ordering.compareTo(b.ordering));
 
     final result = RemoteCatalogSnapshot(
       schemaVersion: (data['schema_version'] as num?)?.toInt() ?? 4,
@@ -139,22 +142,20 @@ class RemoteCatalogDatasource {
   /// pour la page MyPacks ouverte longtemps si un admin publie une nouvelle
   /// version pendant la session.
   Stream<RemoteCatalogSnapshot?> watch() {
-    return _firestore
-        .collection('catalog')
-        .doc('index')
-        .snapshots()
-        .map((snap) {
+    return _firestore.collection('catalog').doc('index').snapshots().map((
+      snap,
+    ) {
       if (!snap.exists) return null;
       final data = snap.data();
       if (data == null) return null;
       final packsRaw = data['packs'] as List<dynamic>?;
       if (packsRaw == null) return null;
-      final packs = packsRaw
-          .whereType<Map<dynamic, dynamic>>()
-          .map((m) =>
-              Pack.fromCatalogEntry(Map<String, dynamic>.from(m)))
-          .toList()
-        ..sort((a, b) => a.ordering.compareTo(b.ordering));
+      final packs =
+          packsRaw
+              .whereType<Map<dynamic, dynamic>>()
+              .map((m) => Pack.fromCatalogEntry(Map<String, dynamic>.from(m)))
+              .toList()
+            ..sort((a, b) => a.ordering.compareTo(b.ordering));
       final snapshot = RemoteCatalogSnapshot(
         schemaVersion: (data['schema_version'] as num?)?.toInt() ?? 4,
         catalogVersion: (data['catalog_version'] as num?)?.toInt() ?? 0,
