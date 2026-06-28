@@ -117,6 +117,7 @@ export {
   rejectCandidate,
   updateCandidate,
   reassignCandidate,
+  assignCandidateToDaily,
 } from "./admin/packReview";
 export { setPackTopup } from "./admin/packTopup";
 export { drainPackJobs } from "./ai/drainPackJobs";

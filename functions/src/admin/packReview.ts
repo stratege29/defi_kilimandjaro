@@ -4,7 +4,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { z } from "zod";
 
 import { requireEditor } from "../utils/auth";
-import { normalize } from "../utils/normalize";
+import { normalize, lettersPoolFromAnswer } from "../utils/normalize";
 import {
   jobRef,
   candidatesRef,
@@ -198,6 +198,79 @@ export const reassignCandidate = onCall(
     );
     logger.info("reassignCandidate", { uid, jobId, candId, targetPackId });
     return { ok: true, effectivePackId: targetPackId };
+  }
+);
+
+const DailyInput = z.object({
+  jobId: z.string().min(3).max(120),
+  candId: z.string().min(3).max(60),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "date attendue yyyy-MM-dd"),
+});
+
+/**
+ * Affecte une question (candidat) comme **devinette du jour** d'une date donnée
+ * (`daily_challenges/{date}`), et marque le candidat traité. Le doc du jour est
+ * une Devinette v3 complète embarquée (même format que upsertDailyChallenge).
+ *
+ * Guard : requireEditor.
+ */
+export const assignCandidateToDaily = onCall(
+  OPTS,
+  async (req): Promise<{ ok: true; date: string; deviId: string }> => {
+    const uid = requireEditor(req.auth);
+    const parsed = DailyInput.safeParse(req.data);
+    if (!parsed.success) {
+      throw new HttpsError("invalid-argument", parsed.error.message);
+    }
+    const { jobId, candId, date } = parsed.data;
+    const candRef = candidatesRef(jobId).doc(candId);
+    const snap = await candRef.get();
+    if (!snap.exists) throw new HttpsError("not-found", "Candidat introuvable.");
+    const cand = snap.data() as CandidateData;
+
+    const answerUpper = (cand.answer || "").toUpperCase();
+    if (!isValidAnswer(answerUpper)) {
+      throw new HttpsError("failed-precondition", `Réponse « ${cand.answer} » invalide.`);
+    }
+    const answerNormalized = normalize(answerUpper);
+    const lettersPool = lettersPoolFromAnswer(answerNormalized.toUpperCase());
+    const deviId = `daily_${date.replace(/-/g, "")}`;
+    const now = FieldValue.serverTimestamp();
+
+    await db().collection("daily_challenges").doc(date).set({
+      id: deviId,
+      pack: "daily",
+      country: cand.country || "ci",
+      answer: answerUpper,
+      answer_normalized: answerNormalized,
+      letters_pool: lettersPool,
+      riddle: { fr: cand.riddleFr },
+      explanation: { fr: cand.explanationFr },
+      difficulty: cand.difficulty,
+      estimated_time_s: cand.estimatedTimeS,
+      tags: (cand.tags ?? []).map((t) => String(t).toLowerCase()),
+      format_version: 3,
+      source: "remotePack",
+      assigned_at: now,
+      assigned_by: uid,
+      custom: true,
+      source_job: cand.jobId,
+    });
+
+    await candRef.set(
+      {
+        reviewStatus: "approved",
+        reviewedBy: uid,
+        reviewedAt: now,
+        promotedDeviId: deviId,
+        promotedPackId: "daily",
+        promotedDailyDate: date,
+      },
+      { merge: true }
+    );
+
+    logger.info("assignCandidateToDaily", { uid, jobId, candId, date });
+    return { ok: true, date, deviId };
   }
 );
 

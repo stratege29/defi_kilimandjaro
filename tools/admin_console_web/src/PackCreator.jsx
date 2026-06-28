@@ -423,10 +423,12 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
   const [busy, setBusy] = useState(false);
   const effPack = cand.effectivePackId || cand.packId;
   const [targetPack, setTargetPack] = useState(effPack);
+  const [dailyDate, setDailyDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const isDaily = targetPack === '__daily__';
 
   // Options du sélecteur : packs existants + le pack du candidat (toujours présent).
   const packOptions = Array.from(new Set([cand.packId, effPack, ...packIds])).filter(Boolean);
-  const moved = targetPack && targetPack !== effPack;
+  const moved = targetPack && targetPack !== effPack && !isDaily;
 
   const act = async (name, data) => {
     setBusy(true);
@@ -478,10 +480,13 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
       {v.notes && <p className="muted small">Note : {v.notes}</p>}
       {cand.promotedDeviId && (
         <p className="muted small">
-          → {cand.promotedDeviId}
-          {cand.promotedPackId && cand.promotedPackId !== cand.packId
-            ? ` (pack ${cand.promotedPackId})`
-            : ''}
+          {cand.promotedPackId === 'daily'
+            ? `→ 📅 Question du jour ${cand.promotedDailyDate || ''}`
+            : `→ ${cand.promotedDeviId}${
+                cand.promotedPackId && cand.promotedPackId !== cand.packId
+                  ? ` (pack ${cand.promotedPackId})`
+                  : ''
+              }`}
         </p>
       )}
 
@@ -497,6 +502,7 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
             onChange={(e) => setTargetPack(e.target.value)}
             style={{ margin: 0, maxWidth: 220 }}
           >
+            <option value="__daily__">📅 Question du jour</option>
             {packOptions.map((p) => (
               <option key={p} value={p}>
                 {p}
@@ -504,6 +510,14 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
               </option>
             ))}
           </select>
+          {isDaily && (
+            <input
+              type="date"
+              value={dailyDate}
+              onChange={(e) => setDailyDate(e.target.value)}
+              style={{ margin: 0, maxWidth: 160 }}
+            />
+          )}
           {moved && (
             <button
               className="btn ghost"
@@ -562,16 +576,20 @@ function CandidateCard({ jobId, cand, packIds = [] }) {
             className="btn primary"
             disabled={busy}
             onClick={() =>
-              act('approveCandidate', {
-                jobId,
-                candId: cand.candId,
-                ...(targetPack ? { targetPackId: targetPack } : {}),
-              })
+              isDaily
+                ? act('assignCandidateToDaily', { jobId, candId: cand.candId, date: dailyDate })
+                : act('approveCandidate', {
+                    jobId,
+                    candId: cand.candId,
+                    ...(targetPack ? { targetPackId: targetPack } : {}),
+                  })
             }
           >
-            {targetPack && targetPack !== cand.packId
-              ? `Approuver → ${targetPack}`
-              : 'Approuver'}
+            {isDaily
+              ? `Affecter au jour ${dailyDate}`
+              : targetPack && targetPack !== cand.packId
+                ? `Approuver → ${targetPack}`
+                : 'Approuver'}
           </button>
         )}
       </div>
