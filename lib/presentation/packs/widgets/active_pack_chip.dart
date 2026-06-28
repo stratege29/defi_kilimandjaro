@@ -56,7 +56,8 @@ class ActivePackChip extends ConsumerWidget {
                 const SizedBox(width: 6),
                 Flexible(
                   child: Text(
-                    pack.nameKey.tr(),
+                    pack.localizedName(context.locale.languageCode) ??
+                        pack.nameKey.tr(),
                     style: AppTypography.labelSm.copyWith(
                       color: AppColors.orJour,
                       fontWeight: FontWeight.w700,

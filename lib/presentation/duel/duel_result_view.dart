@@ -729,7 +729,7 @@ class _UpsellCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Tu as croisé ${pack.nameKey.tr()}',
+                      'Tu as croisé ${pack.localizedName(context.locale.languageCode) ?? pack.nameKey.tr()}',
                       style: AppTypography.headingSm,
                     ),
                     const SizedBox(height: 2),
@@ -944,7 +944,7 @@ class _RoundCard extends ConsumerWidget {
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(
-                      'Devinette du pack ${pack.nameKey.tr()}',
+                      'Devinette du pack ${pack.localizedName(context.locale.languageCode) ?? pack.nameKey.tr()}',
                       style: AppTypography.labelXs.copyWith(
                         color: AppColors.texteTertiaire,
                       ),

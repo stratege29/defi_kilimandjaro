@@ -58,7 +58,8 @@ class _PackChooserViewState extends ConsumerState<PackChooserView>
     if (packId == null || _confirming) return;
 
     final pack = packs.firstWhere((p) => p.id == packId);
-    final packName = pack.nameKey.tr();
+    final packName =
+        pack.localizedName(context.locale.languageCode) ?? pack.nameKey.tr();
 
     final confirmed = await _showConfirmationDialog(packName);
     if (!confirmed || !mounted) return;
@@ -249,7 +250,7 @@ class _PackCardState extends State<_PackCard>
     return Semantics(
       button: true,
       selected: isSelected,
-      label: '${widget.pack.nameKey.tr()} — ${widget.pack.descriptionKey.tr()}',
+      label: '${widget.pack.localizedName(context.locale.languageCode) ?? widget.pack.nameKey.tr()} — ${widget.pack.localizedDescription(context.locale.languageCode) ?? widget.pack.descriptionKey.tr()}',
       child: AnimatedBuilder(
         animation: _scaleAnim,
         builder: (_, child) => Transform.scale(
@@ -294,7 +295,8 @@ class _PackCardState extends State<_PackCard>
                     AppSpacing.hGapSm,
                     Expanded(
                       child: Text(
-                        widget.pack.nameKey.tr(),
+                        widget.pack.localizedName(context.locale.languageCode) ??
+                            widget.pack.nameKey.tr(),
                         style: AppTypography.headingLg,
                       ),
                     ),
@@ -311,7 +313,8 @@ class _PackCardState extends State<_PackCard>
                   height: AppSpacing.md + AppSpacing.sm,
                 ),
                 Text(
-                  widget.pack.descriptionKey.tr(),
+                  widget.pack.localizedDescription(context.locale.languageCode) ??
+                      widget.pack.descriptionKey.tr(),
                   style: AppTypography.bodyMd.copyWith(
                     color: AppColors.texteSecondaire,
                   ),

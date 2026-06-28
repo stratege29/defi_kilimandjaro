@@ -126,7 +126,8 @@ class _PromoPackItem extends _NewsItem {
                 ),
                 const Spacer(),
                 Text(
-                  pack.nameKey.tr(),
+                  pack.localizedName(context.locale.languageCode) ??
+                      pack.nameKey.tr(),
                   style: AppTypography.bebas(color: AppColors.orSoleil),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

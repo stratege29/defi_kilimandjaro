@@ -103,7 +103,8 @@ class _OwnedPackCard extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        pack.nameKey.tr(),
+                        pack.localizedName(context.locale.languageCode) ??
+                            pack.nameKey.tr(),
                         style: AppTypography.headingSm
                             .copyWith(color: AppColors.textePrimaire),
                         maxLines: 1,
