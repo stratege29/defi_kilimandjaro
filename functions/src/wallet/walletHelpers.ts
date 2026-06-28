@@ -31,6 +31,7 @@ export const CAURIS_CREDIT_MAX_BY_SOURCE: Record<string, number> = {
   streak: 500, // > eco_streak_rewards max (300)
   iap: 5000, // = max IAP pack (coins_pack_4999)
   manual: 1000, // dev/admin grant
+  tournament: 5000, // récompense de classement (top tier généreux), serveur-only
 };
 
 /// Solde maximum autorisé (anti-spam, anti-overflow JS).
