@@ -8,9 +8,11 @@
  */
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { logger } from "firebase-functions/v2";
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { getFirestore, FieldValue, FieldPath } from "firebase-admin/firestore";
 
 const HORIZON_DAYS = 14;
+/** Rétention des défis du jour passés (purge auto au-delà). */
+const RETENTION_DAYS = 90;
 
 export const fillDailyQueue = onSchedule(
   {
@@ -69,5 +71,44 @@ export const fillDailyQueue = onSchedule(
       assigned++;
     }
     logger.info("fillDailyQueue", { assigned, remaining: queued.length - qi });
+  }
+);
+
+/**
+ * Purge des défis du jour passés (`daily_challenges/{yyyy-MM-dd}`) au-delà de la
+ * rétention. Les docs sont keyés par date → on borne par documentId() < cutoff.
+ * Inoffensif côté joueur (l'app ne lit que la date du jour) — simple ménage.
+ * Tourne à 04:00 (avant fillDailyQueue à 05:00). Max 400 suppressions / run.
+ */
+export const purgeOldDailyChallenges = onSchedule(
+  {
+    schedule: "0 4 * * *",
+    timeZone: "Africa/Abidjan",
+    region: "europe-west1",
+    timeoutSeconds: 120,
+  },
+  async () => {
+    const db = getFirestore();
+    const cutoff = new Date(Date.now() - RETENTION_DAYS * 86_400_000)
+      .toISOString()
+      .slice(0, 10);
+    const snap = await db
+      .collection("daily_challenges")
+      .where(FieldPath.documentId(), "<", cutoff)
+      .limit(400)
+      .get();
+    if (snap.empty) {
+      logger.info("purgeOldDailyChallenges: rien à purger.", { cutoff });
+      return;
+    }
+    const batch = db.batch();
+    let deleted = 0;
+    for (const d of snap.docs) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d.id)) continue; // garde-fou : ids date seulement
+      batch.delete(d.ref);
+      deleted++;
+    }
+    await batch.commit();
+    logger.info("purgeOldDailyChallenges", { cutoff, deleted });
   }
 );

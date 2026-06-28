@@ -72,7 +72,7 @@ export { bulkImportDevinettes } from "./admin/bulkImportDevinettes";
 export { upsertPackMeta } from "./admin/upsertPackMeta";
 export { addTagsToWhitelist } from "./admin/tagsWhitelist";
 export { moderateSubmission } from "./admin/moderateSubmission";
-export { fillDailyQueue } from "./admin/fillDailyQueue";
+export { fillDailyQueue, purgeOldDailyChallenges } from "./admin/fillDailyQueue";
 export {
   upsertDailyChallenge,
   deleteDailyChallenge,
