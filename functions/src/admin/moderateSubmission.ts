@@ -29,22 +29,29 @@ export const moderateSubmission = onCall(
       throw new HttpsError("invalid-argument", parsed.error.message);
     }
     const { submissionId, status } = parsed.data;
-    const ref = getFirestore().collection("submissions").doc(submissionId);
-    if (!(await ref.get()).exists) {
-      throw new HttpsError("not-found", "Soumission introuvable.");
+    try {
+      const ref = getFirestore().collection("submissions").doc(submissionId);
+      if (!(await ref.get()).exists) {
+        throw new HttpsError("not-found", "Soumission introuvable.");
+      }
+      const now = FieldValue.serverTimestamp();
+      await ref.set(
+        {
+          status,
+          reviewedAt: now,
+          reviewedBy: uid,
+          moderatedAt: now,
+          moderatedBy: uid,
+        },
+        { merge: true }
+      );
+      logger.info("moderateSubmission", { uid, submissionId, status });
+      return { ok: true, status };
+    } catch (e) {
+      if (e instanceof HttpsError) throw e;
+      const msg = (e as Error).message;
+      logger.error("moderateSubmission failed", { uid, submissionId, error: msg });
+      throw new HttpsError("internal", msg);
     }
-    const now = FieldValue.serverTimestamp();
-    await ref.set(
-      {
-        status,
-        reviewedAt: now,
-        reviewedBy: uid,
-        moderatedAt: now,
-        moderatedBy: uid,
-      },
-      { merge: true }
-    );
-    logger.info("moderateSubmission", { uid, submissionId, status });
-    return { ok: true, status };
   }
 );
