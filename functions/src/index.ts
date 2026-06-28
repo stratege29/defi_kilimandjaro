@@ -71,6 +71,7 @@ export { deleteDevinette } from "./admin/deleteDevinette";
 export { bulkImportDevinettes } from "./admin/bulkImportDevinettes";
 export { upsertPackMeta } from "./admin/upsertPackMeta";
 export { addTagsToWhitelist } from "./admin/tagsWhitelist";
+export { moderateSubmission } from "./admin/moderateSubmission";
 export {
   upsertDailyChallenge,
   deleteDailyChallenge,
