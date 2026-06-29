@@ -3,6 +3,7 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/presentation/packs/pack_display.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/pack_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class ActivePackChip extends ConsumerWidget {
                 Flexible(
                   child: Text(
                     pack.localizedName(context.locale.languageCode) ??
-                        pack.nameKey.tr(),
+                        pack.displayName,
                     style: AppTypography.labelSm.copyWith(
                       color: AppColors.orJour,
                       fontWeight: FontWeight.w700,

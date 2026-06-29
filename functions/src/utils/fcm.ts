@@ -108,3 +108,54 @@ export async function sendFcmToUser(
     return false;
   }
 }
+
+/**
+ * Envoie une notification FCM à un topic broadcast (tous les abonnés).
+ *
+ * Utilisé pour les annonces de contenu (nouveaux packs / mises à jour) via le
+ * topic `pack_updates`. Contrairement à {@link sendFcmToUser}, pas de lecture
+ * de token ni de garde "match actif" : c'est un broadcast.
+ *
+ * @param topic - Nom du topic (ex. `pack_updates`).
+ * @param title - Titre de la notification.
+ * @param body  - Corps de la notification.
+ * @param data  - Payload data (routing deep link côté client, ex. `type`).
+ * @returns true si le message a été accepté par FCM, false sinon.
+ */
+export async function sendFcmToTopic(
+  topic: string,
+  title: string,
+  body: string,
+  data: Record<string, string>
+): Promise<boolean> {
+  const message: Message = {
+    topic,
+    notification: { title, body },
+    data,
+    apns: {
+      payload: {
+        aps: {
+          sound: "default",
+          badge: 1,
+          contentAvailable: true,
+        },
+      },
+    },
+    android: {
+      priority: "high",
+      notification: {
+        sound: "default",
+        channelId: "content_updates",
+      },
+    },
+  };
+
+  try {
+    const msgId = await getMessaging().send(message);
+    logger.info(`[FCM] Topic message envoyé topic=${topic} msgId=${msgId}`);
+    return true;
+  } catch (err) {
+    logger.error(`[FCM] Échec envoi topic=${topic}`, err);
+    return false;
+  }
+}

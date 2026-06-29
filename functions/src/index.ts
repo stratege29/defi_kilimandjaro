@@ -47,6 +47,15 @@ export { prunePresence } from "./matchmaking/prunePresence";
 export { resolveStaleMatches } from "./matchmaking/resolveStaleMatches";
 export { purgeMatches } from "./matchmaking/purgeMatches";
 
+// --- Tournoi « arène » (mode multi-joueurs temporisé) ---
+export {
+  createTournament,
+  cancelTournament,
+} from "./tournament/createTournament";
+export { joinTournament } from "./tournament/joinTournament";
+export { requestArenaMatch } from "./tournament/requestArenaMatch";
+export { tournamentTicker } from "./tournament/tournamentTicker";
+
 // --- Social & Viral (Phase 7) ---
 export { sendChallengeNotif } from "./matchmaking/sendChallengeNotif";
 export { requestRematch } from "./matchmaking/requestRematch";
@@ -106,3 +115,6 @@ export {
   adminDeletePlayer,
 } from "./admin/players";
 export { mergeAccounts } from "./account/mergeAccounts";
+
+// --- Contenu : broadcast FCM sur changement de catalogue (nouveaux packs) ---
+export { notifyPackUpdate } from "./content/notifyPackUpdate";

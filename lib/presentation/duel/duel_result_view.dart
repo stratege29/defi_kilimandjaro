@@ -20,6 +20,7 @@ import 'package:defi_kilimandjaro/presentation/auth/link_account_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_controller.dart'
     show lobbyPreviousMatchIdProvider, lobbyRematchUidProvider;
 import 'package:defi_kilimandjaro/presentation/my_packs/widgets/unlock_pack_dialog.dart';
+import 'package:defi_kilimandjaro/presentation/packs/pack_display.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/dashed_button.dart';
@@ -729,7 +730,7 @@ class _UpsellCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Tu as croisé ${pack.localizedName(context.locale.languageCode) ?? pack.nameKey.tr()}',
+                      'Tu as croisé ${pack.localizedName(context.locale.languageCode) ?? pack.displayName}',
                       style: AppTypography.headingSm,
                     ),
                     const SizedBox(height: 2),
@@ -944,7 +945,7 @@ class _RoundCard extends ConsumerWidget {
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(
-                      'Devinette du pack ${pack.localizedName(context.locale.languageCode) ?? pack.nameKey.tr()}',
+                      'Devinette du pack ${pack.localizedName(context.locale.languageCode) ?? pack.displayName}',
                       style: AppTypography.labelXs.copyWith(
                         color: AppColors.texteTertiaire,
                       ),

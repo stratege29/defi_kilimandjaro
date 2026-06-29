@@ -42,9 +42,23 @@ class FcmRepository {
     try {
       await _requestPermission();
       await _persistCurrentToken();
+      await _subscribeToTopics();
       _listenTokenRefresh();
     } on Exception catch (e, stack) {
       _log.e('FCM init failed', error: e, stackTrace: stack);
+    }
+  }
+
+  /// Abonne l'appareil aux topics broadcast.
+  ///
+  /// `pack_updates` : nouveaux packs / contenu mis à jour (push déclenché par
+  /// la Cloud Function `notifyPackUpdate` sur changement de `catalog/index`).
+  /// Best-effort — un échec d'abonnement ne bloque pas le boot.
+  Future<void> _subscribeToTopics() async {
+    try {
+      await _messaging.subscribeToTopic('pack_updates');
+    } on Exception catch (e) {
+      _log.w('FCM subscribeToTopic pack_updates failed: $e');
     }
   }
 

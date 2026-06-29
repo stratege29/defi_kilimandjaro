@@ -7,10 +7,14 @@ import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/composite_devinette_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/composite_pack_catalog_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
+import 'package:defi_kilimandjaro/data/repositories/pack_notification_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/sync/sync_state.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
+import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
+import 'package:defi_kilimandjaro/presentation/my_packs/widgets/pack_updates_banner.dart';
 import 'package:defi_kilimandjaro/presentation/my_packs/widgets/unlock_pack_dialog.dart';
+import 'package:defi_kilimandjaro/presentation/packs/pack_display.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/pack_icon.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -43,6 +47,29 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
   /// Tri courant du catalogue.
   PackSort _sort = PackSort.recent;
 
+  /// Déclenche la synchro OTA (devinettes) + le refresh du catalogue distant.
+  /// Partagé entre le bouton de l'AppBar et le bandeau de mises à jour.
+  /// Seul point qui lance un download — toujours sur action utilisateur.
+  Future<void> _triggerSync() async {
+    if (ref.read(manifestSyncStateProvider) is SyncStateSyncing) return;
+    final messenger = ScaffoldMessenger.of(context);
+    unawaited(ref.read(manifestSyncStateProvider.notifier).startRefresh());
+    try {
+      await ref.read(refreshRemoteCatalogProvider.future);
+    } on Object catch (e) {
+      // Échec catalog n'est pas bloquant — l'app continue de fonctionner sur
+      // le bundle. Juste un toast discret.
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Catalogue distant non récupéré ($e)'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final asyncCatalog = ref.watch(packCatalogProvider);
@@ -50,6 +77,13 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
 
     final syncState = ref.watch(manifestSyncStateProvider);
     final isSyncing = syncState is SyncStateSyncing;
+
+    // Packs possédés ayant une MAJ de contenu disponible (réseau borné).
+    final updatablePacks = ref.watch(packUpdatesProvider).maybeWhen(
+          data: (ids) => ids,
+          orElse: () => const <String>[],
+        );
+    final hasUpdates = updatablePacks.isNotEmpty;
 
     // Messenger capturé au build (élément actif) : ne JAMAIS appeler
     // `ScaffoldMessenger.of(context)` dans le callback de `ref.listen`. Une
@@ -76,6 +110,8 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
           msg = 'my_packs.sync_up_to_date'.tr();
           background = AppColors.boisFonce;
         }
+        // Recalcule le bandeau « MAJ dispo » après une sync réussie.
+        ref.invalidate(packUpdatesProvider);
         messenger
           ..hideCurrentSnackBar()
           ..showSnackBar(
@@ -116,40 +152,30 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
           const _CaurisBalanceChip(),
           IconButton(
             tooltip: 'my_packs.sync_button'.tr(),
-            icon: const Icon(Icons.refresh, color: AppColors.orJour),
-            onPressed: isSyncing
-                ? null
-                : () async {
-                    // Phase 3 : refresh à la fois le manifest (devinettes
-                    // OTA) ET le catalog distant (visibilité/ordering/prix).
-                    // Les deux sont indépendants — on lance en parallèle.
-                    final messenger = ScaffoldMessenger.of(context);
-                    unawaited(ref
-                        .read(manifestSyncStateProvider.notifier)
-                        .startRefresh());
-                    try {
-                      await ref.read(refreshRemoteCatalogProvider.future);
-                    } on Object catch (e) {
-                      // Échec catalog n'est pas bloquant — l'app continue
-                      // de fonctionner sur le bundle. Juste un toast discret.
-                      if (mounted) {
-                        messenger.showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Catalogue distant non récupéré ($e)',
-                            ),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                      }
-                    }
-                  },
+            icon: hasUpdates && !isSyncing
+                ? Badge(
+                    backgroundColor: AppColors.orJour,
+                    label: Text(
+                      '${updatablePacks.length}',
+                      style: AppTypography.labelXs
+                          .copyWith(color: AppColors.boisFonce),
+                    ),
+                    child: const Icon(Icons.refresh, color: AppColors.orJour),
+                  )
+                : const Icon(Icons.refresh, color: AppColors.orJour),
+            // Phase 3 : refresh manifest OTA + catalog distant (cf _triggerSync).
+            onPressed: isSyncing ? null : _triggerSync,
           ),
         ],
       ),
       body: Column(
         children: [
           if (isSyncing) _SyncBanner(state: syncState),
+          if (!isSyncing && hasUpdates)
+            PackUpdatesBanner(
+              count: updatablePacks.length,
+              onUpdate: _triggerSync,
+            ),
           Expanded(
             child: asyncCatalog.when(
               loading: () => const Center(
@@ -179,6 +205,23 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: AppBottomNavBar(
+        current: NavTab.packs,
+        onTabSelected: (t) {
+          switch (t) {
+            case NavTab.accueil:
+              context.go(AppRoutes.home);
+            case NavTab.defi:
+              context.go(AppRoutes.hub);
+            case NavTab.sommets:
+              context.go(AppRoutes.mountains);
+            case NavTab.packs:
+              break;
+            case NavTab.profil:
+              context.go(AppRoutes.profile);
+          }
+        },
       ),
     );
   }
@@ -305,8 +348,9 @@ class _OwnedPacksView extends StatelessWidget {
   }
 }
 
-/// Tuile d'un pack possédé. Tap → active ce pack comme grimpe courante
-/// (`setActivePack`). Le pack actif est mis en avant (bordure or + check).
+/// Tuile d'un pack possédé. Tap → active ce pack (`setActivePack`) **et**
+/// saute directement dans son ascension (`/mountains`) pour jouer sans
+/// détour. Le pack actif est mis en avant (bordure or + check).
 class _OwnedPackTile extends ConsumerWidget {
   const _OwnedPackTile({required this.pack});
 
@@ -321,11 +365,16 @@ class _OwnedPackTile extends ConsumerWidget {
         .watch(packLiveQuestionCountProvider(pack.id))
         .maybeWhen(data: (n) => n, orElse: () => pack.questionCount);
 
-    Future<void> activate() async {
-      if (isActive) return;
-      // `pack` provient de la liste des packs possédés → setActivePack ne
-      // lèvera pas (il valide l'appartenance).
-      await ref.read(playerProgressProvider.notifier).setActivePack(pack.id);
+    Future<void> play() async {
+      if (!isActive) {
+        // `pack` provient de la liste des packs possédés → setActivePack ne
+        // lèvera pas (il valide l'appartenance).
+        await ref.read(playerProgressProvider.notifier).setActivePack(pack.id);
+      }
+      if (!context.mounted) return;
+      // Saut direct dans l'ascension du pack actif — supprime l'aller-retour
+      // (ressortir vers l'accueil puis revenir) pointé par les retours joueurs.
+      context.go(AppRoutes.mountains);
     }
 
     final tile = Container(
@@ -347,7 +396,7 @@ class _OwnedPackTile extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(pack.nameKey.tr(), style: AppTypography.headingMd),
+                Text(pack.displayName, style: AppTypography.headingMd),
                 Text(
                   'my_packs.current_pack_label'
                       .tr(namedArgs: {'count': '$liveCount'}),
@@ -357,24 +406,54 @@ class _OwnedPackTile extends ConsumerWidget {
             ),
           ),
           AppSpacing.hGapSm,
-          if (isActive)
-            const Icon(Icons.check_circle, color: AppColors.orJour, size: 20)
-          else
-            Text(
-              'my_packs.activate'.tr(),
-              style: AppTypography.bebas(size: 13, color: AppColors.success),
-            ),
+          if (isActive) ...[
+            const Icon(Icons.check_circle, color: AppColors.orJour, size: 20),
+            AppSpacing.hGapXs,
+          ],
+          const _PlayPill(),
         ],
       ),
     );
 
-    if (isActive) return tile;
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: activate,
+        onTap: play,
         borderRadius: BorderRadius.circular(12),
         child: tile,
+      ),
+    );
+  }
+}
+
+/// Pastille d'action « Jouer » (flèche play + label or) sur une tuile de
+/// pack possédé. Lance directement l'ascension du pack.
+class _PlayPill extends StatelessWidget {
+  const _PlayPill();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.orJour.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.orJour.withValues(alpha: 0.55)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.play_arrow_rounded,
+            size: 16,
+            color: AppColors.orJour,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            'my_packs.play'.tr(),
+            style: AppTypography.bebas(size: 13, color: AppColors.orJour),
+          ),
+        ],
       ),
     );
   }
@@ -406,8 +485,8 @@ class _CatalogSection extends StatelessWidget {
     final list = q.isEmpty
         ? List<Pack>.of(notOwned)
         : notOwned.where((p) {
-            final name = p.nameKey.tr().toLowerCase();
-            final desc = p.descriptionKey.tr().toLowerCase();
+            final name = p.displayName.toLowerCase();
+            final desc = p.displayDescription.toLowerCase();
             return name.contains(q) || desc.contains(q);
           }).toList();
 
@@ -429,7 +508,7 @@ class _CatalogSection extends StatelessWidget {
       case PackSort.price:
         list.sort((a, b) => _cost(a).compareTo(_cost(b)));
       case PackSort.alpha:
-        list.sort((a, b) => a.nameKey.tr().compareTo(b.nameKey.tr()));
+        list.sort((a, b) => a.displayName.compareTo(b.displayName));
     }
     return list;
   }
@@ -614,14 +693,14 @@ class _LockedPackCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  pack.nameKey.tr(),
+                  pack.displayName,
                   style: AppTypography.headingSm.copyWith(
                     color: AppColors.texteSecondaire,
                   ),
                 ),
                 Text(
                   unlockable
-                      ? pack.descriptionKey.tr()
+                      ? pack.displayDescription
                       : 'my_packs.coming_soon'.tr(),
                   style: AppTypography.bodySm.copyWith(
                     color: AppColors.texteTertiaire,

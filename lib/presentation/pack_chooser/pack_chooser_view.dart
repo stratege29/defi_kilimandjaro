@@ -5,6 +5,7 @@ import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
+import 'package:defi_kilimandjaro/presentation/packs/pack_display.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -59,7 +60,7 @@ class _PackChooserViewState extends ConsumerState<PackChooserView>
 
     final pack = packs.firstWhere((p) => p.id == packId);
     final packName =
-        pack.localizedName(context.locale.languageCode) ?? pack.nameKey.tr();
+        pack.localizedName(context.locale.languageCode) ?? pack.displayName;
 
     final confirmed = await _showConfirmationDialog(packName);
     if (!confirmed || !mounted) return;
@@ -250,7 +251,7 @@ class _PackCardState extends State<_PackCard>
     return Semantics(
       button: true,
       selected: isSelected,
-      label: '${widget.pack.localizedName(context.locale.languageCode) ?? widget.pack.nameKey.tr()} — ${widget.pack.localizedDescription(context.locale.languageCode) ?? widget.pack.descriptionKey.tr()}',
+      label: '${widget.pack.localizedName(context.locale.languageCode) ?? widget.pack.displayName} — ${widget.pack.localizedDescription(context.locale.languageCode) ?? widget.pack.displayDescription}',
       child: AnimatedBuilder(
         animation: _scaleAnim,
         builder: (_, child) => Transform.scale(
@@ -296,7 +297,7 @@ class _PackCardState extends State<_PackCard>
                     Expanded(
                       child: Text(
                         widget.pack.localizedName(context.locale.languageCode) ??
-                            widget.pack.nameKey.tr(),
+                            widget.pack.displayName,
                         style: AppTypography.headingLg,
                       ),
                     ),
@@ -314,7 +315,7 @@ class _PackCardState extends State<_PackCard>
                 ),
                 Text(
                   widget.pack.localizedDescription(context.locale.languageCode) ??
-                      widget.pack.descriptionKey.tr(),
+                      widget.pack.displayDescription,
                   style: AppTypography.bodyMd.copyWith(
                     color: AppColors.texteSecondaire,
                   ),

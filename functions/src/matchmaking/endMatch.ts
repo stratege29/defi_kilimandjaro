@@ -19,6 +19,7 @@ import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { getDatabase } from "firebase-admin/database";
 import { requireAuth } from "../utils/auth";
 import { calculateElo, calculateDrawElo, ELO_INITIAL } from "./elo";
+import { awardTournamentPoints } from "../tournament/awardTournamentPoints";
 
 interface EndMatchData {
   matchId: string;
@@ -59,6 +60,8 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
       winner?: string;
       players?: Record<string, unknown>;
       is_ranked?: boolean;
+      tournament_id?: string;
+      created_at?: number;
     };
 
     // Anti-cheat : vérifier que la phase est bien "finished".
@@ -106,6 +109,33 @@ export const endMatch = onCall<EndMatchData, Promise<EndMatchResult>>(
         "failed-precondition",
         "Le gagnant enregistré n'est pas un participant."
       );
+    }
+
+    // --- Match de tournoi (arène) : points d'arène, JAMAIS d'ELO ---
+    // On court-circuite AVANT la logique ELO. Le verrou `settled` garantit que
+    // les points ne sont appliqués qu'une fois (les 2 joueurs + retries appellent
+    // endMatch). On libère le verrou si l'attribution échoue (retry propre).
+    if (matchData.tournament_id) {
+      const tSettledRef = rtdb.ref(`matches/${matchId}/settled`);
+      const tSettledTxn = await tSettledRef.transaction((cur) =>
+        cur === true ? undefined : true
+      );
+      if (!tSettledTxn.committed) {
+        return { new_elo: ELO_INITIAL, delta: 0 };
+      }
+      try {
+        await awardTournamentPoints({
+          tournamentId: matchData.tournament_id,
+          matchId,
+          players,
+          winnerUid: recordedWinner,
+          matchCreatedAt: matchData.created_at ?? 0,
+        });
+      } catch (err) {
+        await tSettledRef.set(null);
+        throw err;
+      }
+      return { new_elo: ELO_INITIAL, delta: 0 };
     }
 
     // Vérifier que le match est ranked.
