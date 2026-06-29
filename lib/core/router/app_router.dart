@@ -13,6 +13,7 @@ import 'package:defi_kilimandjaro/presentation/duel/duel_scan_view.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_view.dart';
+import 'package:defi_kilimandjaro/presentation/grimper/grimper_view.dart';
 import 'package:defi_kilimandjaro/presentation/home/home_view.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_confirm_view.dart';
 import 'package:defi_kilimandjaro/presentation/leaderboard/add_friend_scan_view.dart';
@@ -44,6 +45,10 @@ abstract final class AppRoutes {
 
   /// Hub Défi 1v1 (onglet « Défi » de la nav bottom).
   static const hub = '/hub';
+
+  /// Hub de jeu plein écran (CTA sticky GRIMPER de l'accueil) — modes solo /
+  /// en ligne / tournoi / ami. Cf [GrimperView].
+  static const grimper = '/grimper';
   static const game = '/game';
   static const result = '/result';
   static const mountains = '/mountains';
@@ -179,6 +184,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       name: 'hub',
       // Phase 5b: Défi tab now lands on the new DuelHubView (Vert Nuit redesign).
       builder: (_, __) => const DuelHubView(),
+    ),
+    GoRoute(
+      path: AppRoutes.grimper,
+      name: 'grimper',
+      builder: (_, __) => const GrimperView(),
     ),
     GoRoute(
       path: AppRoutes.game,
