@@ -7,6 +7,7 @@ import 'package:defi_kilimandjaro/domain/entities/pack.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/section_title.dart';
 import 'package:defi_kilimandjaro/presentation/packs/pack_display.dart';
 import 'package:defi_kilimandjaro/presentation/packs/widgets/active_pack_chip.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -103,7 +104,8 @@ class _OwnedPackCard extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        pack.displayName,
+                        pack.localizedName(context.locale.languageCode) ??
+                            pack.displayName,
                         style: AppTypography.headingSm
                             .copyWith(color: AppColors.textePrimaire),
                         maxLines: 1,

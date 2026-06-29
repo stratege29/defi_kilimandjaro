@@ -21,6 +21,8 @@ class Pack extends Equatable {
     required this.freeChoiceEligible,
     required this.priceEur,
     required this.priceCauris,
+    this.nameOverride,
+    this.descriptionOverride,
     this.visible = true,
     this.ordering = 100,
     this.unlockCostCauris,
@@ -61,6 +63,11 @@ class Pack extends Equatable {
       descriptionKey: descriptionKey ?? 'pack.$id.description',
       questionCount: (json['count'] as num?)?.toInt() ?? 0,
       freeChoiceEligible: (json['free_choice_eligible'] as bool?) ?? false,
+      // Nom/description portés par le catalogue (server-driven) : permet à un
+      // pack OTA créé après le dernier build d'avoir un libellé sans release.
+      // Null si absent → fallback sur les clés i18n bundlées.
+      nameOverride: _parseLocalized(json['name']),
+      descriptionOverride: _parseLocalized(json['description']),
       // Champ legacy IAP — non présent dans catalog/index (price_eur supprimé
       // au profit du modèle cauris-only Phase 4). On laisse 0.0 par défaut.
       priceEur: 0.0,
@@ -88,6 +95,21 @@ class Pack extends Equatable {
     return null;
   }
 
+  /// Parse un champ localisé `{fr: ..., en: ...}` issu de `catalog/index`.
+  /// Retourne null si absent/vide pour laisser le fallback sur la clé i18n.
+  static Map<String, String>? _parseLocalized(dynamic raw) {
+    if (raw is Map) {
+      final out = <String, String>{};
+      raw.forEach((key, value) {
+        if (value is String && value.isNotEmpty) {
+          out[key.toString()] = value;
+        }
+      });
+      return out.isEmpty ? null : out;
+    }
+    return null;
+  }
+
   /// Fusionne ce pack bundle avec une version remote.
   ///
   /// Stratégie : le remote override le bundle pour les champs dynamiques
@@ -98,6 +120,10 @@ class Pack extends Equatable {
       id: id,
       nameKey: nameKey,
       descriptionKey: descriptionKey,
+      // Le libellé server-driven (remote) prime ; sinon on garde celui du
+      // bundle (généralement null → fallback clé i18n).
+      nameOverride: remote.nameOverride ?? nameOverride,
+      descriptionOverride: remote.descriptionOverride ?? descriptionOverride,
       questionCount: questionCount,
       freeChoiceEligible: remote.freeChoiceEligible,
       priceEur: remote.priceEur > 0 ? remote.priceEur : priceEur,
@@ -127,6 +153,14 @@ class Pack extends Equatable {
   /// Clé `easy_localization` pour la description du pack.
   /// Toujours bundle — jamais override par le remote.
   final String descriptionKey;
+
+  /// Nom localisé porté par le catalogue distant (`{fr: ..., en: ...}`).
+  /// Null pour les packs bundlés (qui utilisent [nameKey]). Quand non-null,
+  /// prime sur la clé i18n — permet de nommer un pack OTA sans release app.
+  final Map<String, String>? nameOverride;
+
+  /// Description localisée portée par le catalogue distant. Voir [nameOverride].
+  final Map<String, String>? descriptionOverride;
 
   /// Nombre de devinettes annoncé par le manifest.
   /// Le compte effectif (bundle + cache OTA) vient de
@@ -175,6 +209,25 @@ class Pack extends Equatable {
   /// D'où vient cette instance — utile pour debug et UI badges.
   final PackSource source;
 
+  /// Nom localisé server-driven pour [lang] (fallback `fr` → 1re valeur), ou
+  /// `null` si le pack n'a pas de libellé distant. Les call-sites font alors
+  /// `pack.localizedName(lang) ?? pack.nameKey.tr()` pour garder la rétro-compat
+  /// avec les packs bundlés.
+  String? localizedName(String lang) => _resolveLocalized(nameOverride, lang);
+
+  /// Description localisée server-driven pour [lang]. Voir [localizedName].
+  String? localizedDescription(String lang) =>
+      _resolveLocalized(descriptionOverride, lang);
+
+  static String? _resolveLocalized(Map<String, String>? field, String lang) {
+    if (field == null || field.isEmpty) return null;
+    final exact = field[lang];
+    if (exact != null && exact.isNotEmpty) return exact;
+    final fr = field['fr'];
+    if (fr != null && fr.isNotEmpty) return fr;
+    return field.values.first;
+  }
+
   /// True si le pack est actuellement dans sa fenêtre de disponibilité.
   bool get isWithinAvailability {
     final now = DateTime.now();
@@ -188,6 +241,8 @@ class Pack extends Equatable {
     id,
     nameKey,
     descriptionKey,
+    nameOverride,
+    descriptionOverride,
     questionCount,
     freeChoiceEligible,
     priceEur,

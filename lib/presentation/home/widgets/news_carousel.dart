@@ -6,6 +6,7 @@ import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.d
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/section_title.dart';
 import 'package:defi_kilimandjaro/presentation/packs/pack_display.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -126,7 +127,8 @@ class _PromoPackItem extends _NewsItem {
                 ),
                 const Spacer(),
                 Text(
-                  pack.displayName,
+                  pack.localizedName(context.locale.languageCode) ??
+                      pack.displayName,
                   style: AppTypography.bebas(color: AppColors.orSoleil),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
