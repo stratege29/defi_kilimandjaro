@@ -15,6 +15,7 @@ import 'package:defi_kilimandjaro/presentation/auth/link_account_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/continue_ascent_card.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/daily_streak_dialog.dart';
+import 'package:defi_kilimandjaro/presentation/home/widgets/grimper_cta.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/home_access_tiles.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/home_header.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/packs_section.dart';
@@ -127,10 +128,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                 children: const [
-                  // Zone 1 — HÉROS : continuer l'ascension + CTA GRIMPER.
+                  // Zone 1 — HÉROS : sommet en cours (carte de progression).
                   ContinueAscentCard(),
                   SizedBox(height: 16),
-                  // Zone 2 — accès rapide : duels, défi du jour, sommets.
+                  // Zone 2 — rituel quotidien : Défi du jour (bande unique).
                   HomeAccessTiles(),
                   SizedBox(height: 24),
                   // Zone 3 — TES PACKS : carrousel des packs possédés.
@@ -138,6 +139,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 ],
               ),
             ),
+            // CTA sticky « GRIMPER » — action dominante unique (façon chess.com
+            // « Play ») : ouvre la feuille des modes (solo, en ligne, tournoi,
+            // ami). Hors du ListView pour rester épinglé au-dessus de la nav.
+            const GrimperCta(),
           ],
         ),
       ),

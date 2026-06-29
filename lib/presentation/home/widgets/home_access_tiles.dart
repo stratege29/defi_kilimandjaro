@@ -1,103 +1,67 @@
-import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
-import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/services/daily_challenge_service.dart';
 import 'package:defi_kilimandjaro/presentation/home/home_view.dart'
     show launchDailyChallenge;
-import 'package:defi_kilimandjaro/presentation/home/widgets/quickmatch_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-/// Zone 3 de l'accueil — tuiles d'accès rapide façon maquette Vert Nuit.
+/// Zone 2 de l'accueil — désormais une **bande unique « Défi du jour »**.
 ///
-/// Grille 2×2 de tuiles carrées : « Défier en ligne » (matchmaking ELO) et
-/// « Défier un ami » (QR) en première rangée, puis « Défi du jour » et
-/// « Sommets ». Surfaces opaques `surfaceContainer`, bordures hairline,
-/// pastilles d'icône teintées par fonction (kola = duel, info = quotidien,
-/// or = ascension).
+/// Les anciens accès rapides (défier en ligne, défier un ami, sommets) ont
+/// migré : en ligne/ami vivent dans la feuille du CTA sticky GRIMPER, les
+/// sommets dans la bottom nav. Ne reste ici que le rituel quotidien, gardé
+/// visible pour son caractère temporel (FOMO + série).
 class HomeAccessTiles extends ConsumerWidget {
   const HomeAccessTiles({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final progress = ref.watch(playerProgressProvider);
-    final mountainsAsync = ref.watch(mountainsProvider);
     final playedToday = DailyChallengeService.isPlayedOn(
       progress: progress,
       date: DateTime.now(),
     );
 
-    final (conquered, total) = mountainsAsync.maybeWhen(
-      data: (mountains) => (
-        mountains.where((m) => m.completedLevels >= m.totalLevels).length,
-        mountains.length,
-      ),
-      orElse: () => (0, 0),
-    );
-
-    return Column(
-      children: [
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: _SquareTile(
-                  icon: Icons.public_rounded,
-                  accent: AppColors.kola,
-                  title: 'Défier en ligne',
-                  subtitle: 'Adversaire au hasard',
-                  onTap: () => showQuickmatchOverlay(context),
+    return _TileShell(
+      onTap: () => launchDailyChallenge(context, ref),
+      child: Row(
+        children: [
+          const _IconBadge(icon: Icons.bolt_rounded, accent: AppColors.info),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Défi du jour',
+                  style: AppTypography.headingSm
+                      .copyWith(color: AppColors.textePrimaire),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _SquareTile(
-                  icon: Icons.people_alt_rounded,
-                  accent: AppColors.kola,
-                  title: 'Défier un ami',
-                  subtitle: 'Crée ou rejoins via QR',
-                  onTap: () => context.push(AppRoutes.duel),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: _SquareTile(
-                  icon: Icons.bolt_rounded,
-                  accent: AppColors.info,
-                  title: 'Défi du jour',
-                  subtitle: playedToday
+                const SizedBox(height: 2),
+                Text(
+                  playedToday
                       ? "Fait aujourd'hui"
                       : '+${DailyChallengeService.rewardCauris} cauris',
-                  onTap: () => launchDailyChallenge(context, ref),
+                  style: AppTypography.bodySm
+                      .copyWith(color: AppColors.texteTertiaire),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _SquareTile(
-                  icon: Icons.terrain_rounded,
-                  accent: AppColors.orJour,
-                  title: 'Sommets',
-                  subtitle: total == 0
-                      ? 'Explorer la carte'
-                      : '$conquered / $total conquis',
-                  onTap: () => context.go(AppRoutes.mountains),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 8),
+          Icon(
+            playedToday
+                ? Icons.check_circle_rounded
+                : Icons.chevron_right_rounded,
+            color: playedToday ? AppColors.vertClair : AppColors.texteTertiaire,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -123,63 +87,12 @@ class _IconBadge extends StatelessWidget {
   }
 }
 
-/// Tuile carrée d'une rangée (icône en haut, texte en bas).
-class _SquareTile extends StatelessWidget {
-  const _SquareTile({
-    required this.icon,
-    required this.accent,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final Color accent;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return _TileShell(
-      minHeight: 96,
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _IconBadge(icon: icon, accent: accent),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: AppTypography.headingSm
-                .copyWith(color: AppColors.textePrimaire),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            subtitle,
-            style:
-                AppTypography.bodySm.copyWith(color: AppColors.texteTertiaire),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Conteneur commun des tuiles : surface opaque, bordure hairline, ripple.
+/// Conteneur commun : surface opaque, bordure hairline, ripple.
 class _TileShell extends StatelessWidget {
-  const _TileShell({
-    required this.child,
-    required this.onTap,
-    this.minHeight = 0,
-  });
+  const _TileShell({required this.child, required this.onTap});
 
   final Widget child;
   final VoidCallback onTap;
-  final double minHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -190,8 +103,7 @@ class _TileShell extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(18),
         child: Container(
-          constraints: BoxConstraints(minHeight: minHeight),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: AppColors.hairline),
