@@ -4,9 +4,12 @@ import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart'
     show firebaseAuthProvider;
+import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
 import 'package:defi_kilimandjaro/data/repositories/tournament_repository.dart';
+import 'package:defi_kilimandjaro/domain/entities/pack.dart';
 import 'package:defi_kilimandjaro/domain/entities/tournament.dart';
 import 'package:defi_kilimandjaro/domain/entities/tournament_participant.dart';
+import 'package:defi_kilimandjaro/presentation/packs/pack_display.dart';
 import 'package:defi_kilimandjaro/presentation/tournament/widgets/standings_list.dart';
 import 'package:defi_kilimandjaro/presentation/tournament/widgets/tournament_countdown.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
@@ -144,6 +147,8 @@ class _Body extends ConsumerWidget {
                 label: 'tournament.duration'
                     .tr(args: ['${tournament.durationMin}']),
               ),
+              if (tournament.packIds.isNotEmpty)
+                _PacksRow(packIds: tournament.packIds),
               const SizedBox(height: AppSpacing.xs),
               Align(
                 alignment: Alignment.centerLeft,
@@ -297,6 +302,66 @@ class _CountdownBanner extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Packs dont le tournoi tire ses devinettes, résolus en noms lisibles via le
+/// catalogue (override serveur → traduction bundlée → fallback). N'apparaît que
+/// si des packs ont été sélectionnés (sinon = pool global, rien à montrer).
+class _PacksRow extends ConsumerWidget {
+  const _PacksRow({required this.packIds});
+
+  final List<String> packIds;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final catalog = ref.watch(packCatalogProvider).value ?? const <Pack>[];
+    final byId = {for (final p in catalog) p.id: p};
+    final lang = context.locale.languageCode;
+    String label(String id) {
+      final p = byId[id];
+      return p?.localizedName(lang) ?? p?.displayName ?? id;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.style_outlined,
+              size: 18, color: AppColors.texteSecondaire),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: [
+                for (final id in packIds) _PackChip(label: label(id)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PackChip extends StatelessWidget {
+  const _PackChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+        border: Border.all(color: AppColors.hairline),
+      ),
+      child: Text(label, style: AppTypography.bodySm),
     );
   }
 }
