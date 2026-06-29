@@ -114,7 +114,10 @@ export const requestArenaMatch = onCall<
       if (mSnap.exists()) {
         const m = mSnap.val() as { phase?: string };
         if (m.phase !== "finished") {
-          // Match toujours en cours → rejoin idempotent.
+          // Match toujours en cours → rejoin idempotent. On purge au passage
+          // toute entrée pool résiduelle de ce joueur : sans ça, un 3e joueur
+          // pourrait la réclamer alors qu'on est déjà dans un match (fantôme).
+          await rtdb.ref(arenaPoolPath(tid, uid)).remove();
           return {
             status: "matched",
             matchId: activeMatchId,
@@ -243,6 +246,33 @@ export const requestArenaMatch = onCall<
           [`presence/${uid}`]: { ts: ServerValue.TIMESTAMP },
         });
         return { status: "waiting" };
+      }
+
+      // Garde anti-fantôme finale : l'adversaire réclamé est-il déjà dans un
+      // match actif (entrée pool périmée non nettoyée) ? Si oui, on NE crée pas
+      // un 2e match avec lui : on purge son entrée périmée et on réattend.
+      const oppActiveSnap = await rtdb
+        .ref(arenaActivePath(tid, opponentUid))
+        .get();
+      if (oppActiveSnap.exists()) {
+        const oppMatchSnap = await rtdb
+          .ref(`matches/${oppActiveSnap.val() as string}`)
+          .get();
+        const oppPhase = oppMatchSnap.exists()
+          ? (oppMatchSnap.val() as { phase?: string }).phase
+          : undefined;
+        if (oppMatchSnap.exists() && oppPhase !== "finished") {
+          await rtdb.ref().update({
+            [arenaPoolPath(tid, opponentUid)]: null,
+            [arenaPoolPath(tid, uid)]: {
+              points: myPoints,
+              ts: now,
+              request_id,
+            },
+            [`presence/${uid}`]: { ts: ServerValue.TIMESTAMP },
+          });
+          return { status: "waiting" };
+        }
       }
 
       const matchId = _generateMatchId();
