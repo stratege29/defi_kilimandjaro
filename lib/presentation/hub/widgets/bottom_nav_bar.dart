@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 /// actif n'a **pas de bordure** — il est signalé par un squircle doré discret
 /// derrière l'icône (fond `orJour` @ 14 %) + icône/label en or. Les inactifs
 /// restent sobres (texte tertiaire).
-enum NavTab { accueil, defi, sommets, profil }
+enum NavTab { accueil, defi, sommets, packs, profil }
 
 class AppBottomNavBar extends StatelessWidget {
   const AppBottomNavBar({
@@ -69,6 +69,14 @@ class AppBottomNavBar extends StatelessWidget {
                     label: 'Sommets',
                     active: current == NavTab.sommets,
                     onTap: () => onTabSelected(NavTab.sommets),
+                  ),
+                  _NavItem(
+                    // Placeholder Material : pas encore de PNG dédié dans
+                    // assets/images/icons/ (cf. `iconNavPlay` pour le style cible).
+                    icon: Icons.style_rounded,
+                    label: 'Packs',
+                    active: current == NavTab.packs,
+                    onTap: () => onTabSelected(NavTab.packs),
                   ),
                   _NavItem(
                     assetPath: AppAssets.iconNavProfile,

@@ -32,6 +32,7 @@ class PlayerProgress extends Equatable {
     this.lastFreeHintGrantedDate,
     this.encounteredModifiers = const <LevelModifier>{},
     this.consecutiveLossesByDevinetteId = const <String, int>{},
+    this.rewardedDevinetteIds = const <String>{},
   });
 
   /// État initial pour un nouveau joueur.
@@ -135,6 +136,10 @@ class PlayerProgress extends Equatable {
                       as Map<String, dynamic>?) ??
                   <String, dynamic>{})
               .map((k, v) => MapEntry(k, v as int)),
+      rewardedDevinetteIds:
+          ((json['rewarded_devinettes'] as List<dynamic>?) ?? <dynamic>[])
+              .map((e) => e.toString())
+              .toSet(),
     );
   }
 
@@ -358,6 +363,14 @@ class PlayerProgress extends Equatable {
   /// manche sans cauris ni pub (cf. CLAUDE.md).
   final Map<String, int> consecutiveLossesByDevinetteId;
 
+  /// Devinettes dont la **récompense en cauris a déjà été consommée** : soit
+  /// gagnées une première fois, soit dont la réponse a été révélée (reveal
+  /// payant / auto-reveal anti-blocage). Rejouer une devinette de cet
+  /// ensemble ne crédite plus aucun cauri (anti-farm). La progression
+  /// (niveau conquis, étoiles) reste possible — seul le gain monétaire est
+  /// bloqué. Union au merge cloud (historique best-of-both, jamais perdu).
+  final Set<String> rewardedDevinetteIds;
+
   /// True quand l'utilisateur a déjà choisi son pack gratuit (gating
   /// d'onboarding).
   bool get hasChosenFreePack => freePackChosen != null;
@@ -402,6 +415,8 @@ class PlayerProgress extends Equatable {
           encounteredModifiers.map((m) => m.name).toList(growable: false),
     if (consecutiveLossesByDevinetteId.isNotEmpty)
       'consecutive_losses_by_devinette': consecutiveLossesByDevinetteId,
+    if (rewardedDevinetteIds.isNotEmpty)
+      'rewarded_devinettes': rewardedDevinetteIds.toList(growable: false),
   };
 
   /// Combien de niveaux complétés sur cette montagne **pour le pack actif**.
@@ -441,6 +456,12 @@ class PlayerProgress extends Equatable {
   int consecutiveLossesOn(String devinetteId) =>
       consecutiveLossesByDevinetteId[devinetteId] ?? 0;
 
+  /// True si la récompense cauris de cette devinette a déjà été consommée
+  /// (gagnée une fois, ou réponse révélée). Sert au gating anti-farm du
+  /// reward solo : une devinette déjà récompensée ne re-crédite plus.
+  bool isDevinetteRewarded(String devinetteId) =>
+      rewardedDevinetteIds.contains(devinetteId);
+
   PlayerProgress copyWith({
     int? cauris,
     Map<String, int>? completedLevelsByMountain,
@@ -466,6 +487,7 @@ class PlayerProgress extends Equatable {
     DateTime? lastFreeHintGrantedDate,
     Set<LevelModifier>? encounteredModifiers,
     Map<String, int>? consecutiveLossesByDevinetteId,
+    Set<String>? rewardedDevinetteIds,
   }) {
     return PlayerProgress(
       cauris: cauris ?? this.cauris,
@@ -500,6 +522,8 @@ class PlayerProgress extends Equatable {
           encounteredModifiers ?? this.encounteredModifiers,
       consecutiveLossesByDevinetteId: consecutiveLossesByDevinetteId ??
           this.consecutiveLossesByDevinetteId,
+      rewardedDevinetteIds:
+          rewardedDevinetteIds ?? this.rewardedDevinetteIds,
     );
   }
 
@@ -529,5 +553,6 @@ class PlayerProgress extends Equatable {
     lastFreeHintGrantedDate,
     encounteredModifiers,
     consecutiveLossesByDevinetteId,
+    rewardedDevinetteIds,
   ];
 }

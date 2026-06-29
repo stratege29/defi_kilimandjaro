@@ -71,6 +71,13 @@ PlayerProgress mergeProgress(PlayerProgress local, PlayerProgress cloud) {
       ...local.encounteredModifiers,
       ...cloud.encounteredModifiers,
     },
+    // Historique anti-farm des devinettes déjà récompensées/révélées →
+    // union : un device réinstallé qui re-sync ne peut pas re-farmer les
+    // devinettes déjà consommées sur un autre appareil.
+    rewardedDevinetteIds: <String>{
+      ...local.rewardedDevinetteIds,
+      ...cloud.rewardedDevinetteIds,
+    },
   );
 }
 

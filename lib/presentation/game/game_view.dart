@@ -758,6 +758,17 @@ class _GameViewState extends ConsumerState<GameView>
       answerRevealed = newFailCount >= _autoRevealFailThreshold;
     }
 
+    // Anti-farm : dès que la réponse est révélée (mode T1/Hub où elle l'est
+    // d'office, ou auto-reveal au seuil d'échecs), on marque la devinette
+    // comme « récompense consommée » — reformer ensuite le mot révélé, ou
+    // rejouer cette devinette, ne rapportera plus de cauris. Hors défi du
+    // jour (récompense gérée par date, pas par devinette).
+    if (answerRevealed && !widget.args.isDailyChallenge) {
+      await ref
+          .read(playerProgressProvider.notifier)
+          .markDevinetteRewarded(widget.args.devinette.id);
+    }
+
     if (!ctx.mounted) return;
     // Le `select` garantit que le `canAfford` lu reste cohérent avec
     // l'état au moment d'ouvrir le dialog. Le `FailureView` re-évalue
@@ -790,7 +801,7 @@ class _GameViewState extends ConsumerState<GameView>
             : null,
         canAffordReveal: canAffordReveal,
         onPurchaseReveal: isPayWallActive && !answerRevealed
-            ? () {
+            ? () async {
                 // Analytics : taux d'achat de révélation par variante A/B.
                 unawaited(
                   ref.read(analyticsServiceProvider).logAnswerRevealed(
@@ -798,9 +809,15 @@ class _GameViewState extends ConsumerState<GameView>
                         cost: revealCostCauris,
                       ),
                 );
-                return ref
-                    .read(playerProgressProvider.notifier)
-                    .purchaseReveal(revealCostCauris);
+                final notifier = ref.read(playerProgressProvider.notifier);
+                final ok = await notifier.purchaseReveal(revealCostCauris);
+                if (ok) {
+                  // Anti-farm : reveal payé → récompense de cette devinette
+                  // consommée (reformer le mot révélé ne rapportera rien).
+                  await notifier
+                      .markDevinetteRewarded(widget.args.devinette.id);
+                }
+                return ok;
               }
             : null,
         onRetry: () {
