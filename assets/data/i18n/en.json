@@ -73,6 +73,9 @@
   "result": {
     "victory": {
       "cauris_earned": "+{cauris} Wisdom Cauris",
+      "freehand_bonus": "Freehand: +{cauris} included",
+      "double_cta": "Ad: +{cauris} cauris",
+      "double_done": "+{cauris} cauris bonus!",
       "next": "NEXT →"
     },
     "failure": {
