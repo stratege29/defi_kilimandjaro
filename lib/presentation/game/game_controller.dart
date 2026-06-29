@@ -393,7 +393,23 @@ class GameController extends StateNotifier<GameState> {
       //   sur le montant base — feedback bonus géré côté hub).
       final int caurisAwarded;
       if (_args.isDailyChallenge) {
-        caurisAwarded = DailyChallengeService.rewardCauris;
+        // Défi du jour : récompense fixe, mais UNE fois par jour. S'il a
+        // déjà été joué aujourd'hui, rejouer n'attribue rien — le notifier
+        // `recordDailyChallengeResult` est idempotent côté persistance, on
+        // aligne ici l'affichage VictoryView pour ne pas annoncer un faux
+        // « +100 ».
+        final alreadyPlayedToday = _args.dailyDate != null &&
+            DailyChallengeService.isPlayedOn(
+              progress: _progress.state,
+              date: _args.dailyDate!,
+            );
+        caurisAwarded =
+            alreadyPlayedToday ? 0 : DailyChallengeService.rewardCauris;
+      } else if (_progress.state.isDevinetteRewarded(state.devinette.id)) {
+        // Devinette déjà récompensée (gagnée une 1re fois, ou réponse
+        // révélée) → rejouer ne rapporte plus de cauris (anti-farm). La
+        // victoire reste valide pour la progression (niveau, étoiles).
+        caurisAwarded = 0;
       } else {
         final raw = _economy.winRewardBase +
             state.timeLeft * _economy.speedBonusPerSecond;

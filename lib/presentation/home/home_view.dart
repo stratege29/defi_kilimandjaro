@@ -151,6 +151,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
               context.go(AppRoutes.hub);
             case NavTab.sommets:
               context.go(AppRoutes.mountains);
+            case NavTab.packs:
+              context.go(AppRoutes.myPacks);
             case NavTab.profil:
               context.go(AppRoutes.profile);
           }

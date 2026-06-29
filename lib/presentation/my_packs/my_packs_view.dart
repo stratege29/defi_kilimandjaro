@@ -11,6 +11,7 @@ import 'package:defi_kilimandjaro/data/repositories/pack_notification_repository
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/sync/sync_state.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
+import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/my_packs/widgets/pack_updates_banner.dart';
 import 'package:defi_kilimandjaro/presentation/my_packs/widgets/unlock_pack_dialog.dart';
 import 'package:defi_kilimandjaro/presentation/packs/pack_display.dart';
@@ -205,6 +206,23 @@ class _MyPacksViewState extends ConsumerState<MyPacksView> {
           ),
         ],
       ),
+      bottomNavigationBar: AppBottomNavBar(
+        current: NavTab.packs,
+        onTabSelected: (t) {
+          switch (t) {
+            case NavTab.accueil:
+              context.go(AppRoutes.home);
+            case NavTab.defi:
+              context.go(AppRoutes.hub);
+            case NavTab.sommets:
+              context.go(AppRoutes.mountains);
+            case NavTab.packs:
+              break;
+            case NavTab.profil:
+              context.go(AppRoutes.profile);
+          }
+        },
+      ),
     );
   }
 }
@@ -330,8 +348,9 @@ class _OwnedPacksView extends StatelessWidget {
   }
 }
 
-/// Tuile d'un pack possédé. Tap → active ce pack comme grimpe courante
-/// (`setActivePack`). Le pack actif est mis en avant (bordure or + check).
+/// Tuile d'un pack possédé. Tap → active ce pack (`setActivePack`) **et**
+/// saute directement dans son ascension (`/mountains`) pour jouer sans
+/// détour. Le pack actif est mis en avant (bordure or + check).
 class _OwnedPackTile extends ConsumerWidget {
   const _OwnedPackTile({required this.pack});
 
@@ -346,11 +365,16 @@ class _OwnedPackTile extends ConsumerWidget {
         .watch(packLiveQuestionCountProvider(pack.id))
         .maybeWhen(data: (n) => n, orElse: () => pack.questionCount);
 
-    Future<void> activate() async {
-      if (isActive) return;
-      // `pack` provient de la liste des packs possédés → setActivePack ne
-      // lèvera pas (il valide l'appartenance).
-      await ref.read(playerProgressProvider.notifier).setActivePack(pack.id);
+    Future<void> play() async {
+      if (!isActive) {
+        // `pack` provient de la liste des packs possédés → setActivePack ne
+        // lèvera pas (il valide l'appartenance).
+        await ref.read(playerProgressProvider.notifier).setActivePack(pack.id);
+      }
+      if (!context.mounted) return;
+      // Saut direct dans l'ascension du pack actif — supprime l'aller-retour
+      // (ressortir vers l'accueil puis revenir) pointé par les retours joueurs.
+      context.go(AppRoutes.mountains);
     }
 
     final tile = Container(
@@ -382,24 +406,54 @@ class _OwnedPackTile extends ConsumerWidget {
             ),
           ),
           AppSpacing.hGapSm,
-          if (isActive)
-            const Icon(Icons.check_circle, color: AppColors.orJour, size: 20)
-          else
-            Text(
-              'my_packs.activate'.tr(),
-              style: AppTypography.bebas(size: 13, color: AppColors.success),
-            ),
+          if (isActive) ...[
+            const Icon(Icons.check_circle, color: AppColors.orJour, size: 20),
+            AppSpacing.hGapXs,
+          ],
+          const _PlayPill(),
         ],
       ),
     );
 
-    if (isActive) return tile;
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: activate,
+        onTap: play,
         borderRadius: BorderRadius.circular(12),
         child: tile,
+      ),
+    );
+  }
+}
+
+/// Pastille d'action « Jouer » (flèche play + label or) sur une tuile de
+/// pack possédé. Lance directement l'ascension du pack.
+class _PlayPill extends StatelessWidget {
+  const _PlayPill();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.orJour.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.orJour.withValues(alpha: 0.55)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.play_arrow_rounded,
+            size: 16,
+            color: AppColors.orJour,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            'my_packs.play'.tr(),
+            style: AppTypography.bebas(size: 13, color: AppColors.orJour),
+          ),
+        ],
       ),
     );
   }

@@ -215,6 +215,8 @@ class ProfileView extends ConsumerWidget {
               context.go(AppRoutes.hub);
             case NavTab.sommets:
               context.go(AppRoutes.mountains);
+            case NavTab.packs:
+              context.go(AppRoutes.myPacks);
             case NavTab.profil:
               break;
           }

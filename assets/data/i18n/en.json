@@ -437,8 +437,9 @@
   "my_packs": {
     "title": "My packs",
     "active_title": "Active pack",
-    "active_subtitle": "Pick the pack you want to climb. Each pack has its own ascent.",
+    "active_subtitle": "Tap a pack to play right away. Each pack has its own ascent.",
     "activate": "ACTIVATE",
+    "play": "PLAY",
     "current_pack_label": "{count} riddles",
     "unlock_section": "Unlock a pack",
     "owned_section": "Owned packs",

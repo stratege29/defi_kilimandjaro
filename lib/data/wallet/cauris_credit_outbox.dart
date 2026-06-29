@@ -117,8 +117,11 @@ class CaurisCreditOutbox implements CaurisCreditSink {
         // (login/boot). On retient l'entrée pour la repousser après.
         return _PushOutcome.retry;
       }
-      if (e.code == 'invalid-argument') {
-        // Cap anti-cheat dépassé : rejet permanent, inutile de retenter.
+      if (e.code == 'invalid-argument' || e.code == 'resource-exhausted') {
+        // Rejet permanent serveur : cap de montant dépassé (`invalid-argument`)
+        // ou quota journalier de fréquence atteint (`resource-exhausted`).
+        // Inutile de retenter — on retire l'entrée (le solde local reste tel
+        // quel, mais le serveur fait autorité au prochain sync wallet).
         return _PushOutcome.dropped;
       }
       // Réseau / App Check / indisponible : transitoire.

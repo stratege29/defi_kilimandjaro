@@ -6,10 +6,14 @@ import { z } from "zod";
 import { requireAuth } from "../utils/auth";
 import {
   CAURIS_CREDIT_MAX_BY_SOURCE,
+  CAURIS_CREDIT_DAILY_COUNT_MAX,
   CAURIS_MAX_BALANCE,
   walletDocRef,
   auditCollectionRef,
+  creditCountersRef,
+  utcDayKey,
   type Wallet,
+  type CreditCounters,
 } from "./walletHelpers";
 
 /**
@@ -90,6 +94,9 @@ export const creditCauris = onCall(
 
     const db = getFirestore();
     const walletRef = walletDocRef(uid);
+    const counterRef = creditCountersRef(uid);
+    const today = utcDayKey();
+    const dailyCountMax = CAURIS_CREDIT_DAILY_COUNT_MAX[source];
     // Idempotence : la clé client devient l'ID du doc d'audit. Sa présence
     // dans la transaction prouve que le crédit a déjà été appliqué (le doc
     // n'est écrit qu'avec la mutation du wallet, atomiquement).
@@ -106,12 +113,14 @@ export const creditCauris = onCall(
             cauris_after?: number;
             wallet_version_after?: number;
           };
-          // Replay : no-op idempotent, on renvoie l'état déjà persisté.
+          // Replay : no-op idempotent, on renvoie l'état déjà persisté. Ne
+          // ré-incrémente PAS le compteur journalier (sinon un retry réseau
+          // consommerait à tort le quota).
           return {
+            kind: "replayed" as const,
             cauris: prior.cauris_after ?? 0,
             version: prior.wallet_version_after ?? 0,
             amount: 0,
-            replayed: true,
           };
         }
       }
@@ -123,6 +132,29 @@ export const creditCauris = onCall(
           "Wallet non initialisé. Appeler bootstrapWallet d'abord."
         );
       }
+
+      // Backstop fréquence : nombre de crédits de cette source aujourd'hui
+      // (jour UTC). Lecture AVANT écriture. Le compteur se réinitialise
+      // paresseusement au changement de jour (utc_day différent → counts {}).
+      const counterSnap = await tx.get(counterRef);
+      const counterData = counterSnap.exists
+        ? (counterSnap.data() as CreditCounters)
+        : undefined;
+      const counts =
+        counterData && counterData.utc_day === today
+          ? { ...counterData.counts }
+          : {};
+      const currentCount = counts[source] ?? 0;
+      if (dailyCountMax !== undefined && currentCount >= dailyCountMax) {
+        // Quota journalier atteint → rejet. On sort de la transaction sans
+        // écrire ; l'audit + le throw sont gérés hors transaction.
+        return {
+          kind: "rate_limited" as const,
+          count: currentCount,
+          limit: dailyCountMax,
+        };
+      }
+
       const wallet = walletSnap.data() as Wallet;
       const currentCauris = wallet.cauris;
       const currentVersion = wallet.version;
@@ -135,6 +167,15 @@ export const creditCauris = onCall(
       tx.update(walletRef, {
         cauris: newCauris,
         version: newVersion,
+        updated_at: FieldValue.serverTimestamp(),
+      });
+
+      // Incrémente le compteur journalier de la source (créé/écrasé avec le
+      // jour UTC courant — gère le reset paresseux au passage de minuit UTC).
+      counts[source] = currentCount + 1;
+      tx.set(counterRef, {
+        utc_day: today,
+        counts,
         updated_at: FieldValue.serverTimestamp(),
       });
 
@@ -154,12 +195,42 @@ export const creditCauris = onCall(
       });
 
       return {
+        kind: "applied" as const,
         cauris: newCauris,
         version: newVersion,
         amount: effectiveCredit,
-        replayed: false,
       };
     });
+
+    if (result.kind === "rate_limited") {
+      logger.warn("creditCauris: daily count cap reached (possible farming)", {
+        uid,
+        source,
+        count: result.count,
+        limit: result.limit,
+      });
+      // Audit best-effort hors transaction (la tx a été abandonnée).
+      auditCollectionRef(uid)
+        .doc()
+        .set({
+          type: "rate_limited",
+          source,
+          amount,
+          actor_uid: uid,
+          timestamp: FieldValue.serverTimestamp(),
+          details: {
+            reason: "credit_daily_count_exceeds_cap",
+            count: result.count,
+            limit: result.limit,
+            reference,
+          },
+        })
+        .catch(() => {});
+      throw new HttpsError(
+        "resource-exhausted",
+        `Limite quotidienne de crédits "${source}" atteinte (${result.limit}/jour).`
+      );
+    }
 
     logger.info("creditCauris: success", {
       uid,
@@ -167,7 +238,7 @@ export const creditCauris = onCall(
       requestedAmount: amount,
       effectiveCredit: result.amount,
       newBalance: result.cauris,
-      replayed: result.replayed,
+      replayed: result.kind === "replayed",
     });
 
     return {
