@@ -4,11 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:defi_kilimandjaro/core/constants/duel_protocol.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart'
-    show firebaseFunctionsProvider;
+    show firebaseAuthProvider, firebaseFunctionsProvider;
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart'
     show firestoreProvider;
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:defi_kilimandjaro/domain/entities/tournament.dart';
+import 'package:defi_kilimandjaro/domain/entities/tournament_badge.dart';
 import 'package:defi_kilimandjaro/domain/entities/tournament_participant.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -111,6 +112,24 @@ class TournamentRepository {
     });
   }
 
+  /// Stream des badges de tournoi gagnés par un joueur (profil).
+  ///
+  /// Tri client par rang croissant (vainqueurs d'abord) — pas d'index requis.
+  Stream<List<TournamentBadge>> watchBadges(String uid) {
+    return firestore
+        .collection('profiles')
+        .doc(uid)
+        .collection('badges')
+        .snapshots()
+        .map((snap) {
+      final list = snap.docs
+          .map((d) => TournamentBadge.fromFirestore(d.id, d.data()))
+          .toList()
+        ..sort((a, b) => a.rank.compareTo(b.rank));
+      return list;
+    });
+  }
+
   /// Stream de la fiche du participant courant (points, rang, récompense).
   Stream<TournamentParticipant?> watchMyParticipant(String tid, String uid) {
     return _tournaments
@@ -195,4 +214,12 @@ final tournamentProvider =
 final tournamentStandingsProvider =
     StreamProvider.family<List<TournamentParticipant>, String>((ref, tid) {
   return ref.watch(tournamentRepositoryProvider).watchStandings(tid);
+});
+
+/// Badges de tournoi du joueur courant (vide si non connecté).
+final myTournamentBadgesProvider =
+    StreamProvider<List<TournamentBadge>>((ref) {
+  final uid = ref.watch(firebaseAuthProvider).currentUser?.uid;
+  if (uid == null) return Stream.value(const []);
+  return ref.watch(tournamentRepositoryProvider).watchBadges(uid);
 });
