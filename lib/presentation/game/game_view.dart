@@ -29,6 +29,8 @@ import 'package:defi_kilimandjaro/presentation/mountains/mountain_reveal_intent.
 import 'package:defi_kilimandjaro/presentation/result/failure_view.dart';
 import 'package:defi_kilimandjaro/presentation/result/mountain_conquest_view.dart';
 import 'package:defi_kilimandjaro/presentation/result/victory_view.dart';
+import 'package:defi_kilimandjaro/presentation/theme/pack_background.dart';
+import 'package:defi_kilimandjaro/presentation/theme/pack_theme_provider.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -94,8 +96,9 @@ class _GameViewState extends ConsumerState<GameView>
     if (_briefingShown) return;
     _briefingShown = true;
     final modifiers = widget.args.config.modifiers;
-    final encountered = ref
-        .read(playerProgressProvider.select((p) => p.encounteredModifiers));
+    final encountered = ref.read(
+      playerProgressProvider.select((p) => p.encounteredModifiers),
+    );
     final firstEncounter = modifiers.difference(encountered);
     _pauseForModal();
     await showDialog<void>(
@@ -199,6 +202,7 @@ class _GameViewState extends ConsumerState<GameView>
     final provider = gameControllerProvider(widget.args);
     final gameState = ref.watch(provider);
     final controller = ref.read(provider.notifier);
+    final packTheme = ref.watch(activePackThemeProvider);
 
     // Listen for phase transitions and show overlay exactly once per end state.
     ref.listen<GameState>(provider, (previous, next) {
@@ -210,7 +214,9 @@ class _GameViewState extends ConsumerState<GameView>
         // pack. Seule une victoire effective déclenche le marquage (une
         // défaite garde la devinette ouverte pour un retry).
         unawaited(
-          ref.read(seenDevinetteTrackerProvider).markSolved(
+          ref
+              .read(seenDevinetteTrackerProvider)
+              .markSolved(
                 packId: next.devinette.pack,
                 devinetteId: next.devinette.id,
               ),
@@ -255,71 +261,76 @@ class _GameViewState extends ConsumerState<GameView>
         _confirmBack();
       },
       child: Scaffold(
-        backgroundColor: AppColors.vertForet,
-        body: SafeArea(
-          child: Column(
-            children: <Widget>[
-              // Header — montagne en cours + niveau (au lieu du nom d'app).
-              _buildHeader(gameState.cauris),
-              const SizedBox(height: 8),
-              // Riddle card.
-              _RiddleCard(riddle: widget.args.devinette.riddle),
-              if (widget.args.config.isBoss ||
-                  widget.args.config.modifiers.isNotEmpty) ...<Widget>[
+        backgroundColor: packTheme.background,
+        body: PackBackground(
+          theme: packTheme,
+          child: SafeArea(
+            child: Column(
+              children: <Widget>[
+                // Header — montagne en cours + niveau (au lieu du nom d'app).
+                _buildHeader(gameState.cauris),
                 const SizedBox(height: 8),
-                _ModifierBadges(
-                  modifiers: widget.args.config.modifiers,
-                  isBoss: widget.args.config.isBoss,
+                // Riddle card.
+                _RiddleCard(riddle: widget.args.devinette.riddle),
+                if (widget.args.config.isBoss ||
+                    widget.args.config.modifiers.isNotEmpty) ...<Widget>[
+                  const SizedBox(height: 8),
+                  _ModifierBadges(
+                    modifiers: widget.args.config.modifiers,
+                    isBoss: widget.args.config.isBoss,
+                  ),
+                ],
+                const SizedBox(height: 8),
+                // Timer bar — totalTime calibré sur la config du niveau.
+                TimerBar(
+                  timeLeft: gameState.timeLeft,
+                  totalTime: widget.args.config.timerSeconds,
                 ),
-              ],
-              const SizedBox(height: 8),
-              // Timer bar — totalTime calibré sur la config du niveau.
-              TimerBar(
-                timeLeft: gameState.timeLeft,
-                totalTime: widget.args.config.timerSeconds,
-              ),
-              const SizedBox(height: 10),
-              // Answer cells — quand `reverse` (« mot à l'envers ») est
-              // actif, les cases se remplissent de droite à gauche : la
-              // 1re lettre saisie va dans la dernière case, etc.
-              AnswerCells(
-                answer: gameState.expectedAnswer,
-                formedLetters: gameState.formedWord,
-                isValidated: gameState.validationCorrect,
-                fillFromEnd: gameState.reverseAnswer,
-                revealedPositions: gameState.revealedPositions,
-              ),
-              const SizedBox(height: 10),
-              // Circular tile grid — `Expanded` absorbe l'espace gagné par
-              // la suppression du `_RewardedAdChip` pleine-largeur (~36pt).
-              Expanded(
-                child: Center(
-                  child: CircularGrid(
-                    letters: gameState.displayLetters,
-                    selectedIndices: gameState.selectedIndices,
-                    hiddenIndices: gameState.fogHiddenIndices,
-                    shuffledIndices: gameState.shuffledIndices,
-                    phase: gameState.phase,
-                    onTileEntered: controller.selectTile,
-                    onTrailSelfIntersectingChanged:
-                        controller.updateTrailSelfIntersecting,
-                    onDragEnd: () {
-                      // validate() is called automatically on complete word;
-                      // on partial lift we just let selection persist.
-                    },
+                const SizedBox(height: 10),
+                // Answer cells — quand `reverse` (« mot à l'envers ») est
+                // actif, les cases se remplissent de droite à gauche : la
+                // 1re lettre saisie va dans la dernière case, etc.
+                AnswerCells(
+                  answer: gameState.expectedAnswer,
+                  formedLetters: gameState.formedWord,
+                  isValidated: gameState.validationCorrect,
+                  fillFromEnd: gameState.reverseAnswer,
+                  revealedPositions: gameState.revealedPositions,
+                  theme: packTheme,
+                ),
+                const SizedBox(height: 10),
+                // Circular tile grid — `Expanded` absorbe l'espace gagné par
+                // la suppression du `_RewardedAdChip` pleine-largeur (~36pt).
+                Expanded(
+                  child: Center(
+                    child: CircularGrid(
+                      theme: packTheme,
+                      letters: gameState.displayLetters,
+                      selectedIndices: gameState.selectedIndices,
+                      hiddenIndices: gameState.fogHiddenIndices,
+                      shuffledIndices: gameState.shuffledIndices,
+                      phase: gameState.phase,
+                      onTileEntered: controller.selectTile,
+                      onTrailSelfIntersectingChanged:
+                          controller.updateTrailSelfIntersecting,
+                      onDragEnd: () {
+                        // validate() is called automatically on complete word;
+                        // on partial lift we just let selection persist.
+                      },
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              // Bottom action row — [Pub?] · Indice · Effacer.
-              // Le bouton Valider a été retiré (auto-validation déclenchée
-              // dans `selectTile` quand `state.isComplete`). Le chip pub
-              // pleine-largeur a été absorbé ici pour rendre son espace à
-              // la grille. Pub gating + montant rewarded sont pilotés par
-              // Remote Config via `_buildActionButtons` (cf. helper).
-              _buildActionButtons(context, ref, controller, gameState),
-              const SizedBox(height: 12),
-            ],
+                const SizedBox(height: 10),
+                // Bottom action row — [Pub?] · Indice · Effacer.
+                // Le bouton Valider a été retiré (auto-validation déclenchée
+                // dans `selectTile` quand `state.isComplete`). Le chip pub
+                // pleine-largeur a été absorbé ici pour rendre son espace à
+                // la grille. Pub gating + montant rewarded sont pilotés par
+                // Remote Config via `_buildActionButtons` (cf. helper).
+                _buildActionButtons(context, ref, controller, gameState),
+                const SizedBox(height: 12),
+              ],
+            ),
           ),
         ),
       ),
@@ -427,8 +438,7 @@ class _GameViewState extends ConsumerState<GameView>
     );
 
     return _ActionButtons(
-      hintCostLabel:
-          hasFreeHint ? 'game.hint_free_badge'.tr() : '-$cost',
+      hintCostLabel: hasFreeHint ? 'game.hint_free_badge'.tr() : '-$cost',
       onHint: () {
         // Le freebie quotidien est prioritaire sur le solde cauris.
         // `controller.useHint` appelle `spendOnHint` côté repo qui
@@ -478,7 +488,8 @@ class _GameViewState extends ConsumerState<GameView>
               }
             }
           : null,
-      canHint: hasLettersLeft &&
+      canHint:
+          hasLettersLeft &&
           isPlaying &&
           (hasFreeHint || canAfford || adsAllowed),
       canWatchAd: isPlaying,
@@ -644,8 +655,9 @@ class _GameViewState extends ConsumerState<GameView>
       // Pour la devinette suivante en chaîne, on se base sur le niveau
       // que le joueur s'apprête à atteindre (completedLevels + 1).
       // Si pas de montagne (mode Hub) → config fallback.
-      final nextLevelIndex =
-          mountain != null ? mountain.completedLevels + 1 : null;
+      final nextLevelIndex = mountain != null
+          ? mountain.completedLevels + 1
+          : null;
       final config = mountain != null
           ? LevelDifficultyResolver.resolve(
               mountain: mountain,
@@ -751,10 +763,7 @@ class _GameViewState extends ConsumerState<GameView>
     if (isPayWallActive) {
       final newFailCount = await ref
           .read(playerProgressProvider.notifier)
-          .recordLevelFailure(
-            mountainId: mountainId,
-            levelIndex: levelIndex,
-          );
+          .recordLevelFailure(mountainId: mountainId, levelIndex: levelIndex);
       answerRevealed = newFailCount >= _autoRevealFailThreshold;
     }
 
@@ -804,7 +813,9 @@ class _GameViewState extends ConsumerState<GameView>
             ? () async {
                 // Analytics : taux d'achat de révélation par variante A/B.
                 unawaited(
-                  ref.read(analyticsServiceProvider).logAnswerRevealed(
+                  ref
+                      .read(analyticsServiceProvider)
+                      .logAnswerRevealed(
                         tier: config.difficultyTier,
                         cost: revealCostCauris,
                       ),

@@ -27,6 +27,10 @@ class Pack extends Equatable {
     this.ordering = 100,
     this.unlockCostCauris,
     this.themeColorHex,
+    this.themeId,
+    this.themeOverrides,
+    this.themeMotif,
+    this.themeTileShape,
     this.iconUrl,
     this.minAppVersion,
     this.availableFrom,
@@ -44,6 +48,10 @@ class Pack extends Equatable {
       freeChoiceEligible: (json['free_choice_eligible'] as bool?) ?? false,
       priceEur: (json['price_eur'] as num?)?.toDouble() ?? 0.0,
       priceCauris: (json['price_cauris'] as num?)?.toInt() ?? 0,
+      themeId: json['theme_id'] as String?,
+      themeOverrides: _parseStringMap(json['theme_overrides']),
+      themeMotif: json['theme_motif'] as String?,
+      themeTileShape: json['theme_tile_shape'] as String?,
     );
   }
 
@@ -76,12 +84,27 @@ class Pack extends Equatable {
       ordering: (json['ordering'] as num?)?.toInt() ?? 100,
       unlockCostCauris: (json['unlock_cost_cauris'] as num?)?.toInt(),
       themeColorHex: json['theme_color_hex'] as String?,
+      themeId: json['theme_id'] as String?,
+      themeOverrides: _parseStringMap(json['theme_overrides']),
+      themeMotif: json['theme_motif'] as String?,
+      themeTileShape: json['theme_tile_shape'] as String?,
       iconUrl: json['icon_url'] as String?,
       minAppVersion: json['min_app_version'] as String?,
       availableFrom: _parseDate(json['available_from']),
       availableUntil: _parseDate(json['available_until']),
       source: PackSource.remote,
     );
+  }
+
+  /// Parse une map `{clé: hex}` (overrides couleur). Tolère null / types
+  /// invalides → retourne null. Filtre les entrées non-String.
+  static Map<String, String>? _parseStringMap(dynamic raw) {
+    if (raw is! Map) return null;
+    final out = <String, String>{};
+    raw.forEach((k, v) {
+      if (k is String && v is String) out[k] = v;
+    });
+    return out.isEmpty ? null : out;
   }
 
   static DateTime? _parseDate(dynamic raw) {
@@ -132,6 +155,10 @@ class Pack extends Equatable {
       ordering: remote.ordering,
       unlockCostCauris: remote.unlockCostCauris ?? unlockCostCauris,
       themeColorHex: remote.themeColorHex ?? themeColorHex,
+      themeId: remote.themeId ?? themeId,
+      themeOverrides: remote.themeOverrides ?? themeOverrides,
+      themeMotif: remote.themeMotif ?? themeMotif,
+      themeTileShape: remote.themeTileShape ?? themeTileShape,
       iconUrl: remote.iconUrl ?? iconUrl,
       minAppVersion: remote.minAppVersion ?? minAppVersion,
       availableFrom: remote.availableFrom ?? availableFrom,
@@ -191,7 +218,26 @@ class Pack extends Equatable {
   final int? unlockCostCauris;
 
   /// Hex color (#RRGGBB) du theme visuel du pack. Null si non spécifié.
+  ///
+  /// Legacy : sert uniquement de teinte d'icône fallback. Le skin de jeu
+  /// complet passe désormais par [themeId] / [themeOverrides].
   final String? themeColorHex;
+
+  /// Id du preset de skin bundlé à appliquer (cf. `PackThemes`). Null →
+  /// résolution par convention d'id de pack, sinon thème par défaut.
+  final String? themeId;
+
+  /// Overrides couleur distants appliqués sur le preset (`{role: hex}`).
+  /// Permet de retoucher un skin sans release. Null si aucun override.
+  final Map<String, String>? themeOverrides;
+
+  /// Override distant du motif de fond (`adinkra`, `kita`, `bogolan`,
+  /// `kente`, `vagues`, `none`). Null = motif du preset.
+  final String? themeMotif;
+
+  /// Override distant de la forme des tuiles (`sculpted`, `rounded`, `hex`,
+  /// `diamond`). Null = forme du preset.
+  final String? themeTileShape;
 
   /// URL Storage de l'icône du pack. Null si pas d'icône custom.
   final String? iconUrl;
@@ -251,6 +297,10 @@ class Pack extends Equatable {
     ordering,
     unlockCostCauris,
     themeColorHex,
+    themeId,
+    themeOverrides,
+    themeMotif,
+    themeTileShape,
     iconUrl,
     minAppVersion,
     availableFrom,

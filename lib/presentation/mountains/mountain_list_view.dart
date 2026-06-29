@@ -5,12 +5,15 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
+import 'package:defi_kilimandjaro/domain/entities/pack_theme.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_reveal_intent.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/altimeter_rail.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/atmosphere_layer.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
 import 'package:defi_kilimandjaro/presentation/packs/widgets/active_pack_chip.dart';
+import 'package:defi_kilimandjaro/presentation/theme/pack_motif_painter.dart';
+import 'package:defi_kilimandjaro/presentation/theme/pack_theme_provider.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/mountain_hero_image.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -300,6 +303,7 @@ class _MountainListViewState extends ConsumerState<MountainListView>
   @override
   Widget build(BuildContext context) {
     final asyncMountains = ref.watch(mountainsProvider);
+    final packTheme = ref.watch(activePackThemeProvider);
     // Cache local : on garde la dernière liste connue pour éviter de
     // démonter le PageView pendant un re-fetch (voir doc de _cachedMountains).
     if (asyncMountains.hasValue) {
@@ -366,6 +370,7 @@ class _MountainListViewState extends ConsumerState<MountainListView>
                               isCurrentTarget: index == currentIdx,
                               pulseAnim: _pulseAnim,
                               scrollFraction: scrollFraction,
+                              packTheme: packTheme,
                               onTap: () => _onMountainTap(m),
                             ),
                           );
@@ -457,12 +462,17 @@ class _MountainPage extends StatelessWidget {
     required this.pulseAnim,
     required this.scrollFraction,
     required this.onTap,
+    this.packTheme = PackThemes.defaultTheme,
   });
 
   final Mountain mountain;
   final int rank;
   final bool isCurrentTarget;
   final Animation<double> pulseAnim;
+
+  /// Skin du pack actif — teinte l'ambiance (gradients de biome) et pose un
+  /// motif culturel léger sur la carte. Défaut = ambiance historique pure.
+  final PackTheme packTheme;
   final double scrollFraction;
   final VoidCallback onTap;
 
@@ -497,13 +507,37 @@ class _MountainPage extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               // 1. Scène : ciel biome + nuages parallax (clippés dans la carte).
-              Positioned.fill(child: AtmosphereLayer(biome: biome)),
+              Positioned.fill(
+                child: AtmosphereLayer(
+                  biome: biome,
+                  tint: packTheme.sommetsTint,
+                ),
+              ),
               Positioned.fill(
                 child: ParallaxBgLayer(
                   scrollFraction: scrollFraction,
                   biome: biome,
                 ),
               ),
+              // Motif culturel du pack en sur-couche très légère (identité
+              // visuelle dédiée par pack). Aucun pour le thème par défaut.
+              if (packTheme.motif != PackMotif.none)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: RepaintBoundary(
+                      child: CustomPaint(
+                        painter: PackMotifPainter(
+                          motif: packTheme.motif,
+                          color:
+                              (packTheme.motifColor ??
+                                      packTheme.sommetsTint ??
+                                      packTheme.accent)
+                                  .withValues(alpha: 0.06),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
 
               // 2. Sommet peint (hero PNG) + halo pulsé sur le sommet courant.
               // Repli : silhouette vectorielle si l'asset hero manque.

@@ -4,6 +4,7 @@ import 'package:defi_kilimandjaro/core/geometry/freehand_path.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/domain/entities/pack_theme.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/golden_path.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/letter_grid_pattern.dart';
 import 'package:flutter/material.dart';
@@ -32,12 +33,16 @@ class CircularGrid extends StatefulWidget {
     required this.phase,
     required this.onTileEntered,
     required this.onDragEnd,
+    this.theme = PackThemes.defaultTheme,
     this.shuffledIndices = const <int>[],
     this.seed,
     this.hiddenIndices = const <int>{},
     this.onTrailSelfIntersectingChanged,
     super.key,
   });
+
+  /// Skin de pack appliqué aux tuiles et au chemin. Défaut = « Vert Nuit ».
+  final PackTheme theme;
 
   /// Lettres dans l'ordre shufflé.
   final List<String> letters;
@@ -325,7 +330,8 @@ class _CircularGridState extends State<CircularGrid>
         // doigt la ferait clignoter). Le retrait reste possible via un
         // tap discret (pointer down) ou un slide-back sur une lettre
         // antérieure du chemin.
-        final isLastSelected = widget.selectedIndices.isNotEmpty &&
+        final isLastSelected =
+            widget.selectedIndices.isNotEmpty &&
             widget.selectedIndices.last == idx;
         if (!isLastSelected) {
           _reportTrailGeometry(idx);
@@ -419,6 +425,7 @@ class _CircularGridState extends State<CircularGrid>
                         return GoldenPath(
                           points: _animatedTrail,
                           fingerPosition: _fingerPosition,
+                          color: widget.theme.path,
                         );
                       },
                     ),
@@ -450,6 +457,7 @@ class _CircularGridState extends State<CircularGrid>
                         child: _Tile(
                           letter: widget.letters[i],
                           isSelected: isSelected,
+                          theme: widget.theme,
                           selectionOrder: isSelected
                               ? widget.selectedIndices.indexOf(i) + 1
                               : null,
@@ -477,11 +485,13 @@ class _Tile extends StatefulWidget {
   const _Tile({
     required this.letter,
     required this.isSelected,
+    required this.theme,
     this.selectionOrder,
   });
 
   final String letter;
   final bool isSelected;
+  final PackTheme theme;
   final int? selectionOrder;
 
   @override
@@ -530,6 +540,7 @@ class _TileState extends State<_Tile> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     // Tuile « sculptée » : carré aux coins doux, dégradé bronze (or à la
     // sélection), lèvre 3D en bas + ombre ambiante, lettre foncée crisp.
+    final theme = widget.theme;
     final List<Color> gradient;
     final Color edge;
     final Color textColor;
@@ -537,58 +548,86 @@ class _TileState extends State<_Tile> with SingleTickerProviderStateMixin {
 
     if (selected) {
       gradient = <Color>[
-        Color.lerp(AppColors.orJour, AppColors.textePrimaire, 0.22)!,
-        AppColors.orJour,
+        Color.lerp(theme.tileSelected, AppColors.textePrimaire, 0.22)!,
+        theme.tileSelected,
       ];
-      edge = AppColors.orCrepuscule;
-      textColor = AppColors.surface;
+      edge = theme.tileSelectedEdge;
+      textColor = theme.tileText;
     } else {
       gradient = <Color>[
-        Color.lerp(AppColors.bois, AppColors.textePrimaire, 0.16)!,
-        AppColors.bois,
+        Color.lerp(theme.tile, AppColors.textePrimaire, 0.16)!,
+        theme.tile,
       ];
-      edge = AppColors.boisFonce;
-      textColor = AppColors.surface;
+      edge = theme.tileEdge;
+      textColor = theme.tileText;
     }
 
-    final tile = AnimatedContainer(
-      duration: const Duration(milliseconds: 150),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: gradient,
-        ),
-        boxShadow: <BoxShadow>[
-          // Lèvre sculptée (extrusion 3D bas).
-          BoxShadow(color: edge, offset: const Offset(0, 4)),
-          // Ombre ambiante portée.
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.32),
-            offset: const Offset(0, 8),
-            blurRadius: 12,
-          ),
-          // Halo or lumineux à la sélection.
-          if (selected)
-            BoxShadow(
-              color: AppColors.orJour.withValues(alpha: 0.5),
-              blurRadius: 22,
-            ),
-        ],
+    // Lèvre 3D + ombre ambiante + halo de sélection. GPU-safe (blur sans
+    // MaskFilter). Partagés par les deux chemins de rendu ci-dessous.
+    final shadows = <BoxShadow>[
+      // Lèvre sculptée (extrusion 3D bas).
+      BoxShadow(color: edge, offset: const Offset(0, 4)),
+      // Ombre ambiante portée.
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.32),
+        offset: const Offset(0, 8),
+        blurRadius: 12,
       ),
-      child: Center(
-        child: Text(
-          widget.letter,
-          style: AppTypography.bebas(
-            size: 28,
-            color: textColor,
-            letterSpacing: 0,
-            weight: FontWeight.w800,
-          ),
+      // Halo lumineux à la sélection (teinté par le skin).
+      if (selected)
+        BoxShadow(
+          color: theme.tileSelected.withValues(alpha: 0.5),
+          blurRadius: 22,
+        ),
+    ];
+    final letter = Center(
+      child: Text(
+        widget.letter,
+        style: AppTypography.bebas(
+          size: 28,
+          color: textColor,
+          letterSpacing: 0,
+          weight: FontWeight.w800,
         ),
       ),
     );
+
+    final gradientFill = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: gradient,
+    );
+
+    // Formes rectangulaires (sculpted/rounded) : `AnimatedContainer` pour
+    // garder le micro-fondu 150 ms des couleurs/halo à la sélection.
+    // Formes polygonales (hex/diamond) : `ShapeDecoration` (non animable en
+    // lerp) pour que lèvre/ombres suivent le polygone.
+    final radius = switch (theme.tileShape) {
+      TileShape.rounded => 28.0,
+      _ => AppSpacing.radiusMd,
+    };
+    final isPolygon =
+        theme.tileShape == TileShape.hex ||
+        theme.tileShape == TileShape.diamond;
+
+    final tile = isPolygon
+        ? DecoratedBox(
+            decoration: ShapeDecoration(
+              shape: _tileShapeBorder(theme.tileShape),
+              gradient: gradientFill,
+              shadows: shadows,
+            ),
+            child: letter,
+          )
+        : AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(radius),
+              gradient: gradientFill,
+              boxShadow: shadows,
+            ),
+            child: letter,
+          );
 
     return AnimatedBuilder(
       animation: _scaleAnim,
@@ -597,4 +636,101 @@ class _TileState extends State<_Tile> with SingleTickerProviderStateMixin {
       child: tile,
     );
   }
+}
+
+/// Forme de la tuile selon le skin du pack.
+///
+/// `sculpted` / `rounded` = rectangles à coins plus ou moins doux ;
+/// `hex` / `diamond` = polygones réguliers inscrits.
+ShapeBorder _tileShapeBorder(TileShape shape) {
+  switch (shape) {
+    case TileShape.sculpted:
+      return BorderRadius.circular(AppSpacing.radiusMd).toRoundedRectBorder();
+    case TileShape.rounded:
+      return BorderRadius.circular(28).toRoundedRectBorder();
+    case TileShape.hex:
+      // Hexagone à sommet plat (rotation 30°).
+      return const _PolygonBorder(sides: 6, rotation: math.pi / 6);
+    case TileShape.diamond:
+      return const _PolygonBorder(sides: 4);
+  }
+}
+
+extension on BorderRadius {
+  RoundedRectangleBorder toRoundedRectBorder() =>
+      RoundedRectangleBorder(borderRadius: this);
+}
+
+/// [OutlinedBorder] traçant un polygone régulier inscrit dans la boîte.
+///
+/// Utilisé pour les tuiles `hex` / `diamond`. `paintInterior` permet à
+/// [ShapeDecoration] de remplir le polygone avec le dégradé (et non sa boîte
+/// englobante), et `getOuterPath` fait suivre les ombres à la forme.
+class _PolygonBorder extends OutlinedBorder {
+  const _PolygonBorder({required this.sides, this.rotation = 0});
+
+  /// Nombre de côtés (≥ 3).
+  final int sides;
+
+  /// Rotation de départ (radians) — oriente le polygone.
+  final double rotation;
+
+  Path _polygon(Rect rect) {
+    final center = rect.center;
+    final radius = math.min(rect.width, rect.height) / 2;
+    final path = Path();
+    for (var i = 0; i < sides; i++) {
+      final angle = rotation + i * 2 * math.pi / sides;
+      final point =
+          center + Offset(math.cos(angle) * radius, math.sin(angle) * radius);
+      if (i == 0) {
+        path.moveTo(point.dx, point.dy);
+      } else {
+        path.lineTo(point.dx, point.dy);
+      }
+    }
+    return path..close();
+  }
+
+  @override
+  EdgeInsetsGeometry get dimensions => EdgeInsets.zero;
+
+  @override
+  Path getOuterPath(Rect rect, {TextDirection? textDirection}) =>
+      _polygon(rect);
+
+  @override
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) =>
+      _polygon(rect);
+
+  @override
+  void paintInterior(
+    Canvas canvas,
+    Rect rect,
+    Paint paint, {
+    TextDirection? textDirection,
+  }) {
+    canvas.drawPath(_polygon(rect), paint);
+  }
+
+  @override
+  bool get preferPaintInterior => true;
+
+  @override
+  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {}
+
+  @override
+  _PolygonBorder copyWith({BorderSide? side}) => this;
+
+  @override
+  ShapeBorder scale(double t) => this;
+
+  @override
+  bool operator ==(Object other) =>
+      other is _PolygonBorder &&
+      other.sides == sides &&
+      other.rotation == rotation;
+
+  @override
+  int get hashCode => Object.hash(sides, rotation);
 }

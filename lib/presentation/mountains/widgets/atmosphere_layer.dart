@@ -36,11 +36,19 @@ Color silhouetteColorForBiome(AtmosphereBiome biome) {
 /// Interpolé via [AnimatedContainer] entre les dégradés de biome.
 /// Place cette couche en premier dans le Stack de l'écran Sommets.
 class AtmosphereLayer extends StatelessWidget {
-  const AtmosphereLayer({required this.biome, super.key});
+  const AtmosphereLayer({required this.biome, this.tint, super.key});
 
   final AtmosphereBiome biome;
 
-  List<Color> get _colors {
+  /// Teinte de skin du pack actif. Quand non-null, les couleurs du biome sont
+  /// décalées (lerp ~30 %) vers cette couleur — on garde la logique altitude,
+  /// on la colore. `null` = ambiance historique pure.
+  final Color? tint;
+
+  /// Intensité du décalage des couleurs de biome vers [tint].
+  static const double _tintStrength = 0.32;
+
+  List<Color> get _baseColors {
     switch (biome) {
       case AtmosphereBiome.savanne:
         return [AppColors.savanneOcre, AppColors.savanneFonce];
@@ -51,6 +59,15 @@ class AtmosphereLayer extends StatelessWidget {
       case AtmosphereBiome.altitude:
         return [AppColors.cielHauteur, AppColors.neigeBlanche];
     }
+  }
+
+  List<Color> get _colors {
+    final base = _baseColors;
+    final t = tint;
+    if (t == null) return base;
+    return base
+        .map((c) => Color.lerp(c, t, _tintStrength) ?? c)
+        .toList(growable: false);
   }
 
   @override
@@ -232,10 +249,7 @@ class _AtmospherePainter extends CustomPainter {
     final center = Offset(cx, cy);
     final haloPaint = Paint()
       ..shader = RadialGradient(
-        colors: <Color>[
-          haloColor,
-          haloColor.withValues(alpha: 0),
-        ],
+        colors: <Color>[haloColor, haloColor.withValues(alpha: 0)],
       ).createShader(Rect.fromCircle(center: center, radius: haloR));
     canvas
       ..drawCircle(center, haloR, haloPaint)
@@ -252,7 +266,11 @@ class _AtmospherePainter extends CustomPainter {
   }
 
   /// Dessine des cirrus filiformes : ellipses très plates, horizontales.
-  void _paintCirrus(Canvas canvas, List<_Cirrus> cirruses, {required Color rgb}) {
+  void _paintCirrus(
+    Canvas canvas,
+    List<_Cirrus> cirruses, {
+    required Color rgb,
+  }) {
     for (final c in cirruses) {
       final paint = Paint()
         ..color = rgb.withValues(alpha: c.opacity)
@@ -272,17 +290,47 @@ class _AtmospherePainter extends CustomPainter {
   /// déphasée), les 10 autres sont statiques.
   void _paintStars(Canvas canvas, double w, double h, double dy) {
     final stars = <_Star>[
-      _Star(cx: w * 0.11, cy: h * 0.06 + dy, r: 1.3, baseAlpha: 0.95, twinklePhase: 0),
+      _Star(
+        cx: w * 0.11,
+        cy: h * 0.06 + dy,
+        r: 1.3,
+        baseAlpha: 0.95,
+        twinklePhase: 0,
+      ),
       _Star(cx: w * 0.22, cy: h * 0.03 + dy, r: 0.9, baseAlpha: 0.85),
-      _Star(cx: w * 0.34, cy: h * 0.08 + dy, r: 1.1, baseAlpha: 0.90, twinklePhase: 0.25),
+      _Star(
+        cx: w * 0.34,
+        cy: h * 0.08 + dy,
+        r: 1.1,
+        baseAlpha: 0.90,
+        twinklePhase: 0.25,
+      ),
       _Star(cx: w * 0.45, cy: h * 0.04 + dy, r: 0.8, baseAlpha: 0.80),
       _Star(cx: w * 0.57, cy: h * 0.07 + dy, r: 1, baseAlpha: 0.88),
-      _Star(cx: w * 0.67, cy: h * 0.05 + dy, r: 1.3, baseAlpha: 0.95, twinklePhase: 0.50),
+      _Star(
+        cx: w * 0.67,
+        cy: h * 0.05 + dy,
+        r: 1.3,
+        baseAlpha: 0.95,
+        twinklePhase: 0.50,
+      ),
       _Star(cx: w * 0.90, cy: h * 0.03 + dy, r: 1.1, baseAlpha: 0.90),
       _Star(cx: w * 0.97, cy: h * 0.08 + dy, r: 0.9, baseAlpha: 0.85),
-      _Star(cx: w * 0.15, cy: h * 0.12 + dy, r: 0.8, baseAlpha: 0.78, twinklePhase: 0.75),
+      _Star(
+        cx: w * 0.15,
+        cy: h * 0.12 + dy,
+        r: 0.8,
+        baseAlpha: 0.78,
+        twinklePhase: 0.75,
+      ),
       _Star(cx: w * 0.39, cy: h * 0.13 + dy, r: 0.7, baseAlpha: 0.75),
-      _Star(cx: w * 0.74, cy: h * 0.13 + dy, r: 1, baseAlpha: 0.88, twinklePhase: 0.15),
+      _Star(
+        cx: w * 0.74,
+        cy: h * 0.13 + dy,
+        r: 1,
+        baseAlpha: 0.88,
+        twinklePhase: 0.15,
+      ),
       _Star(cx: w * 0.86, cy: h * 0.16 + dy, r: 0.8, baseAlpha: 0.80),
       _Star(cx: w * 0.28, cy: h * 0.18 + dy, r: 0.6, baseAlpha: 0.70),
       _Star(cx: w * 0.59, cy: h * 0.20 + dy, r: 0.7, baseAlpha: 0.72),

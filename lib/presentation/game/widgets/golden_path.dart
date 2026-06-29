@@ -19,6 +19,7 @@ class GoldenPath extends StatelessWidget {
   const GoldenPath({
     required this.points,
     required this.fingerPosition,
+    this.color = AppColors.orSoleil,
     super.key,
   });
 
@@ -28,6 +29,10 @@ class GoldenPath extends StatelessWidget {
   /// Position courante du doigt lors du drag (null si finger levé).
   final Offset? fingerPosition;
 
+  /// Couleur du chemin (skin de pack). Le glow et le trait net en sont
+  /// dérivés par opacité. Défaut = or historique.
+  final Color color;
+
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
@@ -35,6 +40,7 @@ class GoldenPath extends StatelessWidget {
         painter: _GoldenPathPainter(
           points: points,
           fingerPosition: fingerPosition,
+          color: color,
         ),
       ),
     );
@@ -42,11 +48,15 @@ class GoldenPath extends StatelessWidget {
 }
 
 class _GoldenPathPainter extends CustomPainter {
-  _GoldenPathPainter({required this.points, required this.fingerPosition})
-      : _pointsLength = points.length;
+  _GoldenPathPainter({
+    required this.points,
+    required this.fingerPosition,
+    required this.color,
+  }) : _pointsLength = points.length;
 
   final List<Offset> points;
   final Offset? fingerPosition;
+  final Color color;
 
   /// Snapshot de la longueur au moment de la construction. Indispensable
   /// car `points` est une liste **mutée en place** côté grille (append à
@@ -87,7 +97,7 @@ class _GoldenPathPainter extends CustomPainter {
       canvas.drawPath(
         path,
         Paint()
-          ..color = AppColors.orSoleil.withValues(alpha: alpha)
+          ..color = color.withValues(alpha: alpha)
           ..strokeWidth = width
           ..strokeCap = StrokeCap.round
           ..strokeJoin = StrokeJoin.round
@@ -99,7 +109,7 @@ class _GoldenPathPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = AppColors.cheminDore
+        ..color = color.withValues(alpha: 0.70)
         ..strokeWidth = 5
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
@@ -165,6 +175,7 @@ class _GoldenPathPainter extends CustomPainter {
   @override
   bool shouldRepaint(_GoldenPathPainter oldDelegate) {
     if (oldDelegate.fingerPosition != fingerPosition) return true;
+    if (oldDelegate.color != color) return true;
     // Cas drag normal : `points` est la **même liste mutée en place**
     // (append à chaque pointer move). On détecte le changement via la
     // longueur capturée à la construction.
