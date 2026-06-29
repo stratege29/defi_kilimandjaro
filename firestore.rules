@@ -118,6 +118,32 @@ service cloud.firestore {
           && request.auth.uid == uid;
         allow write: if false;
       }
+
+      // Badges cosmétiques de tournoi — lecture publique (affichés sur le
+      // profil/leaderboard), écriture UNIQUEMENT via Cloud Function
+      // (tournamentTicker, Admin SDK).
+      match /badges/{badgeId} {
+        allow read: if request.auth != null;
+        allow write: if false;
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Tournois « arène » — mode multi-joueurs temporisé
+    // -------------------------------------------------------------------------
+    // Lecture publique signed-in (liste, compte à rebours, nb participants,
+    // classement live). Toutes les écritures passent par les Cloud Functions
+    // (createTournament/joinTournament/requestArenaMatch/tournamentTicker via
+    // Admin SDK) : aucun client ne peut créer un tournoi, s'attribuer des points,
+    // ni modifier un classement.
+    match /tournaments/{tournamentId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+
+      match /participants/{uid} {
+        allow read: if request.auth != null;
+        allow write: if false;
+      }
     }
 
     // -------------------------------------------------------------------------

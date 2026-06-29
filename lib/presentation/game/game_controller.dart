@@ -34,6 +34,8 @@ class GameState {
     this.starsEarned = 0,
     this.fogHiddenIndices = const <int>{},
     this.caurisAwarded = 0,
+    this.currentTrailSelfIntersecting = false,
+    this.freehandBonusAwarded = 0,
   });
 
   final Devinette devinette;
@@ -91,6 +93,18 @@ class GameState {
   /// partie n'est pas en phase `won`.
   final int caurisAwarded;
 
+  /// Vrai si le tracé brut du doigt **en cours** se croise lui-même. Mis à
+  /// jour en continu par `CircularGrid` (cf. `updateTrailSelfIntersecting`)
+  /// au fil du drag. Lu une seule fois par [GameController.validate] au moment
+  /// de la victoire pour décider du bonus « À main levée ». Transitoire — pas
+  /// significatif hors `GamePhase.playing`.
+  final bool currentTrailSelfIntersecting;
+
+  /// Bonus « À main levée » crédité à la **dernière** victoire (0 si le tracé
+  /// se croisait, si le mot était trop court, ou en mode défi du jour). Lu par
+  /// `VictoryView` pour afficher la ligne bonus dédiée.
+  final int freehandBonusAwarded;
+
   /// Séquence de lettres attendue compte tenu du modifier `reverse`.
   /// Stockée comme String pour permettre l'égalité directe avec
   /// [formedWord] et le placement des lettres par indice ([revealedPositions]).
@@ -127,6 +141,8 @@ class GameState {
     int? starsEarned,
     Set<int>? fogHiddenIndices,
     int? caurisAwarded,
+    bool? currentTrailSelfIntersecting,
+    int? freehandBonusAwarded,
   }) {
     return GameState(
       devinette: devinette ?? this.devinette,
@@ -143,6 +159,9 @@ class GameState {
       starsEarned: starsEarned ?? this.starsEarned,
       fogHiddenIndices: fogHiddenIndices ?? this.fogHiddenIndices,
       caurisAwarded: caurisAwarded ?? this.caurisAwarded,
+      currentTrailSelfIntersecting:
+          currentTrailSelfIntersecting ?? this.currentTrailSelfIntersecting,
+      freehandBonusAwarded: freehandBonusAwarded ?? this.freehandBonusAwarded,
     );
   }
 }
@@ -317,7 +336,22 @@ class GameController extends StateNotifier<GameState> {
     state = state.copyWith(
       selectedIndices: const <int>[],
       validationCorrect: false,
+      // Nouveau geste à venir : on repart d'un tracé propre.
+      currentTrailSelfIntersecting: false,
     );
+  }
+
+  /// Remontée continue de la géométrie du tracé brut du doigt par
+  /// `CircularGrid`. Appelée **juste avant** chaque `selectTile`, de sorte que
+  /// la valeur soit à jour quand la sélection complète déclenche `validate()`
+  /// (synchrone). Détermine l'octroi du bonus « À main levée ».
+  // Bool positionnel volontaire : la méthode est passée en tear-off comme
+  // `ValueChanged<bool>` (callback de `CircularGrid`), signature imposée.
+  // ignore: avoid_positional_boolean_parameters
+  void updateTrailSelfIntersecting(bool selfIntersecting) {
+    if (state.phase != GamePhase.playing) return;
+    if (state.currentTrailSelfIntersecting == selfIntersecting) return;
+    state = state.copyWith(currentTrailSelfIntersecting: selfIntersecting);
   }
 
   /// Coût en cauris du **prochain** indice à utiliser (avec scaling
@@ -415,6 +449,13 @@ class GameController extends StateNotifier<GameState> {
             state.timeLeft * _economy.speedBonusPerSecond;
         caurisAwarded = (raw * _args.config.caurisMultiplier).round();
       }
+      // Bonus « À main levée » : récompense un mot relié d'un seul geste
+      // continu sans que le tracé brut du doigt ne se croise lui-même. Hors
+      // périmètre en mode défi du jour (flow de récompense fixe séparé).
+      final freehandBonus =
+          (!_args.isDailyChallenge && !state.currentTrailSelfIntersecting)
+              ? _economy.freehandBonus(state.expectedAnswer.length)
+              : 0;
       // Étoiles : (1) victoire (2) sans indice (3) ≥ 50 % timer restant.
       final stars = LevelStarRating.computeStars(
         won: true,
@@ -425,9 +466,10 @@ class GameController extends StateNotifier<GameState> {
       state = state.copyWith(
         phase: GamePhase.won,
         validationCorrect: true,
-        cauris: state.cauris + caurisAwarded,
+        cauris: state.cauris + caurisAwarded + freehandBonus,
         starsEarned: stars,
         caurisAwarded: caurisAwarded,
+        freehandBonusAwarded: freehandBonus,
       );
       // Persiste la victoire — sauf en mode défi du jour qui a son
       // propre flow (cf. `GameView` qui appelle
@@ -437,7 +479,7 @@ class GameController extends StateNotifier<GameState> {
         unawaited(
           _progress.recordWin(
             mountainId: _args.mountainId,
-            caurisAwarded: caurisAwarded,
+            caurisAwarded: caurisAwarded + freehandBonus,
             levelIndex: _args.levelIndex,
             starsEarned: stars,
             devinetteId: state.devinette.id,
@@ -476,6 +518,9 @@ class GameController extends StateNotifier<GameState> {
       state = state.copyWith(
         selectedIndices: const <int>[],
         validationCorrect: false,
+        // Symétrie avec clearSelection : le prochain geste repart d'un tracé
+        // propre (évite qu'un verdict « croisé » obsolète colle au state).
+        currentTrailSelfIntersecting: false,
       );
     }
   }

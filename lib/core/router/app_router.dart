@@ -29,11 +29,26 @@ import 'package:defi_kilimandjaro/presentation/profile/avatar_picker_view.dart';
 import 'package:defi_kilimandjaro/presentation/profile/profile_view.dart';
 import 'package:defi_kilimandjaro/presentation/shop/shop_view.dart';
 import 'package:defi_kilimandjaro/presentation/splash/splash_view.dart';
+import 'package:defi_kilimandjaro/presentation/tournament/tournament_arena_view.dart';
+import 'package:defi_kilimandjaro/presentation/tournament/tournament_detail_view.dart';
+import 'package:defi_kilimandjaro/presentation/tournament/tournament_list_view.dart';
+import 'package:defi_kilimandjaro/presentation/tournament/tournament_results_view.dart';
 import 'package:defi_kilimandjaro/presentation/ugc/my_submissions/my_submissions_view.dart';
 import 'package:defi_kilimandjaro/presentation/ugc/submit_devinette/submit_devinette_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+/// Arguments de navigation vers [AppRoutes.duelPlay] pour un match de tournoi.
+///
+/// Le duel classique passe directement un [DuelSession] en `extra` ; un match
+/// d'arène passe ce wrapper pour transporter le `tournamentId` (retour à
+/// l'arène en fin de match).
+class DuelPlayArgs {
+  const DuelPlayArgs({required this.session, required this.tournamentId});
+  final DuelSession session;
+  final String tournamentId;
+}
 
 /// Routes nommées de l'application.
 abstract final class AppRoutes {
@@ -101,6 +116,14 @@ abstract final class AppRoutes {
   // Phase 3 — packs thématiques.
   static const packChooser = '/pack-chooser';
   static const myPacks = '/my-packs';
+
+  // Tournois « arène » (mode multi-joueurs temporisé).
+  static const tournaments = '/tournaments';
+
+  static String tournamentDetailPath(String tid) => '/tournaments/$tid';
+  static String tournamentArenaPath(String tid) => '/tournaments/$tid/arena';
+  static String tournamentResultsPath(String tid) =>
+      '/tournaments/$tid/results';
 }
 
 /// Clé de navigation globale exposée pour DeepLinkService et le handler FCM.
@@ -270,9 +293,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       name: 'duel-play',
       pageBuilder: (_, state) => CustomTransitionPage<void>(
         key: state.pageKey,
-        child: DuelPlayView(
-          initialSession: state.extra! as DuelSession,
-        ),
+        child: () {
+          final extra = state.extra;
+          // Soit un [DuelSession] (duel classique), soit un [DuelPlayArgs]
+          // (match de tournoi, avec tournamentId pour le retour à l'arène).
+          if (extra is DuelPlayArgs) {
+            return DuelPlayView(
+              initialSession: extra.session,
+              tournamentId: extra.tournamentId,
+            );
+          }
+          return DuelPlayView(initialSession: extra! as DuelSession);
+        }(),
         transitionDuration: const Duration(milliseconds: 400),
         // reverseTransitionDuration defaults to transitionDuration (400ms) —
         // explicitly set a shorter one for the back gesture.
@@ -337,6 +369,39 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       builder: (_, state) => AddFriendConfirmView(
         friendUid: state.pathParameters['uid'] ?? '',
       ),
+    ),
+    // -------------------------------------------------------------------------
+    // Tournois « arène »
+    // -------------------------------------------------------------------------
+    GoRoute(
+      path: AppRoutes.tournaments,
+      name: 'tournaments',
+      builder: (_, __) => const TournamentListView(),
+      routes: [
+        GoRoute(
+          path: ':tid',
+          name: 'tournament-detail',
+          builder: (_, state) => TournamentDetailView(
+            tournamentId: state.pathParameters['tid']!,
+          ),
+          routes: [
+            GoRoute(
+              path: 'arena',
+              name: 'tournament-arena',
+              builder: (_, state) => TournamentArenaView(
+                tournamentId: state.pathParameters['tid']!,
+              ),
+            ),
+            GoRoute(
+              path: 'results',
+              name: 'tournament-results',
+              builder: (_, state) => TournamentResultsView(
+                tournamentId: state.pathParameters['tid']!,
+              ),
+            ),
+          ],
+        ),
+      ],
     ),
     // -------------------------------------------------------------------------
     // UGC — devinettes communautaires

@@ -235,6 +235,7 @@ class _GameViewState extends ConsumerState<GameView>
             next.timeLeft,
             next.starsEarned,
             next.caurisAwarded,
+            next.freehandBonusAwarded,
           );
         });
       } else if (next.phase == GamePhase.lost &&
@@ -300,6 +301,8 @@ class _GameViewState extends ConsumerState<GameView>
                     shuffledIndices: gameState.shuffledIndices,
                     phase: gameState.phase,
                     onTileEntered: controller.selectTile,
+                    onTrailSelfIntersectingChanged:
+                        controller.updateTrailSelfIntersecting,
                     onDragEnd: () {
                       // validate() is called automatically on complete word;
                       // on partial lift we just let selection persist.
@@ -487,6 +490,7 @@ class _GameViewState extends ConsumerState<GameView>
     int timeLeft,
     int starsEarned,
     int caurisAwarded,
+    int freehandBonus,
   ) {
     // Compte la victoire pour la cadence interstitielle (Étape D).
     // L'incrément est fait au moment de l'overlay : si le joueur quitte
@@ -504,6 +508,7 @@ class _GameViewState extends ConsumerState<GameView>
         devinette: widget.args.devinette,
         timeLeft: timeLeft,
         caurisAwarded: caurisAwarded,
+        freehandBonus: freehandBonus,
         starsEarned: starsEarned,
         isBoss: widget.args.config.isBoss,
         onNext: () async {
