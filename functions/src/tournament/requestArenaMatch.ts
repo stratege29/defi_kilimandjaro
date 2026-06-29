@@ -277,7 +277,17 @@ export const requestArenaMatch = onCall<
 
       const matchId = _generateMatchId();
       const cache = await _loadDevinettesCache();
-      const rounds = _pickThreeRounds(cache);
+      // Scope par packs sélectionnés (config tournoi). Rétro-compat : ancien
+      // champ `pack_id` (singulier) → tableau ; vide ⇒ pool global.
+      const rawPackIds = t["pack_ids"];
+      const packIds = Array.isArray(rawPackIds)
+        ? (rawPackIds as unknown[]).filter(
+            (p): p is string => typeof p === "string"
+          )
+        : typeof t["pack_id"] === "string" && t["pack_id"]
+          ? [t["pack_id"] as string]
+          : [];
+      const rounds = _pickThreeRounds(cache, packIds);
       const now2 = Date.now();
 
       const matchData: Record<string, unknown> = {
