@@ -144,10 +144,27 @@ class _Body extends ConsumerWidget {
                 label: 'tournament.duration'
                     .tr(args: ['${tournament.durationMin}']),
               ),
-              const SizedBox(height: AppSpacing.md),
-              _RulesCard(tournament: tournament),
+              const SizedBox(height: AppSpacing.xs),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () => _showRulesDialog(context, tournament),
+                  icon: const Icon(Icons.info_outline,
+                      size: 18, color: AppColors.orSoleil),
+                  label: Text(
+                    'tournament.rules'.tr(),
+                    style: AppTypography.bodySm
+                        .copyWith(color: AppColors.orSoleil),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+              ),
               if (tournament.rewards.isNotEmpty) ...[
-                const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.sm),
                 _RewardsCard(tournament: tournament),
               ],
               const SizedBox(height: AppSpacing.lg),
@@ -296,39 +313,31 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-class _RulesCard extends StatelessWidget {
-  const _RulesCard({required this.tournament});
-
-  final Tournament tournament;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.hairline),
+/// Popup des règles du tournoi (déclenchée depuis le lien « Règles »).
+Future<void> _showRulesDialog(BuildContext context, Tournament tournament) {
+  return showDialog<void>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: AppColors.surfaceContainer,
+      title: Text('tournament.rules'.tr(), style: AppTypography.headingSm),
+      content: Text(
+        'tournament.rules_body'.tr(args: [
+          '${tournament.pointsWin}',
+          '${tournament.pointsDraw}',
+        ]),
+        style: AppTypography.crimson(
+          size: 14,
+          color: AppColors.texteSecondaire,
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('tournament.rules'.tr(), style: AppTypography.headingSm),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            'tournament.rules_body'.tr(args: [
-              '${tournament.pointsWin}',
-              '${tournament.pointsDraw}',
-            ]),
-            style: AppTypography.crimson(
-              size: 14,
-              color: AppColors.texteSecondaire,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(),
+          child: Text('common.close'.tr()),
+        ),
+      ],
+    ),
+  );
 }
 
 class _RewardsCard extends StatelessWidget {
