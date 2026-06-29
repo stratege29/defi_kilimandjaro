@@ -81,3 +81,21 @@ export function requireEditor(auth: AuthLike): string {
   }
   return uid;
 }
+
+/**
+ * Vérifie le claim `role: 'moderator'` ou `'admin'`.
+ *
+ * Utilisé pour la modération UGC (moderateSubmission) — cohérent avec la règle
+ * Firestore `isModerator()`.
+ */
+export function requireModerator(auth: AuthLike): string {
+  const uid = requireAuth(auth);
+  const role = auth?.token?.role;
+  if (role !== "admin" && role !== "moderator") {
+    throw new HttpsError(
+      "permission-denied",
+      "Privilèges moderator ou admin requis pour cette opération."
+    );
+  }
+  return uid;
+}

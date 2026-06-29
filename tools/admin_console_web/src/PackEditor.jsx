@@ -207,6 +207,8 @@ function MetaForm({ packId, entry, onClose }) {
   const [motif, setMotif] = useState(entry?.theme_motif ?? '');
   const [tileShape, setTileShape] = useState(entry?.theme_tile_shape ?? '');
   const [overrides, setOverrides] = useState(entry?.theme_overrides ?? {});
+  const [name, setName] = useState(entry?.name?.fr ?? '');
+  const [description, setDescription] = useState(entry?.description?.fr ?? '');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
 
@@ -241,6 +243,10 @@ function MetaForm({ packId, entry, onClose }) {
         min_app_version: minApp.trim(),
         tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
       };
+      // Libellés server-driven (catalog/index) — n'envoyer que si renseignés
+      // (le schéma serveur rejette une map vide).
+      if (name.trim()) patch.name = { fr: name.trim() };
+      if (description.trim()) patch.description = { fr: description.trim() };
       await httpsCallable(functions, 'upsertPackMeta')({ packId, patch });
       onClose();
     } catch (e) {
@@ -260,6 +266,21 @@ function MetaForm({ packId, entry, onClose }) {
             qu'il n'y est pas (publier d'abord).
           </p>
         )}
+        <label>Nom du pack (FR)</label>
+        <input
+          value={name}
+          placeholder="ex. Les Petits Génies"
+          onChange={(e) => setName(e.target.value)}
+        />
+        <label>Description (FR)</label>
+        <input
+          value={description}
+          placeholder="ex. Mots simples pour les enfants : animaux, fruits…"
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <p className="muted small">
+          Laisser vide = l'app retombe sur la clé i18n bundlée (pack.{packId}.name).
+        </p>
         <div className="grid2">
           <label className="check">
             <input type="checkbox" checked={visible} onChange={(e) => setVisible(e.target.checked)} />

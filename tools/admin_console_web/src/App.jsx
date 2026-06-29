@@ -7,6 +7,7 @@ import PackEditor from './PackEditor.jsx';
 import DailyChallenges from './DailyChallenges.jsx';
 import Instagram from './Instagram.jsx';
 import Players from './Players.jsx';
+import PackCreator from './PackCreator.jsx';
 import Tournaments from './Tournaments.jsx';
 
 export default function App() {
@@ -41,6 +42,12 @@ export default function App() {
           }}
         >
           Catalogue
+        </button>
+        <button
+          className={tab === 'packcreator' ? 'nav active' : 'nav'}
+          onClick={() => setTab('packcreator')}
+        >
+          Pack Creator
         </button>
         <button
           className={tab === 'daily' ? 'nav active' : 'nav'}
@@ -81,6 +88,7 @@ export default function App() {
           ) : (
             <Catalog onEdit={setEditingPack} />
           ))}
+        {tab === 'packcreator' && <PackCreator />}
         {tab === 'daily' && <DailyChallenges />}
         {tab === 'players' && <Players />}
         {tab === 'tournaments' && <Tournaments />}

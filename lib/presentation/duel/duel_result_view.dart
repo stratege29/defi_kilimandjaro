@@ -25,6 +25,7 @@ import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/dashed_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/pack_icon.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -729,7 +730,7 @@ class _UpsellCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Tu as croisé ${pack.displayName}',
+                      'Tu as croisé ${pack.localizedName(context.locale.languageCode) ?? pack.displayName}',
                       style: AppTypography.headingSm,
                     ),
                     const SizedBox(height: 2),
@@ -944,7 +945,7 @@ class _RoundCard extends ConsumerWidget {
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(
-                      'Devinette du pack ${pack.displayName}',
+                      'Devinette du pack ${pack.localizedName(context.locale.languageCode) ?? pack.displayName}',
                       style: AppTypography.labelXs.copyWith(
                         color: AppColors.texteTertiaire,
                       ),

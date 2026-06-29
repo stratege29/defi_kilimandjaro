@@ -45,6 +45,11 @@ const ThemeOverrides = z
   })
   .strict();
 
+/** Map localisée `{fr: ..., en: ...}` — clés = codes langue ISO. */
+const LocalizedString = z
+  .record(z.string().min(1).max(280))
+  .refine((m) => Object.keys(m).length > 0, "map localisée vide");
+
 const Patch = z
   .object({
     visible: z.boolean().optional(),
@@ -77,6 +82,11 @@ const Patch = z
     free_choice_eligible: z.boolean().optional(),
     min_app_version: z.string().max(20).optional(),
     tags: z.array(z.string()).max(20).optional(),
+    // Libellés server-driven écrits dans catalog/index.packs[] : permettent de
+    // nommer un pack OTA sans release app (le client préfère ces valeurs aux
+    // clés i18n bundlées `pack.<id>.name`). Cf Pack.localizedName côté Flutter.
+    name: LocalizedString.optional(),
+    description: LocalizedString.optional(),
   })
   .strict();
 
