@@ -61,7 +61,15 @@ export const joinTournament = onCall(
 
       const pSnap = await tx.get(pRef);
       if (pSnap.exists) {
+        // Déjà inscrit → idempotent, pas de re-comptage ni de check plafond.
         return { joined: true, already: true };
+      }
+
+      // Plafond d'inscrits (défaut 200). Ne s'applique qu'aux nouveaux.
+      const count = (t["participant_count"] as number) ?? 0;
+      const max = (t["max_participants"] as number) ?? 200;
+      if (count >= max) {
+        throw new HttpsError("resource-exhausted", "Tournoi complet.");
       }
 
       tx.set(pRef, {

@@ -131,6 +131,13 @@ class _TournamentCard extends StatelessWidget {
                     style: AppTypography.bodySm
                         .copyWith(color: AppColors.texteSecondaire),
                   ),
+                  if (tournament.isFull && !tournament.isFinished) ...[
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      '· ${'tournament.full'.tr()}',
+                      style: AppTypography.bodySm.copyWith(color: AppColors.kola),
+                    ),
+                  ],
                   const Spacer(),
                   if (tournament.isFinished) ...[
                     const Icon(Icons.leaderboard_outlined,

@@ -122,6 +122,7 @@ function CreateForm({ onClose }) {
   const [pointsWin, setPointsWin] = useState(3);
   const [pointsDraw, setPointsDraw] = useState(1);
   const [minParticipants, setMinParticipants] = useState(2);
+  const [maxParticipants, setMaxParticipants] = useState(200);
   const [tiers, setTiers] = useState([
     { rank_min: 1, rank_max: 1, cauris: 500, badge_id: 'tournament_gold' },
     { rank_min: 2, rank_max: 3, cauris: 250, badge_id: 'tournament_silver' },
@@ -172,6 +173,7 @@ function CreateForm({ onClose }) {
         points_win: Number(pointsWin),
         points_draw: Number(pointsDraw),
         min_participants: Number(minParticipants),
+        max_participants: Number(maxParticipants),
         rewards,
       });
       onClose();
@@ -234,9 +236,18 @@ function CreateForm({ onClose }) {
           </div>
         </div>
 
-        <label>Participants min. (sous ce seuil, pas de récompense)</label>
-        <input type="number" min={1} value={minParticipants}
-          onChange={(e) => setMinParticipants(e.target.value)} />
+        <div className="grid2">
+          <div>
+            <label>Participants min. (sinon pas de récompense)</label>
+            <input type="number" min={1} value={minParticipants}
+              onChange={(e) => setMinParticipants(e.target.value)} />
+          </div>
+          <div>
+            <label>Participants max. (plafond)</label>
+            <input type="number" min={2} max={10000} value={maxParticipants}
+              onChange={(e) => setMaxParticipants(e.target.value)} />
+          </div>
+        </div>
 
         <label>Récompenses par rang</label>
         <table className="table">

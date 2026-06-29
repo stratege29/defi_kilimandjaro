@@ -497,6 +497,7 @@
     "points_short": "{} pts",
     "join": "Join",
     "joined": "Joined ✓",
+    "full": "Full",
     "join_failed": "Could not join the tournament.",
     "enter_arena": "Enter the arena",
     "view_results": "View results",

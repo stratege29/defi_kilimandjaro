@@ -75,6 +75,7 @@ class Tournament extends Equatable {
     required this.streakMin,
     required this.streakMult,
     required this.minParticipants,
+    required this.maxParticipants,
     required this.rewards,
     this.packId,
   });
@@ -96,6 +97,7 @@ class Tournament extends Equatable {
       streakMin: (data['streak_min'] as num?)?.toInt() ?? 2,
       streakMult: (data['streak_mult'] as num?)?.toInt() ?? 2,
       minParticipants: (data['min_participants'] as num?)?.toInt() ?? 2,
+      maxParticipants: (data['max_participants'] as num?)?.toInt() ?? 200,
       packId: data['pack_id'] as String?,
       rewards: ((data['rewards'] as List<dynamic>?) ?? [])
           .whereType<Map<String, dynamic>>()
@@ -116,8 +118,12 @@ class Tournament extends Equatable {
   final int streakMin;
   final int streakMult;
   final int minParticipants;
+  final int maxParticipants;
   final String? packId;
   final List<RewardTier> rewards;
+
+  /// Plus de place : le plafond d'inscrits est atteint.
+  bool get isFull => participantCount >= maxParticipants;
 
   bool get isScheduled => status == TournamentStatus.scheduled;
   bool get isLive => status == TournamentStatus.live;

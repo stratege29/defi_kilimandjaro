@@ -246,6 +246,15 @@ class _PrimaryAction extends StatelessWidget {
       );
     }
 
+    if (tournament.isFull) {
+      return AppButton(
+        label: 'tournament.full'.tr(),
+        variant: AppButtonVariant.soft,
+        fullWidth: true,
+        onPressed: null,
+      );
+    }
+
     return AppButton(
       label: 'tournament.join'.tr(),
       fullWidth: true,

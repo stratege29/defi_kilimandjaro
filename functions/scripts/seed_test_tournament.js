@@ -77,6 +77,7 @@ async function main() {
     streak_min: 2,
     streak_mult: 2,
     min_participants: 2,
+    max_participants: 200,
     rewards: [
       { rank_min: 1, rank_max: 1, cauris: 500, badge_id: "tournament_gold" },
       { rank_min: 2, rank_max: 3, cauris: 250, badge_id: "tournament_silver" },
