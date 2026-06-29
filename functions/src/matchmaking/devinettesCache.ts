@@ -19,6 +19,9 @@ export interface DevinetteDoc {
   explanation: string;
   proverb: string;
   difficulty: "easy" | "medium" | "hard";
+  /** Pack d'origine (id = `<pack>_NNN`). Sert au scoping par pack des tournois.
+   *  Absent sur les samples de fallback. */
+  pack?: string;
 }
 
 export interface RoundPayload {
@@ -187,11 +190,28 @@ function _shuffleArr<T>(arr: T[]): T[] {
   return copy;
 }
 
-export function _pickThreeRounds(cache: DifficultyCache): RoundPayload[] {
+/**
+ * Tire 3 manches (easy/medium/hard) sans doublon.
+ *
+ * `packIds` (optionnel) restreint le tirage aux devinettes de ces packs (mode
+ * tournoi). Si une difficulté n'a aucune devinette dans les packs choisis, on
+ * retombe sur le pool global pour CETTE difficulté — le match reste jouable
+ * (mieux qu'un tournoi cassé). `packIds` vide/absent ⇒ pool global complet.
+ */
+export function _pickThreeRounds(
+  cache: DifficultyCache,
+  packIds?: string[]
+): RoundPayload[] {
   const usedIds = new Set<string>();
+  const scoped =
+    packIds && packIds.length > 0 ? new Set(packIds) : null;
 
   const pick = (diff: "easy" | "medium" | "hard"): DevinetteDoc => {
-    const pool = cache.get(diff)!;
+    const full = cache.get(diff)!;
+    const scopedPool = scoped
+      ? full.filter((d) => d.pack != null && scoped.has(d.pack))
+      : full;
+    const pool = scopedPool.length > 0 ? scopedPool : full;
     const available = pool.filter((d) => !usedIds.has(d.id));
     const source = available.length > 0 ? available : pool;
     const chosen = source[Math.floor(Math.random() * source.length)];

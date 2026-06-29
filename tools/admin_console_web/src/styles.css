@@ -153,3 +153,5 @@ tr.today td { background: rgba(210,162,76,.08); }
 .modal hr.sep { border: 0; border-top: 1px solid #000; margin: 16px 0 4px; }
 .theme-role { display: flex; flex-direction: column; gap: 2px; }
 .theme-role input[type="color"] { border: 1px solid #000; border-radius: 6px; background: var(--surface2); cursor: pointer; }
+.pack-checklist { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 4px 0 8px; }
+.pack-checklist .check-row { display: flex; align-items: center; gap: 6px; }

@@ -77,6 +77,7 @@ class Tournament extends Equatable {
     required this.minParticipants,
     required this.maxParticipants,
     required this.rewards,
+    required this.packIds,
     this.packId,
   });
 
@@ -99,11 +100,22 @@ class Tournament extends Equatable {
       minParticipants: (data['min_participants'] as num?)?.toInt() ?? 2,
       maxParticipants: (data['max_participants'] as num?)?.toInt() ?? 200,
       packId: data['pack_id'] as String?,
+      packIds: _parsePackIds(data),
       rewards: ((data['rewards'] as List<dynamic>?) ?? [])
           .whereType<Map<String, dynamic>>()
           .map(RewardTier.fromMap)
           .toList(),
     );
+  }
+
+  /// `pack_ids` (tableau) ; rétro-compat : ancien `pack_id` unique.
+  static List<String> _parsePackIds(Map<String, dynamic> data) {
+    final raw = data['pack_ids'];
+    if (raw is List) {
+      return raw.whereType<String>().toList();
+    }
+    final single = data['pack_id'] as String?;
+    return (single != null && single.isNotEmpty) ? [single] : const [];
   }
 
   final String id;
@@ -119,6 +131,11 @@ class Tournament extends Equatable {
   final int streakMult;
   final int minParticipants;
   final int maxParticipants;
+
+  /// Packs dont le tournoi tire ses devinettes ; vide = pool global.
+  final List<String> packIds;
+
+  /// Déprécié : pack unique (rétro-compat lecture). Préférer [packIds].
   final String? packId;
   final List<RewardTier> rewards;
 

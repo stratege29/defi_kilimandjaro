@@ -117,7 +117,7 @@ function CreateForm({ onClose }) {
   const [name, setName] = useState('Tournoi du soir');
   const [startLocal, setStartLocal] = useState(defaultStartLocal());
   const [durationMin, setDurationMin] = useState(20);
-  const [packId, setPackId] = useState('');
+  const [packIds, setPackIds] = useState([]);
   const [packs, setPacks] = useState([]);
   const [pointsWin, setPointsWin] = useState(3);
   const [pointsDraw, setPointsDraw] = useState(1);
@@ -169,7 +169,7 @@ function CreateForm({ onClose }) {
         name: name.trim(),
         start_at: startMs,
         duration_min: Number(durationMin),
-        pack_id: packId || null,
+        pack_ids: packIds,
         points_win: Number(pointsWin),
         points_draw: Number(pointsDraw),
         min_participants: Number(minParticipants),
@@ -215,13 +215,28 @@ function CreateForm({ onClose }) {
           </div>
         </div>
 
-        <label>Pack de devinettes (optionnel)</label>
-        <select value={packId} onChange={(e) => setPackId(e.target.value)}>
-          <option value="">— tous (pool global) —</option>
+        <label>Packs de devinettes (aucun coché = pool global)</label>
+        <div className="pack-checklist">
+          {packs.length === 0 && (
+            <span className="muted small">Aucun pack au catalogue.</span>
+          )}
           {packs.map((p) => (
-            <option key={p} value={p}>{p}</option>
+            <label key={p} className="check-row">
+              <input
+                type="checkbox"
+                checked={packIds.includes(p)}
+                onChange={(e) =>
+                  setPackIds((prev) =>
+                    e.target.checked
+                      ? [...prev, p]
+                      : prev.filter((x) => x !== p),
+                  )
+                }
+              />
+              {p}
+            </label>
           ))}
-        </select>
+        </div>
 
         <div className="grid2">
           <div>

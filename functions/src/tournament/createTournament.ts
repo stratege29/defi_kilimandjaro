@@ -29,6 +29,9 @@ const CreateInput = z.object({
   start_at: z.number().int().positive(),
   /** Durée de la fenêtre de jeu en minutes. */
   duration_min: z.number().int().min(1).max(1440),
+  /** Packs dont le tournoi tire ses devinettes. Vide ⇒ pool global (tous). */
+  pack_ids: z.array(z.string().min(1).max(64)).max(50).optional(),
+  /** Déprécié (rétro-compat) : pack unique. Préférer `pack_ids`. */
   pack_id: z.string().max(64).nullable().optional(),
   points_win: z.number().int().min(0).max(100).optional(),
   points_draw: z.number().int().min(0).max(100).optional(),
@@ -69,6 +72,7 @@ export const createTournament = onCall(OPTS, async (req) => {
     start_at: Timestamp.fromMillis(d.start_at),
     end_at: Timestamp.fromMillis(endAtMs),
     duration_min: d.duration_min,
+    pack_ids: d.pack_ids ?? (d.pack_id ? [d.pack_id] : []),
     pack_id: d.pack_id ?? null,
     participant_count: 0,
     points_win: d.points_win ?? DEFAULT_SCORING.points_win,
