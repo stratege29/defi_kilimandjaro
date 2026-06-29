@@ -38,6 +38,7 @@ class VictoryView extends ConsumerStatefulWidget {
     required this.timeLeft,
     required this.caurisAwarded,
     required this.onNext,
+    this.freehandBonus = 0,
     this.starsEarned = 0,
     this.isBoss = false,
     super.key,
@@ -52,6 +53,11 @@ class VictoryView extends ConsumerStatefulWidget {
   /// du chip "+N CAURIS" et sert de base au bouton "Doubler la récompense"
   /// (rewarded vidéo crédite un second [caurisAwarded] sur succès).
   final int caurisAwarded;
+
+  /// Bonus « À main levée » crédité en plus de [caurisAwarded] (0 si le tracé
+  /// se croisait ou mot trop court). Affiché en ligne dédiée sous le chip
+  /// cauris quand > 0. **Déjà inclus** dans le solde — purement informatif.
+  final int freehandBonus;
 
   /// Nombre d'étoiles obtenues (0-3). 0 ne devrait jamais arriver ici
   /// puisque l'overlay n'est affiché que sur victoire (≥ 1).
@@ -80,7 +86,10 @@ class _VictoryViewState extends ConsumerState<VictoryView>
   late final Animation<double> _cardScale;
   late final Animation<int> _caurisAnim;
 
-  int get _caurisEarned => widget.caurisAwarded;
+  /// Total animé dans le chip « ka-ching » = récompense de base + bonus à
+  /// main levée. La ligne « À main levée : +M inclus » sous le chip en donne
+  /// la décomposition (et évite que le joueur additionne deux nombres).
+  int get _caurisEarned => widget.caurisAwarded + widget.freehandBonus;
 
   /// Vrai après que le joueur a cliqué "Doubler" et que la pub s'est
   /// terminée avec succès — masque le bouton et déclenche le second tween
@@ -194,7 +203,9 @@ class _VictoryViewState extends ConsumerState<VictoryView>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '+$bonus Cauris bonus — récompense doublée !',
+            'result.victory.double_done'.tr(
+              namedArgs: <String, String>{'cauris': '$bonus'},
+            ),
             style: AppTypography.bebas(),
           ),
           backgroundColor: AppColors.orJour,
@@ -237,6 +248,7 @@ class _VictoryViewState extends ConsumerState<VictoryView>
                 onNext: widget.onNext,
                 starsEarned: widget.starsEarned,
                 isBoss: widget.isBoss,
+                freehandBonus: widget.freehandBonus,
                 doubleButton: _buildDoubleButton(context),
               ),
             ),
@@ -259,6 +271,7 @@ class _VictoryCard extends StatelessWidget {
     required this.onNext,
     required this.starsEarned,
     required this.isBoss,
+    required this.freehandBonus,
     required this.doubleButton,
   });
 
@@ -268,6 +281,9 @@ class _VictoryCard extends StatelessWidget {
   final VoidCallback onNext;
   final int starsEarned;
   final bool isBoss;
+
+  /// Bonus « À main levée » (0 = pas de ligne dédiée).
+  final int freehandBonus;
 
   /// Bouton optionnel "Doubler la récompense" (rewarded video). Vide
   /// (SizedBox.shrink) quand les conditions ne sont pas réunies, ce qui
@@ -405,6 +421,12 @@ class _VictoryCard extends StatelessWidget {
           const SizedBox(height: 24),
           // Reward cauris — chip pill animé (ka-ching).
           _CaurisRewardChip(caurisAnim: caurisAnim),
+          // Bonus « À main levée » — ligne dédiée discrète, uniquement quand
+          // le joueur a tracé d'un seul geste sans croiser son trait.
+          if (freehandBonus > 0) ...<Widget>[
+            const SizedBox(height: 10),
+            _FreehandBonusLine(bonus: freehandBonus),
+          ],
           // Bouton optionnel "Doubler" — n'apparaît que si conditions
           // remplies (cf. `_VictoryViewState._buildDoubleButton`).
           doubleButton,
@@ -438,7 +460,12 @@ class _DoubleRewardButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DashedButton(
-      label: 'DOUBLER (+$bonus) ▶',
+      // Le rewarded ne crédite QUE la base (pas le bonus à main levée), donc
+      // le libellé annonce le gain concret en cauris plutôt qu'un « ×2 » qui
+      // serait trompeur quand un bonus à main levée existe.
+      label: '${'result.victory.double_cta'.tr(namedArgs: <String, String>{
+            'cauris': '$bonus',
+          })} ▶',
       onTap: onTap,
       leading: loading
           ? const SizedBox(
@@ -531,6 +558,39 @@ class _CaurisRewardChip extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Ligne « À main levée ! +N » — feedback discret du bonus de tracé propre.
+/// Icône geste + libellé localisé, teinte succès pour distinguer du chip
+/// cauris doré (récompense de base) sans voler la vedette au CTA.
+class _FreehandBonusLine extends StatelessWidget {
+  const _FreehandBonusLine({required this.bonus});
+
+  final int bonus;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        const Icon(
+          Icons.gesture_rounded,
+          size: 18,
+          color: AppColors.success,
+        ),
+        const SizedBox(width: 6),
+        Text(
+          'result.victory.freehand_bonus'.tr(
+            namedArgs: <String, String>{'cauris': '$bonus'},
+          ),
+          style: AppTypography.labelSm.copyWith(
+            color: AppColors.success,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ],
     );
   }
 }

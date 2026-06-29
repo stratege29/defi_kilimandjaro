@@ -20,11 +20,11 @@ import 'package:defi_kilimandjaro/presentation/auth/link_account_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_controller.dart'
     show lobbyPreviousMatchIdProvider, lobbyRematchUidProvider;
 import 'package:defi_kilimandjaro/presentation/my_packs/widgets/unlock_pack_dialog.dart';
+import 'package:defi_kilimandjaro/presentation/packs/pack_display.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/dashed_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/pack_icon.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -729,7 +729,7 @@ class _UpsellCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Tu as croisé ${pack.nameKey.tr()}',
+                      'Tu as croisé ${pack.displayName}',
                       style: AppTypography.headingSm,
                     ),
                     const SizedBox(height: 2),
@@ -944,7 +944,7 @@ class _RoundCard extends ConsumerWidget {
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(
-                      'Devinette du pack ${pack.nameKey.tr()}',
+                      'Devinette du pack ${pack.displayName}',
                       style: AppTypography.labelXs.copyWith(
                         color: AppColors.texteTertiaire,
                       ),

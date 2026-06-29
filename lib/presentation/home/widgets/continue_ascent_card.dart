@@ -3,10 +3,8 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
-import 'package:defi_kilimandjaro/presentation/home/home_view.dart' show launchNextLevel;
 import 'package:defi_kilimandjaro/presentation/home/providers/current_mountain_provider.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
-import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/mountain_hero_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,7 +39,9 @@ class ContinueAscentCard extends ConsumerWidget {
         return _AscentCard(
           mountain: mountain,
           totalLevelsLifetime: progress.totalLevelsCompleted,
-          onTap: () => launchNextLevel(context, ref, mountain),
+          // La carte est désormais un héros de progression : le lancement de
+          // partie passe par le CTA sticky GRIMPER. Un tap mène aux Sommets.
+          onTap: () => context.go(AppRoutes.mountains),
         );
       },
     );
@@ -72,7 +72,9 @@ class _AscentCard extends StatelessWidget {
     final nextLevel = mountain.completedLevels + 1;
     final progress = mountain.progress;
 
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
@@ -188,18 +190,12 @@ class _AscentCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  AppButton(
-                    label: 'GRIMPER',
-                    icon: Icons.terrain,
-                    fullWidth: true,
-                    onPressed: onTap,
-                  ),
                 ],
               ),
             ),
           ],
         ),
+      ),
       ),
     );
   }

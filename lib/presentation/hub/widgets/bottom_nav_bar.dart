@@ -12,7 +12,11 @@ import 'package:flutter/material.dart';
 /// actif n'a **pas de bordure** — il est signalé par un squircle doré discret
 /// derrière l'icône (fond `orJour` @ 14 %) + icône/label en or. Les inactifs
 /// restent sobres (texte tertiaire).
-enum NavTab { accueil, defi, sommets, profil }
+/// Onglets de la barre. `defi` n'a **plus de slot** dans la barre (Option A) :
+/// le duel se lance désormais via la feuille du CTA sticky GRIMPER de
+/// l'accueil. La valeur reste car les écrans duel (`DuelHubView`) passent
+/// encore `current: NavTab.defi` — n'allume alors aucun onglet (sous-flux).
+enum NavTab { accueil, defi, sommets, packs, profil }
 
 class AppBottomNavBar extends StatelessWidget {
   const AppBottomNavBar({
@@ -59,16 +63,18 @@ class AppBottomNavBar extends StatelessWidget {
                     onTap: () => onTabSelected(NavTab.accueil),
                   ),
                   _NavItem(
-                    assetPath: AppAssets.iconNavPlay,
-                    label: 'Défi',
-                    active: current == NavTab.defi,
-                    onTap: () => onTabSelected(NavTab.defi),
-                  ),
-                  _NavItem(
                     assetPath: AppAssets.iconNavMap,
                     label: 'Sommets',
                     active: current == NavTab.sommets,
                     onTap: () => onTabSelected(NavTab.sommets),
+                  ),
+                  _NavItem(
+                    // Placeholder Material : pas encore de PNG dédié dans
+                    // assets/images/icons/ (cf. `iconNavPlay` pour le style cible).
+                    icon: Icons.style_rounded,
+                    label: 'Packs',
+                    active: current == NavTab.packs,
+                    onTap: () => onTabSelected(NavTab.packs),
                   ),
                   _NavItem(
                     assetPath: AppAssets.iconNavProfile,

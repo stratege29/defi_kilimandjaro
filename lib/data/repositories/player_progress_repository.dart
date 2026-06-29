@@ -157,6 +157,17 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
       soloLosses = Map<String, int>.from(soloLosses)..remove(devinetteId);
     }
 
+    // Anti-farm : marque cette devinette comme « récompense consommée » dès
+    // la 1re victoire. Les re-runs ultérieurs (ou une victoire après reveal)
+    // verront ce flag côté `GameController.validate` et n'attribueront plus
+    // de cauris (`caurisAwarded == 0`). La progression reste possible.
+    var rewarded = state.rewardedDevinetteIds;
+    if (devinetteId != null &&
+        devinetteId.isNotEmpty &&
+        !rewarded.contains(devinetteId)) {
+      rewarded = <String>{...rewarded, devinetteId};
+    }
+
     final newState = state.copyWith(
       cauris: state.cauris + caurisAwarded,
       completedLevelsByMountain: levels,
@@ -167,14 +178,38 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
       starsByLevel: stars,
       failsByLevel: fails,
       consecutiveLossesByDevinetteId: soloLosses,
+      rewardedDevinetteIds: rewarded,
     );
     state = newState;
     await _repo.save(newState);
-    _creditSink.enqueue(
-      amount: caurisAwarded,
-      source: CaurisCreditSource.win,
-      reference: devinetteId ?? mountainId,
+    // N'enqueue le crédit serveur que pour un gain réel — un re-run d'une
+    // devinette déjà récompensée passe `caurisAwarded == 0`, inutile (et
+    // contre-productif) de pousser un crédit nul à l'outbox wallet.
+    if (caurisAwarded > 0) {
+      _creditSink.enqueue(
+        amount: caurisAwarded,
+        source: CaurisCreditSource.win,
+        reference: devinetteId ?? mountainId,
+      );
+    }
+  }
+
+  /// Marque une devinette comme « récompense consommée » **sans** créditer
+  /// de cauris. Appelé quand la réponse est révélée au joueur (reveal payant
+  /// ou auto-reveal anti-blocage) : reformer ensuite le mot révélé, ou
+  /// rejouer cette devinette plus tard, ne doit plus rien rapporter
+  /// (anti-farm). Idempotent — no-op si déjà marquée.
+  Future<void> markDevinetteRewarded(String devinetteId) async {
+    if (devinetteId.isEmpty) return;
+    if (state.rewardedDevinetteIds.contains(devinetteId)) return;
+    final newState = state.copyWith(
+      rewardedDevinetteIds: <String>{
+        ...state.rewardedDevinetteIds,
+        devinetteId,
+      },
     );
+    state = newState;
+    await _repo.save(newState);
   }
 
   /// Anti-tilt — incrémente le compteur de défaites consécutives sur
@@ -368,6 +403,17 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
     required bool success,
   }) async {
     final last = state.lastDailyChallengeDate;
+    // Idempotence quotidienne : le défi du jour ne récompense qu'UNE fois par
+    // jour. S'il a déjà été joué aujourd'hui (ou à une date ultérieure au cas
+    // où l'horloge recule), rejouer est un no-op — aucun cauri crédité, streak
+    // inchangé. C'est le garde anti-farm : sans lui, chaque relance le même
+    // jour re-créditait `rewardCauris`.
+    if (last != null) {
+      final lastDay = DateTime(last.year, last.month, last.day);
+      final today = DateTime(date.year, date.month, date.day);
+      if (!today.isAfter(lastDay)) return 0;
+    }
+
     var baseStreak = state.dailyChallengeStreak;
     var freezeTokens = state.freezeTokens;
     var lastFreezeUsedDate = state.lastFreezeUsedDate;
@@ -462,6 +508,25 @@ class PlayerProgressNotifier extends StateNotifier<PlayerProgress> {
         reference: reference,
       );
     }
+  }
+
+  /// Débite des cauris du solde **local** pour une dépense déjà validée et
+  /// débitée côté serveur (ex: déblocage de pack via
+  /// `WalletService.unlockPack`, qui débite le wallet serveur autoritaire).
+  ///
+  /// Purement local et sans push outbox : ce n'est pas un crédit, et le
+  /// serveur a déjà appliqué le débit. Clampé à 0 pour ne jamais passer en
+  /// négatif. No-op si [amount] <= 0.
+  ///
+  /// NB : ne PAS utiliser `addCauris(-cost)` pour une dépense — `addCauris`
+  /// ignore tout montant <= 0 (garde anti-crédit négatif), si bien que le
+  /// débit serait silencieusement avalé et le solde resterait inchangé.
+  Future<void> spendCauris(int amount) async {
+    if (amount <= 0) return;
+    final next = state.cauris - amount;
+    final newState = state.copyWith(cauris: next < 0 ? 0 : next);
+    state = newState;
+    await _repo.save(newState);
   }
 
   // ---------------------------------------------------------------------

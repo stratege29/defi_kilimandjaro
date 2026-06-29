@@ -47,19 +47,24 @@ Future<void> _fcmBackgroundHandler(RemoteMessage message) async {
   // Pas d'action UI ici — la navigation se fait dans onMessageOpenedApp.
 }
 
-/// Navigue vers la route duel deep-link a partir du payload FCM.
+/// Route l'app a partir du payload FCM quand l'utilisateur ouvre une notif.
 ///
 /// Utilise [appRouterNavigatorKey] pour acceder au Navigator sans BuildContext.
-void _navigateToMatchFromFcm(RemoteMessage message) {
-  final matchId = message.data['matchId'] as String?;
+/// - `duel_challenge` → /duel/join/:matchId
+/// - `pack_update`    → /my-packs (nouveau pack / contenu mis a jour)
+void _handleFcmOpen(RemoteMessage message) {
   final type = message.data['type'] as String?;
-  if (matchId == null || matchId.isEmpty) return;
-  if (type != 'duel_challenge') return;
-
-  // Utilise la route deep-link existante /duel/join/:matchId.
   final context = appRouterNavigatorKey.currentContext;
   if (context == null) return;
-  GoRouter.of(context).go(AppRoutes.duelJoinPath(matchId));
+
+  switch (type) {
+    case 'duel_challenge':
+      final matchId = message.data['matchId'] as String?;
+      if (matchId == null || matchId.isEmpty) return;
+      GoRouter.of(context).go(AppRoutes.duelJoinPath(matchId));
+    case 'pack_update':
+      GoRouter.of(context).go(AppRoutes.myPacks);
+  }
 }
 
 Future<void> main() async {
@@ -237,7 +242,7 @@ Future<void> _bootstrap() async {
     FirebaseMessaging.onBackgroundMessage(_fcmBackgroundHandler);
 
     // FCM : handler quand l'utilisateur tape sur une notif depuis background.
-    FirebaseMessaging.onMessageOpenedApp.listen(_navigateToMatchFromFcm);
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleFcmOpen);
 
     // FCM : verifier si l'app a ete ouverte depuis une notif (app terminee).
     // Timeout 3s — getInitialMessage() peut hanger indéfiniment sur iOS si
@@ -251,7 +256,7 @@ Future<void> _bootstrap() async {
       if (initialMessage != null) {
         unawaited(
           Future<void>.delayed(const Duration(milliseconds: 500), () {
-            _navigateToMatchFromFcm(initialMessage);
+            _handleFcmOpen(initialMessage);
           }),
         );
       }
@@ -388,26 +393,43 @@ class _BootGateState extends ConsumerState<_BootGate> {
     });
   }
 
-  /// Affiche une snackbar discrete quand un defi arrive en premier plan.
+  /// Affiche une snackbar discrete quand une notif arrive en premier plan.
   void _onForegroundMessage(RemoteMessage message) {
     if (!mounted) return;
-    final matchId = message.data['matchId'] as String?;
     final type = message.data['type'] as String?;
-    if (matchId == null || type != 'duel_challenge') return;
 
-    final title = message.notification?.title ?? 'Tu as un defi !';
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(title),
-        duration: const Duration(seconds: 6),
-        action: SnackBarAction(
-          label: 'Rejoindre',
-          onPressed: () {
-            GoRouter.of(context).go(AppRoutes.duelJoinPath(matchId));
-          },
+    if (type == 'duel_challenge') {
+      final matchId = message.data['matchId'] as String?;
+      if (matchId == null || matchId.isEmpty) return;
+      final title = message.notification?.title ?? 'Tu as un defi !';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(title),
+          duration: const Duration(seconds: 6),
+          action: SnackBarAction(
+            label: 'Rejoindre',
+            onPressed: () {
+              GoRouter.of(context).go(AppRoutes.duelJoinPath(matchId));
+            },
+          ),
         ),
-      ),
-    );
+      );
+    } else if (type == 'pack_update') {
+      final title =
+          message.notification?.title ?? 'Nouveau contenu disponible';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(title),
+          duration: const Duration(seconds: 6),
+          action: SnackBarAction(
+            label: 'Voir',
+            onPressed: () {
+              GoRouter.of(context).go(AppRoutes.myPacks);
+            },
+          ),
+        ),
+      );
+    }
   }
 
   @override

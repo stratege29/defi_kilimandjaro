@@ -140,6 +140,8 @@ class DuelHubView extends ConsumerWidget {
               break;
             case NavTab.sommets:
               context.go(AppRoutes.mountains);
+            case NavTab.packs:
+              context.go(AppRoutes.myPacks);
             case NavTab.profil:
               context.go(AppRoutes.profile);
           }
@@ -338,6 +340,15 @@ class _OnlineHeroCard extends ConsumerWidget {
                 AppButton(
                   label: 'TROUVER UN ADVERSAIRE',
                   onPressed: () => context.push(AppRoutes.duelLobby),
+                  fullWidth: true,
+                ),
+                AppSpacing.gapSm,
+                // Accès aux tournois « arène ».
+                AppButton(
+                  label: 'Tournois',
+                  icon: Icons.emoji_events,
+                  variant: AppButtonVariant.secondary,
+                  onPressed: () => context.push(AppRoutes.tournaments),
                   fullWidth: true,
                 ),
               ],

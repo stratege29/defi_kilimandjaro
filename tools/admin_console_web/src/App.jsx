@@ -8,6 +8,7 @@ import DailyChallenges from './DailyChallenges.jsx';
 import Instagram from './Instagram.jsx';
 import Players from './Players.jsx';
 import PackCreator from './PackCreator.jsx';
+import Tournaments from './Tournaments.jsx';
 
 export default function App() {
   const [user, setUser] = useState(undefined); // undefined = chargement
@@ -61,6 +62,12 @@ export default function App() {
           Joueurs
         </button>
         <button
+          className={tab === 'tournaments' ? 'nav active' : 'nav'}
+          onClick={() => setTab('tournaments')}
+        >
+          Tournois
+        </button>
+        <button
           className={tab === 'instagram' ? 'nav active' : 'nav'}
           onClick={() => setTab('instagram')}
         >
@@ -84,6 +91,7 @@ export default function App() {
         {tab === 'packcreator' && <PackCreator />}
         {tab === 'daily' && <DailyChallenges />}
         {tab === 'players' && <Players />}
+        {tab === 'tournaments' && <Tournaments />}
         {tab === 'instagram' && <Instagram />}
       </main>
     </div>

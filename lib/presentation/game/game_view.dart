@@ -235,6 +235,7 @@ class _GameViewState extends ConsumerState<GameView>
             next.timeLeft,
             next.starsEarned,
             next.caurisAwarded,
+            next.freehandBonusAwarded,
           );
         });
       } else if (next.phase == GamePhase.lost &&
@@ -300,6 +301,8 @@ class _GameViewState extends ConsumerState<GameView>
                     shuffledIndices: gameState.shuffledIndices,
                     phase: gameState.phase,
                     onTileEntered: controller.selectTile,
+                    onTrailSelfIntersectingChanged:
+                        controller.updateTrailSelfIntersecting,
                     onDragEnd: () {
                       // validate() is called automatically on complete word;
                       // on partial lift we just let selection persist.
@@ -487,6 +490,7 @@ class _GameViewState extends ConsumerState<GameView>
     int timeLeft,
     int starsEarned,
     int caurisAwarded,
+    int freehandBonus,
   ) {
     // Compte la victoire pour la cadence interstitielle (Étape D).
     // L'incrément est fait au moment de l'overlay : si le joueur quitte
@@ -504,6 +508,7 @@ class _GameViewState extends ConsumerState<GameView>
         devinette: widget.args.devinette,
         timeLeft: timeLeft,
         caurisAwarded: caurisAwarded,
+        freehandBonus: freehandBonus,
         starsEarned: starsEarned,
         isBoss: widget.args.config.isBoss,
         onNext: () async {
@@ -753,6 +758,17 @@ class _GameViewState extends ConsumerState<GameView>
       answerRevealed = newFailCount >= _autoRevealFailThreshold;
     }
 
+    // Anti-farm : dès que la réponse est révélée (mode T1/Hub où elle l'est
+    // d'office, ou auto-reveal au seuil d'échecs), on marque la devinette
+    // comme « récompense consommée » — reformer ensuite le mot révélé, ou
+    // rejouer cette devinette, ne rapportera plus de cauris. Hors défi du
+    // jour (récompense gérée par date, pas par devinette).
+    if (answerRevealed && !widget.args.isDailyChallenge) {
+      await ref
+          .read(playerProgressProvider.notifier)
+          .markDevinetteRewarded(widget.args.devinette.id);
+    }
+
     if (!ctx.mounted) return;
     // Le `select` garantit que le `canAfford` lu reste cohérent avec
     // l'état au moment d'ouvrir le dialog. Le `FailureView` re-évalue
@@ -785,7 +801,7 @@ class _GameViewState extends ConsumerState<GameView>
             : null,
         canAffordReveal: canAffordReveal,
         onPurchaseReveal: isPayWallActive && !answerRevealed
-            ? () {
+            ? () async {
                 // Analytics : taux d'achat de révélation par variante A/B.
                 unawaited(
                   ref.read(analyticsServiceProvider).logAnswerRevealed(
@@ -793,9 +809,15 @@ class _GameViewState extends ConsumerState<GameView>
                         cost: revealCostCauris,
                       ),
                 );
-                return ref
-                    .read(playerProgressProvider.notifier)
-                    .purchaseReveal(revealCostCauris);
+                final notifier = ref.read(playerProgressProvider.notifier);
+                final ok = await notifier.purchaseReveal(revealCostCauris);
+                if (ok) {
+                  // Anti-farm : reveal payé → récompense de cette devinette
+                  // consommée (reformer le mot révélé ne rapportera rien).
+                  await notifier
+                      .markDevinetteRewarded(widget.args.devinette.id);
+                }
+                return ok;
               }
             : null,
         onRetry: () {
