@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions/v2";
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { getFirestore, FieldValue, Timestamp } from "firebase-admin/firestore";
 import { z } from "zod";
 
 import { requireAdmin } from "../utils/auth";
@@ -277,6 +277,9 @@ export const publishPack = onCall(
   },
   async (req): Promise<PublishPackOutput> => {
     const uid = requireAdmin(req.auth);
+    // Libellé lisible du publieur (email si dispo, sinon uid).
+    const publishedBy =
+      (req.auth?.token?.email as string | undefined) || uid;
 
     const parsed = Input.safeParse(req.data);
     if (!parsed.success) {
@@ -405,8 +408,15 @@ export const publishPack = onCall(
         { merge: true }
       );
 
-    // 6e. catalog/index : bump catalog_version pour invalider les caches clients
-    const catalogVersion = await bumpCatalogVersion();
+    // 6e. catalog/index : bump catalog_version (cache-bust) + maj de l'entrée
+    // du pack (count, version, dernière publication + publieur) lue par le
+    // Catalogue admin.
+    const catalogVersion = await bumpCatalogVersion({
+      packId,
+      count: payload.length,
+      version: nextVersion,
+      publishedBy,
+    });
 
     // 6f. packs/<id>/meta
     await packRef.collection("meta").doc("doc").set(
@@ -482,21 +492,50 @@ export const publishPack = onCall(
  * Sert de cache-bust pour les clients qui lisent le catalogue distant
  * (cf docs/backoffice_schema.md §3.2). Retourne la nouvelle valeur.
  */
-async function bumpCatalogVersion(): Promise<number> {
+async function bumpCatalogVersion(opts: {
+  packId: string;
+  count: number;
+  version: number;
+  publishedBy: string;
+}): Promise<number> {
   const db = getFirestore();
   const ref = db.collection("catalog").doc("index");
   return db.runTransaction(async (tx) => {
     const snap = await tx.get(ref);
-    const current = snap.exists
-      ? ((snap.data()?.catalog_version as number | undefined) ?? 0)
-      : 0;
-    const next = current + 1;
+    const data = snap.exists ? snap.data() ?? {} : {};
+    const next = ((data.catalog_version as number | undefined) ?? 0) + 1;
+
+    // Maj de l'entrée du pack : count, version, dernière publication + publieur.
+    // serverTimestamp() est interdit dans un élément de tableau → Timestamp.now().
+    const packs: Array<Record<string, unknown>> = Array.isArray(data.packs)
+      ? [...data.packs]
+      : [];
+    const patch = {
+      count: opts.count,
+      current_version: opts.version,
+      last_published_at: Timestamp.now(),
+      last_published_by: opts.publishedBy,
+    };
+    const idx = packs.findIndex((p) => p && p.id === opts.packId);
+    if (idx >= 0) packs[idx] = { ...packs[idx], ...patch };
+    else {
+      packs.push({
+        id: opts.packId,
+        visible: false,
+        bundled: false,
+        ordering: packs.length + 100,
+        ...patch,
+      });
+    }
+
     tx.set(
       ref,
       {
+        packs,
         catalog_version: next,
         schema_version: 4,
         updated_at: FieldValue.serverTimestamp(),
+        updated_by: opts.publishedBy,
       },
       { merge: true }
     );

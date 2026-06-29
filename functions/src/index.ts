@@ -79,6 +79,9 @@ export { upsertDevinette } from "./admin/upsertDevinette";
 export { deleteDevinette } from "./admin/deleteDevinette";
 export { bulkImportDevinettes } from "./admin/bulkImportDevinettes";
 export { upsertPackMeta } from "./admin/upsertPackMeta";
+export { addTagsToWhitelist } from "./admin/tagsWhitelist";
+export { moderateSubmission } from "./admin/moderateSubmission";
+export { fillDailyQueue, purgeOldDailyChallenges } from "./admin/fillDailyQueue";
 export {
   upsertDailyChallenge,
   deleteDailyChallenge,
@@ -115,6 +118,20 @@ export {
   adminDeletePlayer,
 } from "./admin/players";
 export { mergeAccounts } from "./account/mergeAccounts";
+
+// --- Pack Creator (pipeline contenu IA) — cf docs/pack_creator.md ---
+export { createPackJob, cancelPackJob, retryPackJob } from "./admin/packJobs";
+export { generateResearchPlan, approveResearchPlan } from "./admin/packPlan";
+export {
+  approveCandidate,
+  rejectCandidate,
+  updateCandidate,
+  reassignCandidate,
+  assignCandidateToDaily,
+} from "./admin/packReview";
+export { setPackTopup } from "./admin/packTopup";
+export { drainPackJobs } from "./ai/drainPackJobs";
+export { weeklyPackTopup } from "./ai/weeklyPackTopup";
 
 // --- Contenu : broadcast FCM sur changement de catalogue (nouveaux packs) ---
 export { notifyPackUpdate } from "./content/notifyPackUpdate";

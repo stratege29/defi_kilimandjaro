@@ -6,16 +6,14 @@ import {
   orderBy,
   limit,
   onSnapshot,
-  doc,
-  updateDoc,
-  serverTimestamp,
 } from 'firebase/firestore';
-import { auth, db } from './firebase.js';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from './firebase.js';
 
 const FILTERS = [
   { value: 'review', label: 'À modérer' },
-  { value: 'approve', label: 'Approuvées' },
-  { value: 'reject', label: 'Rejetées' },
+  { value: 'approved', label: 'Approuvées' },
+  { value: 'rejected', label: 'Rejetées' },
   { value: 'pending', label: 'En attente LLM' },
 ];
 
@@ -40,12 +38,19 @@ export default function Moderation() {
     );
   }, [filter]);
 
+  const [busy, setBusy] = useState(null);
+
+  // L'écriture sur `submissions` est interdite côté client (règles Firestore) :
+  // la modération passe par la Cloud Function moderateSubmission (Admin SDK).
   async function setStatus(id, status) {
-    await updateDoc(doc(db, 'submissions', id), {
-      status,
-      moderatedAt: serverTimestamp(),
-      moderatedBy: auth.currentUser?.uid ?? null,
-    });
+    setBusy(id);
+    try {
+      await httpsCallable(functions, 'moderateSubmission')({ submissionId: id, status });
+    } catch (e) {
+      alert(`${e.code || ''} ${e.message}`);
+    } finally {
+      setBusy(null);
+    }
   }
 
   return (
@@ -95,10 +100,18 @@ export default function Moderation() {
                 <span className="muted small">Curator : {s.curatedBy}</span>
               )}
               <span className="spacer" />
-              <button className="btn danger" onClick={() => setStatus(s.id, 'reject')}>
+              <button
+                className="btn danger"
+                disabled={busy === s.id}
+                onClick={() => setStatus(s.id, 'rejected')}
+              >
                 Rejeter
               </button>
-              <button className="btn primary" onClick={() => setStatus(s.id, 'approve')}>
+              <button
+                className="btn primary"
+                disabled={busy === s.id}
+                onClick={() => setStatus(s.id, 'approved')}
+              >
                 Approuver
               </button>
             </div>

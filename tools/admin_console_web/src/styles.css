@@ -104,7 +104,18 @@ tr.today td { background: rgba(210,162,76,.08); }
 .chip.score.orange { color: var(--orange); border: 1px solid var(--orange); }
 .chip.score.red { color: var(--red); border: 1px solid var(--red); }
 .chip.green { color: var(--green); background: rgba(76,175,120,.15); }
+.chip.orange { color: var(--orange); background: rgba(210,162,76,.15); }
+.chip.red { color: var(--red); background: rgba(224,89,76,.15); }
 .chip.grey { color: var(--grey); background: rgba(138,130,117,.15); }
+
+/* Pack Creator */
+.progressbar { margin-top: 8px; height: 6px; border-radius: 4px; background: var(--surface2); overflow: hidden; }
+.progressbar > span { display: block; height: 100%; background: var(--or); transition: width .3s; }
+.card input, .card select {
+  background: var(--surface2); color: var(--text);
+  border: 1px solid #000; border-radius: 6px; padding: 6px 8px; font-size: 13px; width: 100%;
+}
+.card .table input { margin: 0; }
 
 /* Table (catalog) */
 .table { width: calc(100% - 48px); margin: 24px; border-collapse: collapse; background: var(--surface); border-radius: 12px; overflow: hidden; }
