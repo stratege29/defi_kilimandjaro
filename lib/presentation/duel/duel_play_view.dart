@@ -7,6 +7,7 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/matchmaking_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
 import 'package:defi_kilimandjaro/domain/avatars/avatar_catalog.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
@@ -35,15 +36,29 @@ import 'package:go_router/go_router.dart';
 /// - [DuelPhase.roundEnd]  → [DuelRoundEndOverlay] par-dessus
 /// - [DuelPhase.finished]  → navigation vers DuelResultView
 class DuelPlayView extends ConsumerStatefulWidget {
-  const DuelPlayView({required this.initialSession, super.key});
+  const DuelPlayView({
+    required this.initialSession,
+    this.tournamentId,
+    super.key,
+  });
 
   final DuelSession initialSession;
+
+  /// Quand non-null, ce duel fait partie d'un tournoi « arène » : à la fin du
+  /// match on règle les points (CF `endMatch`, serveur-only) puis on revient à
+  /// l'arène (`pop`) au lieu de l'écran résultat de duel — la boucle d'arène
+  /// ré-appelle alors `requestArenaMatch`.
+  final String? tournamentId;
 
   @override
   ConsumerState<DuelPlayView> createState() => _DuelPlayViewState();
 }
 
 class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
+  /// Garde anti double-traitement de la phase `finished` (le stream émet
+  /// plusieurs fois).
+  bool _finishedHandled = false;
+
   /// Timer qui declenche advancePhase apres l'animation locale (3s) sur
   /// roundEnd et countdown. Re-armé à chaque changement de phase.
   Timer? _phaseAdvanceTimer;
@@ -91,6 +106,26 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
     });
   }
 
+  /// Fin d'un match de tournoi : règle les points côté serveur (idempotent,
+  /// les 2 joueurs appellent) puis revient à l'arène. Best-effort — si endMatch
+  /// échoue, le filet `resolveStaleMatches`/un prochain appel règlera.
+  Future<void> _finishTournamentMatch(DuelSession s) async {
+    try {
+      await ref.read(matchmakingRepositoryProvider).endMatch(
+            matchId: s.matchId,
+            winnerUid: s.winner ?? '',
+          );
+    } on Exception catch (_) {
+      // Ignoré : le serveur reste autoritaire et idempotent.
+    }
+    if (!mounted) return;
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(AppRoutes.tournamentArenaPath(widget.tournamentId!));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(firebaseAuthProvider);
@@ -122,11 +157,16 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
           _lastObservedPhase = s.phase;
           _scheduleAdvancePhase(s.matchId, s.phase);
         }
-        // Navigation automatique vers résultat.
-        if (s.phase == DuelPhase.finished) {
+        // Navigation automatique en fin de match.
+        if (s.phase == DuelPhase.finished && !_finishedHandled) {
+          _finishedHandled = true;
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!context.mounted) return;
-            context.go(AppRoutes.duelResult, extra: s);
+            if (widget.tournamentId != null) {
+              _finishTournamentMatch(s);
+            } else {
+              context.go(AppRoutes.duelResult, extra: s);
+            }
           });
         }
       },

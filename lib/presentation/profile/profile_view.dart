@@ -7,11 +7,13 @@ import 'package:defi_kilimandjaro/data/local/seen_devinette_store.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
+import 'package:defi_kilimandjaro/data/repositories/tournament_repository.dart';
 import 'package:defi_kilimandjaro/domain/avatars/avatar_catalog.dart';
 import 'package:defi_kilimandjaro/domain/entities/honorific_title.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_profile.dart';
 import 'package:defi_kilimandjaro/domain/entities/player_progress.dart';
+import 'package:defi_kilimandjaro/domain/entities/tournament_badge.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_view.dart'
     show kAltitudeHeroTag;
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
@@ -139,6 +141,10 @@ class ProfileView extends ConsumerWidget {
                   ),
               ],
             ),
+            const SizedBox(height: 28),
+            const _SectionHeader(title: 'TROPHÉES DE TOURNOI'),
+            const SizedBox(height: 12),
+            const _TournamentTrophies(),
             const SizedBox(height: 28),
             _SectionHeader(title: 'profile.sections.leaderboard'.tr()),
             const SizedBox(height: 12),
@@ -275,6 +281,84 @@ class ProfileView extends ConsumerWidget {
 // ---------------------------------------------------------------------------
 // Hero éditorial — avatar halo doré + nom Fraunces + chip titre + contexte
 // ---------------------------------------------------------------------------
+
+/// Trophées gagnés en tournoi (badges `profiles/{uid}/badges`).
+class _TournamentTrophies extends ConsumerWidget {
+  const _TournamentTrophies();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(myTournamentBadgesProvider);
+    final badges = async.value ?? const [];
+
+    if (badges.isEmpty) {
+      return Text(
+        'Aucun trophée encore — gagne un tournoi pour en décrocher.',
+        style: AppTypography.bodyMd.copyWith(color: AppColors.texteSecondaire),
+      );
+    }
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final b in badges) _TrophyChip(badge: b),
+      ],
+    );
+  }
+}
+
+class _TrophyChip extends StatelessWidget {
+  const _TrophyChip({required this.badge});
+
+  final TournamentBadge badge;
+
+  Color get _color {
+    switch (badge.rank) {
+      case 1:
+        return AppColors.orSoleil;
+      case 2:
+        return const Color(0xFFC0C7CE);
+      case 3:
+        return const Color(0xFFCD7F32);
+      default:
+        return AppColors.texteSecondaire;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _color.withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.emoji_events, size: 18, color: _color),
+          const SizedBox(width: 6),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                badge.label,
+                style: AppTypography.bebas(size: 14),
+              ),
+              Text(
+                '${badge.rank}ᵉ place',
+                style: AppTypography.bodySm.copyWith(color: _color),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _ProfileHero extends ConsumerWidget {
   const _ProfileHero({

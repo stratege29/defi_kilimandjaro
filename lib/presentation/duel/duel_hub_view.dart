@@ -342,6 +342,15 @@ class _OnlineHeroCard extends ConsumerWidget {
                   onPressed: () => context.push(AppRoutes.duelLobby),
                   fullWidth: true,
                 ),
+                AppSpacing.gapSm,
+                // Accès aux tournois « arène ».
+                AppButton(
+                  label: 'Tournois',
+                  icon: Icons.emoji_events,
+                  variant: AppButtonVariant.secondary,
+                  onPressed: () => context.push(AppRoutes.tournaments),
+                  fullWidth: true,
+                ),
               ],
             ),
           ),
