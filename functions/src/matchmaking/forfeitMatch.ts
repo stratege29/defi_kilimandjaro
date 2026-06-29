@@ -16,9 +16,11 @@
  */
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { logger } from "firebase-functions/v2";
 import { getDatabase } from "firebase-admin/database";
 import { requireAuth } from "../utils/auth";
 import { readAnswer } from "./matchAnswers";
+import { settleTournamentMatch } from "../tournament/settleTournamentMatch";
 
 interface ForfeitMatchData {
   matchId: string;
@@ -80,6 +82,13 @@ export const forfeitMatch = onCall<
     forfeited_by: callerUid,
     ...(answer != null ? { [`rounds/${round}/answer`]: answer } : {}),
   });
+
+  // Match de tournoi : créditer les points immédiatement, côté serveur, sans
+  // dépendre d'un endMatch client (le forfaiteur quitte sans l'appeler).
+  // No-op + idempotent pour les duels normaux et via le verrou `settled`.
+  await settleTournamentMatch(matchId).catch((err) =>
+    logger.error("forfeitMatch: settle tournoi échoué", { matchId, err })
+  );
 
   return { ok: true, winner: otherUid };
 });

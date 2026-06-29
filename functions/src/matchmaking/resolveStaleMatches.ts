@@ -20,6 +20,7 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import { logger } from "firebase-functions/v2";
 import { getDatabase } from "firebase-admin/database";
 import { readAnswer } from "./matchAnswers";
+import { settleTournamentMatch } from "../tournament/settleTournamentMatch";
 
 const STALE_ACTIVE_MS = 55000; // 30s round + grâce + retries + marge
 // Animation countdown/roundEnd = 3s. Au-delà de ce seuil, le match est
@@ -135,6 +136,16 @@ export const resolveStaleMatches = onSchedule(
       if (answer != null) updates[`rounds/${round}/answer`] = answer;
 
       await rtdb.ref(`matches/${matchId}`).update(updates);
+      // Match de tournoi finalisé (dernier round) : créditer les points
+      // serveur-side (AWOL → aucun client n'appellera endMatch). Idempotent.
+      if (isLastRound) {
+        await settleTournamentMatch(matchId).catch((err) =>
+          logger.error("resolveStaleMatches: settle tournoi échoué", {
+            matchId,
+            err,
+          })
+        );
+      }
       resolved++;
       logger.warn("resolveStaleMatches: match bloqué résolu", {
         matchId,
@@ -173,6 +184,13 @@ export const resolveStaleMatches = onSchedule(
         if (answer != null) updates[`rounds/${round}/answer`] = answer;
 
         await rtdb.ref(`matches/${matchId}`).update(updates);
+        // Idem : finalisation depuis une transition figée → créditer le tournoi.
+        await settleTournamentMatch(matchId).catch((err) =>
+          logger.error("resolveStaleMatches: settle tournoi (transition) échoué", {
+            matchId,
+            err,
+          })
+        );
         resolved++;
         logger.warn("resolveStaleMatches: transition bloquée résolue", {
           matchId,
