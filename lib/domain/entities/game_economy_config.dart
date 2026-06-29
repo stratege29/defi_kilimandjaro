@@ -18,6 +18,9 @@ class GameEconomyConfig extends Equatable {
     required this.sinkTierScalingEnabled,
     required this.winRewardBase,
     required this.speedBonusPerSecond,
+    required this.freehandBonusBase,
+    required this.freehandBonusPerLetter,
+    required this.freehandMinLength,
     required this.rewardedVideoBonus,
     required this.rewardedDoubleEnabled,
     required this.rewardedDailyCap,
@@ -60,6 +63,21 @@ class GameEconomyConfig extends Equatable {
   /// × multiplier tier (1.0 → 2.5).
   final int speedBonusPerSecond;
 
+  /// Forfait de base du bonus « À main levée » : crédité en plus quand le
+  /// joueur relie les lettres d'un seul geste continu sans que son tracé ne
+  /// se croise lui-même. S'ajoute à la récompense de victoire (cf.
+  /// [freehandBonus]).
+  final int freehandBonusBase;
+
+  /// Bonus « À main levée » additionnel par lettre **au-delà** de
+  /// [freehandMinLength] (tracer proprement un mot long est plus dur).
+  final int freehandBonusPerLetter;
+
+  /// Longueur minimale du mot pour que le bonus « À main levée » soit éligible.
+  /// En dessous, un tracé ne peut géométriquement pas se croiser → bonus
+  /// trivial, donc neutralisé.
+  final int freehandMinLength;
+
   /// Cauris crédités après une rewarded video terminée.
   final int rewardedVideoBonus;
 
@@ -100,6 +118,9 @@ class GameEconomyConfig extends Equatable {
     sinkTierScalingEnabled: true,
     winRewardBase: 20,
     speedBonusPerSecond: 1,
+    freehandBonusBase: 15,
+    freehandBonusPerLetter: 3,
+    freehandMinLength: 4,
     rewardedVideoBonus: 50,
     rewardedDoubleEnabled: true,
     rewardedDailyCap: 5,
@@ -138,6 +159,15 @@ class GameEconomyConfig extends Equatable {
     return (sinkTierScalingEnabled ? base * tierMultiplier : base).round();
   }
 
+  /// Bonus « À main levée » pour un mot de [wordLength] lettres tracé sans
+  /// auto-intersection. Vaut 0 sous [freehandMinLength], sinon
+  /// [freehandBonusBase] + (longueur − seuil) × [freehandBonusPerLetter].
+  int freehandBonus(int wordLength) {
+    if (wordLength < freehandMinLength) return 0;
+    return freehandBonusBase +
+        (wordLength - freehandMinLength) * freehandBonusPerLetter;
+  }
+
   /// Récompense streak pour un compteur donné (1-indexé : `streakDay = 1` →
   /// `streakRewards[0]`). Au-delà de la liste, retourne la dernière valeur
   /// (palier asymptotique).
@@ -156,6 +186,9 @@ class GameEconomyConfig extends Equatable {
     bool? sinkTierScalingEnabled,
     int? winRewardBase,
     int? speedBonusPerSecond,
+    int? freehandBonusBase,
+    int? freehandBonusPerLetter,
+    int? freehandMinLength,
     int? rewardedVideoBonus,
     bool? rewardedDoubleEnabled,
     int? rewardedDailyCap,
@@ -173,6 +206,10 @@ class GameEconomyConfig extends Equatable {
           sinkTierScalingEnabled ?? this.sinkTierScalingEnabled,
       winRewardBase: winRewardBase ?? this.winRewardBase,
       speedBonusPerSecond: speedBonusPerSecond ?? this.speedBonusPerSecond,
+      freehandBonusBase: freehandBonusBase ?? this.freehandBonusBase,
+      freehandBonusPerLetter:
+          freehandBonusPerLetter ?? this.freehandBonusPerLetter,
+      freehandMinLength: freehandMinLength ?? this.freehandMinLength,
       rewardedVideoBonus: rewardedVideoBonus ?? this.rewardedVideoBonus,
       rewardedDoubleEnabled:
           rewardedDoubleEnabled ?? this.rewardedDoubleEnabled,
@@ -195,6 +232,9 @@ class GameEconomyConfig extends Equatable {
         sinkTierScalingEnabled,
         winRewardBase,
         speedBonusPerSecond,
+        freehandBonusBase,
+        freehandBonusPerLetter,
+        freehandMinLength,
         rewardedVideoBonus,
         rewardedDoubleEnabled,
         rewardedDailyCap,
@@ -218,6 +258,9 @@ abstract class RemoteConfigKeys {
   static const String sinkTierScaling = 'eco_sink_tier_scaling';
   static const String winRewardBase = 'eco_win_reward_base';
   static const String speedBonusPerSecond = 'eco_speed_bonus_per_second';
+  static const String freehandBonusBase = 'eco_freehand_bonus_base';
+  static const String freehandBonusPerLetter = 'eco_freehand_bonus_per_letter';
+  static const String freehandMinLength = 'eco_freehand_min_length';
   static const String rewardedVideoBonus = 'eco_rewarded_video_bonus';
   static const String rewardedDoubleEnabled = 'eco_rewarded_double_enabled';
   static const String rewardedDailyCap = 'eco_rewarded_daily_cap';

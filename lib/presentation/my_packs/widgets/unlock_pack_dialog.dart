@@ -80,9 +80,12 @@ class _UnlockPackDialogState extends ConsumerState<UnlockPackDialog> {
         }
       }
 
-      // Update local pour offline-first cohérent
+      // Update local pour offline-first cohérent. Le wallet serveur a déjà
+      // débité `result.cost` (unlockPack) → on miroite le débit en local via
+      // spendCauris (et surtout PAS addCauris(-cost), qui ignore les montants
+      // négatifs et laisserait le solde inchangé).
       await progress.grantPack(widget.pack.id);
-      await progress.addCauris(-result.cost);
+      await progress.spendCauris(result.cost);
 
       if (!mounted) return;
       Navigator.of(context).pop(true);

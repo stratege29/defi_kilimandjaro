@@ -59,6 +59,42 @@ void main() {
     });
   });
 
+  group('freehandBonus — bonus « À main levée »', () {
+    const d = GameEconomyConfig.defaults; // base 15, +3/lettre, seuil 4
+
+    test('défauts câblés', () {
+      expect(d.freehandBonusBase, 15);
+      expect(d.freehandBonusPerLetter, 3);
+      expect(d.freehandMinLength, 4);
+    });
+
+    test('mot trop court (< seuil) → 0', () {
+      expect(d.freehandBonus(0), 0);
+      expect(d.freehandBonus(3), 0);
+    });
+
+    test('exactement le seuil → forfait de base seul', () {
+      expect(d.freehandBonus(4), 15); // 15 + 0×3
+    });
+
+    test('au-delà du seuil → base + (longueur − seuil) × perLetter', () {
+      expect(d.freehandBonus(5), 18); // 15 + 1×3
+      expect(d.freehandBonus(6), 21); // 15 + 2×3
+      expect(d.freehandBonus(8), 27); // 15 + 4×3
+    });
+
+    test('overrides Remote Config respectés', () {
+      final c = d.copyWith(
+        freehandBonusBase: 10,
+        freehandBonusPerLetter: 5,
+        freehandMinLength: 5,
+      );
+      expect(c.freehandBonus(4), 0); // sous le nouveau seuil
+      expect(c.freehandBonus(5), 10); // forfait
+      expect(c.freehandBonus(7), 20); // 10 + 2×5
+    });
+  });
+
   group('streakRewardForDay — inchangé (faucet de rétention)', () {
     const d = GameEconomyConfig.defaults;
 

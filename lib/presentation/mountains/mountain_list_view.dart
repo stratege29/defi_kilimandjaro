@@ -439,6 +439,8 @@ class _MountainListViewState extends ConsumerState<MountainListView>
                 final idx = _currentMountainIndex(ms) ?? 0;
                 _animateToIndex(idx);
               }
+            case NavTab.packs:
+              context.go(AppRoutes.myPacks);
             case NavTab.profil:
               context.go(AppRoutes.profile);
           }

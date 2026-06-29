@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:defi_kilimandjaro/core/geometry/freehand_path.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
@@ -36,6 +37,7 @@ class CircularGrid extends StatefulWidget {
     this.shuffledIndices = const <int>[],
     this.seed,
     this.hiddenIndices = const <int>{},
+    this.onTrailSelfIntersectingChanged,
     super.key,
   });
 
@@ -75,6 +77,12 @@ class CircularGrid extends StatefulWidget {
 
   /// Appelé quand le doigt est levé.
   final VoidCallback onDragEnd;
+
+  /// Notifie si le **tracé brut du doigt** se croise lui-même, recalculé à
+  /// chaque ajout de lettre. Sert au bonus « À main levée » : le controller
+  /// stocke la valeur et la lit lors de la validation. Optionnel (les
+  /// call-sites synthétiques / tests peuvent l'ignorer).
+  final ValueChanged<bool>? onTrailSelfIntersectingChanged;
 
   @override
   State<CircularGrid> createState() => _CircularGridState();
@@ -274,12 +282,34 @@ class _CircularGridState extends State<CircularGrid>
     return null;
   }
 
+  /// Recalcule l'auto-intersection du tracé brut courant et la remonte au
+  /// controller. Appelé **juste avant** `onTileEntered` pour que la valeur
+  /// soit fraîche quand l'ajout de la dernière lettre déclenche la validation
+  /// (synchrone). Au moment de la lettre finale, `_trail` contient déjà tous
+  /// les points bruts du geste → verdict correct.
+  void _reportTrailGeometry(int targetIdx) {
+    final cb = widget.onTrailSelfIntersectingChanged;
+    if (cb == null) return;
+    // On INCLUT le centre de la tuile cible dans le test. Au moment du report,
+    // le snap final n'est pas encore dans `_trail` (il y est ajouté au rebuild
+    // suivant via `_syncTrailWithSelection`, donc APRÈS le `validate()`
+    // synchrone). Sans lui, le dernier segment (dernier point brut → centre),
+    // pourtant dessiné par le golden path et validé, échapperait au test —
+    // et en jeu « tap-only » `_trail` n'a aucun point brut intermédiaire du
+    // tout. On teste donc le tracé réellement affiché/validé.
+    final probe = targetIdx < _tileCenters.length
+        ? <Offset>[..._trail, _tileCenters[targetIdx]]
+        : _trail;
+    cb(FreehandPath.isSelfIntersecting(probe));
+  }
+
   void _onPointerDown(PointerDownEvent event) {
     final idx = _hitTest(event.localPosition);
     if (idx != null) {
       _lastHitIdx = idx;
       // Tap discret : on délègue toujours (ajoute si nouvelle, retire/tronque
       // si déjà sélectionnée — intentionnel et explicite côté utilisateur).
+      _reportTrailGeometry(idx);
       widget.onTileEntered(idx);
     }
     setState(() => _fingerPosition = event.localPosition);
@@ -304,6 +334,7 @@ class _CircularGridState extends State<CircularGrid>
             widget.selectedIndices.isNotEmpty &&
             widget.selectedIndices.last == idx;
         if (!isLastSelected) {
+          _reportTrailGeometry(idx);
           widget.onTileEntered(idx);
         }
       }

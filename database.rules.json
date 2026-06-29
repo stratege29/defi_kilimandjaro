@@ -20,6 +20,23 @@
         ".write": "auth != null && auth.uid === $uid"
       }
     },
+    "arena": {
+      "$tid": {
+        ".read": "auth != null",
+        "pool": {
+          "$uid": {
+            ".read": "auth != null",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        },
+        "active": {
+          "$uid": {
+            ".read": "auth != null",
+            ".write": "false"
+          }
+        }
+      }
+    },
     "matches": {
       ".indexOn": ["phase"],
       "$matchId": {
