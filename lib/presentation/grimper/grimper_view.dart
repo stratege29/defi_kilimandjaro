@@ -91,19 +91,7 @@ class GrimperView extends ConsumerWidget {
             accent: AppColors.orJour,
             title: 'Tournoi',
             subtitle: 'Arène — classement cauris',
-            comingSoon: true,
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: AppColors.boisFonce,
-                  content: Text(
-                    'Tournoi — bientôt disponible',
-                    style: AppTypography.labelSm
-                        .copyWith(color: AppColors.textePrimaire),
-                  ),
-                ),
-              );
-            },
+            onTap: () => unawaited(context.push<void>(AppRoutes.tournaments)),
           ),
           const SizedBox(height: 10),
           _ModeRow(
@@ -209,7 +197,6 @@ class _ModeRow extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
-    this.comingSoon = false,
   });
 
   final IconData icon;
@@ -217,7 +204,6 @@ class _ModeRow extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-  final bool comingSoon;
 
   @override
   Widget build(BuildContext context) {
@@ -227,69 +213,51 @@ class _ModeRow extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(14),
-        child: Opacity(
-          opacity: comingSoon ? 0.72 : 1,
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.hairline),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(11),
-                  ),
-                  child: Icon(icon, size: 21, color: accent),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.hairline),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(11),
                 ),
-                const SizedBox(width: 13),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        title,
-                        style: AppTypography.headingSm
-                            .copyWith(color: AppColors.textePrimaire),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle,
-                        style: AppTypography.bodySm
-                            .copyWith(color: AppColors.texteSecondaire),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
+                child: Icon(icon, size: 21, color: accent),
+              ),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: AppTypography.headingSm
+                          .copyWith(color: AppColors.textePrimaire),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: AppTypography.bodySm
+                          .copyWith(color: AppColors.texteSecondaire),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                if (comingSoon)
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: AppColors.orJour,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      'BIENTÔT',
-                      style: AppTypography.labelXs
-                          .copyWith(color: AppColors.boisFonce),
-                    ),
-                  )
-                else
-                  const Icon(
-                    Icons.chevron_right_rounded,
-                    color: AppColors.texteTertiaire,
-                  ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.texteTertiaire,
+              ),
+            ],
           ),
         ),
       ),
