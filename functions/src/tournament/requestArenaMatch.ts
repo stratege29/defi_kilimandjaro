@@ -210,8 +210,41 @@ export const requestArenaMatch = onCall<
       await rtdb.ref().update(cleanup);
     }
 
-    // --- Adversaire trouvé : créer le match de tournoi ---
+    // --- Adversaire trouvé : appariement anti-course ---
+    // Deux protections combinées contre les "duels fantômes" (deux joueurs
+    // créant chacun un match avec le même adversaire quand ils re-quêtent
+    // simultanément — fréquent en 1v1 après chaque match) :
+    //   1. Symétrie : seul le plus PETIT uid de la paire crée ; l'autre attend
+    //      le pointeur actif. Casse le cas où A et B se choisissent mutuellement.
+    //   2. Réclamation atomique : transaction sur `pool/{adversaire}/matched_to`.
+    //      Empêche deux créateurs distincts (C<B et A<B) de réclamer le même B.
+    if (opponentUid && uid > opponentUid) {
+      // L'adversaire (uid plus petit) est responsable de créer. On (re)attend ;
+      // notre prochain poll récupèrera le match via `arena/{tid}/active/{uid}`.
+      await rtdb.ref().update({
+        [arenaPoolPath(tid, uid)]: { points: myPoints, ts: now, request_id },
+        [`presence/${uid}`]: { ts: ServerValue.TIMESTAMP },
+      });
+      return { status: "waiting" };
+    }
+
     if (opponentUid) {
+      // uid < opponentUid : on réclame l'adversaire atomiquement avant de créer.
+      const claimRef = rtdb.ref(
+        `${arenaPoolPath(tid, opponentUid)}/matched_to`
+      );
+      const claim = await claimRef.transaction((cur) =>
+        cur ? undefined : uid
+      );
+      if (!claim.committed || claim.snapshot.val() !== uid) {
+        // Adversaire déjà réclamé/parti → on retente au prochain poll.
+        await rtdb.ref().update({
+          [arenaPoolPath(tid, uid)]: { points: myPoints, ts: now, request_id },
+          [`presence/${uid}`]: { ts: ServerValue.TIMESTAMP },
+        });
+        return { status: "waiting" };
+      }
+
       const matchId = _generateMatchId();
       const cache = await _loadDevinettesCache();
       const rounds = _pickThreeRounds(cache);

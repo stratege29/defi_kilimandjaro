@@ -25,6 +25,15 @@ function dbRef(path = "") {
       removed.push(path);
       rtdbData.delete(path);
     },
+    transaction: async (fn: (cur: unknown) => unknown) => {
+      const cur = rtdbData.has(path) ? rtdbData.get(path) : undefined;
+      const next = fn(cur);
+      if (next === undefined) {
+        return { committed: false, snapshot: { val: () => cur } };
+      }
+      rtdbData.set(path, next);
+      return { committed: true, snapshot: { val: () => next } };
+    },
   };
 }
 
@@ -170,6 +179,24 @@ describe("requestArenaMatch", () => {
     expect(atomic[`arena/${TID}/pool/opp`]).toBeNull();
     expect(atomic[`arena/${TID}/active/me`]).toBe(res.matchId);
     expect(atomic[`arena/${TID}/active/opp`]).toBe(res.matchId);
+  });
+
+  test("symétrie anti-fantôme : uid plus grand n'crée pas, attend", async () => {
+    setLiveTournament();
+    setParticipant("zzz", 5);
+    const now = Date.now();
+    // adversaire "aaa" éligible mais uid plus petit -> c'est LUI qui doit créer.
+    rtdbData.set(`arena/${TID}/pool`, { aaa: { points: 5, ts: now } });
+    rtdbData.set('presence', { aaa: { ts: now } });
+
+    const res = await call('zzz');
+    expect(res.status).toBe('waiting');
+    // Aucun match créé par "zzz".
+    expect(
+      updateCalls.find((u) =>
+        Object.keys(u).some((k) => k.startsWith('matches/')),
+      ),
+    ).toBeUndefined();
   });
 
   test("adversaire hors bande -> waiting (pas de match)", async () => {

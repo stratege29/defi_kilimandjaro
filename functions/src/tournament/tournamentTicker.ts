@@ -30,6 +30,12 @@ import {
   type RewardTier,
 } from "./scoring";
 
+/// Délai de grâce après `end_at` avant de finaliser : laisse les matchs déjà
+/// en cours au moment du buzzer se terminer et créditer leurs points (un duel
+/// 3 manches dure ~2 min) avant que le classement ne soit figé. Les matchs
+/// CRÉÉS après `end_at` ne comptent pas (garde dans awardTournamentPoints).
+const FINALIZE_GRACE_MS = 120_000;
+
 export const tournamentTicker = onSchedule(
   {
     schedule: "every 1 minutes",
@@ -63,7 +69,7 @@ export const tournamentTicker = onSchedule(
         .where("status", "==", "live")
         .get();
       for (const doc of liveSnap.docs) {
-        if (toMillis(doc.data()["end_at"]) <= now) {
+        if (toMillis(doc.data()["end_at"]) + FINALIZE_GRACE_MS <= now) {
           await finalizeTournament(doc);
         }
       }
