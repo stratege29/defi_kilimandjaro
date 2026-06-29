@@ -57,16 +57,21 @@ class TournamentRepository {
   /// Stream des tournois ouverts (programmés + en cours), triés par date de
   /// début croissante. Les tournois terminés/annulés sont exclus de la liste
   /// de découverte.
+  ///
+  /// Le tri se fait côté client : combiner `whereIn(status)` avec
+  /// `orderBy(start_at)` exigerait un index composite Firestore. Le volume
+  /// (tournois ouverts) est faible, le tri local est négligeable.
   Stream<List<Tournament>> watchOpenTournaments() {
     return _tournaments
         .where('status', whereIn: ['scheduled', 'live'])
-        .orderBy('start_at')
         .snapshots()
-        .map(
-          (snap) => snap.docs
-              .map((d) => Tournament.fromFirestore(d.id, d.data()))
-              .toList(),
-        );
+        .map((snap) {
+      final list = snap.docs
+          .map((d) => Tournament.fromFirestore(d.id, d.data()))
+          .toList()
+        ..sort((a, b) => a.startAt.compareTo(b.startAt));
+      return list;
+    });
   }
 
   /// Stream d'un tournoi précis (détail/lobby + suivi du statut).
@@ -78,19 +83,24 @@ class TournamentRepository {
 
   /// Stream du classement live (participants triés par points desc, puis
   /// victoires desc).
+  ///
+  /// Tri serveur sur `points` uniquement (index simple auto) + limite ; le
+  /// départage par victoires se fait côté client pour éviter un index composite.
   Stream<List<TournamentParticipant>> watchStandings(String tid) {
     return _tournaments
         .doc(tid)
         .collection('participants')
         .orderBy('points', descending: true)
-        .orderBy('wins', descending: true)
         .limit(kStandingsLimit)
         .snapshots()
-        .map(
-          (snap) => snap.docs
-              .map((d) => TournamentParticipant.fromFirestore(d.id, d.data()))
-              .toList(),
-        );
+        .map((snap) {
+      final list = snap.docs
+          .map((d) => TournamentParticipant.fromFirestore(d.id, d.data()))
+          .toList()
+        ..sort((a, b) =>
+            b.points != a.points ? b.points.compareTo(a.points) : b.wins.compareTo(a.wins));
+      return list;
+    });
   }
 
   /// Stream de la fiche du participant courant (points, rang, récompense).
