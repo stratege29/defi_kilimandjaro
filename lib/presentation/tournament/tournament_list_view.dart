@@ -24,6 +24,13 @@ class TournamentListView extends ConsumerWidget {
       backgroundColor: AppColors.surface,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
+        // Retour toujours disponible : la pile peut avoir été remplacée
+        // (retour depuis l'écran résultats via `go`) → fallback vers le hub.
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go(AppRoutes.hub),
+        ),
         title: Text('tournament.title'.tr(), style: AppTypography.headingLg),
       ),
       body: async.when(
@@ -125,27 +132,38 @@ class _TournamentCard extends StatelessWidget {
                         .copyWith(color: AppColors.texteSecondaire),
                   ),
                   const Spacer(),
-                  Icon(
-                    isLive ? Icons.timer_outlined : Icons.schedule,
-                    size: 16,
-                    color: isLive ? AppColors.kola : AppColors.orSoleil,
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Text(
-                    isLive
-                        ? '${'tournament.ends_in'.tr()} '
-                        : '${'tournament.starts_in'.tr()} ',
-                    style: AppTypography.bodySm
-                        .copyWith(color: AppColors.texteSecondaire),
-                  ),
-                  TournamentCountdown(
-                    target: isLive ? tournament.endAt : tournament.startAt,
-                    color: isLive ? AppColors.kola : AppColors.orSoleil,
-                    style: AppTypography.bebas(),
-                  ),
+                  if (tournament.isFinished) ...[
+                    const Icon(Icons.leaderboard_outlined,
+                        size: 16, color: AppColors.texteSecondaire),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      'tournament.view_results'.tr(),
+                      style: AppTypography.bodySm
+                          .copyWith(color: AppColors.texteSecondaire),
+                    ),
+                  ] else ...[
+                    Icon(
+                      isLive ? Icons.timer_outlined : Icons.schedule,
+                      size: 16,
+                      color: isLive ? AppColors.kola : AppColors.orSoleil,
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      isLive
+                          ? '${'tournament.ends_in'.tr()} '
+                          : '${'tournament.starts_in'.tr()} ',
+                      style: AppTypography.bodySm
+                          .copyWith(color: AppColors.texteSecondaire),
+                    ),
+                    TournamentCountdown(
+                      target: isLive ? tournament.endAt : tournament.startAt,
+                      color: isLive ? AppColors.kola : AppColors.orSoleil,
+                      style: AppTypography.bebas(),
+                    ),
+                  ],
                 ],
               ),
-              if (now.isAfter(tournament.startAt) && !isLive) ...[
+              if (now.isAfter(tournament.startAt) && tournament.isScheduled) ...[
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   'tournament.starting_soon'.tr(),

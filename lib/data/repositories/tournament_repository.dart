@@ -54,22 +54,30 @@ class TournamentRepository {
   // Lectures temps réel
   // ---------------------------------------------------------------------------
 
-  /// Stream des tournois ouverts (programmés + en cours), triés par date de
-  /// début croissante. Les tournois terminés/annulés sont exclus de la liste
-  /// de découverte.
+  /// Stream des tournois visibles : en cours, à venir, et récemment terminés
+  /// (pour pouvoir rouvrir leur classement). Les `cancelled` sont exclus.
   ///
-  /// Le tri se fait côté client : combiner `whereIn(status)` avec
-  /// `orderBy(start_at)` exigerait un index composite Firestore. Le volume
-  /// (tournois ouverts) est faible, le tri local est négligeable.
+  /// Tri client (pas d'index composite) : live d'abord, puis à venir (début le
+  /// plus proche), puis terminés (les plus récents en premier). `whereIn` sur un
+  /// seul champ utilise l'index simple automatique.
   Stream<List<Tournament>> watchOpenTournaments() {
     return _tournaments
-        .where('status', whereIn: ['scheduled', 'live'])
+        .where('status', whereIn: ['scheduled', 'live', 'finished'])
         .snapshots()
         .map((snap) {
+      int priority(Tournament t) =>
+          t.isLive ? 0 : (t.isScheduled ? 1 : 2);
       final list = snap.docs
           .map((d) => Tournament.fromFirestore(d.id, d.data()))
           .toList()
-        ..sort((a, b) => a.startAt.compareTo(b.startAt));
+        ..sort((a, b) {
+          final p = priority(a).compareTo(priority(b));
+          if (p != 0) return p;
+          // Terminés : plus récents d'abord ; sinon début croissant.
+          return a.isFinished
+              ? b.endAt.compareTo(a.endAt)
+              : a.startAt.compareTo(b.startAt);
+        });
       return list;
     });
   }

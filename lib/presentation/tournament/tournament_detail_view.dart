@@ -130,8 +130,10 @@ class _Body extends ConsumerWidget {
             children: [
               Text(tournament.name, style: AppTypography.displaySm),
               const SizedBox(height: AppSpacing.md),
-              _CountdownBanner(tournament: tournament),
-              const SizedBox(height: AppSpacing.md),
+              if (tournament.isScheduled || tournament.isLive) ...[
+                _CountdownBanner(tournament: tournament),
+                const SizedBox(height: AppSpacing.md),
+              ],
               _InfoRow(
                 icon: Icons.group,
                 label: 'tournament.participants'
