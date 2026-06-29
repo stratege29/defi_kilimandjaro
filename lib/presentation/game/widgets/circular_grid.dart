@@ -531,46 +531,72 @@ class _TileState extends State<_Tile> with SingleTickerProviderStateMixin {
       textColor = theme.tileText;
     }
 
-    // ShapeDecoration (et non BoxDecoration) pour que la lèvre 3D, l'ombre
-    // ambiante et le halo suivent la forme du skin — y compris hexagone /
-    // losange. Les ombres restent GPU-safe (blur sans MaskFilter).
-    final tile = DecoratedBox(
-      decoration: ShapeDecoration(
-        shape: _tileShapeBorder(theme.tileShape),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: gradient,
-        ),
-        shadows: <BoxShadow>[
-          // Lèvre sculptée (extrusion 3D bas).
-          BoxShadow(color: edge, offset: const Offset(0, 4)),
-          // Ombre ambiante portée.
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.32),
-            offset: const Offset(0, 8),
-            blurRadius: 12,
-          ),
-          // Halo lumineux à la sélection (teinté par le skin).
-          if (selected)
-            BoxShadow(
-              color: theme.tileSelected.withValues(alpha: 0.5),
-              blurRadius: 22,
-            ),
-        ],
+    // Lèvre 3D + ombre ambiante + halo de sélection. GPU-safe (blur sans
+    // MaskFilter). Partagés par les deux chemins de rendu ci-dessous.
+    final shadows = <BoxShadow>[
+      // Lèvre sculptée (extrusion 3D bas).
+      BoxShadow(color: edge, offset: const Offset(0, 4)),
+      // Ombre ambiante portée.
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.32),
+        offset: const Offset(0, 8),
+        blurRadius: 12,
       ),
-      child: Center(
-        child: Text(
-          widget.letter,
-          style: AppTypography.bebas(
-            size: 28,
-            color: textColor,
-            letterSpacing: 0,
-            weight: FontWeight.w800,
-          ),
+      // Halo lumineux à la sélection (teinté par le skin).
+      if (selected)
+        BoxShadow(
+          color: theme.tileSelected.withValues(alpha: 0.5),
+          blurRadius: 22,
+        ),
+    ];
+    final letter = Center(
+      child: Text(
+        widget.letter,
+        style: AppTypography.bebas(
+          size: 28,
+          color: textColor,
+          letterSpacing: 0,
+          weight: FontWeight.w800,
         ),
       ),
     );
+
+    final gradientFill = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: gradient,
+    );
+
+    // Formes rectangulaires (sculpted/rounded) : `AnimatedContainer` pour
+    // garder le micro-fondu 150 ms des couleurs/halo à la sélection.
+    // Formes polygonales (hex/diamond) : `ShapeDecoration` (non animable en
+    // lerp) pour que lèvre/ombres suivent le polygone.
+    final radius = switch (theme.tileShape) {
+      TileShape.rounded => 28.0,
+      _ => AppSpacing.radiusMd,
+    };
+    final isPolygon =
+        theme.tileShape == TileShape.hex ||
+        theme.tileShape == TileShape.diamond;
+
+    final tile = isPolygon
+        ? DecoratedBox(
+            decoration: ShapeDecoration(
+              shape: _tileShapeBorder(theme.tileShape),
+              gradient: gradientFill,
+              shadows: shadows,
+            ),
+            child: letter,
+          )
+        : AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(radius),
+              gradient: gradientFill,
+              boxShadow: shadows,
+            ),
+            child: letter,
+          );
 
     return AnimatedBuilder(
       animation: _scaleAnim,
