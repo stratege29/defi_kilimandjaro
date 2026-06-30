@@ -83,7 +83,9 @@ class GrimperView extends ConsumerWidget {
             accent: AppColors.kola,
             title: 'Défis en ligne',
             subtitle: 'Adversaire au hasard · ELO',
-            onTap: () => context.go(AppRoutes.hub),
+            // Lance directement la recherche d'adversaire (matchmaking) au lieu
+            // de rouvrir la page Défi (qui a son propre onglet dans la nav bar).
+            onTap: () => unawaited(context.push<void>(AppRoutes.duelLobby)),
           ),
           const SizedBox(height: 10),
           _ModeRow(
