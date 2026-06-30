@@ -55,8 +55,15 @@ class TournamentRepository {
   // Lectures temps réel
   // ---------------------------------------------------------------------------
 
-  /// Stream des tournois visibles : en cours, à venir, et récemment terminés
-  /// (pour pouvoir rouvrir leur classement). Les `cancelled` sont exclus.
+  /// Fenêtre d'affichage d'un tournoi terminé dans la liste de découverte :
+  /// passé ce délai après la fin, il est purgé de l'UI (le joueur a eu le temps
+  /// de consulter ses résultats juste après la partie). Évite l'accumulation de
+  /// vieux tournois dans la liste.
+  static const Duration kFinishedRetention = Duration(hours: 2);
+
+  /// Stream des tournois visibles : en cours, à venir, et terminés **récents**
+  /// (< [kFinishedRetention], pour rouvrir leur classement). Les `cancelled` et
+  /// les terminés anciens sont exclus → purge automatique côté UI.
   ///
   /// Tri client (pas d'index composite) : live d'abord, puis à venir (début le
   /// plus proche), puis terminés (les plus récents en premier). `whereIn` sur un
@@ -66,10 +73,13 @@ class TournamentRepository {
         .where('status', whereIn: ['scheduled', 'live', 'finished'])
         .snapshots()
         .map((snap) {
+      final cutoff = DateTime.now().subtract(kFinishedRetention);
       int priority(Tournament t) =>
           t.isLive ? 0 : (t.isScheduled ? 1 : 2);
       final list = snap.docs
           .map((d) => Tournament.fromFirestore(d.id, d.data()))
+          // Purge UI : on masque les tournois terminés trop anciens.
+          .where((t) => !t.isFinished || t.endAt.isAfter(cutoff))
           .toList()
         ..sort((a, b) {
           final p = priority(a).compareTo(priority(b));
