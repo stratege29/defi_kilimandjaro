@@ -56,6 +56,7 @@ export { joinTournament } from "./tournament/joinTournament";
 export { requestArenaMatch } from "./tournament/requestArenaMatch";
 export { tournamentTicker } from "./tournament/tournamentTicker";
 export { purgeOldTournaments } from "./tournament/purgeOldTournaments";
+export { scheduleDailyTournaments } from "./tournament/scheduleDailyTournaments";
 
 // --- Social & Viral (Phase 7) ---
 export { sendChallengeNotif } from "./matchmaking/sendChallengeNotif";
