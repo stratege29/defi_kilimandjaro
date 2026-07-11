@@ -18,6 +18,7 @@ import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.d
 import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
+import 'package:defi_kilimandjaro/domain/entities/pack_theme.dart';
 import 'package:defi_kilimandjaro/presentation/auth/link_account_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
@@ -271,7 +272,10 @@ class _GameViewState extends ConsumerState<GameView>
                 _buildHeader(gameState.cauris),
                 const SizedBox(height: 8),
                 // Riddle card.
-                _RiddleCard(riddle: widget.args.devinette.riddle),
+                _RiddleCard(
+                  riddle: widget.args.devinette.riddle,
+                  theme: packTheme,
+                ),
                 if (widget.args.config.isBoss ||
                     widget.args.config.modifiers.isNotEmpty) ...<Widget>[
                   const SizedBox(height: 8),
@@ -959,13 +963,15 @@ class _CaurisChip extends StatelessWidget {
 }
 
 class _RiddleCard extends StatelessWidget {
-  const _RiddleCard({required this.riddle});
+  const _RiddleCard({required this.riddle, required this.theme});
 
   final String riddle;
+  final PackTheme theme;
 
   @override
   Widget build(BuildContext context) {
-    // Carte devinette — accent gauche or (3pt) sur fond surfaceContainer.
+    // Carte devinette — accent gauche (3pt) sur fond de bulle, couleurs pilotées
+    // par le skin du pack (défaut = surfaceContainer / or / crème historiques).
     // Plus de bordure dorée pleine : la hiérarchie vient de l'accent + ombre.
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -982,13 +988,13 @@ class _RiddleCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         child: ColoredBox(
-          color: AppColors.surfaceContainer,
+          color: theme.bubbleBackground,
           child: IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                // Filet d'accent or pleine hauteur.
-                Container(width: 3, color: AppColors.orJour),
+                // Filet d'accent pleine hauteur (couleur du skin).
+                Container(width: 3, color: theme.bubbleAccent),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(13, 16, 18, 16),
@@ -1005,7 +1011,7 @@ class _RiddleCard extends StatelessWidget {
                             style: AppTypography.bodyMd.copyWith(
                               fontSize: 22,
                               height: 1.35,
-                              color: AppColors.textePrimaire,
+                              color: theme.bubbleText,
                             ),
                           ),
                         ),

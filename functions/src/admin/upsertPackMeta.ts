@@ -41,6 +41,9 @@ const ThemeOverrides = z
     on_accent: hexColor.optional(),
     path: hexColor.optional(),
     validation: hexColor.optional(),
+    bubble_background: hexColor.optional(),
+    bubble_accent: hexColor.optional(),
+    bubble_text: hexColor.optional(),
     sommets_tint: hexColor.optional(),
   })
   .strict();

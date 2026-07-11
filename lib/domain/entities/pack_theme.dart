@@ -42,6 +42,9 @@ class PackTheme extends Equatable {
     required this.onAccent,
     required this.path,
     required this.validation,
+    this.bubbleBackground = AppColors.surfaceContainer,
+    this.bubbleAccent = AppColors.orJour,
+    this.bubbleText = AppColors.textePrimaire,
     this.sommetsTint,
     this.motif = PackMotif.none,
     this.motifColor,
@@ -84,6 +87,18 @@ class PackTheme extends Equatable {
   /// Couleur de validation (flip de victoire des cellules-réponse).
   final Color validation;
 
+  /// Fond de la carte-devinette (« bulle question ») affichée au-dessus de la
+  /// grille. Défaut = `AppColors.surfaceContainer` (look historique).
+  final Color bubbleBackground;
+
+  /// Filet d'accent vertical (3pt) à gauche de la bulle question.
+  /// Défaut = `AppColors.orJour`.
+  final Color bubbleAccent;
+
+  /// Couleur du texte de l'énoncé dans la bulle question.
+  /// Défaut = `AppColors.textePrimaire`.
+  final Color bubbleText;
+
   /// Teinte d'ambiance Sommets — colore les gradients de biome vers cette
   /// couleur. `null` = ambiance purement altitude (look historique).
   final Color? sommetsTint;
@@ -120,6 +135,9 @@ class PackTheme extends Equatable {
       onAccent: pick('on_accent', onAccent),
       path: pick('path', path),
       validation: pick('validation', validation),
+      bubbleBackground: pick('bubble_background', bubbleBackground),
+      bubbleAccent: pick('bubble_accent', bubbleAccent),
+      bubbleText: pick('bubble_text', bubbleText),
       sommetsTint: overrides.containsKey('sommets_tint')
           ? parseHexColor(overrides['sommets_tint']) ?? sommetsTint
           : sommetsTint,
@@ -144,6 +162,9 @@ class PackTheme extends Equatable {
       onAccent: onAccent,
       path: path,
       validation: validation,
+      bubbleBackground: bubbleBackground,
+      bubbleAccent: bubbleAccent,
+      bubbleText: bubbleText,
       sommetsTint: sommetsTint,
       motif: motif ?? this.motif,
       motifColor: motifColor,
@@ -197,6 +218,9 @@ class PackTheme extends Equatable {
     onAccent,
     path,
     validation,
+    bubbleBackground,
+    bubbleAccent,
+    bubbleText,
     sommetsTint,
     motif,
     motifColor,

@@ -86,6 +86,31 @@ void main() {
       expect(t.accent, PackThemes.defaultTheme.accent);
     });
 
+    test('défaut : bulle question = couleurs historiques', () {
+      const t = PackThemes.defaultTheme;
+      expect(t.bubbleBackground, AppColors.surfaceContainer);
+      expect(t.bubbleAccent, AppColors.orJour);
+      expect(t.bubbleText, AppColors.textePrimaire);
+    });
+
+    test('les couleurs de la bulle question sont surchargeables', () {
+      final t = PackThemes.resolve(
+        overrides: const <String, String>{
+          'bubble_background': '#111213',
+          'bubble_accent': '#445566',
+          'bubble_text': '#AABBCC',
+        },
+      );
+      expect(t.bubbleBackground, const Color(0xFF111213));
+      expect(t.bubbleAccent, const Color(0xFF445566));
+      expect(t.bubbleText, const Color(0xFFAABBCC));
+      // Rôle bulle non surchargé garde le défaut.
+      final partial = PackThemes.resolve(
+        overrides: const <String, String>{'bubble_text': '#AABBCC'},
+      );
+      expect(partial.bubbleBackground, PackThemes.defaultTheme.bubbleBackground);
+    });
+
     test('motif et forme de tuiles surchargent le preset', () {
       final t = PackThemes.resolve(
         packId: 'culture_ci', // preset adinkra / sculpted

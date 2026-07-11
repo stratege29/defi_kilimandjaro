@@ -8,6 +8,7 @@ import {
   THEME_ROLES,
   MOTIF_OPTIONS,
   TILE_SHAPE_OPTIONS,
+  resolveThemeColors,
 } from './packThemes.js';
 
 const COUNTRIES = ['ci', 'sn', 'ml', 'cm', 'bj'];
@@ -17,6 +18,140 @@ function colorInputValue(hex) {
   if (typeof hex !== 'string') return '#000000';
   const v = hex.replace('#', '');
   return v.length >= 6 ? `#${v.slice(0, 6)}` : '#000000';
+}
+
+/** Style CSS de la forme d'une tuile-lettre (approximation du rendu app). */
+function tileShapeStyle(shape) {
+  switch (shape) {
+    case 'rounded':
+      return { borderRadius: '50%' };
+    case 'hex':
+      return { clipPath: 'polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0 50%)' };
+    case 'diamond':
+      return { clipPath: 'polygon(50% 0,100% 50%,50% 100%,0 50%)' };
+    case 'sculpted':
+    default:
+      return { borderRadius: 8 };
+  }
+}
+
+const MOTIF_LABELS = {
+  none: 'aucun',
+  adinkra: 'adinkra',
+  kita: 'kita',
+  bogolan: 'bogolan',
+  kente: 'kente',
+  vagues: 'vagues',
+};
+const SHAPE_LABELS = {
+  sculpted: 'sculptée',
+  rounded: 'arrondie',
+  hex: 'hexagone',
+  diamond: 'losange',
+};
+
+/**
+ * Prévisualisation live du skin : mini-scène de jeu (fond, bulle question,
+ * cellules-réponse, tuiles-lettres) rendue avec les couleurs résolues du
+ * preset + overrides. Reflète en direct chaque changement du sélecteur.
+ */
+function ThemePreview({ themeId, packId, overrides, motif, tileShape }) {
+  const { colors, motif: rMotif, tileShape: rShape } = useMemo(
+    () => resolveThemeColors({ themeId, packId, overrides, motif, tileShape }),
+    [themeId, packId, overrides, motif, tileShape],
+  );
+  const shapeCss = tileShapeStyle(rShape);
+  // 4 tuiles : 3 au repos + 1 sélectionnée (dernière).
+  const restTiles = ['K', 'A', 'B'];
+
+  return (
+    <div className="theme-preview-wrap">
+      <div
+        className="theme-preview"
+        style={{
+          background: `linear-gradient(160deg, ${colors.background}, ${colors.background_end})`,
+        }}
+      >
+        {/* Bulle question */}
+        <div
+          className="tp-bubble"
+          style={{ background: colors.bubble_background }}
+        >
+          <span
+            className="tp-bubble-stripe"
+            style={{ background: colors.bubble_accent }}
+          />
+          <span className="tp-bubble-text" style={{ color: colors.bubble_text }}>
+            Quel fleuve traverse Abidjan ?
+          </span>
+        </div>
+
+        {/* Cellules-réponse */}
+        <div className="tp-cells">
+          {[0, 1, 2, 3, 4].map((i) => {
+            const filled = i < 2;
+            return (
+              <span
+                key={i}
+                className="tp-cell"
+                style={{
+                  background: filled ? colors.accent : 'transparent',
+                  border: `1.5px solid ${colors.accent}`,
+                  color: colors.on_accent,
+                }}
+              >
+                {filled ? ['É', 'B'][i] : ''}
+              </span>
+            );
+          })}
+        </div>
+
+        {/* Filet « golden path » indicatif */}
+        <div className="tp-path" style={{ background: colors.path }} />
+
+        {/* Tuiles-lettres */}
+        <div className="tp-tiles">
+          {restTiles.map((ch, i) => (
+            <span
+              key={i}
+              className="tp-tile"
+              style={{
+                background: colors.tile,
+                borderBottom: `3px solid ${colors.tile_edge}`,
+                color: colors.tile_text,
+                ...shapeCss,
+              }}
+            >
+              {ch}
+            </span>
+          ))}
+          <span
+            className="tp-tile"
+            style={{
+              background: colors.tile_selected,
+              borderBottom: `3px solid ${colors.tile_selected_edge}`,
+              color: colors.tile_text,
+              ...shapeCss,
+            }}
+          >
+            J
+          </span>
+        </div>
+      </div>
+      <p className="muted small tp-caption">
+        Motif : {MOTIF_LABELS[rMotif] ?? rMotif} · Tuiles : {SHAPE_LABELS[rShape] ?? rShape}
+        {colors.sommets_tint && (
+          <>
+            {' · '}Teinte Sommets{' '}
+            <span
+              className="tp-swatch"
+              style={{ background: colors.sommets_tint }}
+            />
+          </>
+        )}
+      </p>
+    </div>
+  );
 }
 
 export default function PackEditor({ packId, onBack }) {
@@ -330,6 +465,14 @@ function MetaForm({ packId, entry, onClose }) {
             <option key={p.id} value={p.id}>{p.label}</option>
           ))}
         </select>
+
+        <ThemePreview
+          themeId={themeId}
+          packId={packId}
+          overrides={overrides}
+          motif={motif}
+          tileShape={tileShape}
+        />
 
         <div className="grid2">
           <div>
