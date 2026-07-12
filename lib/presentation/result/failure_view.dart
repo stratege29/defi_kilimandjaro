@@ -203,7 +203,14 @@ class _FailureCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Image.asset(AppAssets.griotSad, width: 96, height: 96),
+          // Kili découragé — patte sur la tête, larme. Pose dédiée à
+          // l'échec (remplace le placeholder neutre `KiliMascot`).
+          Image.asset(
+            AppAssets.kiliSad,
+            width: 110,
+            height: 81,
+            fit: BoxFit.contain,
+          ),
           const SizedBox(height: 16),
           if (revealed) ..._revealedHeader() else ..._hiddenHeader(),
           const SizedBox(height: 16),

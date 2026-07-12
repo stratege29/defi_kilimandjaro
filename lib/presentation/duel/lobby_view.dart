@@ -19,7 +19,7 @@ const kAltitudeHeroTag = 'player-altitude-chip';
 /// Trois états :
 /// - [LobbyPhase.searching] : **radar** (ondes + balayage) autour de ton avatar + bande ELO.
 /// - [LobbyPhase.matched] : flash doré + transition crossfade vers [AppRoutes.duelPlay].
-/// - [LobbyPhase.noOpponent] : griot pensif + 2 CTA slide-up.
+/// - [LobbyPhase.noOpponent] : Kili qui somnole + 2 CTA slide-up.
 class LobbyView extends ConsumerStatefulWidget {
   const LobbyView({super.key});
 
@@ -549,10 +549,15 @@ class _NoOpponentBody extends ConsumerWidget {
       child: Column(
         children: [
           const Spacer(),
-          // Griot pensif fade-in.
+          // Kili qui somnole en attendant — fade-in.
           FadeTransition(
             opacity: slideCtrl,
-            child: Image.asset(AppAssets.griotIdle, width: 120, height: 120),
+            child: Image.asset(
+              AppAssets.kiliSleep,
+              width: 120,
+              height: 89,
+              fit: BoxFit.contain,
+            ),
           ),
           const SizedBox(height: 24),
           FadeTransition(

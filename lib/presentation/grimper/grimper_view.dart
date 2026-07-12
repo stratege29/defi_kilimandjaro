@@ -7,6 +7,7 @@ import 'package:defi_kilimandjaro/presentation/home/home_view.dart'
     show launchNextLevel;
 import 'package:defi_kilimandjaro/presentation/home/providers/current_mountain_provider.dart';
 import 'package:defi_kilimandjaro/presentation/hub/widgets/bottom_nav_bar.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/kili_mascot.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -37,24 +38,11 @@ class GrimperView extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
-          // Héros : pastille montagne dorée (équiv. du pion chess.com).
-          Center(
-            child: Container(
-              width: 92,
-              height: 92,
-              margin: const EdgeInsets.only(top: 8, bottom: 24),
-              decoration: BoxDecoration(
-                color: AppColors.orJour.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.orJour.withValues(alpha: 0.5),
-                ),
-              ),
-              child: const Icon(
-                Icons.terrain_rounded,
-                size: 46,
-                color: AppColors.orJour,
-              ),
+          // Héros : la mascotte Kili (margouillat), animée. Un tap → hochement.
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: 4, bottom: 16),
+              child: KiliMascot(size: 150),
             ),
           ),
 
