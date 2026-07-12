@@ -106,6 +106,7 @@ flutter:
     - assets/images/shop/
     - assets/images/duel/
     - assets/images/avatars/
+    - assets/kili/
 
   # Polices bundlées (variables) — chargées localement, plus aucun fetch
   # réseau google_fonts au runtime. Flutter mappe `fontWeight` sur l'axe

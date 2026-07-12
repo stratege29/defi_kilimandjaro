@@ -70,8 +70,13 @@ class GriotBriefingOverlay extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            // Avatar griot — identité narrative conservée dans les 2 modes.
-            Image.asset(AppAssets.griotIdle, width: 64, height: 64),
+            // Kili en pleine escalade — visualise « la pente se raidit ».
+            Image.asset(
+              AppAssets.kiliClimb,
+              width: 72,
+              height: 53,
+              fit: BoxFit.contain,
+            ),
             const SizedBox(height: 8),
             // Badge « BOSS » — uniquement sur un stage boss, pastille dorée
             // pour signaler l'enjeu sans alourdir la card.

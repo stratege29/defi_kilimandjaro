@@ -588,10 +588,13 @@ class _RiddleCard extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(13, 16, 16, 16),
                     child: Row(
                       children: <Widget>[
+                        // Kili « peek » — même traitement que la carte-énigme
+                        // en solo (crop large ~1.9:1).
                         Image.asset(
-                          AppAssets.griotIdle,
-                          width: 56,
-                          height: 56,
+                          AppAssets.kiliPeek,
+                          width: 66,
+                          height: 40,
+                          fit: BoxFit.contain,
                         ),
                         const SizedBox(width: 12),
                         Expanded(

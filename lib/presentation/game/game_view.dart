@@ -1001,8 +1001,15 @@ class _RiddleCard extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        // Griot avatar — 44pt, gauche.
-                        Image.asset(AppAssets.griotIdle, width: 44, height: 44),
+                        // Kili « peek » — pattes agrippées à une rampe, tête
+                        // qui dépasse pour lire l'énoncé avec le joueur.
+                        // Crop large (ratio ~1.9:1) : largeur > hauteur.
+                        Image.asset(
+                          AppAssets.kiliPeek,
+                          width: 66,
+                          height: 40,
+                          fit: BoxFit.contain,
+                        ),
                         const SizedBox(width: 12),
                         // Énoncé — 22pt, héros culturel de l'écran.
                         Expanded(

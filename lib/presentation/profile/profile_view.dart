@@ -517,7 +517,7 @@ class _ProfileHero extends ConsumerWidget {
 ///
 /// Lookup dynamique sur `profile.avatarId` :
 /// - avatarId défini + asset valide → image du catalogue
-/// - sinon → fallback `AppAssets.griotIdle` (comportement legacy)
+/// - sinon → fallback `AppAssets.kiliFace`
 ///
 /// Un petit pictogramme crayon dans le coin signale la clickabilité.
 class _AvatarBadge extends ConsumerWidget {
@@ -535,10 +535,10 @@ class _AvatarBadge extends ConsumerWidget {
     }
     final avatar = AvatarCatalog.byId(asyncProfile.value?.avatarId);
 
-    // Avatar SVG si défini, sinon mascotte griot PNG legacy.
+    // Avatar SVG si défini, sinon mascotte Kili (visage) en fallback.
     final avatarChild = avatar != null
         ? SvgPicture.asset(avatar.assetPath, fit: BoxFit.cover)
-        : Image.asset(AppAssets.griotIdle, fit: BoxFit.cover);
+        : Image.asset(AppAssets.kiliFace, fit: BoxFit.cover);
 
     return Semantics(
       button: true,

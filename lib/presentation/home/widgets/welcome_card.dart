@@ -7,9 +7,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Carte d'accueil world-class : griot animé + salutation contextuelle.
+/// Carte d'accueil world-class : Kili animé + salutation contextuelle.
 ///
-/// Layout : griot à gauche avec respiration idle subtile (translate Y ±2px),
+/// Layout : Kili à gauche avec respiration idle subtile (translate Y ±2px),
 /// salutation Bebas 26 orSoleil + date Crimson 12 italique à droite.
 /// Background gradient diagonal surfaceVariant → surfaceContainer avec
 /// bordure or fine pour la profondeur.
@@ -65,7 +65,7 @@ class _WelcomeCardState extends ConsumerState<WelcomeCard>
       ),
       child: Row(
         children: [
-          // Griot avec respiration idle, format compact.
+          // Kili tout content (pouce levé) avec respiration idle, format compact.
           AnimatedBuilder(
             animation: _breath,
             builder: (_, child) {
@@ -76,9 +76,9 @@ class _WelcomeCardState extends ConsumerState<WelcomeCard>
               );
             },
             child: SizedBox(
-              width: 60,
-              height: 80,
-              child: Image.asset(AppAssets.griotWelcome),
+              width: 72,
+              height: 53,
+              child: Image.asset(AppAssets.kiliCheer, fit: BoxFit.contain),
             ),
           ),
           const SizedBox(width: 12),

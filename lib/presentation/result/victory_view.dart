@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
@@ -11,6 +10,7 @@ import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/dashed_button.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/kili_mascot.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
@@ -21,7 +21,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Affiché via [showDialog] avec fond noir à 92 % d'opacité.
 ///
 /// **Architecture visuelle** : card centrée éditoriale.
-/// - Griot 96pt en haut (mascotte célèbre, scale-bounce continu)
+/// - Kili (le margouillat) en haut (idle + hochement de tête déclenché à
+///   l'ouverture de la card — seule animation de la mascotte, pas de pulsation)
 /// - Mot-réponse en Fraunces display (la plus belle fonte du DS)
 /// - Explication culturelle 2-3 lignes Crimson italic
 /// - **Proverbe** dans son cadre éditorial dédié — séparateurs gold
@@ -78,13 +79,15 @@ class VictoryView extends ConsumerStatefulWidget {
 class _VictoryViewState extends ConsumerState<VictoryView>
     with TickerProviderStateMixin {
   late final AnimationController _particleCtrl;
-  late final AnimationController _celebCtrl;
   late final AnimationController _cardCtrl;
   late final AnimationController _caurisCtrl;
 
-  late final Animation<double> _celebScale;
   late final Animation<double> _cardScale;
   late final Animation<int> _caurisAnim;
+
+  /// Poignée pilotant la mascotte Kili : on déclenche son hochement de tête
+  /// une fois la card apparue (geste signature « bonne réponse »).
+  final KiliController _kili = KiliController();
 
   /// Total animé dans le chip « ka-ching » = récompense de base + bonus à
   /// main levée. La ligne « À main levée : +M inclus » sous le chip en donne
@@ -109,11 +112,6 @@ class _VictoryViewState extends ConsumerState<VictoryView>
       duration: const Duration(milliseconds: 1500),
     )..forward();
 
-    _celebCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    )..repeat(reverse: true);
-
     // Spring damped — 1 overshoot puis stabilisation (Duolingo-style).
     _cardCtrl = AnimationController(vsync: this, upperBound: 2)
       ..animateWith(
@@ -124,11 +122,6 @@ class _VictoryViewState extends ConsumerState<VictoryView>
           0,
         ),
       );
-
-    _celebScale = Tween<double>(
-      begin: 0.92,
-      end: 1.08,
-    ).animate(CurvedAnimation(parent: _celebCtrl, curve: Curves.easeInOut));
 
     _cardScale = Tween<double>(begin: 0.7, end: 1).animate(_cardCtrl);
 
@@ -143,12 +136,18 @@ class _VictoryViewState extends ConsumerState<VictoryView>
     Future<void>.delayed(const Duration(milliseconds: 450), () {
       if (mounted) _caurisCtrl.forward();
     });
+
+    // Hochement de Kili une fois la card posée (le spring pop-in dure ~600 ms).
+    // Synchronisé grosso modo avec le « ka-ching » cauris pour un pic de
+    // célébration unique.
+    Future<void>.delayed(const Duration(milliseconds: 550), () {
+      if (mounted) _kili.nod();
+    });
   }
 
   @override
   void dispose() {
     _particleCtrl.dispose();
-    _celebCtrl.dispose();
     _cardCtrl.dispose();
     _caurisCtrl.dispose();
     super.dispose();
@@ -244,7 +243,7 @@ class _VictoryViewState extends ConsumerState<VictoryView>
               child: _VictoryCard(
                 devinette: widget.devinette,
                 caurisAnim: _caurisAnim,
-                celebScale: _celebScale,
+                kili: _kili,
                 onNext: widget.onNext,
                 starsEarned: widget.starsEarned,
                 isBoss: widget.isBoss,
@@ -267,7 +266,7 @@ class _VictoryCard extends StatelessWidget {
   const _VictoryCard({
     required this.devinette,
     required this.caurisAnim,
-    required this.celebScale,
+    required this.kili,
     required this.onNext,
     required this.starsEarned,
     required this.isBoss,
@@ -277,7 +276,11 @@ class _VictoryCard extends StatelessWidget {
 
   final Devinette devinette;
   final Animation<int> caurisAnim;
-  final Animation<double> celebScale;
+
+  /// Poignée de la mascotte Kili affichée en tête de card (hochement piloté
+  /// par [_VictoryViewState]).
+  final KiliController kili;
+
   final VoidCallback onNext;
   final int starsEarned;
   final bool isBoss;
@@ -350,20 +353,13 @@ class _VictoryCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
           ],
-          // Mascotte griot 96pt — bouncing victory pose. En mode boss,
-          // surmontée d'une couronne flottante.
+          // Mascotte Kili — idle + hochement de tête à l'ouverture (pas de
+          // pulsation). En mode boss, surmontée d'une couronne flottante.
           Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.topCenter,
             children: <Widget>[
-              ScaleTransition(
-                scale: celebScale,
-                child: Image.asset(
-                  AppAssets.griotVictory,
-                  width: 96,
-                  height: 96,
-                ),
-              ),
+              KiliMascot(controller: kili, size: 130),
               if (isBoss)
                 Positioned(
                   top: -14,

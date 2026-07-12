@@ -19,9 +19,9 @@ Future<void> markOnboardingSeen(SharedPreferences prefs) async {
 
 /// 3 écrans skippables au premier lancement.
 ///
-/// Étape 1 : drag des lettres (mascotte griotIdle)
-/// Étape 2 : ascension des montagnes (mascotte griotPoint)
-/// Étape 3 : défi entre amis (mascotte griotWelcome)
+/// Étape 1 : drag des lettres (Kili peek)
+/// Étape 2 : ascension des montagnes (Kili climb)
+/// Étape 3 : défi entre amis (Kili cheer)
 class OnboardingView extends ConsumerStatefulWidget {
   const OnboardingView({super.key});
 
@@ -40,7 +40,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
       defaultTitle: 'Bienvenue, voyageur',
       defaultBody:
           'Glisse ton doigt sur les lettres pour former le mot caché par le griot.',
-      mascotAsset: AppAssets.griotIdle,
+      mascotAsset: AppAssets.kiliPeek,
     ),
     _OnboardingStep(
       titleKey: 'onboarding.step2.title',
@@ -48,7 +48,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
       defaultTitle: "Gravis l'Afrique",
       defaultBody:
           "51 sommets t'attendent, du Red Rocks de Gambie au toit du Kilimandjaro.",
-      mascotAsset: AppAssets.griotPoint,
+      mascotAsset: AppAssets.kiliClimb,
     ),
     _OnboardingStep(
       titleKey: 'onboarding.step3.title',
@@ -56,7 +56,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
       defaultTitle: 'Défie un ami',
       defaultBody:
           'QR code en main, lance un duel temps réel. Le plus rapide remporte la sagesse.',
-      mascotAsset: AppAssets.griotWelcome,
+      mascotAsset: AppAssets.kiliCheer,
     ),
   ];
 

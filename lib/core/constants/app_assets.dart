@@ -1,7 +1,6 @@
 /// Chemins centralisés des assets images. Toute référence d'asset dans le
 /// code passe par ici — jamais de string en dur.
 abstract final class AppAssets {
-  static const _mascot = 'assets/images/mascot';
   static const _brand = 'assets/images/brand';
   static const _tiles = 'assets/images/tiles';
   static const _buttons = 'assets/images/buttons';
@@ -20,33 +19,36 @@ abstract final class AppAssets {
   /// Référencé via `'${AppAssets.avatarsDir}/<id>.png'` dans chaque `Avatar`.
   static const String avatarsDir = 'assets/images/avatars';
 
-  // --- Mascotte griot (turban bleu, halo jaune) ---
-  /// Pose neutre / approbation (clin d'œil + pouce levé). Carte devinette, HUD.
-  static const String griotIdle = '$_mascot/griot_idle.png';
+  static const _kili = 'assets/kili';
 
-  /// Pose victoire (poings levés en triomphe). Écran 04 Victoire.
-  static const String griotVictory = '$_mascot/griot_victory.png';
+  // --- Mascotte Kili (margouillat, remplace le griot) ---
+  /// Corps complet, pose neutre. Héros de la page Grimper (`KiliMascot`).
+  static const String kiliBody = '$_kili/kili.png';
 
-  /// Pose réflexion / indice (index levé + main sur cœur). Bouton Indice, tooltip.
-  static const String griotHint = '$_mascot/griot_hint.png';
+  /// Découpe tête seule, pivote sur le cou (rig 2 calques `KiliMascot`).
+  static const String kiliHead = '$_kili/kili_head.png';
 
-  /// Pose narration / guidance (pointe du doigt). Onboarding, tutoriels.
-  static const String griotPoint = '$_mascot/griot_point.png';
+  /// Pose « peek » : pattes agrippées à une rampe, tête qui dépasse,
+  /// vue légèrement plongeante. Carte devinette en jeu.
+  static const String kiliPeek = '$_kili/kili_peek.png';
 
-  /// Pose célébration ouverte (bras grands ouverts). Écran d'accueil, fanfare.
-  static const String griotWelcome = '$_mascot/griot_welcome.png';
+  /// Variante de [kiliPeek] avec la rampe recolorée en or (au lieu du gris/
+  /// beige d'origine) — pour poser Kili directement sur une surface dorée
+  /// (CTA GRIMPER) sans rupture de teinte entre l'illustration et le fond.
+  static const String kiliPeekGold = '$_kili/kili_peek_gold.png';
 
-  /// Pose consolation (à générer — voir asset bible B4).
-  static const String griotSad = '$_mascot/griot_sad.png';
+  /// Vue plongeante, pattes écartées façon escalade de paroi. Overlay de
+  /// mise en garde d'ascension (pente qui se raidit / boss).
+  static const String kiliClimb = '$_kili/kili_climb.png';
 
-  /// Pose hero sommet Kilimandjaro (à générer — voir asset bible B6).
-  static const String griotSummit = '$_mascot/griot_summit.png';
+  /// Pouce levé, yeux pétillants (cœurs/étoiles). Carte d'accueil.
+  static const String kiliCheer = '$_kili/kili_cheer.png';
 
-  /// Bulle de dialogue (queue vers le haut). Pour les tooltips au-dessus du griot.
-  static const String speechBubbleUp = '$_mascot/speech_bubble_up.png';
+  /// Roulé en boule, endormi. Lobby duel en attente d'adversaire.
+  static const String kiliSleep = '$_kili/kili_sleep.png';
 
-  /// Bulle de dialogue (queue vers le bas). Pour les tooltips en dessous du griot.
-  static const String speechBubbleDown = '$_mascot/speech_bubble_down.png';
+  /// Tête seule, cadrage serré, grand sourire. Avatar profil (fallback rond).
+  static const String kiliFace = '$_kili/kili_face.png';
 
   // --- Brand ---
   static const String appIcon = '$_brand/app_icon.png';
