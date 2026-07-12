@@ -136,7 +136,7 @@ export const bulkImportDevinettes = onCall(
         id: devi.id,
         pack: packId,
         country: devi.country ?? "ci",
-        answer: answerUpper,
+        answer: answerNormalized.toUpperCase(),
         answer_normalized: answerNormalized,
         letters_pool: lettersPool,
         riddle: devi.riddle ?? {},
