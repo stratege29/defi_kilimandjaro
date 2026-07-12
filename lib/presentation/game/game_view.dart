@@ -973,64 +973,71 @@ class _RiddleCard extends StatelessWidget {
     // Carte devinette — accent gauche (3pt) sur fond de bulle, couleurs pilotées
     // par le skin du pack (défaut = surfaceContainer / or / crème historiques).
     // Plus de bordure dorée pleine : la hiérarchie vient de l'accent + ombre.
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.topCenter,
+      children: <Widget>[
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.4),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        child: ColoredBox(
-          color: theme.bubbleBackground,
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                // Filet d'accent pleine hauteur (couleur du skin).
-                Container(width: 3, color: theme.bubbleAccent),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(13, 16, 18, 16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        // Kili « peek » — pattes agrippées à une rampe, tête
-                        // qui dépasse pour lire l'énoncé avec le joueur.
-                        // Crop large (ratio ~1.9:1) : largeur > hauteur.
-                        Image.asset(
-                          AppAssets.kiliPeek,
-                          width: 66,
-                          height: 40,
-                          fit: BoxFit.contain,
-                        ),
-                        const SizedBox(width: 12),
-                        // Énoncé — 22pt, héros culturel de l'écran.
-                        Expanded(
-                          child: Text(
-                            riddle,
-                            style: AppTypography.bodyMd.copyWith(
-                              fontSize: 22,
-                              height: 1.35,
-                              color: theme.bubbleText,
-                            ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            child: ColoredBox(
+              color: theme.bubbleBackground,
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    // Filet d'accent pleine hauteur (couleur du skin).
+                    Container(width: 3, color: theme.bubbleAccent),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 28, 18, 16),
+                        // Énoncé — 22pt, héros culturel de l'écran. Padding
+                        // haut majoré pour laisser respirer Kili posé sur
+                        // le bord supérieur.
+                        child: Text(
+                          riddle,
+                          style: AppTypography.bodyMd.copyWith(
+                            fontSize: 22,
+                            height: 1.35,
+                            color: theme.bubbleText,
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
-      ),
+        // Kili « peek » — à cheval sur le bord supérieur de la bulle, comme
+        // s'il grimpait pour lire l'énoncé avec le joueur. `top: -37` cale
+        // la bordure de la rampe (dans le PNG source) sur le bord réel de la
+        // carte (même calcul que le CTA GRIMPER). `IgnorePointer` : purement
+        // décoratif.
+        Positioned(
+          top: -37,
+          child: IgnorePointer(
+            child: Image.asset(
+              AppAssets.kiliPeek,
+              width: 84,
+              height: 43,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

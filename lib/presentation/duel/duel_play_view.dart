@@ -552,8 +552,8 @@ class _ProgressRow extends ConsumerWidget {
   }
 }
 
-/// Carte devinette du duel — meme style que le mode solo (`game_view.dart`)
-/// avec l'avatar du griot a gauche et le texte en bodyMd non-italique.
+/// Carte devinette du duel — meme style que le mode solo (`game_view.dart`),
+/// Kili posé sur le bord inférieur, texte en bodyMd non-italique.
 class _RiddleCard extends StatelessWidget {
   const _RiddleCard({required this.riddle});
 
@@ -562,60 +562,66 @@ class _RiddleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Carte devinette à accent gauche or (cohérence avec le mode solo).
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.topCenter,
+      children: <Widget>[
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.4),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        child: ColoredBox(
-          color: AppColors.surfaceContainer,
-          child: IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Container(width: 3, color: AppColors.orJour),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(13, 16, 16, 16),
-                    child: Row(
-                      children: <Widget>[
-                        // Kili « peek » — même traitement que la carte-énigme
-                        // en solo (crop large ~1.9:1).
-                        Image.asset(
-                          AppAssets.kiliPeek,
-                          width: 66,
-                          height: 40,
-                          fit: BoxFit.contain,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            riddle,
-                            style: AppTypography.bodyMd.copyWith(
-                              fontSize: 16,
-                              height: 1.45,
-                              color: AppColors.textePrimaire,
-                            ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            child: ColoredBox(
+              color: AppColors.surfaceContainer,
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Container(width: 3, color: AppColors.orJour),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 28, 16, 16),
+                        // Padding haut majoré pour laisser respirer Kili posé
+                        // sur le bord (cf. `_RiddleCard` du mode solo).
+                        child: Text(
+                          riddle,
+                          style: AppTypography.bodyMd.copyWith(
+                            fontSize: 16,
+                            height: 1.45,
+                            color: AppColors.textePrimaire,
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
-      ),
+        // Kili « peek » — à cheval sur le bord supérieur, même traitement que
+        // la carte-énigme en solo (cf. `game_view.dart` `_RiddleCard`).
+        Positioned(
+          top: -37,
+          child: IgnorePointer(
+            child: Image.asset(
+              AppAssets.kiliPeek,
+              width: 84,
+              height: 43,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
