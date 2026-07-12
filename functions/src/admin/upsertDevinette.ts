@@ -20,8 +20,11 @@ import { normalize, lettersPoolFromAnswer } from "../utils/normalize";
  *   le draft remplacera la published.
  * - Si le doc existe déjà en draft → update simple.
  *
- * Auto-calcul : `answer_normalized` et `letters_pool` sont toujours
- * recalculés serveur-side (jamais confiance au client).
+ * Auto-calcul : `answer`, `answer_normalized` et `letters_pool` sont toujours
+ * recalculés serveur-side (jamais confiance au client). `answer` est stocké
+ * SANS accent (= `answer_normalized` en majuscules) pour matcher les lettres
+ * de `letters_pool`, elles-mêmes générées depuis la forme normalisée — sinon
+ * un mot accentué (ex. « FÊTE ») devient impossible à valider côté client.
  *
  * Guard : `requireEditor` (admin ou editor).
  */
@@ -101,7 +104,7 @@ export const upsertDevinette = onCall(
       id: devinette.id,
       pack: devinette.pack,
       country: devinette.country,
-      answer: answerUpper,
+      answer: answerNormalized.toUpperCase(),
       answer_normalized: answerNormalized,
       letters_pool: lettersPool,
       riddle: devinette.riddle ?? {},

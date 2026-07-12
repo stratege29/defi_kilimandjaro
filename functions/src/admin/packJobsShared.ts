@@ -211,7 +211,7 @@ export function devinetteFromCandidate(
     id: deviId,
     pack: cand.packId,
     country: cand.country || "ci",
-    answer: answerUpper,
+    answer: answerNormalized.toUpperCase(),
     answer_normalized: answerNormalized,
     letters_pool: lettersPool,
     riddle: { fr: cand.riddleFr },
