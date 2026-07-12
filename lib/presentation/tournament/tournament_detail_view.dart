@@ -19,8 +19,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Salle d'attente d'un tournoi : compte à rebours, participants, règles +
-/// récompenses, et inscription. Quand le tournoi est `live` et que le joueur
-/// est inscrit, le bouton bascule sur « Entrer dans l'arène ».
+/// récompenses, et inscription. Quand le tournoi passe `live` et que le
+/// joueur est inscrit, l'entrée en arène est automatique (voir
+/// `_maybeAutoEnterArena`) ; le bouton « Entrer dans l'arène » reste un
+/// filet de sécurité pour revenir manuellement.
 class TournamentDetailView extends ConsumerStatefulWidget {
   const TournamentDetailView({required this.tournamentId, super.key});
 
@@ -33,6 +35,23 @@ class TournamentDetailView extends ConsumerStatefulWidget {
 
 class _TournamentDetailViewState extends ConsumerState<TournamentDetailView> {
   bool _joining = false;
+
+  /// Anti-doublon : empêche de repousser l'utilisateur dans l'arène à chaque
+  /// rebuild (le countdown re-render l'écran chaque seconde). Reste `true`
+  /// si le joueur revient manuellement sur cet écran après avoir quitté
+  /// l'arène pendant que le tournoi tourne encore — dans ce cas le bouton
+  /// « Entrer dans l'arène » sert de filet de sécurité, pas de re-poussée
+  /// forcée.
+  bool _autoEnteredArena = false;
+
+  void _maybeAutoEnterArena(Tournament tournament, bool joined) {
+    if (_autoEnteredArena || !tournament.isLive || !joined) return;
+    _autoEnteredArena = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _enterArena();
+    });
+  }
 
   Future<void> _join() async {
     setState(() => _joining = true);
@@ -88,6 +107,7 @@ class _TournamentDetailViewState extends ConsumerState<TournamentDetailView> {
             );
           }
           final joined = myParticipant.value != null;
+          _maybeAutoEnterArena(tournament, joined);
           return _Body(
             tournament: tournament,
             joined: joined,

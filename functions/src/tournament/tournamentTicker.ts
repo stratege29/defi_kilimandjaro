@@ -29,6 +29,7 @@ import {
   type ParticipantScore,
   type RewardTier,
 } from "./scoring";
+import { sendTournamentReminders } from "./sendTournamentReminders";
 
 /// Délai de grâce après `end_at` avant de finaliser : laisse les matchs déjà
 /// en cours au moment du buzzer se terminer et créditer leurs points (un duel
@@ -60,6 +61,17 @@ export const tournamentTicker = onSchedule(
       }
     } catch (err) {
       logger.error("tournamentTicker: activation échouée", err);
+    }
+
+    // --- Rappel : notif push avant démarrage imminent ---
+    try {
+      const scheduledSnap = await db
+        .collection("tournaments")
+        .where("status", "==", "scheduled")
+        .get();
+      await sendTournamentReminders(scheduledSnap.docs, now);
+    } catch (err) {
+      logger.error("tournamentTicker: rappel échoué", err);
     }
 
     // --- Finalisation : live → finished ---

@@ -1,6 +1,7 @@
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/core/utils/network_error.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
@@ -63,12 +64,12 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
       // ignore: avoid_catches_without_on_clauses
     } catch (e) {
       if (!mounted) return;
+      final message = isDeviceNetworkError(e)
+          ? kNetworkErrorMessage
+          : 'Connexion impossible : $e';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Connexion impossible : $e',
-            style: AppTypography.bebas(),
-          ),
+          content: Text(message, style: AppTypography.bebas()),
           backgroundColor: AppColors.rouge,
         ),
       );
@@ -260,12 +261,12 @@ class _DuelScanViewState extends ConsumerState<DuelScanView> {
       // ignore: avoid_catches_without_on_clauses
     } catch (e) {
       if (!mounted) return;
+      final message = isDeviceNetworkError(e)
+          ? kNetworkErrorMessage
+          : 'Connexion impossible : $e';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Connexion impossible : $e',
-            style: AppTypography.bebas(),
-          ),
+          content: Text(message, style: AppTypography.bebas()),
           backgroundColor: AppColors.rouge,
         ),
       );

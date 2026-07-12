@@ -50,8 +50,10 @@ Future<void> _fcmBackgroundHandler(RemoteMessage message) async {
 /// Route l'app a partir du payload FCM quand l'utilisateur ouvre une notif.
 ///
 /// Utilise [appRouterNavigatorKey] pour acceder au Navigator sans BuildContext.
-/// - `duel_challenge` → /duel/join/:matchId
-/// - `pack_update`    → /my-packs (nouveau pack / contenu mis a jour)
+/// - `duel_challenge`      → /duel/join/:matchId
+/// - `pack_update`         → /my-packs (nouveau pack / contenu mis a jour)
+/// - `tournament_reminder` → /tournaments/:tid (l'entree en arene est geree
+///   automatiquement par TournamentDetailView si le tournoi est deja live)
 void _handleFcmOpen(RemoteMessage message) {
   final type = message.data['type'] as String?;
   final context = appRouterNavigatorKey.currentContext;
@@ -64,6 +66,10 @@ void _handleFcmOpen(RemoteMessage message) {
       GoRouter.of(context).go(AppRoutes.duelJoinPath(matchId));
     case 'pack_update':
       GoRouter.of(context).go(AppRoutes.myPacks);
+    case 'tournament_reminder':
+      final tid = message.data['tournament_id'] as String?;
+      if (tid == null || tid.isEmpty) return;
+      GoRouter.of(context).go(AppRoutes.tournamentDetailPath(tid));
   }
 }
 

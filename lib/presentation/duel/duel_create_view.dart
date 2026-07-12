@@ -1,6 +1,7 @@
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/core/utils/network_error.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/duel_session.dart';
 import 'package:flutter/material.dart';
@@ -61,13 +62,28 @@ class _DuelCreateViewState extends ConsumerState<DuelCreateView> {
               );
             }
             if (snap.hasError) {
+              final err = snap.error!;
+              final isNetwork = isDeviceNetworkError(err);
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
-                  child: Text(
-                    'Erreur création du duel : ${snap.error}',
-                    style: AppTypography.crimson(),
-                    textAlign: TextAlign.center,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isNetwork ? Icons.wifi_off : Icons.error_outline,
+                        color: AppColors.orSoleil,
+                        size: 40,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        isNetwork
+                            ? kNetworkErrorMessage
+                            : 'Erreur création du duel : $err',
+                        style: AppTypography.crimson(),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
               );
