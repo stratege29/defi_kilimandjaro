@@ -20,7 +20,7 @@ Future<void> markOnboardingSeen(SharedPreferences prefs) async {
 /// 3 écrans skippables au premier lancement.
 ///
 /// Étape 1 : drag des lettres (Kili peek)
-/// Étape 2 : ascension des montagnes (Kili climb)
+/// Étape 2 : ascension des montagnes (Kili point)
 /// Étape 3 : défi entre amis (Kili cheer)
 class OnboardingView extends ConsumerStatefulWidget {
   const OnboardingView({super.key});
@@ -48,7 +48,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
       defaultTitle: "Gravis l'Afrique",
       defaultBody:
           "51 sommets t'attendent, du Red Rocks de Gambie au toit du Kilimandjaro.",
-      mascotAsset: AppAssets.kiliClimb,
+      mascotAsset: AppAssets.kiliPoint,
     ),
     _OnboardingStep(
       titleKey: 'onboarding.step3.title',

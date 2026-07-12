@@ -1,10 +1,10 @@
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/dashed_button.dart';
-import 'package:defi_kilimandjaro/presentation/widgets/kili_mascot.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -203,9 +203,14 @@ class _FailureCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          // `tapToNod: false` — le hochement est un geste de célébration,
-          // hors de propos sur un écran d'échec.
-          const KiliMascot(size: 96, tapToNod: false),
+          // Kili découragé — patte sur la tête, larme. Pose dédiée à
+          // l'échec (remplace le placeholder neutre `KiliMascot`).
+          Image.asset(
+            AppAssets.kiliSad,
+            width: 110,
+            height: 81,
+            fit: BoxFit.contain,
+          ),
           const SizedBox(height: 16),
           if (revealed) ..._revealedHeader() else ..._hiddenHeader(),
           const SizedBox(height: 16),

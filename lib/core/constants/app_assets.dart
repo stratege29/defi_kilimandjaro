@@ -50,6 +50,12 @@ abstract final class AppAssets {
   /// Tête seule, cadrage serré, grand sourire. Avatar profil (fallback rond).
   static const String kiliFace = '$_kili/kili_face.png';
 
+  /// Assis, patte sur la tête, larme — déception. Écran d'échec.
+  static const String kiliSad = '$_kili/kili_sad.png';
+
+  /// Debout, bras qui pointe vers l'avenir. Onboarding étape 2 (ascension).
+  static const String kiliPoint = '$_kili/kili_point.png';
+
   // --- Brand ---
   static const String appIcon = '$_brand/app_icon.png';
   static const String logoK = '$_brand/logo_k.png';
