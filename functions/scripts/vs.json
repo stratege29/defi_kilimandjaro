@@ -1,12 +1,10 @@
 [
- {"a":"FOUTOU","b":"ATTIÉKÉ","q":"Le vrai plat ivoirien ?"},
- {"a":"ALLOCO","b":"GARBA","q":"Ton péché mignon ?"},
- {"a":"COUPÉ-DÉCALÉ","b":"ZOUGLOU","q":"Le meilleur son ?"},
- {"a":"ATTIÉKÉ","b":"PLACALI","q":"Avec la sauce, tu prends quoi ?"},
- {"a":"MAQUIS","b":"RESTAURANT","q":"Pour kiffer, tu vas où ?"},
- {"a":"GINGEMBRE","b":"BISSAP","q":"Le jus du pays ?"},
- {"a":"GAOU","b":"ENJAILLÉ","q":"Le mot que tu dis le plus ?"},
- {"a":"KEDJENOU","b":"SAUCE GRAINE","q":"Le dimanche midi, c'est ?"},
+ {"a":"FOUTOU","b":"FOUFOU","q":"La vraie pâte du pays ?"},
+ {"a":"ALLOCO","b":"CLACLO","q":"Banane plantain : ta version ?"},
+ {"a":"COUPÉ-DÉCALÉ","b":"RAP IVOIRE","q":"Le meilleur son du 225 ?"},
+ {"a":"GARBA","b":"PLACALI","q":"Le petit-déj' qui cale ?"},
+ {"a":"BASSAM","b":"JACQUEVILLE","q":"Ta plage du weekend ?"},
+ {"a":"GNAMAKOU","b":"BISSAP","q":"Le jus du pays ?"},
  {"a":"ABIDJAN","b":"LE VILLAGE","q":"Ton cœur penche où ?"},
  {"a":"THÉ","b":"CAFÉ","q":"Ton matin, c'est ?"}
 ]

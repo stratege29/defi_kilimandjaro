@@ -28,6 +28,14 @@ class DuelRepository {
   DatabaseReference _matchRef(String matchId) =>
       database.ref('matches/$matchId');
 
+  /// Callable avec timeout court (15 s) — le défaut du SDK est 70 s, ce qui
+  /// fige l'UI de duel sur une connexion lente/absente. Aligné sur
+  /// `MatchmakingRepository`.
+  HttpsCallable _fn(String name) => functions.httpsCallable(
+        name,
+        options: HttpsCallableOptions(timeout: const Duration(seconds: 15)),
+      );
+
   String get currentUid {
     final uid = auth.currentUser?.uid;
     if (uid == null) {
@@ -45,7 +53,7 @@ class DuelRepository {
   /// dans RTDB. Le client recoit juste matchId + secret pour generer
   /// le QR code.
   Future<({String matchId, String secret})> createDuel() async {
-    final callable = functions.httpsCallable('createLocalDuel');
+    final callable = _fn('createLocalDuel');
     final result = await callable.call<Map<Object?, Object?>>(<String, dynamic>{
       'protocol_version': kDuelProtocolVersion,
     });
@@ -72,7 +80,7 @@ class DuelRepository {
     // Anti-cheat (C1) : l'ajout du joueur + bascule phase=countdown passent
     // par la Cloud Function joinDuel (Admin SDK). Le client ne peut plus
     // ecrire `phase` directement en RTDB.
-    final callable = functions.httpsCallable('joinDuel');
+    final callable = _fn('joinDuel');
     await callable.call<Map<Object?, Object?>>(<String, dynamic>{
       'matchId': matchId,
       if (secret.isNotEmpty) 'secret': secret,
@@ -121,7 +129,7 @@ class DuelRepository {
     String winnerUid,
     String word,
   ) async {
-    final callable = functions.httpsCallable('submitRoundWin');
+    final callable = _fn('submitRoundWin');
     final result = await callable.call<Map<String, dynamic>>(<String, dynamic>{
       'match_id': matchId,
       'round': round,
@@ -139,7 +147,7 @@ class DuelRepository {
   /// Idempotent : les 2 clients peuvent appeler simultanement, le serveur
   /// gere via verification du delai minimal et de la phase courante.
   Future<void> advancePhase(String matchId) async {
-    final callable = functions.httpsCallable('advancePhase');
+    final callable = _fn('advancePhase');
     await callable.call<Map<String, dynamic>>(<String, dynamic>{
       'match_id': matchId,
     });
@@ -152,7 +160,7 @@ class DuelRepository {
   ///
   /// Idempotent : les 2 clients appellent en parallele, le serveur gere.
   Future<void> submitRoundTimeout(String matchId, int round) async {
-    final callable = functions.httpsCallable('submitRoundTimeout');
+    final callable = _fn('submitRoundTimeout');
     await callable.call<Map<String, dynamic>>(<String, dynamic>{
       'match_id': matchId,
       'round': round,
@@ -165,7 +173,7 @@ class DuelRepository {
   /// directement en RTDB. forfeitMatch (Admin SDK) designe l'adversaire
   /// vainqueur et bascule la phase.
   Future<void> forfeit(String matchId) async {
-    final callable = functions.httpsCallable('forfeitMatch');
+    final callable = _fn('forfeitMatch');
     await callable.call<Map<Object?, Object?>>(<String, dynamic>{
       'matchId': matchId,
     });
@@ -175,7 +183,7 @@ class DuelRepository {
   ///
   /// Anti-cheat (C1) : delegue a la Cloud Function joinDuel (Admin SDK).
   Future<DuelSession> joinOpen(String matchId) async {
-    final callable = functions.httpsCallable('joinDuel');
+    final callable = _fn('joinDuel');
     final result = await callable.call<Map<Object?, Object?>>(<String, dynamic>{
       'matchId': matchId,
       'protocol_version': kDuelProtocolVersion,

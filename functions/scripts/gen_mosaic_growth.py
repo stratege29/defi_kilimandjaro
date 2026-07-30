@@ -22,6 +22,21 @@ import compose_styles as C
 ROOT = GP.ROOT
 HASH = "Joue sur défi-Kili (lien en bio) · #DéfiKilimandjaro"
 
+# Mots écartés des CÔTÉS : retirés sur demande (CHAUD/ZOZO/PIPO/CALER) + nouchi
+# edgy/obscurs + anti-doublon avec les rubriques (Complète/VS). Ne PAS bloquer
+# les mots gardés du milieu/côtés (KPATA, FAROTER, GBANGBAN, MAQUIS, MOGO).
+BLOCK = {
+    "CHAUD", "ZOZO", "PIPO", "CALER",
+    "ZIGUEHI", "KPACOLO", "GBONHI", "FRAYA", "GLOH", "GBAGBA", "CASSER", "AGBADJA",
+    "ENJAILLE", "SAUCE", "ATTIEKE", "ALLOCO", "FOUTOU", "GAOU", "PAGNE", "FOYER",
+    "GARBA", "ZOUGLOU", "PLACALI", "GINGEMBRE", "BISSAP", "KEDJENOU", "RESTAURANT",
+    "BASSAM", "JACQUEVILLE",
+}
+
+# Mot imposé dans une cellule côté précise {(row, col): "ANSWER"} — sert à placer
+# une signature reconnaissable (ex. BALAFON = instrument-signature du jeu).
+PIN = {(5, 0): "BALAFON"}
+
 
 def build(word):
     letters = GMR.clean_letters(word)
@@ -44,8 +59,8 @@ def build(word):
                       "caption": f"🧩 Une phrase se cache dans la colonne du milieu… lis de haut en bas.\n{HASH} #Mosaïque"})
 
     # pools côtés (≠ du milieu)
-    pool = [("Crack Nouchi", GP.ACC["nouchi"], d) for d in GRT.load("crack_nouchi") if d["answer"] not in used]
-    pool += [("Culture 225", GP.ACC["culture"], d) for d in GRT.load("culture_ci") if d["answer"] not in used]
+    pool = [("Crack Nouchi", GP.ACC["nouchi"], d) for d in GRT.load("crack_nouchi") if d["answer"] not in used and d["answer"] not in BLOCK]
+    pool += [("Culture 225", GP.ACC["culture"], d) for d in GRT.load("culture_ci") if d["answer"] not in used and d["answer"] not in BLOCK]
     pi = [0]
 
     def next_dev():
@@ -55,8 +70,22 @@ def build(word):
                 used.add(d["answer"]); return cat, acc, d
         return pool[0][0], pool[0][1], pool[0][2]
 
+    def _find(ans):
+        for cat, key, pack in (("Crack Nouchi", "nouchi", "crack_nouchi"), ("Culture 225", "culture", "culture_ci")):
+            for d in GRT.load(pack):
+                if d["answer"] == ans:
+                    return cat, GP.ACC[key], d
+        return None
+
+    def dev_for(r, col):
+        if (r, col) in PIN:
+            hit = _find(PIN[(r, col)])
+            if hit:
+                used.add(hit[2]["answer"]); return hit
+        return next_dev()
+
     def gameplay(k, r, col):
-        cat, acc, d = next_dev()
+        cat, acc, d = dev_for(r, col)
         mp4 = f"side_{k}.mp4"
         GRT.encode(lambda t, c=cat, a=acc, dd=d: GRT.frame(c, a, dd["riddle"], GRT.letters_of(dd["answer"]), dd["expl"], t),
                    os.path.join(media, mp4))
@@ -75,12 +104,12 @@ def build(word):
             C.s_proverbe(txt, src, GP.ACC["foot"]).save(os.path.join(media, img_name))
             cap = f"« {txt} »\n— {src}\n\n{HASH} #ProverbeAfricain"
         elif kind == "mot":
-            cat, acc, d = next_dev()
+            cat, acc, d = dev_for(r, col)
             ex = d["expl"] if len(d["expl"]) <= 90 else d["expl"][:88] + "…"
             C.s_mot(d["answer"], "Le mot du jour", ex, acc).save(os.path.join(media, img_name))
             cap = f"{d['answer']} = {d['expl']}\n\n{HASH} #Nouchi"
         else:  # reponse / « le saviez-vous »
-            cat, acc, d = next_dev()
+            cat, acc, d = dev_for(r, col)
             GP.side_reponse(cat, acc, d["answer"], d["expl"])[0].save(os.path.join(media, img_name))
             cap = f"Le saviez-vous ? {d['answer']} : {d['expl']}\n\n{HASH}"
         return {"row": r, "col": col, "type": "image", "img": img_name, "caption": cap}

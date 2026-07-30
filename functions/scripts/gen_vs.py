@@ -17,6 +17,7 @@ from PIL import ImageDraw
 import generate as G
 import gen_phrase as GP
 import gen_reels_theme as GRT
+import gen_hook as GH
 
 VW, VH = 1080, 1920
 FPS, DUR = 30, 6.0
@@ -90,7 +91,8 @@ def build(count, offset=0):
     for i in range(count):
         o = data[(offset + i) % len(data)]
         a, b, q = o["a"], o["b"], o["q"]
-        encode(lambda t, A=a, B=b, Q=q: frame(A, B, Q, t), os.path.join(OUT, f"REEL_vs_{i}.mp4"))
+        GH.encode_hooked(lambda t, A=a, B=b, Q=q: frame(A, B, Q, t), os.path.join(OUT, f"REEL_vs_{i}.mp4"),
+                         GH.HOOKS["vs"][i % len(GH.HOOKS["vs"])], G.GOLD, FPS, DUR)
         frame(a, b, q, 0.9).save(os.path.join(OUT, f"COVER_vs_{i}.png"))
         cap = (f"{a} ou {b} ? {q} 🔥\nVote en commentaire 👇 et défends ton camp.\n"
                f"#LeVS #CôteDivoire #225 #DéfiKilimandjaro")
