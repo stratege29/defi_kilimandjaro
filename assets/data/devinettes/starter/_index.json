@@ -14,7 +14,7 @@
     "crack_nouchi": {
       "file": "crack_nouchi.json",
       "count": 100,
-      "current_version": 2,
+      "current_version": 5,
       "name_key": "pack.crack_nouchi.name",
       "description_key": "pack.crack_nouchi.description",
       "free_choice_eligible": true,
