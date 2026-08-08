@@ -1,4 +1,5 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 
 /// Activates Firebase App Check with the right provider per platform/build.
@@ -35,27 +36,46 @@ Future<void> activateAppCheck() async {
   // veux un token fixe par run de debug.
   await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
 
-  // En debug, on imprime le token via Dart pour qu'il apparaisse dans
-  // `flutter run`. La valeur retournée est le token JWT signé (long).
-  // Le debug-token UUID à allow-lister en Firebase Console est imprimé
-  // séparément par le plugin natif côté iOS/Android (cf. console Xcode /
-  // logcat), MAIS sur le simulator iOS récent il est silencieux — on peut
-  // forcer l'extraction de l'UUID en passant par les UserDefaults iOS
-  // (clé `FIRAAppCheckDebugToken`). Pour l'instant on log juste la
-  // confirmation que la procédure d'activation s'est bien terminée et que
-  // le plugin a généré un token utilisable.
-  if (kDebugMode) {
-    try {
-      final token = await FirebaseAppCheck.instance.getToken();
+  // On vérifie systématiquement (debug ET release) que l'activation a bien
+  // produit un token exploitable. `getTokenResult` (>=0.4.6) renvoie le JWT
+  // + son expiration ; en debug on l'imprime pour `flutter run`. Un échec ici
+  // (attestation Play Integrity/DeviceCheck qui ne renvoie pas de token
+  // exploitable) est la cause typique d'un rejet silencieux des callables
+  // duel enforceAppCheck (cf. lobby qui tourne sans jamais créer de match) —
+  // on le remonte donc en non-fatal Crashlytics pour l'avoir en prod sans
+  // dépendre d'un accès `adb logcat`.
+  try {
+    final result = await FirebaseAppCheck.instance.getTokenResult();
+    if (result == null) {
+      // Pas d'exception mais pas de token non plus : l'attestation native a
+      // échoué silencieusement (cas observé sur Play Integrity). À signaler
+      // comme l'échec ci-dessous, pas comme un succès.
+      throw StateError('getTokenResult returned null (no token available)');
+    }
+    if (kDebugMode) {
       // ignore: avoid_print
       print(
-        '🛡️ App Check activated — token len=${token?.length ?? 0} '
+        '🛡️ App Check activated — token len=${result.token.length}, '
+        'expires=${result.expirationTime} '
         '(JWT, allow-list the debug UUID printed by native plugin in '
         'Firebase Console > App Check > Apps > ⋮ > Manage debug tokens)',
       );
-    } on Object catch (e) {
+    }
+  } on Object catch (e, stack) {
+    if (kDebugMode) {
       // ignore: avoid_print
-      print('🛡️ App Check getToken failed: $e');
+      print('🛡️ App Check getTokenResult failed: $e');
+    }
+    try {
+      await FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: 'AppCheckSetup.getTokenResult failed '
+            '(platform=$defaultTargetPlatform)',
+      );
+    } on Object {
+      // Crashlytics pas encore disponible/configuré — ne pas bloquer le
+      // boot pour un problème de télémétrie.
     }
   }
 }

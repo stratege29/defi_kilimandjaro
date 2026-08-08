@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "site": "kilimandjaro-legal",
+    "public": "public",
+    "cleanUrls": true,
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
