@@ -5918,20 +5918,6 @@
     "format_version": 3
   },
   {
-    "id": "crack_nouchi_246",
-    "pack": "crack_nouchi",
-    "country": "ci",
-    "answer": "KPOHOUNKPASSA",
-    "answer_normalized": "kpohounkpassa",
-    "letters_pool": ["K","P","O","H","O","U","N","K","P","A","S","S","A"],
-    "riddle": {"fr": "L'absurdité totale incarnée, l'idiotie sans limite ni excuse."},
-    "explanation": {"fr": "Kpohounkpassa = débile, idiot total (adjectif). Très long mot (13 lettres). Entrée hardcore fun du répertoire nouchi."},
-    "difficulty": 3,
-    "estimated_time_s": 35,
-    "tags": ["personne", "hardcore"],
-    "format_version": 3
-  },
-  {
     "id": "crack_nouchi_247",
     "pack": "crack_nouchi",
     "country": "ci",
