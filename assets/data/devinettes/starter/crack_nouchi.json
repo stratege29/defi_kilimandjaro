@@ -5862,20 +5862,6 @@
     "format_version": 3
   },
   {
-    "id": "crack_nouchi_242",
-    "pack": "crack_nouchi",
-    "country": "ci",
-    "answer": "BIZNESSEUR",
-    "answer_normalized": "biznesseur",
-    "letters_pool": ["B","I","Z","N","E","S","S","E","U","R"],
-    "riddle": {"fr": "Le petit tycoon du commerce de rue, toujours une affaire en poche."},
-    "explanation": {"fr": "Biznesseur = un homme d'affaires, un débrouillard des petites affaires (nom). Long mot (10 lettres). Emprunt anglais 'business'. Figure emblématique urbaine."},
-    "difficulty": 3,
-    "estimated_time_s": 32,
-    "tags": ["personne", "hardcore"],
-    "format_version": 3
-  },
-  {
     "id": "crack_nouchi_243",
     "pack": "crack_nouchi",
     "country": "ci",
