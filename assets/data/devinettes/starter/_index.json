@@ -13,8 +13,8 @@
     },
     "crack_nouchi": {
       "file": "crack_nouchi.json",
-      "count": 38,
-      "current_version": 1,
+      "count": 248,
+      "current_version": 6,
       "name_key": "pack.crack_nouchi.name",
       "description_key": "pack.crack_nouchi.description",
       "free_choice_eligible": true,
@@ -32,5 +32,5 @@
       "price_cauris": 2000
     }
   },
-  "total": 888
+  "total": 1098
 }

@@ -5,7 +5,16 @@
     "country": "ci",
     "answer": "ENJAILLE",
     "answer_normalized": "enjaille",
-    "letters_pool": ["E","N","J","A","I","L","L","E"],
+    "letters_pool": [
+      "E",
+      "N",
+      "J",
+      "A",
+      "I",
+      "L",
+      "L",
+      "E"
+    ],
     "riddle": {
       "fr": "Quand le DJ joue le morceau parfait, c'est mon état. Je suis trop heureux."
     },
@@ -14,7 +23,10 @@
     },
     "difficulty": 1,
     "estimated_time_s": 20,
-    "tags": ["emotion", "mainstream"],
+    "tags": [
+      "emotion",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
@@ -23,7 +35,12 @@
     "country": "ci",
     "answer": "GAOU",
     "answer_normalized": "gaou",
-    "letters_pool": ["G","A","O","U"],
+    "letters_pool": [
+      "G",
+      "A",
+      "O",
+      "U"
+    ],
     "riddle": {
       "fr": "Frais débarqué du village, je crois encore que la pluie tombe d'en haut."
     },
@@ -32,7 +49,10 @@
     },
     "difficulty": 1,
     "estimated_time_s": 20,
-    "tags": ["personne", "mainstream"],
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
@@ -41,7 +61,13 @@
     "country": "ci",
     "answer": "KPATA",
     "answer_normalized": "kpata",
-    "letters_pool": ["K","P","A","T","A"],
+    "letters_pool": [
+      "K",
+      "P",
+      "A",
+      "T",
+      "A"
+    ],
     "riddle": {
       "fr": "Quand elle passe dans la rue, les regards arrêtent le temps. Elle est magnifique."
     },
@@ -50,7 +76,10 @@
     },
     "difficulty": 1,
     "estimated_time_s": 20,
-    "tags": ["personne", "mainstream"],
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
@@ -59,7 +88,15 @@
     "country": "ci",
     "answer": "FAROTER",
     "answer_normalized": "faroter",
-    "letters_pool": ["F","A","R","O","T","E","R"],
+    "letters_pool": [
+      "F",
+      "A",
+      "R",
+      "O",
+      "T",
+      "E",
+      "R"
+    ],
     "riddle": {
       "fr": "Sortir les mille billets juste pour montrer qu'on a, c'est mon jeu favori."
     },
@@ -68,7 +105,10 @@
     },
     "difficulty": 1,
     "estimated_time_s": 25,
-    "tags": ["attitude", "mainstream"],
+    "tags": [
+      "attitude",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
@@ -77,16 +117,28 @@
     "country": "ci",
     "answer": "GBANGBAN",
     "answer_normalized": "gbangban",
-    "letters_pool": ["G","B","A","N","G","B","A","N"],
+    "letters_pool": [
+      "G",
+      "B",
+      "A",
+      "N",
+      "G",
+      "B",
+      "A",
+      "N"
+    ],
     "riddle": {
-      "fr": "Confus, désorienté, je ne sais plus où j'en suis."
+      "fr": "Quand j'arrive au quartier, tout le monde court et se cache. C'est la bagarre."
     },
     "explanation": {
-      "fr": "Gbangban = confus, interloqué, déstabilisé, pas au clair. Terme onomatopéique très expressif, couramment utilisé pour décrire une personne sous le choc ou perdue."
+      "fr": "Gbangban = guerre, bagarre, gros problème, chaos. Onomatopée qui évoque le fracas d'un conflit. Utilisé pour décrire une rixe ou une situation explosive."
     },
     "difficulty": 1,
     "estimated_time_s": 25,
-    "tags": ["emotion", "mainstream"],
+    "tags": [
+      "action",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
@@ -95,7 +147,14 @@
     "country": "ci",
     "answer": "MAQUIS",
     "answer_normalized": "maquis",
-    "letters_pool": ["M","A","Q","U","I","S"],
+    "letters_pool": [
+      "M",
+      "A",
+      "Q",
+      "U",
+      "I",
+      "S"
+    ],
     "riddle": {
       "fr": "Bar de quartier où on danse, on boit, on rigole tard le soir."
     },
@@ -104,7 +163,10 @@
     },
     "difficulty": 1,
     "estimated_time_s": 20,
-    "tags": ["lieu", "mainstream"],
+    "tags": [
+      "lieu",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
@@ -113,7 +175,13 @@
     "country": "ci",
     "answer": "CALER",
     "answer_normalized": "caler",
-    "letters_pool": ["C","A","L","E","R"],
+    "letters_pool": [
+      "C",
+      "A",
+      "L",
+      "E",
+      "R"
+    ],
     "riddle": {
       "fr": "Arrêter quelqu'un, le bloquer, l'empêcher de bouger. C'est un art abidjanais."
     },
@@ -122,7 +190,10 @@
     },
     "difficulty": 1,
     "estimated_time_s": 20,
-    "tags": ["action", "mainstream"],
+    "tags": [
+      "action",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
@@ -131,7 +202,13 @@
     "country": "ci",
     "answer": "CHAUD",
     "answer_normalized": "chaud",
-    "letters_pool": ["C","H","A","U","D"],
+    "letters_pool": [
+      "C",
+      "H",
+      "A",
+      "U",
+      "D"
+    ],
     "riddle": {
       "fr": "C'est mon état quand je suis excité, agressif ou très en forme."
     },
@@ -140,7 +217,10 @@
     },
     "difficulty": 1,
     "estimated_time_s": 20,
-    "tags": ["emotion", "mainstream"],
+    "tags": [
+      "emotion",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
@@ -149,16 +229,24 @@
     "country": "ci",
     "answer": "PIPO",
     "answer_normalized": "pipo",
-    "letters_pool": ["P","I","P","O"],
+    "letters_pool": [
+      "P",
+      "I",
+      "P",
+      "O"
+    ],
     "riddle": {
-      "fr": "Faux ami, hypocrite qui fait semblant. On ne peut pas lui faire confiance."
+      "fr": "Du vent, du baratin, on ne peut rien en croire. C'est complètement faux."
     },
     "explanation": {
-      "fr": "Pipo = faux, hypocrite, personne qui fait semblant ou se la raconte. Très utilisé pour qualifier quelqu'un d'inauthentique ou de mensonger."
+      "fr": "Pipo = mensonge, baratin, parole creuse. Du français 'pipeau'. Quand on dit 'c'est du pipo', on affirme que c'est du vent, de la foutaise."
     },
     "difficulty": 1,
     "estimated_time_s": 20,
-    "tags": ["personne", "mainstream"],
+    "tags": [
+      "expression",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
@@ -167,16 +255,24 @@
     "country": "ci",
     "answer": "MOGO",
     "answer_normalized": "mogo",
-    "letters_pool": ["M","O","G","O"],
+    "letters_pool": [
+      "M",
+      "O",
+      "G",
+      "O"
+    ],
     "riddle": {
       "fr": "Quelqu'un, une personne. En Nouchi, c'est le mot universel."
     },
     "explanation": {
-      "fr": "Mogo = personne, quelqu'un (du mot baoulé/malinké). Très courant pour désigner un individu de façon neutre, comme 'type' ou 'gars' en français."
+      "fr": "Mogo = personne, quelqu'un (du mot dioula/malinké 'mɔgɔ'). Très courant pour désigner un individu de façon neutre, comme 'type' ou 'gars' en français."
     },
     "difficulty": 1,
     "estimated_time_s": 20,
-    "tags": ["personne", "mainstream"],
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
@@ -185,7 +281,12 @@
     "country": "ci",
     "answer": "ZOZO",
     "answer_normalized": "zozo",
-    "letters_pool": ["Z","O","Z","O"],
+    "letters_pool": [
+      "Z",
+      "O",
+      "Z",
+      "O"
+    ],
     "riddle": {
       "fr": "Fou, dingue, je pète un câble. Mon cerveau n'est plus là."
     },
@@ -194,25 +295,38 @@
     },
     "difficulty": 1,
     "estimated_time_s": 20,
-    "tags": ["emotion", "mainstream"],
+    "tags": [
+      "emotion",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_012",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "BLEDARD",
-    "answer_normalized": "bledard",
-    "letters_pool": ["B","L","E","D","A","R","D"],
+    "answer": "GOUMIN",
+    "answer_normalized": "goumin",
+    "letters_pool": [
+      "G",
+      "O",
+      "U",
+      "M",
+      "I",
+      "N"
+    ],
     "riddle": {
-      "fr": "Originaire du bled, du village lointain. Un vrai campagnard."
+      "fr": "Chagrin d'amour, peine de cœur, je traîne mon mal. C'est du blues abidjanais."
     },
     "explanation": {
-      "fr": "Bledard = personne originaire du bled (village), campagnard. Proche de 'gaou' mais plus neutre, désignant simplement quelqu'un des zones rurales."
+      "fr": "Goumin = chagrin d'amour, peine de cœur. Mot nouchi devenu célèbre dans toute la francophonie ; mélange de tristesse et d'autodérision urbaine. 'J'ai le goumin' = je souffre."
     },
     "difficulty": 1,
-    "estimated_time_s": 25,
-    "tags": ["personne", "mainstream"],
+    "estimated_time_s": 20,
+    "tags": [
+      "emotion",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
@@ -221,88 +335,141 @@
     "country": "ci",
     "answer": "BOUCAN",
     "answer_normalized": "boucan",
-    "letters_pool": ["B","O","U","C","A","N"],
+    "letters_pool": [
+      "B",
+      "O",
+      "U",
+      "C",
+      "A",
+      "N"
+    ],
     "riddle": {
       "fr": "Tapage, bruit intense, fête sauvage. C'est de la folie sonore."
     },
     "explanation": {
-      "fr": "Boucan = vacarme, bruit de folie, tapage infernal, fête intense. Très utilisé pour décrire l'ambiance déchaînée d'un maquis ou d'une soirée dansante."
+      "fr": "Boucan = vacarme, bruit de folie, tapage infernal, fête intense. Très utilisé pour décrire l'ambiance déchaînée d'un maquis. A donné son nom au 'boucantier' du Coupé Décalé."
     },
     "difficulty": 1,
     "estimated_time_s": 20,
-    "tags": ["objet", "mainstream"],
+    "tags": [
+      "expression",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_014",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "BABTOU",
-    "answer_normalized": "babtou",
-    "letters_pool": ["B","A","B","T","O","U"],
+    "answer": "BROUTEUR",
+    "answer_normalized": "brouteur",
+    "letters_pool": [
+      "B",
+      "R",
+      "O",
+      "U",
+      "T",
+      "E",
+      "U",
+      "R"
+    ],
     "riddle": {
-      "fr": "Étranger blanc qui débarque à Abidjan, nouveau dans le coin."
+      "fr": "Derrière mon écran, je joue les amoureux pour vider les comptes des naïfs."
     },
     "explanation": {
-      "fr": "Babtou = Blanc, expatrié, étranger occidental. Terme neutre utilisé pour désigner les touristes ou expatriés français, belges, etc. qui visitent la Côte d'Ivoire."
+      "fr": "Brouteur = arnaqueur sur internet, escroc en ligne. Référence au mouton qui 'broute' sans effort ; phénomène abidjanais documenté depuis les années 2000."
     },
     "difficulty": 1,
-    "estimated_time_s": 20,
-    "tags": ["personne", "mainstream"],
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_015",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "BANGALA",
-    "answer_normalized": "bangala",
-    "letters_pool": ["B","A","N","G","A","L","A"],
+    "answer": "SOUTRA",
+    "answer_normalized": "soutra",
+    "letters_pool": [
+      "S",
+      "O",
+      "U",
+      "T",
+      "R",
+      "A"
+    ],
     "riddle": {
-      "fr": "Maison typique du quartier, construction en dur ou en tôle. C'est là qu'on vit."
+      "fr": "Je t'aide, je te dépanne dans la galère. Je suis ton appui."
     },
     "explanation": {
-      "fr": "Bangala = petit immeuble ou maison de quartier où vivent plusieurs familles. Habitat typiquement urbain abidjanais, lieu de vie collective."
+      "fr": "Soutra = aider, dépanner quelqu'un, donner un coup de main. Formé avec le suffixe dioula '-li' ('soutrali' = l'aide). Verbe fondamental de la solidarité urbaine."
     },
     "difficulty": 1,
-    "estimated_time_s": 25,
-    "tags": ["lieu", "mainstream"],
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "mainstream"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_016",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "DJANDJOU",
-    "answer_normalized": "djandjou",
-    "letters_pool": ["D","J","A","N","D","J","O","U"],
+    "answer": "AWOULABA",
+    "answer_normalized": "awoulaba",
+    "letters_pool": [
+      "A",
+      "W",
+      "O",
+      "U",
+      "L",
+      "A",
+      "B",
+      "A"
+    ],
     "riddle": {
-      "fr": "Femme fatale, bombe qui fait tourner les têtes. Elle a un charme irrésistible."
+      "fr": "Belle femme ivoirienne aux formes généreuses, canon de beauté local. Je suis fière."
     },
     "explanation": {
-      "fr": "Djandjou = très belle femme, bombe, canon. Terme admiratif et enjoué pour qualifier une femme d'une grande beauté et d'un charme magnétique."
+      "fr": "Awoulaba = belle femme ivoirienne aux formes généreuses, idéal esthétique local. Terme respectueux et fier ; a donné son nom au concours Miss Awoulaba."
     },
     "difficulty": 2,
     "estimated_time_s": 25,
-    "tags": ["personne", "intermediaire"],
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_017",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "WOUBI",
-    "answer_normalized": "woubi",
-    "letters_pool": ["W","O","U","B","I"],
+    "answer": "CHOCO",
+    "answer_normalized": "choco",
+    "letters_pool": [
+      "C",
+      "H",
+      "O",
+      "C",
+      "O"
+    ],
     "riddle": {
-      "fr": "Beau gosse bien habillé, qui séduit au premier coup d'oeil."
+      "fr": "Élégant, raffiné, chic, je suis sapé à mort. Beau gosse bien tiré."
     },
     "explanation": {
-      "fr": "Woubi = beau garçon, jeune homme séduisant et charismatique. Terme admiratif très populaire pour décrire un mec attirant."
+      "fr": "Choco = élégant, raffiné, chic, beau gosse bien sapé. Terme d'admiration urbaine pour quelqu'un qui a du style et de la classe."
     },
     "difficulty": 2,
     "estimated_time_s": 20,
-    "tags": ["personne", "intermediaire"],
+    "tags": [
+      "attitude",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
@@ -311,52 +478,81 @@
     "country": "ci",
     "answer": "BRAMOGO",
     "answer_normalized": "bramogo",
-    "letters_pool": ["B","R","A","M","O","G","O"],
+    "letters_pool": [
+      "B",
+      "R",
+      "A",
+      "M",
+      "O",
+      "G",
+      "O"
+    ],
     "riddle": {
-      "fr": "Type bizarre, un peu chelou, qui ne rentre dans aucune case."
+      "fr": "Mon ami, mon compagnon de galère, on traîne ensemble. C'est mon pote de toujours."
     },
     "explanation": {
-      "fr": "Bramogo = bizarre, étrange, type louche ou original. Mélange de 'bra' (étrange) et 'mogo' (personne), pour décrire quelqu'un de curieux ou d'excentrique."
+      "fr": "Bramogo = ami, compagnon de galère. Hybride de 'bra' + dioula 'môgô' (personne). 'Mon bramôgô' = mon pote de toujours, mon acolyte urbain."
     },
     "difficulty": 2,
     "estimated_time_s": 25,
-    "tags": ["personne", "intermediaire"],
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_019",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "FARADJE",
-    "answer_normalized": "faradje",
-    "letters_pool": ["F","A","R","A","D","J","E"],
+    "answer": "MAGA",
+    "answer_normalized": "maga",
+    "letters_pool": [
+      "M",
+      "A",
+      "G",
+      "A"
+    ],
     "riddle": {
-      "fr": "Fouiller, chercher partout. Je veux tout trouver, tout savoir."
+      "fr": "Au marché, mes doigts sont rapides : les étalages perdent toujours quelque chose."
     },
     "explanation": {
-      "fr": "Faradje = fouiller, chercher avec insistance, enquêter. Verbe très utilisé pour dire 'vérifier', 'fouiller dans les affaires' ou 'chercher à savoir'."
+      "fr": "Maga = chaparder, voler à la tire ou à l'étalage. Verbe très urbain pour petits larcins ; populaire chez les jeunes des quartiers d'Abidjan."
     },
     "difficulty": 2,
-    "estimated_time_s": 25,
-    "tags": ["action", "intermediaire"],
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_020",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "COXER",
-    "answer_normalized": "coxer",
-    "letters_pool": ["C","O","X","E","R"],
+    "answer": "COXEUR",
+    "answer_normalized": "coxeur",
+    "letters_pool": [
+      "C",
+      "O",
+      "X",
+      "E",
+      "U",
+      "R"
+    ],
     "riddle": {
-      "fr": "Critiquer, se moquer de quelqu'un en public. C'est vache mais courant."
+      "fr": "À la gare routière, je recrute à la criée les passagers des woro-woros. Je crie fort."
     },
     "explanation": {
-      "fr": "Coxer = critiquer, se moquer, humilier verbalement. Très commun en milieu urbain pour désigner une moquerie ou une humiliation sociale."
+      "fr": "Coxeur = rabatteur des gares routières qui recrute à voix haute les passagers pour les woro-woros et gbakas. Figure sonore incontournable des gares d'Abidjan."
     },
     "difficulty": 2,
-    "estimated_time_s": 20,
-    "tags": ["action", "intermediaire"],
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
@@ -365,34 +561,57 @@
     "country": "ci",
     "answer": "ZIGUEHI",
     "answer_normalized": "ziguehi",
-    "letters_pool": ["Z","I","G","U","E","H","I"],
+    "letters_pool": [
+      "Z",
+      "I",
+      "G",
+      "U",
+      "E",
+      "H",
+      "I"
+    ],
     "riddle": {
-      "fr": "Petite arnaque, petit jeu, petite combine sans gravité."
+      "fr": "Loubard, gros bras des quartiers d'Abidjan dans les années 1980. Je suis un guerrier."
     },
     "explanation": {
-      "fr": "Ziguehi = petite escroquerie, petit jeu ou combine facile. Terme léger pour décrire une arnaque mineure ou un jeu de mots."
+      "fr": "Ziguehi = loubard, 'gros bras' des quartiers populaires d'Abidjan des années 1980-90. Signifie 'guerrier' ; ces bagarreurs mythiques sont une des origines du nouchi."
     },
     "difficulty": 2,
     "estimated_time_s": 25,
-    "tags": ["action", "intermediaire"],
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_022",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "KPACOLO",
-    "answer_normalized": "kpacolo",
-    "letters_pool": ["K","P","A","C","O","L","O"],
+    "answer": "KPAKPATO",
+    "answer_normalized": "kpakpato",
+    "letters_pool": [
+      "K",
+      "P",
+      "A",
+      "K",
+      "P",
+      "A",
+      "T",
+      "O"
+    ],
     "riddle": {
-      "fr": "Tête de pioche, imbécile, débile qui comprend rien."
+      "fr": "Commère, rapporteur, indiscret qui fouille partout. Je me mêle de tout le quartier."
     },
     "explanation": {
-      "fr": "Kpacolo = idiot, débile, personne stupide ou qui n'écoute pas. Insulte légère et très populaire dans l'argot urbain abidjanais."
+      "fr": "Kpakpato = commère, rapporteur, indiscret qui se mêle de tout. Popularisé notamment par le magazine satirique Gbich. Figure type de la rue abidjanaise."
     },
     "difficulty": 2,
     "estimated_time_s": 25,
-    "tags": ["personne", "intermediaire"],
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
@@ -401,16 +620,26 @@
     "country": "ci",
     "answer": "GBONHI",
     "answer_normalized": "gbonhi",
-    "letters_pool": ["G","B","O","N","H","I"],
+    "letters_pool": [
+      "G",
+      "B",
+      "O",
+      "N",
+      "H",
+      "I"
+    ],
     "riddle": {
-      "fr": "Coin reculé, zone cachée de la ville où les gens se retrouvent."
+      "fr": "Groupe d'amis, bande, équipe. On traîne tous ensemble, on est soudés."
     },
     "explanation": {
-      "fr": "Gbonhi = endroit reculé, coin perdu, zone éloignée. Peut aussi désigner une zone dangereuse ou peu fréquentée d'Abidjan."
+      "fr": "Gbonhi = groupe d'amis, bande, équipe. 'Mon gbonhi' = ma bande, mes potes. Terme affectueux pour désigner le collectif urbain auquel on appartient."
     },
     "difficulty": 2,
     "estimated_time_s": 20,
-    "tags": ["lieu", "intermediaire"],
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
@@ -419,16 +648,25 @@
     "country": "ci",
     "answer": "FRAYA",
     "answer_normalized": "fraya",
-    "letters_pool": ["F","R","A","Y","A"],
+    "letters_pool": [
+      "F",
+      "R",
+      "A",
+      "Y",
+      "A"
+    ],
     "riddle": {
-      "fr": "Femme compliquée, délicate, qui crée du drama. Pas simple du tout."
+      "fr": "Fuir, s'enfuir, déguerpir. Je me sauve en vitesse quand c'est chaud."
     },
     "explanation": {
-      "fr": "Fraya = femme chiante, compliquée, à problèmes. De l'anglais 'fray' (chaos), désigne une femme qui cause du problème ou du drame."
+      "fr": "Fraya = fuir, s'enfuir, déguerpir. 'Frayali' = la fuite. Verbe très urbain qui évoque le départ précipité du quartier en cas de problème."
     },
     "difficulty": 2,
     "estimated_time_s": 20,
-    "tags": ["personne", "intermediaire"],
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
@@ -437,7 +675,13 @@
     "country": "ci",
     "answer": "GBAKA",
     "answer_normalized": "gbaka",
-    "letters_pool": ["G","B","A","K","A"],
+    "letters_pool": [
+      "G",
+      "B",
+      "A",
+      "K",
+      "A"
+    ],
     "riddle": {
       "fr": "Bus blanc de transport qui voyage entre les villes. Trop chargé de passagers."
     },
@@ -446,61 +690,93 @@
     },
     "difficulty": 2,
     "estimated_time_s": 20,
-    "tags": ["objet", "intermediaire"],
+    "tags": [
+      "objet",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_026",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "DJOSS",
-    "answer_normalized": "djoss",
-    "letters_pool": ["D","J","O","S","S"],
+    "answer": "DJOSSI",
+    "answer_normalized": "djossi",
+    "letters_pool": [
+      "D",
+      "J",
+      "O",
+      "S",
+      "S",
+      "I"
+    ],
     "riddle": {
-      "fr": "Fille facile, sans morale, qui couche avec n'importe qui."
+      "fr": "Ménages, courses, petites tâches : je gagne mes sous à la journée."
     },
     "explanation": {
-      "fr": "Djoss = femme réputée pour sa permissivité sexuelle. Terme très péjoratif et humiliant en Nouchi, à utiliser avec prudence."
+      "fr": "Djossi = petit boulot, travail domestique, tâche quotidienne. 'Faire djossi' = bosser dur pour des sous, vivre à la journée en tant qu'ouvrier ou aide de maison."
     },
     "difficulty": 2,
     "estimated_time_s": 20,
-    "tags": ["personne", "intermediaire"],
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_027",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "GLOH",
-    "answer_normalized": "gloh",
-    "letters_pool": ["G","L","O","H"],
+    "answer": "DECALER",
+    "answer_normalized": "decaler",
+    "letters_pool": [
+      "D",
+      "E",
+      "C",
+      "A",
+      "L",
+      "E",
+      "R"
+    ],
     "riddle": {
-      "fr": "Foutre le camps, partir vite, s'enfuir sans explication."
+      "fr": "Le coup est fait, plus personne ne me voit : je file à toute allure."
     },
     "explanation": {
-      "fr": "Gloh = partir précipitamment, s'enfuir, décamper. Onomatopée très expressive du Nouchi urbain."
+      "fr": "Décaler = s'enfuir, filer, partir vite. C'est le 'décalé' de 'Coupé-Décalé' : couper (arnaquer) puis décaler (s'enfuir). Verbe clé de la culture urbaine abidjanaise."
     },
     "difficulty": 2,
-    "estimated_time_s": 20,
-    "tags": ["action", "intermediaire"],
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_028",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "GBAGBA",
-    "answer_normalized": "gbagba",
-    "letters_pool": ["G","B","A","G","B","A"],
+    "answer": "BARA",
+    "answer_normalized": "bara",
+    "letters_pool": [
+      "B",
+      "A",
+      "R",
+      "A"
+    ],
     "riddle": {
-      "fr": "Solide, fort, vrai de vrai. Pas de blague, c'est sérieux."
+      "fr": "Chaque matin je m'y rends pour gagner ma vie à la sueur du front."
     },
     "explanation": {
-      "fr": "Gbagba = solide, sincère, légitime, vrai. Utilisé pour approuver, valider ou affirmer l'authenticité de quelque chose."
+      "fr": "Bara = le travail, l'emploi. 'Je vais au bara' = je vais bosser. Terme factuel et neutre pour désigner le labeur quotidien et la routine de l'ouvrier urbain."
     },
     "difficulty": 2,
-    "estimated_time_s": 25,
-    "tags": ["attitude", "intermediaire"],
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
@@ -509,7 +785,14 @@
     "country": "ci",
     "answer": "CASSER",
     "answer_normalized": "casser",
-    "letters_pool": ["C","A","S","S","E","R"],
+    "letters_pool": [
+      "C",
+      "A",
+      "S",
+      "S",
+      "E",
+      "R"
+    ],
     "riddle": {
       "fr": "Faire échouer, ruiner quelqu'un. C'est brutal comme action."
     },
@@ -518,55 +801,70 @@
     },
     "difficulty": 2,
     "estimated_time_s": 20,
-    "tags": ["action", "intermediaire"],
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_030",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "AGBADJA",
-    "answer_normalized": "agbadja",
-    "letters_pool": ["A","G","B","A","D","J","A"],
+    "answer": "BOUCANTIER",
+    "answer_normalized": "boucantier",
+    "letters_pool": [
+      "B",
+      "O",
+      "U",
+      "C",
+      "A",
+      "N",
+      "T",
+      "I",
+      "E",
+      "R"
+    ],
     "riddle": {
-      "fr": "Qui crâne trop, qui se montre, qui fait l'intéressant. C'est un vantard."
+      "fr": "Frimeur flamboyant qui exhibe ses billets, ses habits voyants. Je suis la Jet Set."
     },
     "explanation": {
-      "fr": "Agbadja = prétentieux, vantard, qui se vante beaucoup. Personne qui crâne sans arrêt et se met en avant de façon exagérée."
+      "fr": "Boucantier = frimeur flamboyant du Coupé-Décalé qui fait son 'boucan' : habits voyants, billets exhibés, vie de luxe ostentatoire. Figure incarnée par DJ Arafat et la Jet Set abidjanaise."
     },
     "difficulty": 2,
     "estimated_time_s": 25,
-    "tags": ["attitude", "intermediaire"],
+    "tags": [
+      "attitude",
+      "intermediaire"
+    ],
     "format_version": 3
   },
   {
     "id": "crack_nouchi_031",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "MOULOULOU",
-    "answer_normalized": "mouloulou",
+    "answer": "ATALAKON",
+    "answer_normalized": "atalakon",
     "letters_pool": [
-      "M",
-      "O",
-      "U",
+      "A",
+      "T",
+      "A",
       "L",
+      "A",
+      "K",
       "O",
-      "U",
-      "L",
-      "O",
-      "U"
+      "N"
     ],
     "riddle": {
-      "fr": "Fête folle, bamboche sans fin, j'explose la nuit dans les maquis abidjanais."
+      "fr": "Compliment appuyé, éloge, tu me flattes trop. Je chante tes louanges."
     },
     "explanation": {
-      "fr": "Mouloulou = fête très animée, bamboche, soirée déchaînée. Terme très populaire en nouchi pour décrire une célébration joyeuse et débridée."
+      "fr": "Atalakon = éloge, compliment appuyé. 'Faire un atalakon' = chanter les louanges de quelqu'un, complimenter de façon excessive et jouée. Terme du folklore urbain."
     },
     "difficulty": 3,
-    "estimated_time_s": 35,
+    "estimated_time_s": 30,
     "tags": [
-      "fete",
-      "emotion",
+      "action",
       "hardcore"
     ],
     "format_version": 3
@@ -575,30 +873,25 @@
     "id": "crack_nouchi_032",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "GRIGUITON",
-    "answer_normalized": "griguiton",
+    "answer": "SIDJO",
+    "answer_normalized": "sidjo",
     "letters_pool": [
-      "G",
-      "R",
+      "S",
       "I",
-      "G",
-      "U",
-      "I",
-      "T",
-      "O",
-      "N"
+      "D",
+      "J",
+      "O"
     ],
     "riddle": {
-      "fr": "Débile, débordé, qui débarque de nulle part. Je n'ai aucune classe."
+      "fr": "Entre frères du quartier, on se salue avec cette poignée de main bien à nous."
     },
     "explanation": {
-      "fr": "Griguiton = personne bizarre, débile, sans style. Insulte légère et amusante en nouchi pour qualifier quelqu'un d'excentrique ou de ridicule."
+      "fr": "Sidjo = salut fraternel, poignée de main amicale. 'Prends mon sidjô' = salue-moi fraternellement. Geste de camaraderie urbaine, particulièrement chez les jeunes."
     },
     "difficulty": 3,
-    "estimated_time_s": 35,
+    "estimated_time_s": 30,
     "tags": [
-      "personne",
-      "insult",
+      "expression",
       "hardcore"
     ],
     "format_version": 3
@@ -607,30 +900,26 @@
     "id": "crack_nouchi_033",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "TALONNEUR",
-    "answer_normalized": "talonneur",
+    "answer": "ROPERO",
+    "answer_normalized": "ropero",
     "letters_pool": [
-      "T",
-      "A",
-      "L",
+      "R",
       "O",
-      "N",
-      "N",
+      "P",
       "E",
-      "U",
-      "R"
+      "R",
+      "O"
     ],
     "riddle": {
-      "fr": "Je te suis partout, je fouille tes poches. Gare à toi la nuit dans le marché."
+      "fr": "Profiteur, qui vit aux crochets des autres. Je suis un parasite urbain."
     },
     "explanation": {
-      "fr": "Talonneur = pickpocket, voleur, criminel urbain qui suit ses victimes et les dépouille. Terme très utilisé en nouchi pour désigner les arnaqueurs."
+      "fr": "Ropero = profiteur, celui qui vit aux crochets, parasite qui exploite les autres. Figure négative du nouchi pour décrire l'opportuniste sans scrupule."
     },
     "difficulty": 3,
-    "estimated_time_s": 35,
+    "estimated_time_s": 30,
     "tags": [
       "personne",
-      "crime",
       "hardcore"
     ],
     "format_version": 3
@@ -639,29 +928,28 @@
     "id": "crack_nouchi_034",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "KOUAKOUA",
-    "answer_normalized": "kouakoua",
+    "answer": "KPAKITES",
+    "answer_normalized": "kpakites",
     "letters_pool": [
       "K",
-      "O",
-      "U",
+      "P",
       "A",
       "K",
-      "O",
-      "U",
-      "A"
+      "I",
+      "T",
+      "E",
+      "S"
     ],
     "riddle": {
-      "fr": "Je tremblote, je tremble de peur. Mon corps ne tient plus debout."
+      "fr": "Les mâchoires, tu es dans les miennes. Je t'aime à la folie."
     },
     "explanation": {
-      "fr": "Kouakoua = avoir peur, trembler, être terrifié. Onomatopée expressive très courante pour décrire la panique ou la terreur."
+      "fr": "Kpakites = les mâchoires. 'Tu es dans mes kpakites' = je t'aime à la folie, tu me fascines intensément. Métaphore poétique du nouchi urbain."
     },
     "difficulty": 3,
     "estimated_time_s": 30,
     "tags": [
-      "emotion",
-      "action",
+      "expression",
       "hardcore"
     ],
     "format_version": 3
@@ -670,29 +958,27 @@
     "id": "crack_nouchi_035",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "GRIGRIGRI",
-    "answer_normalized": "grigrigri",
+    "answer": "BAGABAGA",
+    "answer_normalized": "bagabaga",
     "letters_pool": [
+      "B",
+      "A",
       "G",
-      "R",
-      "I",
+      "A",
+      "B",
+      "A",
       "G",
-      "R",
-      "I",
-      "G",
-      "R",
-      "I"
+      "A"
     ],
     "riddle": {
-      "fr": "Ruse, taquinerie, petite combine pour rire. Je ne suis pas méchante, juste drôle."
+      "fr": "Je te fais sursauter dans le noir, ton cœur bat à mille à l'heure."
     },
     "explanation": {
-      "fr": "Grigrigri = taquinerie, petite ruse amusante, jeu de mots espiègle. Terme tendre et léger du nouchi pour une blague sans malveillance."
+      "fr": "Bagabaga = effrayer, faire peur, terroriser. Onomatopée très expressive du nouchi pour décrire l'effet de panique intense."
     },
     "difficulty": 3,
     "estimated_time_s": 30,
     "tags": [
-      "humour",
       "action",
       "hardcore"
     ],
@@ -702,29 +988,28 @@
     "id": "crack_nouchi_036",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "SAKOUKOU",
-    "answer_normalized": "sakoukou",
+    "answer": "MOUROUTI",
+    "answer_normalized": "mourouti",
     "letters_pool": [
-      "S",
-      "A",
-      "K",
+      "M",
       "O",
       "U",
-      "K",
+      "R",
       "O",
-      "U"
+      "U",
+      "T",
+      "I"
     ],
     "riddle": {
-      "fr": "Costume étriqué, vêtement ridicule. Je regarde le mec qui le porte et je rigole."
+      "fr": "Se mettre en colère, s'emporter, je pète les plombs. C'est du brûlant."
     },
     "explanation": {
-      "fr": "Sakoukou = vêtement ridicule, costume qui serre trop, fringues démodées. Terme moqueur en nouchi urbain pour critiquer le style vestimentaire."
+      "fr": "Mourouti = se mettre en colère, s'emporter, perdre son sang-froid. Verbe expressif du nouchi pour décrire une colère intense et soudaine."
     },
     "difficulty": 3,
     "estimated_time_s": 30,
     "tags": [
-      "vetement",
-      "attitude",
+      "emotion",
       "hardcore"
     ],
     "format_version": 3
@@ -733,31 +1018,26 @@
     "id": "crack_nouchi_037",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "BOUBOUKLAK",
-    "answer_normalized": "boubouklak",
+    "answer": "SOGBAN",
+    "answer_normalized": "sogban",
     "letters_pool": [
-      "B",
+      "S",
       "O",
-      "U",
+      "G",
       "B",
-      "O",
-      "U",
-      "K",
-      "L",
       "A",
-      "K"
+      "N"
     ],
     "riddle": {
-      "fr": "Chaos total, débordement complet. La situation a explosé et c'est l'anarchie."
+      "fr": "Soixante-quinze francs, la monnaie du nouchi codé. Je suis l'argent secret."
     },
     "explanation": {
-      "fr": "Boubouklak = confusion totale, chaos, débordement. Terme onomatopéique très expressif du nouchi pour décrire le désordre et la pagaille."
+      "fr": "Sogban = 75 francs CFA dans le langage codé de l'argent en nouchi, hérité du système des pièces. Un des nombreux codes monétaires de la rue abidjanaise."
     },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
-      "situation",
-      "emotion",
+      "argent",
       "hardcore"
     ],
     "format_version": 3
@@ -766,33 +1046,4917 @@
     "id": "crack_nouchi_038",
     "pack": "crack_nouchi",
     "country": "ci",
-    "answer": "ABOUBOULOU",
-    "answer_normalized": "abouboulou",
+    "answer": "POTO",
+    "answer_normalized": "poto",
     "letters_pool": [
+      "P",
+      "O",
+      "T",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Manger avec les doigts, goulûment, sans retenue. Je dévore la main dans le plat."
+    },
+    "explanation": {
+      "fr": "Poto = manger avec les doigts, goulûment, sans couverts. Terme neutre et factuel du nouchi pour décrire la façon traditionnelle de se nourrir au pays."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "action",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_039",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "NOUCHI",
+    "answer_normalized": "nouchi",
+    "letters_pool": [
+      "N",
+      "O",
+      "U",
+      "C",
+      "H",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Argot ivoirien, langue des rues d'Abidjan. Je suis le code secret urbain."
+    },
+    "explanation": {
+      "fr": "Nouchi = l'argot ivoirien. Le mot désignait à l'origine les jeunes débrouillards des rues d'Abidjan ; il désigne aujourd'hui la langue elle-même, parlée dans tout le pays."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "expression",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_040",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MOUSSO",
+    "answer_normalized": "mousso",
+    "letters_pool": [
+      "M",
+      "O",
+      "U",
+      "S",
+      "S",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Femme, la fille, ma blonde. Du dioula, elle est incontournable."
+    },
+    "explanation": {
+      "fr": "Mousso = femme, du dioula. Terme neutre et très courant pour désigner une femme ou une fille dans le nouchi urbain."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_041",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "YAKO",
+    "answer_normalized": "yako",
+    "letters_pool": [
+      "Y",
+      "A",
+      "K",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Courage, résistance, mes condoléances sincères. Je suis avec toi."
+    },
+    "explanation": {
+      "fr": "Yako = expression de compassion, courage, condoléances. Interjection abidjanaise pour soutenir quelqu'un dans la peine ou l'adversité."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "emotion",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_042",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DRAP",
+    "answer_normalized": "drap",
+    "letters_pool": [
+      "D",
+      "R",
+      "A",
+      "P"
+    ],
+    "riddle": {
+      "fr": "Embrouille ou pépin : à Abidjan, quand ça se gâte, on dit qu'il y en a."
+    },
+    "explanation": {
+      "fr": "Drap = problème, embrouille, souci. 'Y a drap!' = il y a un problème! Interjection très urbaine pour signaler un hic."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "expression",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_043",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "WOROWORO",
+    "answer_normalized": "woroworo",
+    "letters_pool": [
+      "W",
+      "O",
+      "R",
+      "O",
+      "W",
+      "O",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Taxi collectif d'Abidjan qui fait les trajets à prix fixe. On entasse dedans."
+    },
+    "explanation": {
+      "fr": "Woroworo = taxi collectif urbain d'Abidjan qui assure des trajets à prix fixe, transportant passagers multiples. Figure centrale des transports urbains en Côte d'Ivoire."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "transport",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_044",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TOUBABOU",
+    "answer_normalized": "toubabou",
+    "letters_pool": [
+      "T",
+      "O",
+      "U",
+      "B",
       "A",
       "B",
-      "O",
-      "U",
-      "B",
-      "O",
-      "U",
-      "L",
       "O",
       "U"
     ],
     "riddle": {
-      "fr": "Grosse bosse, personne très enrobée. Je ne rentre plus nulle part."
+      "fr": "Le Blanc, l'Européen, celui de là-bas. Le vrai mot du pays pour le désigner."
     },
     "explanation": {
-      "fr": "Abouboulou = grosse personne, personne très enrobée avec une protubérance. Terme moquer en nouchi pour décrire l'obésité de façon crue et amusante."
+      "fr": "Toubabou = le Blanc, l'Européen, l'expatrié occidental. Mot d'Afrique de l'Ouest (dioula), le vrai terme utilisé à Abidjan, neutre et descriptif."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_045",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BINGUE",
+    "answer_normalized": "bingue",
+    "letters_pool": [
+      "B",
+      "I",
+      "N",
+      "G",
+      "U",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Le rêve de beaucoup : partir là-bas, de l'autre côté de la mer, en Europe."
+    },
+    "explanation": {
+      "fr": "Bingue = l'Europe, la France, le rêve du Blanc abidjanais. 'Partir au bingue' = s'expatrier en Europe pour y faire fortune."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "lieu",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_046",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GNAGA",
+    "answer_normalized": "gnaga",
+    "letters_pool": [
+      "G",
+      "N",
+      "A",
+      "G",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Bagarre, baston, grosse palabre qui explose. C'est du chaud."
+    },
+    "explanation": {
+      "fr": "Gnaga = bagarre, baston, grosse rixe qui dégénère. Terme très urbain du nouchi pour décrire les affrontements violents de quartier."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_047",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DABA",
+    "answer_normalized": "daba",
+    "letters_pool": [
+      "D",
+      "A",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Manger, ou frapper, je peux te faire l'un ou l'autre. C'est double."
+    },
+    "explanation": {
+      "fr": "Daba = manger ; peut aussi vouloir dire frapper, cogner. Verbe polysémique du nouchi très courant dans les contextes urbains."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_048",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TRACER",
+    "answer_normalized": "tracer",
+    "letters_pool": [
+      "T",
+      "R",
+      "A",
+      "C",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Pas de gbaka, pas de taxi : j'avale les kilomètres à pied."
+    },
+    "explanation": {
+      "fr": "Tracer = marcher longtemps, avaler les kilomètres à pied, partir. Verbe urbain qui évoque la galère de la marche quotidienne abidjanaise."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_049",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ZINZIN",
+    "answer_normalized": "zinzin",
+    "letters_pool": [
+      "Z",
+      "I",
+      "N",
+      "Z",
+      "I",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Ma tête est partie ailleurs, complètement givrée. On m'évite au quartier."
+    },
+    "explanation": {
+      "fr": "Zinzin = fou, givré, pas net, débile. Terme léger du nouchi pour qualifier quelqu'un d'excentrique ou de vraiment barré."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "emotion",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_050",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KESSIA",
+    "answer_normalized": "kessia",
+    "letters_pool": [
+      "K",
+      "E",
+      "S",
+      "S",
+      "I",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Un seul mot pour demander ce qui se passe quand ça s'agite."
+    },
+    "explanation": {
+      "fr": "Kessia = 'qu'est-ce qu'il y a?', interjection abidjanaise pour demander ce qui se passe, l'état des lieux. Contraction du français 'qu'est-ce que...'"
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "expression",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_051",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BADE",
+    "answer_normalized": "bade",
+    "letters_pool": [
+      "B",
+      "A",
+      "D",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Fidèle compagnon de galère et de rires, toujours à mes côtés."
+    },
+    "explanation": {
+      "fr": "Bade = ami, pote. 'Mon badé' = mon pote, mon ami de confiance. Terme tendre du nouchi urbain pour la camaraderie."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_052",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FOHI",
+    "answer_normalized": "fohi",
+    "letters_pool": [
+      "F",
+      "O",
+      "H",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Quand tout va bien, on répond qu'il n'y a... rien du tout."
+    },
+    "explanation": {
+      "fr": "Fohi = rien, pas de problème, c'est tranquille. 'Y a fohi' = il n'y a rien, pas de souci, pas grave. Interjection rassurante du nouchi."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "expression",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_053",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TIASSE",
+    "answer_normalized": "tiasse",
+    "letters_pool": [
+      "T",
+      "I",
+      "A",
+      "S",
+      "S",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Fauché, sans argent, je n'ai pas un sou. Je dois emprunter."
+    },
+    "explanation": {
+      "fr": "Tiasse = fauché, sans argent. Terme courant du nouchi pour décrire la pauvreté urbaine et l'absence de moyens financiers."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "argent",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_054",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MIMBO",
+    "answer_normalized": "mimbo",
+    "letters_pool": [
+      "M",
+      "I",
+      "M",
+      "B",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Boisson, alcool, mon verre à la main. Je bois sec."
+    },
+    "explanation": {
+      "fr": "Mimbo = boisson, alcool, breuvage en général. Terme neutre et factuel du nouchi urbain pour désigner ce qu'on boit au maquis ou à la rue."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "nourriture",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_055",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SIFFLER",
+    "answer_normalized": "siffler",
+    "letters_pool": [
+      "S",
+      "I",
+      "F",
+      "F",
+      "L",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Mon verre ne fait pas long feu : je le vide d'un seul trait."
+    },
+    "explanation": {
+      "fr": "Siffler = boire d'un trait, avaler rapidement. Terme léger et factuel du nouchi pour décrire la consommation rapide de boisson."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_056",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FISSA",
+    "answer_normalized": "fissa",
+    "letters_pool": [
+      "F",
+      "I",
+      "S",
+      "S",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Pas le temps de traîner : tout doit se faire à toute vitesse."
+    },
+    "explanation": {
+      "fr": "Fissa = vite, rapidement, sans traîner. Adverbe très courant du nouchi urbain emprunté à l'italien/arabe pour signifier l'urgence."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "expression",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_057",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GROTO",
+    "answer_normalized": "groto",
+    "letters_pool": [
+      "G",
+      "R",
+      "O",
+      "T",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Costume, villa, respect du quartier : j'ai réussi et ça se voit."
+    },
+    "explanation": {
+      "fr": "Groto = riche, notable, bourgeois qui a réussi et affiche son statut. Terme du nouchi urbain pour celui qui a fait fortune et vit bien."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_058",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "COUPER",
+    "answer_normalized": "couper",
+    "letters_pool": [
+      "C",
+      "O",
+      "U",
+      "P",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Je te roule dans la farine et ton argent change de poche."
+    },
+    "explanation": {
+      "fr": "Couper = arnaquer, escroquer, rouler quelqu'un. C'est le 'coupé' de 'Coupé-Décalé' : couper d'abord (l'arnaque), puis décaler (s'enfuir)."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_059",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BINGUISTE",
+    "answer_normalized": "binguiste",
+    "letters_pool": [
+      "B",
+      "I",
+      "N",
+      "G",
+      "U",
+      "I",
+      "S",
+      "T",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Je descends de l'avion de Paris, valises pleines, prêt à briller au quartier."
+    },
+    "explanation": {
+      "fr": "Binguiste = celui qui revient d'Europe (le 'bingue'), souvent en mode frime. Figure du nouchi urbain pour l'expatrié réussi qui rentre au pays."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_060",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GNAMBRO",
+    "answer_normalized": "gnambro",
+    "letters_pool": [
+      "G",
+      "N",
+      "A",
+      "M",
+      "B",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "À la gare routière, j'encadre les passagers des woro-woros. Je crie tout le temps."
+    },
+    "explanation": {
+      "fr": "Gnambro = rabatteur/encadreur des gares routières qui organise le chargement des woro-woros. Figure incontournable et bruyante des gares d'Abidjan."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_061",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ZANGO",
+    "answer_normalized": "zango",
+    "letters_pool": [
+      "Z",
+      "A",
+      "N",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Chemise repassée, chaussures qui brillent : je suis tiré à quatre épingles."
+    },
+    "explanation": {
+      "fr": "Zango = sapé, tiré à quatre épingles, bien habillé avec style. Terme admiratif du nouchi pour celui qui a du swag et de la classe vestimentaire."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "attitude",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_062",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TIKA",
+    "answer_normalized": "tika",
+    "letters_pool": [
+      "T",
+      "I",
+      "K",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Mes tenues sont toujours bien choisies, tout le monde salue mon bon goût."
+    },
+    "explanation": {
+      "fr": "Tika = bien habillé, stylé, qui sait s'habiller avec goût. Terme admiratif du nouchi urbain pour la qualité vestimentaire et le style personnel."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "attitude",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_063",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "VOGO",
+    "answer_normalized": "vogo",
+    "letters_pool": [
+      "V",
+      "O",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Sans adresse fixe, je traîne de rue en rue, du matin au soir."
+    },
+    "explanation": {
+      "fr": "Vogo = vagabond, errant, clochard qui vit à la rue. Terme neutre du nouchi urbain pour celui sans domicile qui traîne partout."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_064",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BREZO",
+    "answer_normalized": "brezo",
+    "letters_pool": [
+      "B",
+      "R",
+      "E",
+      "Z",
+      "O"
+    ],
+    "riddle": {
+      "fr": "On me raconte n'importe quoi et j'y crois : les malins m'adorent."
+    },
+    "explanation": {
+      "fr": "Brezo = naïf, pas dégourdi, simplet. Synonyme de 'gaou', terme du nouchi urbain pour celui qui se laisse facilement arnaquer."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_065",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DIGBA",
+    "answer_normalized": "digba",
+    "letters_pool": [
+      "D",
+      "I",
+      "G",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Bâti comme une armoire, on ne me bouscule pas au quartier."
+    },
+    "explanation": {
+      "fr": "Digba = costaud, balèze, musclé. Terme du nouchi urbain pour celui qui a la carrure imposante et le physique impressionnant."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_066",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "AGBOLO",
+    "answer_normalized": "agbolo",
+    "letters_pool": [
+      "A",
+      "G",
+      "B",
+      "O",
+      "L",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Des heures de pompes et de fonte : mes bras parlent pour moi."
+    },
+    "explanation": {
+      "fr": "Agbolo = musclé, les muscles développés, bodybuilté. Terme admiratif du nouchi urbain pour celui qui cultive son physique."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_067",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "LOGER",
+    "answer_normalized": "loger",
+    "letters_pool": [
+      "L",
+      "O",
+      "G",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Le piège était bien préparé : tu es tombé dedans en souriant."
+    },
+    "explanation": {
+      "fr": "Loger = piéger, rouler quelqu'un, arnaquer. Verbe du nouchi urbain pour décrire l'escroquerie raffinée et bien préparée."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_068",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GNAGAMI",
+    "answer_normalized": "gnagami",
+    "letters_pool": [
+      "G",
+      "N",
+      "A",
+      "G",
+      "A",
+      "M",
+      "I"
+    ],
+    "riddle": {
+      "fr": "L'embrouille monte, les esprits chauffent, et tout dégénère d'un coup."
+    },
+    "explanation": {
+      "fr": "Gnagami = embrouille, rixe, situation qui dégénère. Terme du nouchi urbain pour le chaos et la pagaille d'une altercation violente."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_069",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "PATAPATA",
+    "answer_normalized": "patapata",
+    "letters_pool": [
+      "P",
+      "A",
+      "T",
+      "A",
+      "P",
+      "A",
+      "T",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Les coups pleuvent des deux côtés, on entend le bruit jusqu'au carrefour."
+    },
+    "explanation": {
+      "fr": "Patapata = se bagarrer, se battre à coups violents. Onomatopée du nouchi urbain pour les sons des coups qui pleuvent."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_070",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CHICOTTER",
+    "answer_normalized": "chicotter",
+    "letters_pool": [
+      "C",
+      "H",
+      "I",
+      "C",
+      "O",
+      "T",
+      "T",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Punition à l'ancienne : celui qui exagère trop finit corrigé."
+    },
+    "explanation": {
+      "fr": "Chicotter = frapper, corriger, rouler de coups. Du français 'chicotte' (le fouet) ; terme du nouchi urbain pour la violence physique."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_071",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KPATRA",
+    "answer_normalized": "kpatra",
+    "letters_pool": [
+      "K",
+      "P",
+      "A",
+      "T",
+      "R",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Un seul geste bien placé et l'affaire est réglée."
+    },
+    "explanation": {
+      "fr": "Kpatra = frapper, cogner, assommer. Verbe du nouchi urbain pour la violence physique soudaine et brutale."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_072",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FANGBAN",
+    "answer_normalized": "fangban",
+    "letters_pool": [
+      "F",
+      "A",
+      "N",
+      "G",
+      "B",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Riz, sauce graine, attiéké : tout ce qui remplit mon ventre chaque jour."
+    },
+    "explanation": {
+      "fr": "Fangban = la nourriture, le manger, les aliments. Terme très courant du nouchi urbain pour désigner ce qu'on mange au quotidien."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "nourriture",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_073",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CRAZ",
+    "answer_normalized": "craz",
+    "letters_pool": [
+      "C",
+      "R",
+      "A",
+      "Z"
+    ],
+    "riddle": {
+      "fr": "Mon ventre gronde si fort qu'on l'entend depuis la cour."
+    },
+    "explanation": {
+      "fr": "Craz = faim intense, sensation de creux dans le ventre. Terme très urbain du nouchi pour l'appétit féroce."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "emotion",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_074",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BOUGLER",
+    "answer_normalized": "bougler",
+    "letters_pool": [
+      "B",
+      "O",
+      "U",
+      "G",
+      "L",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Devant un bon garba, je dévore tout sans lever la tête."
+    },
+    "explanation": {
+      "fr": "Bougler = manger avec grand appétit, dévorer, engloutir. Verbe du nouchi urbain pour la consommation vorace de nourriture."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_075",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KOROTO",
+    "answer_normalized": "koroto",
+    "letters_pool": [
+      "K",
+      "O",
+      "R",
+      "O",
+      "T",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Après une longue journée, je m'allonge enfin pour la nuit."
+    },
+    "explanation": {
+      "fr": "Koroto = se coucher, aller dormir, se reposer. 'Se koroto' = s'allonger pour la nuit, verbe très urbain du nouchi."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_076",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BEOU",
+    "answer_normalized": "beou",
+    "letters_pool": [
+      "B",
+      "E",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Sans prévenir personne, je disparais du coin en un clin d'œil."
+    },
+    "explanation": {
+      "fr": "Beou = partir, se casser, décamper précipitamment. Verbe très léger du nouchi urbain pour le départ rapide, souvent sans explication."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_077",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KABA",
+    "answer_normalized": "kaba",
+    "letters_pool": [
+      "K",
+      "A",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Quatre murs et des barreaux : ceux qui jouent trop finissent chez moi."
+    },
+    "explanation": {
+      "fr": "Kaba = la prison, la taule. Terme du nouchi urbain pour l'enfermement."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "lieu",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_078",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "LALE",
+    "answer_normalized": "lale",
+    "letters_pool": [
+      "L",
+      "A",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Dans ma poche, il sonne, vibre et me relie au monde entier."
+    },
+    "explanation": {
+      "fr": "Lale = téléphone portable, téléphone mobile, gsm. Terme très courant du nouchi urbain pour l'appareil de communication urbain."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "objet",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_079",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BINGO",
+    "answer_normalized": "bingo",
+    "letters_pool": [
+      "B",
+      "I",
+      "N",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Tu veux me parler ? Passe-moi un petit coup de fil vite fait."
+    },
+    "explanation": {
+      "fr": "Bingo = appel téléphonique, coup de fil. 'Fais-moi un bingo' = appelle-moi vite. Terme du nouchi urbain pour l'appel entrant ou sortant."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_080",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GUIMERO",
+    "answer_normalized": "guimero",
+    "letters_pool": [
+      "G",
+      "U",
+      "I",
+      "M",
+      "E",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Les honnêtes gens changent de trottoir quand je m'approche la nuit."
+    },
+    "explanation": {
+      "fr": "Guimero = voyou, bandit, criminel urbain. Terme du nouchi pour celui qui vit en marge et vit de petites arnaques et de vols."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_081",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BLAKORO",
+    "answer_normalized": "blakoro",
+    "letters_pool": [
+      "B",
+      "L",
+      "A",
+      "K",
+      "O",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Encore petit dans le milieu, j'apprends la débrouille auprès des grands."
+    },
+    "explanation": {
+      "fr": "Blakoro = garnement, jeune non initié aux réalités, apprenti de la rue. Terme du nouchi urbain pour le jeune inexpérimenté."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_082",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "WOTRO",
+    "answer_normalized": "wotro",
+    "letters_pool": [
+      "W",
+      "O",
+      "T",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "De passage en ville, je loue une petite chambre pour la nuit."
+    },
+    "explanation": {
+      "fr": "Wotro = hôtel, petit hébergement bon marché. Terme du nouchi urbain pour les petits hôtels de quartier."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "lieu",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_083",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SOMOU",
+    "answer_normalized": "somou",
+    "letters_pool": [
+      "S",
+      "O",
+      "M",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "La bague au doigt, c'est elle qui tient la maison : ma moitié officielle."
+    },
+    "explanation": {
+      "fr": "Somou = épouse, femme mariée, compagne. Terme respectueux du nouchi urbain pour désigner l'épouse ou la conjointe."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_084",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MORO",
+    "answer_normalized": "moro",
+    "letters_pool": [
+      "M",
+      "O",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "La toute petite pièce : cinq francs seulement, dans le code de l'argent."
+    },
+    "explanation": {
+      "fr": "Moro = 5 francs CFA. Un des codes monétaires du nouchi, hérité de la rue abidjanaise, pour parler d'argent entre initiés."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "argent",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_085",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TOGO",
+    "answer_normalized": "togo",
+    "letters_pool": [
+      "T",
+      "O",
+      "G",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Cent francs dans le code de la rue, comme le nom d'un pays voisin."
+    },
+    "explanation": {
+      "fr": "Togo = 100 francs CFA dans le langage codé de l'argent en nouchi. La pièce de cent francs porte le nom du pays voisin."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "argent",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_086",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KRIKA",
+    "answer_normalized": "krika",
+    "letters_pool": [
+      "K",
+      "R",
+      "I",
+      "K",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Mille francs dans le code de la rue : de quoi voir venir la journée."
+    },
+    "explanation": {
+      "fr": "Krika = 1 000 francs CFA. Code de l'argent en nouchi, utilisé pour parler d'argent sans se faire comprendre."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "argent",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_087",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBON",
+    "answer_normalized": "gbon",
+    "letters_pool": [
+      "G",
+      "B",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Cinq mille francs dans le code de la rue : le billet qui impose le respect."
+    },
+    "explanation": {
+      "fr": "Gbon = 5 000 francs CFA dans le langage codé de l'argent en nouchi. Un des codes les plus connus de la vieille école."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "argent",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_088",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CHELSEA",
+    "answer_normalized": "chelsea",
+    "letters_pool": [
+      "C",
+      "H",
+      "E",
+      "L",
+      "S",
+      "E",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Le billet de deux mille, bleu comme le maillot du club de Drogba."
+    },
+    "explanation": {
+      "fr": "Chelsea = 2 000 francs CFA, surnom du billet bleu en nouchi. Couleur du club de foot Chelsea, popularisé par Drogba en Côte d'Ivoire."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "argent",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_089",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BRIQUE",
+    "answer_normalized": "brique",
+    "letters_pool": [
+      "B",
+      "R",
+      "I",
+      "Q",
+      "U",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Un million tout rond : la somme qui fait rêver tout le quartier."
+    },
+    "explanation": {
+      "fr": "Brique = un million de francs CFA dans le langage codé du nouchi. Terme très prestigieux pour la grosse fortune."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "argent",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_090",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "RIENNEUX",
+    "answer_normalized": "rienneux",
+    "letters_pool": [
+      "R",
+      "I",
+      "E",
+      "N",
+      "N",
+      "E",
+      "U",
+      "X"
+    ],
+    "riddle": {
+      "fr": "Mes poches ne contiennent que du vent : pas un seul franc sur moi."
+    },
+    "explanation": {
+      "fr": "Rienneux = sans le sou, fauché complètement, sans aucun argent. Terme du nouchi urbain pour la pauvreté extrême, l'absence de ressource."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "argent",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_091",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GANMAN",
+    "answer_normalized": "ganman",
+    "letters_pool": [
+      "G",
+      "A",
+      "N",
+      "M",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Pied au plancher sur le boulevard, les passagers s'accrochent."
+    },
+    "explanation": {
+      "fr": "Ganman = rouler à vive allure, conduire vite et dangereusement. Terme du nouchi urbain pour la conduite sportive ou agressive."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "action",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_092",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BORIFIN",
+    "answer_normalized": "borifin",
+    "letters_pool": [
+      "B",
+      "O",
+      "R",
+      "I",
+      "F",
+      "I",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Quatre roues, un moteur : je te promène dans toute la ville."
+    },
+    "explanation": {
+      "fr": "Borifin = véhicule, voiture en général, automobile. Terme du nouchi urbain pour désigner tout type de transport motorisé personnel."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "objet",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_093",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "PANNEAU",
+    "answer_normalized": "panneau",
+    "letters_pool": [
+      "P",
+      "A",
+      "N",
+      "N",
+      "E",
+      "A",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Le grand transport public bondé qui traverse la ville, arrêt après arrêt."
+    },
+    "explanation": {
+      "fr": "Panneau = le bus urbain, le transport collectif de masse. Terme du nouchi urbain pour les autobus publics qui circulent à Abidjan."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "transport",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_094",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "LAGALAGA",
+    "answer_normalized": "lagalaga",
+    "letters_pool": [
+      "L",
+      "A",
+      "G",
+      "A",
+      "L",
+      "A",
+      "G",
+      "A"
+    ],
+    "riddle": {
+      "fr": "On me fait croire que la lagune est à vendre, et je signe."
+    },
+    "explanation": {
+      "fr": "Lagalaga = benêt, niais, naïf, simpliste. Terme moqueur du nouchi urbain pour celui qui est facile à duper."
     },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
       "personne",
-      "appearance",
       "hardcore"
     ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_095",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DIBIDIBI",
+    "answer_normalized": "dibidibi",
+    "letters_pool": [
+      "D",
+      "I",
+      "B",
+      "I",
+      "D",
+      "I",
+      "B",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Cette affaire n'est pas claire du tout : méfie-toi avant de signer."
+    },
+    "explanation": {
+      "fr": "Dibidibi = louche, pas clair, douteux, suspect. Terme du nouchi urbain pour décrire quelque chose ou quelqu'un de peu recommandable."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "attitude",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_096",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BELEBELE",
+    "answer_normalized": "belebele",
+    "letters_pool": [
+      "B",
+      "E",
+      "L",
+      "E",
+      "B",
+      "E",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Ma carrure remplit la porte : on me remarque de loin."
+    },
+    "explanation": {
+      "fr": "Belebele = imposant, costaud, personne large ou impressionnante. Terme neutre et respectueux du nouchi urbain, jamais moqueur."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "personne",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_097",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "COCO",
+    "answer_normalized": "coco",
+    "letters_pool": [
+      "C",
+      "O",
+      "C",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Toujours à ta table, jamais là au moment de payer l'addition."
+    },
+    "explanation": {
+      "fr": "Coco = tapeur, parasite, celui qui vit aux dépens d'autrui sans rien donner. Terme péjoratif du nouchi urbain."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "personne",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_098",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ZOGUOH",
+    "answer_normalized": "zoguoh",
+    "letters_pool": [
+      "Z",
+      "O",
+      "G",
+      "U",
+      "O",
+      "H"
+    ],
+    "riddle": {
+      "fr": "Je vois tout, j'entends tout, et je vais tout répéter aux autorités."
+    },
+    "explanation": {
+      "fr": "Zoguoh = indicateur, celui qui renseigne la police ou les autorités. Terme très péjoratif du nouchi urbain pour le délateur."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "personne",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_099",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SANGREA",
+    "answer_normalized": "sangrea",
+    "letters_pool": [
+      "S",
+      "A",
+      "N",
+      "G",
+      "R",
+      "E",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Depuis ce matin, aucun repas : mon estomac crie au secours."
+    },
+    "explanation": {
+      "fr": "Sangrea = la faim, le manque, la sensation de famine. Terme du nouchi urbain pour l'absence de nourriture et l'appétit intense."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "emotion",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_100",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "WEREWERE",
+    "answer_normalized": "werewere",
+    "letters_pool": [
+      "W",
+      "E",
+      "R",
+      "E",
+      "W",
+      "E",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Elle vit à sa façon, parle fort et n'attend la permission de personne."
+    },
+    "explanation": {
+      "fr": "Werewere = femme délurée, affranchie, audacieuse et libre. Terme positif et respectueux du nouchi urbain pour la femme moderne et indépendante."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": [
+      "personne",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_101",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBECE",
+    "answer_normalized": "gbece",
+    "letters_pool": [
+      "G",
+      "B",
+      "E",
+      "C",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Petit billet qui vaut un bon verre frais rue du commerce."
+    },
+    "explanation": {
+      "fr": "Gbècè = 500 francs CFA dans le code argent du nouchi urbain. Dénomination courante pour une petite transaction."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "argent",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_102",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ROUGEOT",
+    "answer_normalized": "rougeot",
+    "letters_pool": [
+      "R",
+      "O",
+      "U",
+      "G",
+      "E",
+      "O",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Un seul billet de ce genre paie un complet repas abidjanais pour toute la famille."
+    },
+    "explanation": {
+      "fr": "Rougeot = 10 000 francs CFA, du nom de la couleur rougeâtre du billet. Terme du nouchi pour cette dénomination courante."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "argent",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_103",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BARFILS",
+    "answer_normalized": "barfils",
+    "letters_pool": [
+      "B",
+      "A",
+      "R",
+      "F",
+      "I",
+      "L",
+      "S"
+    ],
+    "riddle": {
+      "fr": "Entre mille cinq cents : la transaction d'équilibre dans le marché du soir."
+    },
+    "explanation": {
+      "fr": "Barfils = 1 500 francs CFA au cœur de la transaction urbaine. Terme contracté du nouchi, orthographe « Bar-fils »."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "argent",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_104",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "PIERRE",
+    "answer_normalized": "pierre",
+    "letters_pool": [
+      "P",
+      "I",
+      "E",
+      "R",
+      "R",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Je suis ce que les sages accumulent et ce que les pauvres rêvent de posséder."
+    },
+    "explanation": {
+      "fr": "Pierre = l'argent, la fortune dans le langage du nouchi (« avoir pierre » = avoir de l'argent). Attention : le sens nouchi diffère complètement du mot français courant (objet minéral) — c'est un usage métaphorique urbain."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "argent",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_105",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "JETON",
+    "answer_normalized": "jeton",
+    "letters_pool": [
+      "J",
+      "E",
+      "T",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Ce que le maquignon demande avant de te servir son riz sauce."
+    },
+    "explanation": {
+      "fr": "Jeton = l'argent, la thune dans le nouchi urbain (« avoir jeton » = avoir de l'argent). Monnaie d'échange du quotidien abidjanais."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "argent",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_106",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBOLOZAILLI",
+    "answer_normalized": "gbolozailli",
+    "letters_pool": [
+      "G",
+      "B",
+      "O",
+      "L",
+      "O",
+      "Z",
+      "A",
+      "I",
+      "L",
+      "L",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Imposant comme une montagne de muscle, capable de soulever une voiture seul."
+    },
+    "explanation": {
+      "fr": "Gbolozailli = gros, massif, très musclé dans le nouchi urbain. Physique impressionnant et puissant, ton admiratif."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "personne",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_107",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GAWA",
+    "answer_normalized": "gawa",
+    "letters_pool": [
+      "G",
+      "A",
+      "W",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Le style d'hier qui n'a plus sa place sur le boulevard aujourd'hui."
+    },
+    "explanation": {
+      "fr": "Gawa = ringard, démodé dans le nouchi urbain. Celui dont la mode a vieilli, qui ne suit plus les tendances."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "attitude",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_108",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "WAHA",
+    "answer_normalized": "waha",
+    "letters_pool": [
+      "W",
+      "A",
+      "H",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Elle marche comme avant, porte les mêmes habits depuis une décennie."
+    },
+    "explanation": {
+      "fr": "Waha = personne démodée, ringarde dans le nouchi urbain. Cellui qui n'a pas suivi l'évolution des styles et manières."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_109",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FIENGAL",
+    "answer_normalized": "fiengal",
+    "letters_pool": [
+      "F",
+      "I",
+      "E",
+      "N",
+      "G",
+      "A",
+      "L"
+    ],
+    "riddle": {
+      "fr": "Maigre comme un fil, presque transparent : le vent pourrait l'emporter."
+    },
+    "explanation": {
+      "fr": "Fiengal = maigrichon, très mince dans le nouchi urbain. Morphologie frêle et délicate, souvent avec une touche d'humour léger."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_110",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SEKPEL",
+    "answer_normalized": "sekpel",
+    "letters_pool": [
+      "S",
+      "E",
+      "K",
+      "P",
+      "E",
+      "L"
+    ],
+    "riddle": {
+      "fr": "Léger comme une plume dans les bras : rien que des os."
+    },
+    "explanation": {
+      "fr": "Sekpel = poids plume, maigrichon dans le nouchi urbain. Celui qui n'a pas une once de graisse, très mince."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_111",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ZOTA",
+    "answer_normalized": "zota",
+    "letters_pool": [
+      "Z",
+      "O",
+      "T",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Regardez-la passer : elle captive tous les yeux sur le trottoir."
+    },
+    "explanation": {
+      "fr": "Zota = belle, jolie (au féminin) dans le nouchi urbain. Femme attirante et séduisante, ton admiratif et positif."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_112",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CLINE",
+    "answer_normalized": "cline",
+    "letters_pool": [
+      "C",
+      "L",
+      "I",
+      "N",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Soigné comme un diamant : aucune tache, nickel partout."
+    },
+    "explanation": {
+      "fr": "Cline = propre, bien soigné, nickel dans le nouchi urbain. Celui qui porte attention à son apparence et son environnement."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "attitude",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_113",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "AGNON",
+    "answer_normalized": "agnon",
+    "letters_pool": [
+      "A",
+      "G",
+      "N",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "On les porte du matin au soir : sa robe, son costume, son élégance."
+    },
+    "explanation": {
+      "fr": "Agnon = les habits, les vêtements dans le nouchi urbain. Ce qui habille le corps, symbole de style et d'identité."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "objet",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_114",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TCHOUZE",
+    "answer_normalized": "tchouze",
+    "letters_pool": [
+      "T",
+      "C",
+      "H",
+      "O",
+      "U",
+      "Z",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Aux pieds du guerrier urbain : sa fierté et son assurance à chaque marche."
+    },
+    "explanation": {
+      "fr": "Tchouze = les chaussures, les godasses dans le nouchi urbain. Accessoire essentiel de style et de déplacement."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "objet",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_115",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CHACOTO",
+    "answer_normalized": "chacoto",
+    "letters_pool": [
+      "C",
+      "H",
+      "A",
+      "C",
+      "O",
+      "T",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Discret sous la chemise : ce qu'on ne montre pas au marché mais qui compte."
+    },
+    "explanation": {
+      "fr": "Chacoto = un caleçon, un sous-vêtement dans le nouchi urbain. Terme léger et comique pour ce basique de l'intimité."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "objet",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_116",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BEZE",
+    "answer_normalized": "beze",
+    "letters_pool": [
+      "B",
+      "E",
+      "Z",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Trois pièces parfaites pour la soirée au restaurant : le jour où on impressionne."
+    },
+    "explanation": {
+      "fr": "Beze = un costume, une tenue habillée dans le nouchi urbain. L'habit de prestige et d'élégance pour les occasions."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "objet",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_117",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "PUISSANT",
+    "answer_normalized": "puissant",
+    "letters_pool": [
+      "P",
+      "U",
+      "I",
+      "S",
+      "S",
+      "A",
+      "N",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Il entre dans la rue et les regards se fixent : élégance et séduction incarnées."
+    },
+    "explanation": {
+      "fr": "Puissant = beau, séduisant, qui a de l'allure et du succès dans le nouchi urbain. Attention : le sens nouchi diffère totalement du mot français (capacité physique) — c'est un usage admiratif pour la beauté et l'ascendant social."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_118",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BORLAI",
+    "answer_normalized": "borlai",
+    "letters_pool": [
+      "B",
+      "O",
+      "R",
+      "L",
+      "A",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Il ne comprend rien aux codes de la rue : naïf comme un enfant."
+    },
+    "explanation": {
+      "fr": "Borlai = ignorant, naïf, pas dégourdi dans le nouchi urbain. Terme synonyme de « gaou », celui qui ne manie pas les subtilités sociales."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_119",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GNAKOUE",
+    "answer_normalized": "gnakoue",
+    "letters_pool": [
+      "G",
+      "N",
+      "A",
+      "K",
+      "O",
+      "U",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Il marche sur les cracks du trottoir : pas les plus vif d'esprit du quartier."
+    },
+    "explanation": {
+      "fr": "Gnakoue = ignorant, naïf, un peu bête dans le nouchi urbain. Terme léger et bon enfant, synonyme de « gaou », sans méchanceté."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_120",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BABIE",
+    "answer_normalized": "babie",
+    "letters_pool": [
+      "B",
+      "A",
+      "B",
+      "I",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Pas très malin, juste assez pour rire avec lui sans le blesser."
+    },
+    "explanation": {
+      "fr": "Babie = imbécile, un peu bête dans le nouchi urbain. Terme léger et comique, sans intention cruelle, pour décrire une naïveté amusante."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_121",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "LACROU",
+    "answer_normalized": "lacrou",
+    "letters_pool": [
+      "L",
+      "A",
+      "C",
+      "R",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "N'a jamais ouvert un livre : le monde des lettres lui est fermé."
+    },
+    "explanation": {
+      "fr": "Lacrou = inculte, illettré, sans instruction dans le nouchi urbain. Celui que l'école n'a pas atteint ou qui refuse le savoir formel."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_122",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "AKPASMANDI",
+    "answer_normalized": "akpasmandi",
+    "letters_pool": [
+      "A",
+      "K",
+      "P",
+      "A",
+      "S",
+      "M",
+      "A",
+      "N",
+      "D",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Elle colporte des mensonges empoisonnés : la médisance est son commerce préféré."
+    },
+    "explanation": {
+      "fr": "Akpasmandi = personne qui colporte des ragots méchants dans le nouchi urbain. Celle qui invente et amplifie les rumeurs pour nuire."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "personne",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_123",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ZEKINAN",
+    "answer_normalized": "zekinan",
+    "letters_pool": [
+      "Z",
+      "E",
+      "K",
+      "I",
+      "N",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Les poings levés, toujours prêt à en découdre : la bagarre est son sport."
+    },
+    "explanation": {
+      "fr": "Zekinan = bagarreur, personne qui cherche la bagarre dans le nouchi urbain. Celui qui règle ses conflits par la violence."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_124",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GRANDO",
+    "answer_normalized": "grando",
+    "letters_pool": [
+      "G",
+      "R",
+      "A",
+      "N",
+      "D",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Aîné respecté du quartier : celui qu'on écoute et qu'on honore."
+    },
+    "explanation": {
+      "fr": "Grando = grand frère, aîné respecté dans le nouchi urbain. Figure d'autorité bienveillante et de sagesse transmise par l'expérience."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_125",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KPEKPERO",
+    "answer_normalized": "kpekpero",
+    "letters_pool": [
+      "K",
+      "P",
+      "E",
+      "K",
+      "P",
+      "E",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Plus jeune et timide : il suit son mentor dans les pas."
+    },
+    "explanation": {
+      "fr": "Kpekpero = petit frère, protégé dans le nouchi urbain. Celui qui apprend aux côtés d'un plus expérimenté, relation d'apprentissage respectueuse."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_126",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KOBO",
+    "answer_normalized": "kobo",
+    "letters_pool": [
+      "K",
+      "O",
+      "B",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Celui qu'on appelle avec tendresse le soir et le matin."
+    },
+    "explanation": {
+      "fr": "Kobo = papa, terme affectueux dans le nouchi urbain. Référence bienveillante au père ou à une figure paternelle."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_127",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MIFA",
+    "answer_normalized": "mifa",
+    "letters_pool": [
+      "M",
+      "I",
+      "F",
+      "A"
+    ],
+    "riddle": {
+      "fr": "La tribu qui partage le repas et les secrets de la maison."
+    },
+    "explanation": {
+      "fr": "Mifa = la famille dans le nouchi urbain. Le collectif des proches qui vous protègent et vous aident."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_128",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "AWOULI",
+    "answer_normalized": "awouli",
+    "letters_pool": [
+      "A",
+      "W",
+      "O",
+      "U",
+      "L",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Celui qu'on salue avec un sourire complice au coin de la rue."
+    },
+    "explanation": {
+      "fr": "Awouli = mon cher, mon ami dans le nouchi urbain. Terme d'affection et de camaraderie envers un proche."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_129",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "OUEGNIN",
+    "answer_normalized": "ouegnin",
+    "letters_pool": [
+      "O",
+      "U",
+      "E",
+      "G",
+      "N",
+      "I",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Inséparable depuis dix ans : l'ami confident qui connaît tous tes secrets."
+    },
+    "explanation": {
+      "fr": "Ouegnin = ami confident, inséparable dans le nouchi urbain. Celui à qui on confie tout, le compagnon de tous les jours."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_130",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJANTERMAN",
+    "answer_normalized": "djanterman",
+    "letters_pool": [
+      "D",
+      "J",
+      "A",
+      "N",
+      "T",
+      "E",
+      "R",
+      "M",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Les cheveux peignés, le complet sans pli : il est venu impressionner le quartier."
+    },
+    "explanation": {
+      "fr": "Djanterman = homme stylé, bien sapé dans le nouchi urbain. Celui qui maîtrise l'art de la présentation élégante, emprunt anglais « man »."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "personne",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_131",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJAGUE",
+    "answer_normalized": "djague",
+    "letters_pool": [
+      "D",
+      "J",
+      "A",
+      "G",
+      "U",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Elle lui tient la main au marché : l'amour nouchi existe."
+    },
+    "explanation": {
+      "fr": "Djague = copine, petite amie dans le nouchi urbain. La femme avec qui on partage son cœur et son quotidien."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_132",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BABI",
+    "answer_normalized": "babi",
+    "letters_pool": [
+      "B",
+      "A",
+      "B",
+      "I"
+    ],
+    "riddle": {
+      "fr": "La reine des marchés, le cœur battant du commerce urbain."
+    },
+    "explanation": {
+      "fr": "Babi = surnom affectueux d'Abidjan dans le nouchi urbain. La ville-mère, symbole de richesse et d'opportunités."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "lieu",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_133",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BOYORODJAN",
+    "answer_normalized": "boyorodjan",
+    "letters_pool": [
+      "B",
+      "O",
+      "Y",
+      "O",
+      "R",
+      "O",
+      "D",
+      "J",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Venu de loin, les mœurs différentes : celui qu'on reconnaît à ses accents étrangers."
+    },
+    "explanation": {
+      "fr": "Boyorodjan = étranger (au sens large) dans le nouchi urbain. Celui d'ailleurs, de culture ou pays différent, sans péjoratif."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "personne",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_134",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MONO",
+    "answer_normalized": "mono",
+    "letters_pool": [
+      "M",
+      "O",
+      "N",
+      "O"
+    ],
+    "riddle": {
+      "fr": "L'uniforme sombre qui fait baisser les yeux des enfants de la rue."
+    },
+    "explanation": {
+      "fr": "Mono = policier, gendarme ou militaire (homme en uniforme) dans le nouchi urbain. Figure d'autorité souvent redoutée dans les quartiers."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "personne",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_135",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "AWANAN",
+    "answer_normalized": "awanan",
+    "letters_pool": [
+      "A",
+      "W",
+      "A",
+      "N",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Ses poches sont vides et son cœur aussi : il ne donne jamais rien."
+    },
+    "explanation": {
+      "fr": "Awanan = avare, radin dans le nouchi urbain. Celui qui retient son argent avec un poing de fer, sans générosité."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_136",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DANGEREUX",
+    "answer_normalized": "dangereux",
+    "letters_pool": [
+      "D",
+      "A",
+      "N",
+      "G",
+      "E",
+      "R",
+      "E",
+      "U",
+      "X"
+    ],
+    "riddle": {
+      "fr": "Il traverse la rue et le cœur s'arrête : trop séduisant pour la tranquillité."
+    },
+    "explanation": {
+      "fr": "Dangereux = beau, séduisant, qui plaît beaucoup dans le nouchi urbain. Attention : le sens nouchi diffère radicalement du français standard (qui cause du danger) — c'est un usage admiratif pour désigner une personne extrêmement attirante."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 30,
+    "tags": [
+      "personne",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_137",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "WAWAYOU",
+    "answer_normalized": "wawayou",
+    "letters_pool": [
+      "W",
+      "A",
+      "W",
+      "A",
+      "Y",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Admirée par les foules, vedette du quartier : l'idole qu'on crie."
+    },
+    "explanation": {
+      "fr": "Wawayou = idole, star adulée dans le nouchi urbain. Celle ou celui qui brille et que tout le monde regarde passer."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_138",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ATOTO",
+    "answer_normalized": "atoto",
+    "letters_pool": [
+      "A",
+      "T",
+      "O",
+      "T",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Je suis celui qui revient sans corps dans les ténèbres d'Abidjan."
+    },
+    "explanation": {
+      "fr": "Atoto = un revenant, un fantôme (registre léger, surnaturel sans être effrayant). Présence invisible qui apparaît dans le quotidien urbain ivoirien."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "objet",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_139",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BROBRO",
+    "answer_normalized": "brobro",
+    "letters_pool": [
+      "B",
+      "R",
+      "O",
+      "B",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Trimmer sans relâche pour s'échapper de la misère quotidienne."
+    },
+    "explanation": {
+      "fr": "Brobro = chercher, travailler dur pour s'en sortir. Effort intense de survie économique dans la rue d'Abidjan."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_140",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GRIGALI",
+    "answer_normalized": "grigali",
+    "letters_pool": [
+      "G",
+      "R",
+      "I",
+      "G",
+      "A",
+      "L",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Le petit commerce précaire des rues d'Abidjan : survivre par les bouts."
+    },
+    "explanation": {
+      "fr": "Grigali = la débrouille, le petit travail précaire. Petit boulot informel, économie de survie du quartier populaire."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_141",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GRIGRA",
+    "answer_normalized": "grigra",
+    "letters_pool": [
+      "G",
+      "R",
+      "I",
+      "G",
+      "R",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Lutter au quotidien pour rester debout malgré les obstacles."
+    },
+    "explanation": {
+      "fr": "Grigra = se débrouiller pour survivre (forme familière de Grigali). Lutte quotidienne dans les conditions précaires."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_142",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CHERCHEMENT",
+    "answer_normalized": "cherchement",
+    "letters_pool": [
+      "C",
+      "H",
+      "E",
+      "R",
+      "C",
+      "H",
+      "E",
+      "M",
+      "E",
+      "N",
+      "T"
+    ],
+    "riddle": {
+      "fr": "La quête perpétuelle de survie dans les rues chaudes de la lagune."
+    },
+    "explanation": {
+      "fr": "Cherchement = la débrouille, la recherche quotidienne de survie. Attitude constante face aux défis économiques urbains."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": [
+      "action",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_143",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBAGBOTER",
+    "answer_normalized": "gbagboter",
+    "letters_pool": [
+      "G",
+      "B",
+      "A",
+      "G",
+      "B",
+      "O",
+      "T",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Avaler les kilomètres à pied sous le soleil brûlant du pays."
+    },
+    "explanation": {
+      "fr": "Gbagboter = marcher longtemps, avaler les kilomètres à pied. Parcourir de grandes distances dans les conditions difficiles du quotidien ivoirien."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": [
+      "action",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_144",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "PANTOUGOULER",
+    "answer_normalized": "pantougouler",
+    "letters_pool": [
+      "P",
+      "A",
+      "N",
+      "T",
+      "O",
+      "U",
+      "G",
+      "O",
+      "U",
+      "L",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "S'évaporer rapidement quand le danger rôde dans la rue."
+    },
+    "explanation": {
+      "fr": "Pantougouler = fuir, s'échapper précipitamment. Départ en vitesse pour échapper à une situation compliquée."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 33,
+    "tags": [
+      "action",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_145",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MOUILLER",
+    "answer_normalized": "mouiller",
+    "letters_pool": [
+      "M",
+      "O",
+      "U",
+      "I",
+      "L",
+      "L",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Trembler devant les risques, la peur prend tout le corps."
+    },
+    "explanation": {
+      "fr": "Mouiller = avoir peur (nouchi). Attention : le sens nouchi diffère totalement du verbe français standard (être trempé) — c'est la peur viscérale qui domine."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "emotion",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_146",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MOUILLEUR",
+    "answer_normalized": "mouilleur",
+    "letters_pool": [
+      "M",
+      "O",
+      "U",
+      "I",
+      "L",
+      "L",
+      "E",
+      "U",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Celui qui tremble devant tout, le trouillard de la bande."
+    },
+    "explanation": {
+      "fr": "Mouilleur = froussard, trouillard (dérivé de Mouiller). Personne qui a peur facilement et manque de courage."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": [
+      "personne",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_147",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "YOHI",
+    "answer_normalized": "yohi",
+    "letters_pool": [
+      "Y",
+      "O",
+      "H",
+      "I"
+    ],
+    "riddle": {
+      "fr": "La peur qui saisit le cœur quand la nuit tombe sur Abidjan."
+    },
+    "explanation": {
+      "fr": "Yohi = avoir peur, trembler. État de frayeur immédiate face au danger."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "emotion",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_148",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DEGBA",
+    "answer_normalized": "degba",
+    "letters_pool": [
+      "D",
+      "E",
+      "G",
+      "B",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Écrasé par les murs, le cœur n'a plus d'espoir aujourd'hui."
+    },
+    "explanation": {
+      "fr": "Degba = déçu, découragé, dépité. État de découragement total face aux déboires de la vie urbaine."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "emotion",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_149",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DEGAMMER",
+    "answer_normalized": "degammer",
+    "letters_pool": [
+      "D",
+      "E",
+      "G",
+      "A",
+      "M",
+      "M",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Exploser de colère sous le poids des injustices quotidiennes."
+    },
+    "explanation": {
+      "fr": "Degammer = s'énerver, tempêter. Accès de rage contre une situation intolérable."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "emotion",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_150",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TOLO",
+    "answer_normalized": "tolo",
+    "letters_pool": [
+      "T",
+      "O",
+      "L",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Le coup sec de la main sur la joue du malveillant."
+    },
+    "explanation": {
+      "fr": "Tolo = gifler (violence légère dans le ton nouchi, registre établi avec CHICOTTER/KPATRA/PATAPATA). Coup direct du revers."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_151",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BATARISER",
+    "answer_normalized": "batariser",
+    "letters_pool": [
+      "B",
+      "A",
+      "T",
+      "A",
+      "R",
+      "I",
+      "S",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Voler l'argent d'autrui par la ruse et le mensonge urbain."
+    },
+    "explanation": {
+      "fr": "Batariser = escroquer, arnaquer. Forme sophistiquée de vol par la tromperie (3e synonyme avec COUPER/LOGER)."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": [
+      "action",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_152",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DEBALOU",
+    "answer_normalized": "debalou",
+    "letters_pool": [
+      "D",
+      "E",
+      "B",
+      "A",
+      "L",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Prendre sans demander ce qui ne m'appartient pas : le larcin."
+    },
+    "explanation": {
+      "fr": "Debalou = voler, dérober (2e synonyme de vol avec Maga). Appropriation discrète d'objets dans la rue d'Abidjan."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_153",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DEBALOUSSEUR",
+    "answer_normalized": "debalousseur",
+    "letters_pool": [
+      "D",
+      "E",
+      "B",
+      "A",
+      "L",
+      "O",
+      "U",
+      "S",
+      "S",
+      "E",
+      "U",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Celui qui pique dans les poches des autres avec adresse et silence."
+    },
+    "explanation": {
+      "fr": "Debalousseur = voleur, chapardeur (dérivé de Debalou). Spécialiste du vol mineur qui opère dans les foules de Treichville."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 33,
+    "tags": [
+      "personne",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_154",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TCHOUN",
+    "answer_normalized": "tchoun",
+    "letters_pool": [
+      "T",
+      "C",
+      "H",
+      "O",
+      "U",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Surprendre quelqu'un en pleine mauvaise action, pris sur le fait."
+    },
+    "explanation": {
+      "fr": "Tchoun = choper quelqu'un en flagrant délit. Interception rapide du malfaiteur surpris en action."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_155",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SIRI",
+    "answer_normalized": "siri",
+    "letters_pool": [
+      "S",
+      "I",
+      "R",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Saisir vite celui qui essaie de s'enfuir dans le marché."
+    },
+    "explanation": {
+      "fr": "Siri = attraper, choper (verbe court et direct). Prise rapide d'une personne ou d'un objet."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_156",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KROU",
+    "answer_normalized": "krou",
+    "letters_pool": [
+      "K",
+      "R",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Mettre en secret loin des regards curieux et des envieux."
+    },
+    "explanation": {
+      "fr": "Krou = cacher, dissimuler. Masquer quelque chose des autres pour le protéger."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "action",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_157",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DECROU",
+    "answer_normalized": "decrou",
+    "letters_pool": [
+      "D",
+      "E",
+      "C",
+      "R",
+      "O",
+      "U"
+    ],
+    "riddle": {
+      "fr": "Chercher et trouver ce qui était caché, le révéler enfin."
+    },
+    "explanation": {
+      "fr": "Decrou = trouver, dénicher, découvrir (contraire de Krou). Révélation d'un secret."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_158",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBASSER",
+    "answer_normalized": "gbasser",
+    "letters_pool": [
+      "G",
+      "B",
+      "A",
+      "S",
+      "S",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Lancer une malédiction par le marabout pour ruiner l'ennemi."
+    },
+    "explanation": {
+      "fr": "Gbasser = envoûter, jeter un sort, ensorceler (thème maraboutage). Invocation mystique contre un adversaire."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_159",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBASSEUR",
+    "answer_normalized": "gbasseur",
+    "letters_pool": [
+      "G",
+      "B",
+      "A",
+      "S",
+      "S",
+      "E",
+      "U",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Le maître du mystère qui lance les sorts de la nuit sacrée."
+    },
+    "explanation": {
+      "fr": "Gbasseur = le féticheur, le sorcier (dérivé de Gbasser). Praticien du maraboutage respecté et craint."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "personne",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_160",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CADENASSER",
+    "answer_normalized": "cadenasser",
+    "letters_pool": [
+      "C",
+      "A",
+      "D",
+      "E",
+      "N",
+      "A",
+      "S",
+      "S",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Enfermer par le pouvoir occulte du marabout dans les ténèbres."
+    },
+    "explanation": {
+      "fr": "Cadenasser = envoûter, ensorceler par magie (2e verbe d'ensorcellement avec Gbasser). Enchantement urbain du pays."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": [
+      "action",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_161",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KAPA",
+    "answer_normalized": "kapa",
+    "letters_pool": [
+      "K",
+      "A",
+      "P",
+      "A"
+    ],
+    "riddle": {
+      "fr": "L'amulette cachée au cou qui protège de tout malheur sacré."
+    },
+    "explanation": {
+      "fr": "Kapa = un fétiche, un gris-gris protecteur (thème maraboutage). Objet magique de protection personnelle."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": [
+      "objet",
+      "mainstream"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_162",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJAFOULE",
+    "answer_normalized": "djafoule",
+    "letters_pool": [
+      "D",
+      "J",
+      "A",
+      "F",
+      "O",
+      "U",
+      "L",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Tout donner avec exubérance pour épater la galerie d'Abidjan."
+    },
+    "explanation": {
+      "fr": "Djafoule = tout donner, impressionner à fond. Générosité spectaculaire pour briller en société."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_163",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FONGNON",
+    "answer_normalized": "fongnon",
+    "letters_pool": [
+      "F",
+      "O",
+      "N",
+      "G",
+      "N",
+      "O",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Se pavaner avec orgueil et superbe dans le quartier prestigieux."
+    },
+    "explanation": {
+      "fr": "Fongnon = frimer, se donner des airs. Attitude hautaine et suffisante du malin urbain."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "attitude",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_164",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "PRODADA",
+    "answer_normalized": "prodada",
+    "letters_pool": [
+      "P",
+      "R",
+      "O",
+      "D",
+      "A",
+      "D",
+      "A"
+    ],
+    "riddle": {
+      "fr": "Le gâchis clinquant de celui qui jette l'or par la fenêtre."
+    },
+    "explanation": {
+      "fr": "Prodada = le gaspillage, la frime, le gâchis ostentateur. Dépense spectaculaire sans sens pour paraître riche."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "attitude",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_165",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "COUMAN",
+    "answer_normalized": "couman",
+    "letters_pool": [
+      "C",
+      "O",
+      "U",
+      "M",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Bavarder sans fin sur les secrets du quartier et des amis."
+    },
+    "explanation": {
+      "fr": "Couman = parler, bavarder. Conversation bavarde du carrefour ou du maquis d'Abidjan."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_166",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJABACAROL",
+    "answer_normalized": "djabacarol",
+    "letters_pool": [
+      "D",
+      "J",
+      "A",
+      "B",
+      "A",
+      "C",
+      "A",
+      "R",
+      "O",
+      "L"
+    ],
+    "riddle": {
+      "fr": "Discuter à n'en plus finir pour régler les litiges du clan."
+    },
+    "explanation": {
+      "fr": "Djabacarol = causer, discuter (long mot de 10 lettres). Dialogue sérieux pour résoudre les tensions urbaines."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 33,
+    "tags": [
+      "action",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_167",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BINBEHAN",
+    "answer_normalized": "binbehan",
+    "letters_pool": [
+      "B",
+      "I",
+      "N",
+      "B",
+      "E",
+      "H",
+      "A",
+      "N"
+    ],
+    "riddle": {
+      "fr": "Baratiner avec charme pour faire plier la volonté d'autrui."
+    },
+    "explanation": {
+      "fr": "Binbehan = enjôler, baratiner pour convaincre. Art de la persuasion par la flaterie et le beau parlé."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_168",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MOULER",
+    "answer_normalized": "mouler",
+    "letters_pool": [
+      "M",
+      "O",
+      "U",
+      "L",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Swinguer au rythme endiablé de la musique abidjanaise enflammée."
+    },
+    "explanation": {
+      "fr": "Mouler = danser (nouchi). Attention : le verbe français standard (donner une forme) diffère totalement — c'est la danse urbaine qui prime ici."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_169",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "AMBIANCER",
+    "answer_normalized": "ambiancer",
+    "letters_pool": [
+      "A",
+      "M",
+      "B",
+      "I",
+      "A",
+      "N",
+      "C",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Mettre la salle en transe avec le rythme brûlant des tam-tams."
+    },
+    "explanation": {
+      "fr": "Ambiancer = mettre de l'ambiance, chauffer la salle. Créer une atmosphère électrique au maquis ou à la soirée."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": [
+      "action",
+      "hardcore"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_170",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CHAUFFER",
+    "answer_normalized": "chauffer",
+    "letters_pool": [
+      "C",
+      "H",
+      "A",
+      "U",
+      "F",
+      "F",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Faire la fête toute la nuit sans s'arrêter au maquis."
+    },
+    "explanation": {
+      "fr": "Chauffer = faire la fête, chauffer l'ambiance (famille avec Chaud). Prolonger le plaisir jusqu'à l'aube."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_171",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MOUSSER",
+    "answer_normalized": "mousser",
+    "letters_pool": [
+      "M",
+      "O",
+      "U",
+      "S",
+      "S",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Être en vogue, connaître le succès au cœur de la ville."
+    },
+    "explanation": {
+      "fr": "Mousser = avoir du succès, être en vogue, cartonner (nouchi). Attention : le verbe français (faire de la mousse) n'a aucun rapport — c'est le succès social qui compte ici."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_172",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BREQUER",
+    "answer_normalized": "brequer",
+    "letters_pool": [
+      "B",
+      "R",
+      "E",
+      "Q",
+      "U",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Séduire adroitement celui qui plaît au détour du marché."
+    },
+    "explanation": {
+      "fr": "Brequer = draguer, chercher à séduire. Jeu de séduction urbain du carrefour abidjanais."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_173",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BOMBER",
+    "answer_normalized": "bomber",
+    "letters_pool": [
+      "B",
+      "O",
+      "M",
+      "B",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "Attraper celui qui tente de s'enfuir dans la foule compacte."
+    },
+    "explanation": {
+      "fr": "Bomber = attraper, choper quelqu'un (nouchi). Attention : le sens nouchi diffère du français standard (revêtement de vêtement) — c'est l'interception qui prime."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_174",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "JAMPER",
+    "answer_normalized": "jamper",
+    "letters_pool": [
+      "J",
+      "A",
+      "M",
+      "P",
+      "E",
+      "R"
+    ],
+    "riddle": {
+      "fr": "S'élancer haut et loin dans un mouvement d'envol rapide."
+    },
+    "explanation": {
+      "fr": "Jamper = sauter (emprunt anglais 'jump'). Mouvement brusque vers le haut ou l'avant."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": [
+      "action",
+      "intermediaire"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_175",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BORI",
+    "answer_normalized": "bori",
+    "letters_pool": ["B","O","R","I"],
+    "riddle": {"fr": "J'ai besoin de rapidité pour attraper le bus au carrefour."},
+    "explanation": {"fr": "Bori = courir (verbe d'action nouchi). Mouvement rapide dans le quotidien urbain abidjanais."},
+    "difficulty": 1,
+    "estimated_time_s": 22,
+    "tags": ["action", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_176",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBOSSO",
+    "answer_normalized": "gbosso",
+    "letters_pool": ["G","B","O","S","S","O"],
+    "riddle": {"fr": "Je trace les mots sur le papier pour garder la trace."},
+    "explanation": {"fr": "Gbosso = écrire (verbe nouchi). Acte de former des caractères sur une surface."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["action", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_177",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KLOIKLOI",
+    "answer_normalized": "kloikloi",
+    "letters_pool": ["K","L","O","I","K","L","O","I"],
+    "riddle": {"fr": "Sorti de l'usine, tout brille sans une égratignure."},
+    "explanation": {"fr": "Kloikloi = neuf, flambant neuf (adjectif). Marchandise en parfait état, pas encore utilisée."},
+    "difficulty": 2,
+    "estimated_time_s": 27,
+    "tags": ["attitude", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_178",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ORIDJIDJI",
+    "answer_normalized": "oridjidji",
+    "letters_pool": ["O","R","I","D","J","I","D","J","I"],
+    "riddle": {"fr": "Vrai de vrai, garanti sans contrefaçon au marché."},
+    "explanation": {"fr": "Oridjidji = authentique, vrai de vrai, original (adjectif). Produit certifié, pas une imitation."},
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": ["attitude", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_179",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TCHOKOTCHOKO",
+    "answer_normalized": "tchokotchoko",
+    "letters_pool": ["T","C","H","O","K","O","T","C","H","O","K","O"],
+    "riddle": {"fr": "Coûte que coûte, il faut le faire absolument."},
+    "explanation": {"fr": "Tchokotchoko = à coup sûr, absolument, coûte que coûte (expression). Détermination sans faille, pas de compromis."},
+    "difficulty": 3,
+    "estimated_time_s": 33,
+    "tags": ["expression", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_180",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBRA",
+    "answer_normalized": "gbra",
+    "letters_pool": ["G","B","R","A"],
+    "riddle": {"fr": "Je quitte le véhicule arrivé à destination."},
+    "explanation": {"fr": "Gbra = descendre d'un véhicule (verbe). Action de quitter un car ou un taxi."},
+    "difficulty": 1,
+    "estimated_time_s": 21,
+    "tags": ["action", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_181",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SERRER",
+    "answer_normalized": "serrer",
+    "letters_pool": ["S","E","R","R","E","R"],
+    "riddle": {"fr": "Je laisse ma voiture en stationnement dans la rue."},
+    "explanation": {"fr": "Serrer = garer, stationner un véhicule (verbe nouchi). Attention : le sens nouchi diffère du verbe français standard (comprimer) — c'est le stationnement qui prime ici."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["action", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_182",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBROUGBRAN",
+    "answer_normalized": "gbrougbran",
+    "letters_pool": ["G","B","R","O","U","G","B","R","A","N"],
+    "riddle": {"fr": "Tout est sens dessus dessous, l'ordre est perturbé."},
+    "explanation": {"fr": "Gbrougbran = mélanger, mettre le désordre, perturber (verbe). État de chaos complet."},
+    "difficulty": 3,
+    "estimated_time_s": 34,
+    "tags": ["action", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_183",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DESCIENCER",
+    "answer_normalized": "desciencer",
+    "letters_pool": ["D","E","S","C","I","E","N","C","E","R"],
+    "riddle": {"fr": "Faire honte publiquement, ridiculiser devant tous."},
+    "explanation": {"fr": "Desciencer = humilier, ridiculiser publiquement (verbe). Acte d'embarras social intentionnel."},
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": ["action", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_184",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DAYE",
+    "answer_normalized": "daye",
+    "letters_pool": ["D","A","Y","E"],
+    "riddle": {"fr": "Les effets de l'alcool m'ont rendu malade."},
+    "explanation": {"fr": "Daye = être ivre, être soûl (adjectif/état). Registre factuel, état causé par l'alcool."},
+    "difficulty": 1,
+    "estimated_time_s": 23,
+    "tags": ["emotion", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_185",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FATALI",
+    "answer_normalized": "fatali",
+    "letters_pool": ["F","A","T","A","L","I"],
+    "riddle": {"fr": "Le projet a connu une débâcle totale et irrémédiable."},
+    "explanation": {"fr": "Fatali = une chute, un échec, un fiasco (nom). Effondrement d'un plan ou d'une entreprise."},
+    "difficulty": 2,
+    "estimated_time_s": 27,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_186",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TCHAPA",
+    "answer_normalized": "tchapa",
+    "letters_pool": ["T","C","H","A","P","A"],
+    "riddle": {"fr": "Se pavaner avec ses habits neufs dans la rue."},
+    "explanation": {"fr": "Tchapa = frimer, se vanter exagérément (verbe). Arrogance urbaine affichée publiquement."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["attitude", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_187",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BROUTER",
+    "answer_normalized": "brouter",
+    "letters_pool": ["B","R","O","U","T","E","R"],
+    "riddle": {"fr": "Tromper le client pour soutirer son argent en ligne."},
+    "explanation": {"fr": "Brouter = escroquer en ligne (verbe). Fraude numérique. Complète les mots nouchi BROUTEUR et BROUTAGE."},
+    "difficulty": 2,
+    "estimated_time_s": 27,
+    "tags": ["action", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_188",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "WARIKO",
+    "answer_normalized": "wariko",
+    "letters_pool": ["W","A","R","I","K","O"],
+    "riddle": {"fr": "Une transaction louche impliquant des sous."},
+    "explanation": {"fr": "Wariko = une affaire d'argent, une magouille financière (nom). Tractation suspecte pour argent."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["argent", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_189",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "MAGNERAGE",
+    "answer_normalized": "magnerage",
+    "letters_pool": ["M","A","G","N","E","R","A","G","E"],
+    "riddle": {"fr": "Les pourparlers secrets entre deux adversaires."},
+    "explanation": {"fr": "Magnerage = des négociations discrètes, des tractations (nom). Discussions confidentielles et tactiques."},
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": ["action", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_190",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ANAGOLAN",
+    "answer_normalized": "anagolan",
+    "letters_pool": ["A","N","A","G","O","L","A","N"],
+    "riddle": {"fr": "Une supercherie pour tromper l'autre."},
+    "explanation": {"fr": "Anagolan = une tromperie, une arnaque (nom). Acte de duperie intentionnelle."},
+    "difficulty": 2,
+    "estimated_time_s": 27,
+    "tags": ["action", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_191",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBATA",
+    "answer_normalized": "gbata",
+    "letters_pool": ["G","B","A","T","A"],
+    "riddle": {"fr": "Là où j'habite avec ma famille dans le quartier."},
+    "explanation": {"fr": "Gbata = la maison, le quartier (nom). Lieu de résidence et d'appartenance communautaire."},
+    "difficulty": 1,
+    "estimated_time_s": 22,
+    "tags": ["lieu", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_192",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GLOGLO",
+    "answer_normalized": "gloglo",
+    "letters_pool": ["G","L","O","G","L","O"],
+    "riddle": {"fr": "La petite allée étroite qui traverse le bas quartier."},
+    "explanation": {"fr": "Gloglo = un raccourci, une ruelle, un bas quartier (nom). Géographie urbaine des petites venelles."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["lieu", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_193",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBELEDROME",
+    "answer_normalized": "gbeledrome",
+    "letters_pool": ["G","B","E","L","E","D","R","O","M","E"],
+    "riddle": {"fr": "L'établissement où se vend l'alcool local."},
+    "explanation": {"fr": "Gbeledrome = le lieu de vente du gbêlê (alcool local) (nom). Établissement traditionnel ivoirien."},
+    "difficulty": 3,
+    "estimated_time_s": 33,
+    "tags": ["lieu", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_194",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CABINETIGUI",
+    "answer_normalized": "cabinetigui",
+    "letters_pool": ["C","A","B","I","N","E","T","I","G","U","I"],
+    "riddle": {"fr": "Celui qui gère au quartier le petit poste à pièces pour passer un coup de fil."},
+    "explanation": {"fr": "Cabinetigui = opérateur de cabine téléphonique publique (nom). Profession urbaine ancienne (pré-internet). Suffixe dioula -tigui (maître/propriétaire)."},
+    "difficulty": 3,
+    "estimated_time_s": 34,
+    "tags": ["personne", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_195",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GARBATIGUI",
+    "answer_normalized": "garbatigui",
+    "letters_pool": ["G","A","R","B","A","T","I","G","U","I"],
+    "riddle": {"fr": "Le commerçant qui vend l'attiéké-thon au carrefour."},
+    "explanation": {"fr": "Garbatigui = vendeur de garba (attiéké-thon) (nom). Métier de vendeur ambulant. Suffixe dioula -tigui (maître/propriétaire)."},
+    "difficulty": 3,
+    "estimated_time_s": 33,
+    "tags": ["personne", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_196",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KPRASSE",
+    "answer_normalized": "kprasse",
+    "letters_pool": ["K","P","R","A","S","S","E"],
+    "riddle": {"fr": "L'outil aiguisé qui coupe la viande et les légumes."},
+    "explanation": {"fr": "Kprasse = un couteau (nom). Outil neutre du quotidien culinaire."},
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_197",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ANTA",
+    "answer_normalized": "anta",
+    "letters_pool": ["A","N","T","A"],
+    "riddle": {"fr": "L'outil pour défricher et tailler le bois."},
+    "explanation": {"fr": "Anta = une machette (nom). Outil agricole et forestier neutre."},
+    "difficulty": 1,
+    "estimated_time_s": 21,
+    "tags": ["objet", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_198",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJOROKO",
+    "answer_normalized": "djoroko",
+    "letters_pool": ["D","J","O","R","O","K","O"],
+    "riddle": {"fr": "Le bijou qui brille au cou ou au poignet."},
+    "explanation": {"fr": "Djoroko = une chaîne, un collier (nom). Accessoire de valeur urbain."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_199",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KLOIBA",
+    "answer_normalized": "kloiba",
+    "letters_pool": ["K","L","O","I","B","A"],
+    "riddle": {"fr": "L'ustensile utilisé la nuit, dans l'intimité."},
+    "explanation": {"fr": "Kloiba = un pot de chambre, un vase de nuit (nom). Registre léger et comique."},
+    "difficulty": 2,
+    "estimated_time_s": 27,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_200",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GLEOU",
+    "answer_normalized": "gleou",
+    "letters_pool": ["G","L","E","O","U"],
+    "riddle": {"fr": "Le livre qui contient tous les mots avec leurs sens."},
+    "explanation": {"fr": "Gleou = un dictionnaire (nom). Mot méta amusant pour ce pack de nouchi !"},
+    "difficulty": 1,
+    "estimated_time_s": 22,
+    "tags": ["objet", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_201",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "AKPANI",
+    "answer_normalized": "akpani",
+    "letters_pool": ["A","K","P","A","N","I"],
+    "riddle": {"fr": "L'animal volant qui sort à la tombée du jour."},
+    "explanation": {"fr": "Akpani = une chauve-souris (nom). Nom d'animal nocturne."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_202",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BUCHETTE",
+    "answer_normalized": "buchette",
+    "letters_pool": ["B","U","C","H","E","T","T","E"],
+    "riddle": {"fr": "Le petit bâton qui s'enflamme pour allumer du feu."},
+    "explanation": {"fr": "Buchette = une allumette (nom). Outil de feu quotidien."},
+    "difficulty": 2,
+    "estimated_time_s": 27,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_203",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BOUROU",
+    "answer_normalized": "bourou",
+    "letters_pool": ["B","O","U","R","O","U"],
+    "riddle": {"fr": "La pâte cuite qui nourrit les foules chaque matin."},
+    "explanation": {"fr": "Bourou = le pain (nom). Aliment de base du quotidien ivoirien."},
+    "difficulty": 2,
+    "estimated_time_s": 25,
+    "tags": ["nourriture", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_204",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BLISSI",
+    "answer_normalized": "blissi",
+    "letters_pool": ["B","L","I","S","S","I"],
+    "riddle": {"fr": "La banane plantain grillée au charbon de bois."},
+    "explanation": {"fr": "Blissi = la banane braisée (nom). Plat culinaire ivoirien populaire."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["nourriture", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_205",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBOZON",
+    "answer_normalized": "gbozon",
+    "letters_pool": ["G","B","O","Z","O","N"],
+    "riddle": {"fr": "Le gâteau plat et sucré vendu aux carrefours."},
+    "explanation": {"fr": "Gbozon = une galette (nom). Pâtisserie urbaine des rues abidjanaises."},
+    "difficulty": 2,
+    "estimated_time_s": 27,
+    "tags": ["nourriture", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_206",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FROTOMOUGOU",
+    "answer_normalized": "frotomougou",
+    "letters_pool": ["F","R","O","T","O","M","O","U","G","O","U"],
+    "riddle": {"fr": "La poudre brûlante qui relève tous les plats."},
+    "explanation": {"fr": "Frotomougou = la poudre de piment (nom). Épice culinaire essentielle en Côte d'Ivoire."},
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": ["nourriture", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_207",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BALLADUR",
+    "answer_normalized": "balladur",
+    "letters_pool": ["B","A","L","L","A","D","U","R"],
+    "riddle": {"fr": "Le car usé qui roule tant bien que mal."},
+    "explanation": {"fr": "Balladur = un vieux bus, une guimbarde (nom). Transport urbain délabré. Nommé d'après le Premier ministre français Balladur (anecdote culturelle)."},
+    "difficulty": 2,
+    "estimated_time_s": 27,
+    "tags": ["transport", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_208",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BALANCEUR",
+    "answer_normalized": "balanceur",
+    "letters_pool": ["B","A","L","A","N","C","E","U","R"],
+    "riddle": {"fr": "L'assistant qui encaisse l'argent du car public."},
+    "explanation": {"fr": "Balanceur = l'apprenti chauffeur, l'aide du chauffeur de car (nom). Profession urbaine de transport collectif."},
+    "difficulty": 3,
+    "estimated_time_s": 33,
+    "tags": ["personne", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_209",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SIRIKI",
+    "answer_normalized": "siriki",
+    "letters_pool": ["S","I","R","I","K","I"],
+    "riddle": {"fr": "L'appareil portatif qui permet de téléphoner partout."},
+    "explanation": {"fr": "Siriki = un téléphone portable, un cellulaire (nom). Technologie urbaine moderne. Deuxième synonyme nouchi de téléphone avec LALE."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_210",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBELEYA",
+    "answer_normalized": "gbeleya",
+    "letters_pool": ["G","B","E","L","E","Y","A"],
+    "riddle": {"fr": "La condition difficile, l'absence totale de ressources."},
+    "explanation": {"fr": "Gbeleya = la galère, la misère, la pauvreté (nom). État de précarité socioéconomique."},
+    "difficulty": 2,
+    "estimated_time_s": 27,
+    "tags": ["emotion", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_211",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FLOKOL",
+    "answer_normalized": "flokol",
+    "letters_pool": ["F","L","O","K","O","L"],
+    "riddle": {"fr": "La parole qui n'est pas vraie, l'histoire forgée."},
+    "explanation": {"fr": "Flokol = un mensonge (nom). Tromperie verbale. Deuxième synonyme nouchi de mensonge avec PIPO."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["expression", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_212",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DANMANGAN",
+    "answer_normalized": "danmangan",
+    "letters_pool": ["D","A","N","M","A","N","G","A","N"],
+    "riddle": {"fr": "Des mots qui s'envolent légers, sans poids ni substance."},
+    "explanation": {"fr": "Danmangan = paroles en l'air, du bla-bla sans valeur (nom). Propos creux et insignifiants."},
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": ["expression", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_213",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FOUGNRINS",
+    "answer_normalized": "fougnrins",
+    "letters_pool": ["F","O","U","G","N","R","I","N","S"],
+    "riddle": {"fr": "Histoires de vent, contes sans fondement, poudre aux yeux."},
+    "explanation": {"fr": "Fougnrins = des foutaises, des bêtises (nom). Propos trompeurs et mensongers."},
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": ["expression", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_214",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "RAMBAR",
+    "answer_normalized": "rambar",
+    "letters_pool": ["R","A","M","B","A","R"],
+    "riddle": {"fr": "L'obstacle qui entrave, l'embrouille qui bloque tout."},
+    "explanation": {"fr": "Rambar = un problème, une embrouille (nom). Situation confuse et compliquée."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["expression", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_215",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FROUFROU",
+    "answer_normalized": "froufrou",
+    "letters_pool": ["F","R","O","U","F","R","O","U"],
+    "riddle": {"fr": "Le bruit des querelles, le va-et-vient des disputes sans fin."},
+    "explanation": {"fr": "Froufrou = une palabre, un conflit, une embrouille (nom). Dispute animée et conflictuelle."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["expression", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_216",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBAIRE",
+    "answer_normalized": "gbaire",
+    "letters_pool": ["G","B","A","I","R","E"],
+    "riddle": {"fr": "Les rumeurs qui circulent au marché, le bavardage qui colporte."},
+    "explanation": {"fr": "Gbaire = le commérage, le ragot (nom). Rumeur de bouche à oreille en milieu urbain."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["expression", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_217",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "SABABOU",
+    "answer_normalized": "sababou",
+    "letters_pool": ["S","A","B","A","B","O","U"],
+    "riddle": {"fr": "L'arrivée soudaine du succès, la tirer de la loterie."},
+    "explanation": {"fr": "Sababou = la chance, le bol, la veine (nom). Coup de fortune heureux. Forme un duo avec Bahi (malchance)."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["emotion", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_218",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BAHI",
+    "answer_normalized": "bahi",
+    "letters_pool": ["B","A","H","I"],
+    "riddle": {"fr": "Quand tout va mal sans raison, la poisse du quotidien."},
+    "explanation": {"fr": "Bahi = la malchance, la poisse (nom). Adversité constante et frustrante. Forme un duo avec Sababou (chance)."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["emotion", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_219",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BADJOLI",
+    "answer_normalized": "badjoli",
+    "letters_pool": ["B","A","D","J","O","L","I"],
+    "riddle": {"fr": "Le petit secret glissé dans la manche en classe, l'aide clandestine."},
+    "explanation": {"fr": "Badjoli = une antisèche, un pense-bête caché pour tricher (nom). Complète Badjo déjà publié."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["objet", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_220",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "PETROLE",
+    "answer_normalized": "petrole",
+    "letters_pool": ["P","E","T","R","O","L","E"],
+    "riddle": {"fr": "L'astuce interdite en salle de classe, le procédé malhonnête."},
+    "explanation": {"fr": "Pétrole = la tricherie, l'arnaque scolaire (nom). Homographe du mot français 'pétrole', sens nouchi détourné."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["expression", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_221",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FALER",
+    "answer_normalized": "faler",
+    "letters_pool": ["F","A","L","E","R"],
+    "riddle": {"fr": "L'action interdite, le nuage bleu qui monte vers le ciel."},
+    "explanation": {"fr": "Faler = fumer (verbe). Dérivé de Fal (cigarette). Registre factuel, aucune glorification."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["action", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_222",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GBELE",
+    "answer_normalized": "gbele",
+    "letters_pool": ["G","B","E","L","E"],
+    "riddle": {"fr": "La boisson brûlante du quartier, alcool traditionnel à forte dose."},
+    "explanation": {"fr": "Gbélé = un alcool local à forte dose (nom). Registre factuel, aucune glorification de l'alcool."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["nourriture", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_223",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "JAHIN",
+    "answer_normalized": "jahin",
+    "letters_pool": ["J","A","H","I","N"],
+    "riddle": {"fr": "En aucun cas, à coup sûr non, certainement pas aujourd'hui."},
+    "explanation": {"fr": "Jahin = jamais (adverbe). Négation absolue et catégorique de possibilité."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["expression", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_224",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "PAHE",
+    "answer_normalized": "pahe",
+    "letters_pool": ["P","A","H","E"],
+    "riddle": {"fr": "L'explication donnée, la raison qui justifie tout."},
+    "explanation": {"fr": "Pahé = parce que, car (conjonction). Introduit l'explication ou la justification d'une action."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["expression", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_225",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "YAFOR",
+    "answer_normalized": "yafor",
+    "letters_pool": ["Y","A","F","O","R"],
+    "riddle": {"fr": "L'assentiment du sage, l'approbation sans réserve."},
+    "explanation": {"fr": "Yafor = d'accord (interjection). Acceptation entière d'une proposition ou d'une idée."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["expression", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_226",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FOUL",
+    "answer_normalized": "foul",
+    "letters_pool": ["F","O","U","L"],
+    "riddle": {"fr": "En grande quantité, à ras bord, copieusement rempli."},
+    "explanation": {"fr": "Foul = plein, beaucoup (adjectif/adverbe). Indique l'abondance ou la plénitude."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["expression", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_227",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "COHAN",
+    "answer_normalized": "cohan",
+    "letters_pool": ["C","O","H","A","N"],
+    "riddle": {"fr": "De cette manière précise, ainsi exactement, voilà le mode."},
+    "explanation": {"fr": "Cohan = comme ça, de cette façon (adverbe/démonstratif). Indique la manière ou le mode opératoire."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["expression", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_228",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "LASS",
+    "answer_normalized": "lass",
+    "letters_pool": ["L","A","S","S"],
+    "riddle": {"fr": "La tendance du moment, le top de la modernité urbaine."},
+    "explanation": {"fr": "Lass = le dernier cri, la nouveauté, le top du top (nom). Emprunt anglais 'last' (récent, dernier). Statut de cool maximal."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["attitude", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_229",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "CHAPECHAPE",
+    "answer_normalized": "chapechape",
+    "letters_pool": ["C","H","A","P","E","C","H","A","P","E"],
+    "riddle": {"fr": "En toute hâte, expéditif, sans traîner ni réfléchir longtemps."},
+    "explanation": {"fr": "Chapechape = rapidement, vite fait (adverbe/redoublement). Orthographe soudée. Vitesse d'exécution sans détail."},
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": ["expression", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_230",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BADRO",
+    "answer_normalized": "badro",
+    "letters_pool": ["B","A","D","R","O"],
+    "riddle": {"fr": "Le geste simple du repas, avaler le liquide qui désaltère."},
+    "explanation": {"fr": "Badro = boire (verbe). Action basique de consommer une boisson. Registre factuel."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["action", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_231",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BEDOU",
+    "answer_normalized": "bedou",
+    "letters_pool": ["B","E","D","O","U"],
+    "riddle": {"fr": "L'accessoire serré à la taille, qui garde les pièces précieuses."},
+    "explanation": {"fr": "Bédou = un portefeuille, un porte-monnaie (nom). Objet urbain de rangement discret des sous."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["objet", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_232",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KENER",
+    "answer_normalized": "kener",
+    "letters_pool": ["K","E","N","E","R"],
+    "riddle": {"fr": "Le jeu subtil de la négociation, l'art du calcul commercial."},
+    "explanation": {"fr": "Kéner = manigancer, négocier, dealer (verbe). Dérivé de Kén. Tactiques urbaines de transaction."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["action", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_233",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DEMOISIR",
+    "answer_normalized": "demoisir",
+    "letters_pool": ["D","E","M","O","I","S","I","R"],
+    "riddle": {"fr": "L'appui financier soudain, l'aide qui sort du pétrin."},
+    "explanation": {"fr": "Démoisir = dépanner, aider financièrement (verbe). Deuxième synonyme nouchi d'aide avec Soutra. Relief économique urgent."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["action", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_234",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BLEBLE",
+    "answer_normalized": "bleble",
+    "letters_pool": ["B","L","E","B","L","E"],
+    "riddle": {"fr": "Sans hâte ni agitation, dans la détente et la sérénité."},
+    "explanation": {"fr": "Blèblé = doucement, calmement, tranquillement (adverbe). Allure posée et décontractée."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["expression", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_235",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "FANGAN",
+    "answer_normalized": "fangan",
+    "letters_pool": ["F","A","N","G","A","N"],
+    "riddle": {"fr": "L'énergie brute, la puissance intérieure qui fait agir."},
+    "explanation": {"fr": "Fangan = la force (nom). Vigueur physique ou morale. Capacité à surmonter les obstacles."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["emotion", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_236",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DEGAGEMENT",
+    "answer_normalized": "degagement",
+    "letters_pool": ["D","E","G","A","G","E","M","E","N","T"],
+    "riddle": {"fr": "La virée nocturne entre amis, l'évasion loin des soucis urbains."},
+    "explanation": {"fr": "Dégagement = une sortie nocturne, une virée entre amis (nom). Long mot (10 lettres). Moment de décontraction collective."},
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": ["expression", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_237",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "ZOGOR",
+    "answer_normalized": "zogor",
+    "letters_pool": ["Z","O","G","O","R"],
+    "riddle": {"fr": "Celui qui fatigue, qui énerve, qui gâche l'ambiance."},
+    "explanation": {"fr": "Zogor = une chose ou une personne ennuyeuse (nom). Qualité négative de ce qui importune ou lasse."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["attitude", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_238",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "YERE",
+    "answer_normalized": "yere",
+    "letters_pool": ["Y","E","R","E"],
+    "riddle": {"fr": "Celui qui joue des coudes, rapide d'esprit et avisé."},
+    "explanation": {"fr": "Yéré = intelligent, malin, futé (adjectif). Capacité mentale à trouver des solutions astucieuses."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["personne", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_239",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BOBO",
+    "answer_normalized": "bobo",
+    "letters_pool": ["B","O","B","O"],
+    "riddle": {"fr": "Celui qui ne parle point, fermé à tout échange verbal."},
+    "explanation": {"fr": "Bobo = muet (adjectif/nom). Personne qui s'abstient de parole ou qui ne peut pas parler."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["personne", "mainstream"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_240",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DJOSSEUR",
+    "answer_normalized": "djosseur",
+    "letters_pool": ["D","J","O","S","S","E","U","R"],
+    "riddle": {"fr": "Celui qui s'active sans relâche, toujours sur le terrain."},
+    "explanation": {"fr": "Djosseur = un travailleur acharné, un bosseur (nom). Dérivé de Djossi. Engagement total au travail."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["personne", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_241",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "GROUILLEUR",
+    "answer_normalized": "grouilleur",
+    "letters_pool": ["G","R","O","U","I","L","L","E","U","R"],
+    "riddle": {"fr": "Le magicien de la survie, celui qui invente toujours une issue."},
+    "explanation": {"fr": "Grouilleur = un débrouillard (nom). Long mot (10 lettres). Expert urbain du système D."},
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": ["personne", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_242",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "BIZNESSEUR",
+    "answer_normalized": "biznesseur",
+    "letters_pool": ["B","I","Z","N","E","S","S","E","U","R"],
+    "riddle": {"fr": "Le petit tycoon du commerce de rue, toujours une affaire en poche."},
+    "explanation": {"fr": "Biznesseur = un homme d'affaires, un débrouillard des petites affaires (nom). Long mot (10 lettres). Emprunt anglais 'business'. Figure emblématique urbaine."},
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": ["personne", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_243",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TITROLOGUE",
+    "answer_normalized": "titrologue",
+    "letters_pool": ["T","I","T","R","O","L","O","G","U","E"],
+    "riddle": {"fr": "Devant le kiosque, il commente toute la une sans jamais avoir ouvert le journal."},
+    "explanation": {"fr": "Titrologue = celui qui commente les gros titres des journaux sans lire l'article (nom). Long mot (10 lettres). Phénomène culturel ivoirien bien documenté."},
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": ["personne", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_244",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KPAYAILLE",
+    "answer_normalized": "kpayaille",
+    "letters_pool": ["K","P","A","Y","A","I","L","L","E"],
+    "riddle": {"fr": "Le choc imprévu, le coup dur du destin qui dérange tout."},
+    "explanation": {"fr": "Kpayaille = un accident, un choc, un pépin (nom). Événement malheureux et perturbateur."},
+    "difficulty": 3,
+    "estimated_time_s": 32,
+    "tags": ["objet", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_245",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KPAYORO",
+    "answer_normalized": "kpayoro",
+    "letters_pool": ["K","P","A","Y","O","R","O"],
+    "riddle": {"fr": "Avoir du goût intense pour quelque chose, l'apprécier fort."},
+    "explanation": {"fr": "Kpayoro = aimer, apprécier fort (verbe). Expression d'affection ou de préférence marquée."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["emotion", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_246",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "KPOHOUNKPASSA",
+    "answer_normalized": "kpohounkpassa",
+    "letters_pool": ["K","P","O","H","O","U","N","K","P","A","S","S","A"],
+    "riddle": {"fr": "L'absurdité totale incarnée, l'idiotie sans limite ni excuse."},
+    "explanation": {"fr": "Kpohounkpassa = débile, idiot total (adjectif). Très long mot (13 lettres). Entrée hardcore fun du répertoire nouchi."},
+    "difficulty": 3,
+    "estimated_time_s": 35,
+    "tags": ["personne", "hardcore"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_247",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "TCHELE",
+    "answer_normalized": "tchele",
+    "letters_pool": ["T","C","H","E","L","E"],
+    "riddle": {"fr": "En quantité insuffisante, trop peu pour le besoin urgent."},
+    "explanation": {"fr": "Tchélé = petit, insuffisant, pas assez (adjectif). Incapacité à satisfaire l'exigence minimale."},
+    "difficulty": 2,
+    "estimated_time_s": 26,
+    "tags": ["attitude", "intermediaire"],
+    "format_version": 3
+  },
+  {
+    "id": "crack_nouchi_248",
+    "pack": "crack_nouchi",
+    "country": "ci",
+    "answer": "DEBE",
+    "answer_normalized": "debe",
+    "letters_pool": ["D","E","B","E"],
+    "riddle": {"fr": "S'effondrer moralement, tomber au plus profond du désespoir."},
+    "explanation": {"fr": "Débé = être à terre, être au plus bas (verbe/adjectif). État de déchéance morale ou financière totale."},
+    "difficulty": 1,
+    "estimated_time_s": 20,
+    "tags": ["emotion", "mainstream"],
     "format_version": 3
   }
 ]
