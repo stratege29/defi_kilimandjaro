@@ -37,10 +37,23 @@ class _DuelCreateViewState extends ConsumerState<DuelCreateView> {
           icon: const Icon(Icons.close, size: 22),
           color: AppColors.orSoleil,
           onPressed: () async {
-            // Cleanup: supprime la session en attente.
-            final res = await _creation;
-            if (res != null) {
-              await ref.read(duelRepositoryProvider).deleteIfOwner(res.matchId);
+            // Cleanup: supprime la session en attente. `_creation` peut déjà
+            // être résolu en erreur (ex. App Check rejeté) — un simple
+            // `await` le relève alors immédiatement ; sans try/catch ici,
+            // fermer l'écran après un échec de création plantait l'app
+            // (exception non observée remontant à PlatformDispatcher.onError
+            // → Crashlytics fatal, cf. issue "_extractReplyValueOrThrow").
+            try {
+              final res = await _creation;
+              if (res != null) {
+                await ref
+                    .read(duelRepositoryProvider)
+                    .deleteIfOwner(res.matchId);
+              }
+              // ignore: avoid_catches_without_on_clauses
+            } catch (e) {
+              // Rien à nettoyer côté serveur si la création elle-même a
+              // échoué ; on ferme quand même l'écran sans planter.
             }
             if (!context.mounted) return;
             context.pop();
