@@ -59,6 +59,9 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
   /// plusieurs fois).
   bool _finishedHandled = false;
 
+  /// Garde anti double-tap sur le bouton « Abandonner ».
+  bool _forfeiting = false;
+
   /// Timer qui declenche advancePhase apres l'animation locale (3s) sur
   /// roundEnd et countdown. Re-armé à chaque changement de phase.
   Timer? _phaseAdvanceTimer;
@@ -123,6 +126,28 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
       context.pop();
     } else {
       context.go(AppRoutes.tournamentArenaPath(widget.tournamentId!));
+    }
+  }
+
+  /// Abandonne le duel puis sort de l'écran. Best-effort : si l'appel réseau
+  /// échoue (coupure, App Check…), `resolveStaleMatches` réglera le match
+  /// côté serveur — on sort quand même au lieu de laisser remonter une
+  /// exception non catchée (même famille de crash que ff5a824).
+  Future<void> _handleForfeit(String matchId) async {
+    if (_forfeiting) return;
+    _forfeiting = true;
+    try {
+      await ref.read(duelRepositoryProvider).forfeit(matchId);
+    } on Exception catch (_) {
+      // Ignoré : le serveur reste autoritaire (filet resolveStaleMatches).
+    }
+    if (!mounted) return;
+    // Selon le chemin d'arrivée (lobby/scan/deep-link via `go`), la stack
+    // peut ne rien avoir à dépiler.
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(AppRoutes.duel);
     }
   }
 
@@ -195,13 +220,7 @@ class _DuelPlayViewState extends ConsumerState<DuelPlayView> {
       selfPlayer: selfPlayer,
       opponent: opponent,
       formedLetters: formedLetters,
-      onForfeit: () async {
-        await ref
-            .read(duelRepositoryProvider)
-            .forfeit(liveSession.matchId);
-        if (!context.mounted) return;
-        context.pop();
-      },
+      onForfeit: () => unawaited(_handleForfeit(liveSession.matchId)),
     );
 
     return Scaffold(

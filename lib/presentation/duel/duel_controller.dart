@@ -198,8 +198,13 @@ class DuelController extends StateNotifier<DuelLocalState> {
       state.selectedIndices.length / max(roundData.lettersPool.length, 1),
       1,
     );
+    // Best-effort a chaque tuile selectionnee : une ecriture RTDB refusee
+    // (match supprime, phase verrouillee par les rules) ne doit pas remonter
+    // en erreur fatale non catchee.
     unawaited(
-      repository.updateProgress(session.matchId, state.currentRound, p),
+      repository
+          .updateProgress(session.matchId, state.currentRound, p)
+          .catchError((Object _) {}),
     );
   }
 

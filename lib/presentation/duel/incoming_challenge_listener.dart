@@ -80,7 +80,12 @@ class _IncomingChallengeListenerState
       _log.i('[Challenge] Recu: matchId=$matchId from=$fromName');
 
       await _showChallengeDialog(matchId: matchId, fromName: fromName);
-    });
+    },
+        // Listener global monté toute la vie de l'app : sans onError, une
+        // erreur de stream (permission-denied, token expiré) serait une
+        // erreur fatale non catchée.
+        onError: (Object e) =>
+            _log.e('[Challenge] Erreur listener RTDB', error: e));
   }
 
   Future<void> _showChallengeDialog({
