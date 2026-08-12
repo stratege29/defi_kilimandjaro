@@ -208,12 +208,20 @@ class LobbyController extends StateNotifier<LobbyState> {
     _matchedToSub = database
         .ref('lobby/$uid/matched_to')
         .onValue
-        .listen((event) {
-      final value = event.snapshot.value;
-      if (value is! String) return;
-      _log.i('[Lobby] Match push detecte via RTDB: $value');
-      unawaited(_handleMatched(value));
-    });
+        .listen(
+      (event) {
+        final value = event.snapshot.value;
+        if (value is! String) return;
+        _log.i('[Lobby] Match push detecte via RTDB: $value');
+        unawaited(_handleMatched(value));
+      },
+      // Sans onError, une erreur de stream (permission-denied, token expire)
+      // remonterait en erreur fatale non catchee. Le poll periodique reste le
+      // fallback d'appariement.
+      onError: (Object e) {
+        _log.e('[Lobby] Erreur listener matched_to (poll fallback)', error: e);
+      },
+    );
   }
 
   /// Bascule l'etat en `matched` apres avoir recupere la session.
@@ -276,8 +284,19 @@ class LobbyController extends StateNotifier<LobbyState> {
       _log.i('[Rematch] Nouveau match créé: $newMatchId');
 
       // Observer le match en temps réel via RTDB stream.
-      _rematchWatchSub =
-          duelRepository.watch(newMatchId).listen(_onRematchSessionUpdate);
+      _rematchWatchSub = duelRepository.watch(newMatchId).listen(
+        _onRematchSessionUpdate,
+        onError: (Object e) {
+          _log.e('[Rematch] Erreur stream match $newMatchId', error: e);
+          if (!_cancelled && state.phase == LobbyPhase.searching) {
+            state = state.copyWith(
+              phase: LobbyPhase.noOpponent,
+              errorMessage: 'Impossible de créer le rematch. Réessaie.',
+            );
+            unawaited(audioController.stopLobbySearchLoop());
+          }
+        },
+      );
     } on Exception catch (e) {
       _log.e('[Rematch] requestRematch failed', error: e);
       if (!_cancelled && state.phase == LobbyPhase.searching) {

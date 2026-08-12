@@ -6,12 +6,14 @@
  * 2. Rate-limit 1 appel / 3 s par UID.
  * 3. Lit (ou initialise a 1000) l'ELO du joueur dans Firestore.
  * 4. Cherche dans /lobby un adversaire dans la bande ELO +/-band_radius.
- * 4a. Si adversaire trouve :
+ * 4a. Si adversaire trouve ET uid < adversaire (symetrie anti-course) :
  *     - Tire 3 devinettes (easy/medium/hard) depuis le cache Firestore.
  *     - Cree /matches/{matchId} avec les 3 rounds.
- *     - Supprime les 2 entrees lobby.
+ *     - Reclame l'adversaire par transaction sur lobby/{adversaire}/matched_to.
  *     - Retourne {status:"matched", matchId, matchData}.
- * 4b. Sinon : ecrit /lobby/{uid} et retourne {status:"waiting"}.
+ * 4b. Sinon : ecrit /lobby/{uid} et retourne {status:"waiting"} — si
+ *     l'adversaire trouve a un uid plus petit, c'est LUI qui creera le match
+ *     a son prochain poll (cf. requestArenaMatch pour l'origine du pattern).
  *
  * Cache des devinettes : voir devinettesCache.ts (TTL 5 min, fallback samples).
  */
@@ -189,6 +191,22 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
       await rtdb.ref().update(cleanup);
     }
 
+    // --- Adversaire trouvé : appariement anti-course ---
+    // Deux protections combinées contre les « duels fantômes » (deux joueurs
+    // créant chacun un match avec le même adversaire quand ils re-quêtent
+    // simultanément — fréquent en 1v1 après chaque match), portées depuis
+    // requestArenaMatch :
+    //   1. Symétrie : seul le plus PETIT uid de la paire crée ; l'autre attend
+    //      le pointeur `matched_to`. Casse le cas où A et B se choisissent
+    //      mutuellement.
+    //   2. Réclamation atomique : transaction sur `lobby/{adversaire}/matched_to`.
+    //      Empêche deux créateurs distincts de réclamer le même adversaire.
+    if (opponentUid && uid > opponentUid) {
+      // L'adversaire (uid plus petit) est responsable de créer. On attend en
+      // lobby ; son prochain poll nous trouvera et nous réclamera.
+      opponentUid = null;
+    }
+
     // --- Match trouve ---
     if (opponentUid) {
       const matchId = _generateMatchId();
@@ -234,34 +252,46 @@ export const requestMatch = onCall<RequestMatchData, Promise<RequestMatchResult>
         },
       };
 
-      // Ecriture atomique : creation du match + notification du joueur passif
-      // via `matched_to` sur son entree lobby (sera detecte par son listener
-      // RTDB ou par son prochain poll). L'appelant `uid` est notifie via la
-      // valeur de retour, donc son entree lobby peut etre supprimee.
-      const updates: Record<string, unknown> = {
+      // Le match (+ réponses serveur-only) est écrit AVANT la réclamation :
+      // ainsi `matched_to` ne pointe jamais vers un match inexistant — le poll
+      // du joueur passif supprime son entrée lobby quand le match manque, ce
+      // qui casserait une réclamation en cours.
+      await rtdb.ref().update({
         [`matches/${matchId}`]: matchData,
         [matchAnswersPath(matchId)]: buildAnswersNode(
           answersFromRounds(rounds)
         ),
-        [`lobby/${uid}`]: null,
-        [`lobby/${opponentUid}/matched_to`]: matchId,
-      };
-      await rtdb.ref().update(updates);
+      });
 
-      return { status: "matched", matchId, matchData };
+      // Réclamation atomique de l'adversaire. Si un autre créateur l'a déjà
+      // réclamé (transaction abandonnée ou valeur étrangère), on annule le
+      // match pré-créé et on retombe en attente.
+      const claimRef = rtdb.ref(`lobby/${opponentUid}/matched_to`);
+      const claim = await claimRef.transaction((cur) =>
+        cur ? undefined : matchId
+      );
+      if (claim.committed && claim.snapshot.val() === matchId) {
+        await lobbyRef.remove();
+        return { status: "matched", matchId, matchData };
+      }
+      await rtdb.ref().update({
+        [`matches/${matchId}`]: null,
+        [matchAnswersPath(matchId)]: null,
+      });
     }
 
     // --- Pas d'adversaire : ecrire / mettre a jour le lobby ---
-    await lobbyRef.set({ mmr: myElo, ts: now, request_id });
-
-    // Écriture de la présence : le client maintient cela via heartbeat,
-    // mais la CF peut aussi l'écrire pour garantir un timestamp frais.
-    // La prunePresence CF recalculera le compteur /lobby/stats/online
-    // automatiquement toutes les 1 minute.
-    const updatePresence: Record<string, unknown> = {
+    // Champ par champ (pas de set) pour ne pas écraser un `matched_to` écrit
+    // par un créateur concurrent entre notre scan et cette écriture.
+    // La présence est écrite dans la même passe : le client la maintient via
+    // heartbeat, mais la CF garantit un timestamp frais. La prunePresence CF
+    // recalculera le compteur /lobby/stats/online toutes les 1 minute.
+    await rtdb.ref().update({
+      [`lobby/${uid}/mmr`]: myElo,
+      [`lobby/${uid}/ts`]: now,
+      [`lobby/${uid}/request_id`]: request_id,
       [`presence/${uid}`]: { ts: ServerValue.TIMESTAMP },
-    };
-    await rtdb.ref().update(updatePresence);
+    });
 
     return { status: "waiting", lobbyEntry: { mmr: myElo, ts: now } };
   }

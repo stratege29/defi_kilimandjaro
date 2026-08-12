@@ -291,6 +291,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     GoRoute(
       path: AppRoutes.duelPlay,
       name: 'duel-play',
+      // Sans `extra` valide (restauration Android après process-death,
+      // navigation directe), la session est irrécupérable : retour au hub
+      // duel plutôt qu'un crash au cast.
+      redirect: (_, state) =>
+          state.extra is DuelPlayArgs || state.extra is DuelSession
+              ? null
+              : AppRoutes.duel,
       pageBuilder: (_, state) => CustomTransitionPage<void>(
         key: state.pageKey,
         child: () {
@@ -318,6 +325,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     GoRoute(
       path: AppRoutes.duelResult,
       name: 'duel-result',
+      // Même garde que duelPlay : sans session en extra, retour au hub duel.
+      redirect: (_, state) =>
+          state.extra is DuelSession ? null : AppRoutes.duel,
       builder: (_, state) => DuelResultView(
         session: state.extra! as DuelSession,
       ),
