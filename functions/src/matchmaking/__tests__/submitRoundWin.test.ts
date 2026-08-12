@@ -11,9 +11,25 @@
 
 const mockUpdate = jest.fn().mockResolvedValue(undefined);
 const mockGet = jest.fn();
+// Valeur courante du verrou rounds/{round}/won_by (réclamation atomique de la
+// manche). Pré-remplir avec un uid pour simuler une manche déjà réclamée.
+let claimValue: unknown = null;
+const mockTransaction = jest.fn(async (fn: (cur: unknown) => unknown) => {
+  const next = fn(claimValue);
+  if (next === undefined) {
+    return { committed: false, snapshot: { val: () => claimValue } };
+  }
+  claimValue = next;
+  return { committed: true, snapshot: { val: () => next } };
+});
 const mockRef = jest.fn().mockReturnValue({
   get: mockGet,
   update: mockUpdate,
+  transaction: mockTransaction,
+});
+
+beforeEach(() => {
+  claimValue = null;
 });
 
 jest.mock("firebase-admin/database", () => ({
@@ -264,6 +280,36 @@ describe("submitRoundWin — transitions de phase", () => {
     await expect(
       callSubmitRoundWin({ match_id: "NOTFOUND", round: 0, winner_uid: "winner_uid" })
     ).rejects.toMatchObject({ code: "not-found" });
+  });
+
+  test("course : manche deja reclamee par l'adversaire -> refus, aucun update", async () => {
+    const state = buildMatchState({ current_round: 0 });
+    mockGet.mockResolvedValueOnce({ exists: () => true, val: () => state });
+    // L'adversaire a soumis le mot quelques ms avant : le verrou est a lui.
+    claimValue = "loser_uid";
+
+    await expect(
+      callSubmitRoundWin({ match_id: "M9", round: 0, winner_uid: "winner_uid" })
+    ).rejects.toMatchObject({ code: "failed-precondition" });
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  test("retry reseau : verrou deja pose a notre uid -> continue normalement", async () => {
+    const state = buildMatchState({ current_round: 0 });
+    mockGet.mockResolvedValueOnce({ exists: () => true, val: () => state });
+    // Un 1er appel a pose le verrou puis a echoue avant l'update.
+    claimValue = "winner_uid";
+
+    const result = await callSubmitRoundWin({
+      match_id: "M10",
+      round: 0,
+      winner_uid: "winner_uid",
+    });
+
+    expect(result.ok).toBe(true);
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ phase: "roundEnd" })
+    );
   });
 });
 

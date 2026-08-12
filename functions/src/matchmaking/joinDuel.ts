@@ -9,7 +9,8 @@
  *
  * Couvre les deux flux d'entrée du 2e joueur :
  *   - QR ami (createLocalDuel)        → `secret` fourni, vérifié.
- *   - Deep link / rematch accepté     → pas de secret (matchId = protection).
+ *   - Deep link / rematch accepté     → pas de secret ; si le match porte un
+ *     `target_uid`, seul ce destinataire peut rejoindre.
  *
  * Le flux matchmaking ELO (requestMatch) n'utilise PAS cette CF : les deux
  * joueurs y sont déjà ajoutés à la création.
@@ -52,6 +53,7 @@ export const joinDuel = onCall<JoinDuelData, Promise<JoinDuelResult>>(
     const data = snap.val() as {
       secret?: string;
       created_by?: string;
+      target_uid?: string;
       phase?: string;
       players?: Record<string, unknown>;
     };
@@ -68,11 +70,29 @@ export const joinDuel = onCall<JoinDuelData, Promise<JoinDuelResult>>(
       throw new HttpsError("permission-denied", "Secret invalide.");
     }
 
+    // Défi ciblé (rematch/challenge via requestRematch) : seul le
+    // destinataire peut rejoindre — le matchId seul ne suffit pas.
+    if (data.target_uid && data.target_uid !== uid) {
+      throw new HttpsError("permission-denied", "duel_reserved");
+    }
+
     if (Object.keys(players).length >= 2) {
       throw new HttpsError("failed-precondition", "duel_full");
     }
     if (data.phase === "finished") {
       throw new HttpsError("failed-precondition", "duel_expired");
+    }
+
+    // --- Réclamation atomique de la place de 2e joueur (anti-course) ---
+    // Le check players.length ci-dessus est lu AVANT écriture : deux uids
+    // différents (même code/QR partagé à plusieurs amis) pouvaient le passer
+    // tous les deux et produire un match à 3 joueurs — toute la logique aval
+    // suppose exactement 2. Transaction premier-arrivé sur joiner_uid ; un
+    // retry réseau du même joueur (claim déjà à son uid) continue.
+    const claimRef = rtdb.ref(`matches/${matchId}/joiner_uid`);
+    const claim = await claimRef.transaction((cur) => (cur ? undefined : uid));
+    if (claim.snapshot.val() !== uid) {
+      throw new HttpsError("failed-precondition", "duel_full");
     }
 
     await matchRef.update({
@@ -88,6 +108,18 @@ export const joinDuel = onCall<JoinDuelData, Promise<JoinDuelResult>>(
     });
 
     const updated = await matchRef.get();
+    const updatedData = updated.val() as {
+      rounds?: unknown;
+      created_by?: string;
+    } | null;
+    // Si le créateur a supprimé le match pendant le join (fenêtre lecture →
+    // écriture, autorisée par les rules tant que phase == waiting), l'update
+    // ci-dessus a RECRÉÉ un nœud tronqué sans rounds : grille vide injouable.
+    // On nettoie et on signale l'expiration.
+    if (updatedData?.rounds == null || updatedData.created_by == null) {
+      await matchRef.remove();
+      throw new HttpsError("failed-precondition", "duel_expired");
+    }
     return { ok: true, matchData: updated.val() as Record<string, unknown> };
   }
 );

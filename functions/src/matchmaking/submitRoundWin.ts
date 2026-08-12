@@ -146,6 +146,25 @@ export const submitRoundWin = onCall<SubmitRoundWinData, Promise<SubmitRoundWinR
       throw new HttpsError("permission-denied", "Mot incorrect.");
     }
 
+    // --- Reclamation atomique de la manche (anti-course) ---
+    // Deux joueurs peuvent soumettre le mot correct a quelques ms d'ecart :
+    // les deux lectures ci-dessus passent alors toutes les verifications et,
+    // sans verrou, la manche serait creditee aux DEUX joueurs (et phase/winner
+    // ecrases par le dernier ecrivain). Transaction premier-arrive sur
+    // rounds/{round}/won_by ; le perdant recoit la meme erreur qu'une
+    // soumission arrivee apres la fin de manche (le client la gere deja).
+    // Un retry reseau du gagnant (claim deja pose a son uid) continue.
+    const claimRef = rtdb.ref(`matches/${match_id}/rounds/${round}/won_by`);
+    const claim = await claimRef.transaction((cur) =>
+      cur ? undefined : winner_uid
+    );
+    if (claim.snapshot.val() !== winner_uid) {
+      throw new HttpsError(
+        "failed-precondition",
+        `Manche ${round} deja gagnee par l'adversaire.`
+      );
+    }
+
     const now = Date.now();
     const phaseStartedAt = matchData.phase_started_at ?? matchData.created_at;
     const timeTakenMs = now - phaseStartedAt;
