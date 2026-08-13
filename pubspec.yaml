@@ -136,11 +136,14 @@ flutter_launcher_icons:
 # ----------------------------------------------------------------------------
 # Native splash (run: dart run flutter_native_splash:create)
 # ----------------------------------------------------------------------------
+# La couleur DOIT rester égale à AppColors.surface (0xFF0C1712) : le splash
+# Flutter prend le relais du natif sans coupure visible (pas de flash de fond,
+# pas de logo qui « réapparaît »).
 flutter_native_splash:
-  color: "#1A3A20"
+  color: "#0C1712"
   image: assets/images/brand/logo_k.png
   android_12:
-    color: "#1A3A20"
+    color: "#0C1712"
     image: assets/images/brand/logo_k.png
   ios_content_mode: center
   fullscreen: true

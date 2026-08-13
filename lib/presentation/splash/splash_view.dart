@@ -13,8 +13,17 @@ import 'package:go_router/go_router.dart';
 /// Écran 01 — Splash Screen, sobre.
 ///
 /// Fond uni « Vert Nuit » (couleur du thème), logo "K", kicker « Défi » et
-/// titre KILIMANDJARO centrés, avec un point or pulsant comme indicateur de
+/// titre KILIMANDJARO, avec un point or pulsant comme indicateur de
 /// chargement.
+///
+/// IMPORTANT — continuité avec le splash natif : le logo est posé au centre
+/// EXACT de l'écran (hors SafeArea) à 128×128, soit la position et la taille
+/// du splash natif (cf. `flutter_native_splash` dans pubspec.yaml, même fond
+/// #0C1712). Sans ça le logo disparaissait avec le splash natif puis
+/// réapparaissait ailleurs : l'utilisateur voyait deux fois le logo. Le titre
+/// et le point de chargement viennent en fondu SOUS le logo, qui ne bouge
+/// jamais. Toute modif de taille/position ici doit être répercutée sur la
+/// config native (et inversement).
 ///
 /// Auto-transition après 2.5s vers l'onboarding (1er lancement) ou le hub.
 class SplashView extends ConsumerStatefulWidget {
@@ -58,58 +67,106 @@ class _SplashViewState extends ConsumerState<SplashView>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      body: SafeArea(
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Logo + kicker « Défi » + titre, centrés.
-            Align(
-              alignment: const Alignment(0, -0.08),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Logo calé sur le splash natif : centre exact de l'écran, 128×128.
+          // Le titre est positionné SOUS lui (Stack, pas Column) pour que
+          // l'arrivée du texte ne décale pas le logo.
+          Center(
+            child: SizedBox(
+              width: double.infinity,
+              height: _logoSize,
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  Image.asset(
-                    AppAssets.logoK,
-                    width: 128,
-                    height: 128,
-                    fit: BoxFit.contain,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Défi',
-                    style: AppTypography.playfair(
-                      size: 22,
-                      style: FontStyle.italic,
+                  Center(
+                    child: Image.asset(
+                      AppAssets.logoK,
+                      width: _logoSize,
+                      height: _logoSize,
+                      fit: BoxFit.contain,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'KILIMANDJARO',
-                    style: AppTypography.logoTitle,
+                  Positioned(
+                    top: _logoSize + 10,
+                    left: 0,
+                    right: 0,
+                    child: _FadeIn(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Défi',
+                            style: AppTypography.playfair(
+                              size: 22,
+                              style: FontStyle.italic,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'KILIMANDJARO',
+                            style: AppTypography.logoTitle,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            // Indicateur de chargement pulsant (or).
-            Align(
+          ),
+          // Indicateur de chargement pulsant (or).
+          SafeArea(
+            child: Align(
               alignment: const Alignment(0, 0.92),
-              child: ScaleTransition(
-                scale: Tween<double>(begin: 0.7, end: 1.15).animate(
-                  CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
-                ),
-                child: Container(
-                  width: 12,
-                  height: 12,
-                  decoration: const BoxDecoration(
-                    color: AppColors.orJour,
-                    shape: BoxShape.circle,
+              child: _FadeIn(
+                child: ScaleTransition(
+                  scale: Tween<double>(begin: 0.7, end: 1.15).animate(
+                    CurvedAnimation(
+                      parent: _pulseCtrl,
+                      curve: Curves.easeInOut,
+                    ),
+                  ),
+                  child: Container(
+                    width: 12,
+                    height: 12,
+                    decoration: const BoxDecoration(
+                      color: AppColors.orJour,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+}
+
+/// Taille du logo — doit rester identique à celle générée pour le splash
+/// natif (128 pt : `splash.png` 128/192/256/384/512 px selon la densité,
+/// `LaunchImage@1x/2x/3x` 128/256/384 px).
+const double _logoSize = 128;
+
+/// Fondu d'apparition one-shot, utilisé pour tout ce qui n'existe pas sur le
+/// splash natif (titre, indicateur). Le logo, lui, est déjà à l'écran : il ne
+/// doit ni réapparaître ni bouger.
+class _FadeIn extends StatelessWidget {
+  const _FadeIn({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOut,
+      builder: (_, value, child) => Opacity(opacity: value, child: child),
+      child: child,
     );
   }
 }
