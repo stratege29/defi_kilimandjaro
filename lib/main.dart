@@ -97,6 +97,26 @@ final RemoteConfigService _remoteConfig = RemoteConfigService();
 final AnalyticsService _analytics =
     FirebaseAnalyticsService(FirebaseAnalytics.instance);
 
+/// Signale que la session Firebase Auth est prête (anonyme ou existante).
+///
+/// Le sign-in a lieu APRÈS `runApp` (cf. [_deferredBoot]) : tout ce qui a
+/// besoin d'un uid doit donc attendre ce future au lieu de lire
+/// `FirebaseAuth.instance.currentUser` directement au boot, sinon le travail
+/// part avec `uid == null` et se transforme silencieusement en no-op (cas
+/// vécu : le token FCM n'était plus enregistré).
+///
+/// Toujours complété — y compris si le sign-in échoue ou timeout — pour ne
+/// jamais laisser un consommateur suspendu.
+final Completer<void> _authReadyCompleter = Completer<void>();
+Future<void> get authReady => _authReadyCompleter.future;
+
+/// Emulateurs locaux — opt-in via `--dart-define USE_FIREBASE_EMULATOR=true`.
+const _useEmulator = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
+const _emulatorHost = String.fromEnvironment(
+  'EMULATOR_HOST',
+  defaultValue: 'localhost',
+);
+
 Future<void> _bootstrap() async {
   // [BOOT] timeline via print() — visible dans Xcode console (debug + flutter run).
   // ignore: avoid_print
@@ -116,13 +136,17 @@ Future<void> _bootstrap() async {
   await EasyLocalization.ensureInitialized();
   // ignore: avoid_print
   print('[BOOT] 2 EasyLocalization OK');
-  await AudioEngine.instance.init();
-  // ignore: avoid_print
-  print('[BOOT] 3 AudioEngine OK');
 
-  // Firebase: initialize then ensure an anonymous session exists so
-  // every player has a UID for duels even before signing in with
-  // Google/Apple (Phase 6.1+).
+  // Firebase core : initialisation LOCALE uniquement (aucun appel réseau),
+  // requise avant tout provider qui touche Firestore/Functions.
+  //
+  // Tout le reste du boot (audio, App Check, sign-in anonyme, Remote Config,
+  // message FCM initial) est déplacé APRÈS runApp — cf. [_deferredBoot].
+  // Chacune de ces étapes faisait un aller-retour réseau ici même : tant que
+  // la chaîne n'avait pas rendu la main, runApp n'était pas appelé et Flutter
+  // ne pouvait afficher AUCUNE frame — l'utilisateur restait sur le splash
+  // natif figé (jusqu'à ~20 s de timeouts cumulés sur réseau dégradé).
+  // Ne PAS ré-introduire d'await réseau dans cette fonction.
   try {
     // Native plugins (e.g. firebase_messaging on iOS) may auto-initialize the
     // default app from GoogleService-Info.plist before Dart gets here, which
@@ -139,45 +163,21 @@ Future<void> _bootstrap() async {
       print('🔧 Firebase default app already exists (native auto-init) — OK');
     }
 
-    // App Check: must run right after Firebase.initializeApp and before any
-    // authenticated call (Auth, Firestore, RTDB, Cloud Functions).
-    await activateAppCheck();
-
-    // Remote Config : économie + ad fréquences + killswitch. Fail-soft —
-    // si le fetch échoue, les defaults baked-in restent actifs.
-    await _remoteConfig.init();
-
-    // Analytics : active la collecte et tague la variante A/B du scaling
-    // des sinks (rééquilibrage cauris) en user property GA4 — base du
-    // suivi de l'experiment Firebase A/B Testing. Fail-soft, non bloquant.
-    unawaited(_analytics.init());
-    unawaited(
-      _analytics.setSinkScalingVariant(
-        enabled: _remoteConfig.current.sinkTierScalingEnabled,
-      ),
-    );
-
-    // Local emulator wiring — opt-in via --dart-define USE_FIREBASE_EMULATOR=true
-    // (cf. README emulator section). Doit être appelé AVANT toute requête
-    // Firestore/RTDB/Functions et AVANT signInAnonymously.
-    // Chaque appel est isolé pour ne pas tuer le boot si l'emulator est
-    // injoignable.
-    const useEmulator = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
-    if (useEmulator) {
-      const emulatorHost = String.fromEnvironment(
-        'EMULATOR_HOST',
-        defaultValue: 'localhost',
-      );
+    // Emulateurs locaux (cf. README) : câblage SYNCHRONE, sans réseau. Doit
+    // précéder toute requête Firestore/RTDB/Functions, donc rester ici — les
+    // providers peuvent émettre dès la première frame. Le câblage Auth, lui,
+    // est awaité (5 s) : il part dans [_deferredBoot], juste avant le sign-in.
+    if (_useEmulator) {
       // ignore: avoid_print
-      print('🔧 Wiring Firebase emulators to $emulatorHost');
+      print('🔧 Wiring Firebase emulators to $_emulatorHost');
       try {
-        FirebaseFirestore.instance.useFirestoreEmulator(emulatorHost, 8080);
+        FirebaseFirestore.instance.useFirestoreEmulator(_emulatorHost, 8080);
       } catch (e) {
         // ignore: avoid_print
         print('🔧 Firestore emulator wire failed: $e');
       }
       try {
-        FirebaseDatabase.instance.useDatabaseEmulator(emulatorHost, 9000);
+        FirebaseDatabase.instance.useDatabaseEmulator(_emulatorHost, 9000);
       } catch (e) {
         // ignore: avoid_print
         print('🔧 Database emulator wire failed: $e');
@@ -185,18 +185,10 @@ Future<void> _bootstrap() async {
       try {
         FirebaseFunctions.instanceFor(
           region: 'europe-west1',
-        ).useFunctionsEmulator(emulatorHost, 5001);
+        ).useFunctionsEmulator(_emulatorHost, 5001);
       } catch (e) {
         // ignore: avoid_print
         print('🔧 Functions emulator wire failed: $e');
-      }
-      try {
-        await FirebaseAuth.instance
-            .useAuthEmulator(emulatorHost, 9099)
-            .timeout(const Duration(seconds: 5));
-      } catch (e) {
-        // ignore: avoid_print
-        print('🔧 Auth emulator wire failed/timeout: $e');
       }
     }
 
@@ -211,36 +203,9 @@ Future<void> _bootstrap() async {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
-      !kDebugMode,
+    unawaited(
+      FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode),
     );
-
-    // En mode emulator, on force un fresh sign-in pour invalider tout
-    // token cached d'une session prod précédente (qui ferait rejeter les
-    // requêtes Firestore avec permission-denied).
-    if (useEmulator && FirebaseAuth.instance.currentUser != null) {
-      try {
-        await FirebaseAuth.instance.signOut();
-        // ignore: avoid_print
-        print('🔧 Emulator mode: signed out previous user (likely prod token)');
-      } catch (e) {
-        // ignore: avoid_print
-        print('🔧 signOut failed: $e');
-      }
-    }
-
-    if (FirebaseAuth.instance.currentUser == null) {
-      try {
-        final cred = await FirebaseAuth.instance.signInAnonymously().timeout(
-          const Duration(seconds: 8),
-        );
-        // ignore: avoid_print
-        print('🔧 signInAnonymously OK uid=${cred.user?.uid}');
-      } catch (e) {
-        // ignore: avoid_print
-        print('🔧 signInAnonymously failed/timeout: $e');
-      }
-    }
 
     // FCM : enregistrer le handler background AVANT toute autre init FCM.
     // Doit etre appele ici (avant runApp) pour que le plugin le connaisse
@@ -250,41 +215,22 @@ Future<void> _bootstrap() async {
     // FCM : handler quand l'utilisateur tape sur une notif depuis background.
     FirebaseMessaging.onMessageOpenedApp.listen(_handleFcmOpen);
 
-    // FCM : verifier si l'app a ete ouverte depuis une notif (app terminee).
-    // Timeout 3s — getInitialMessage() peut hanger indéfiniment sur iOS si
-    // APNs n'est pas encore prêt (cas typique : 1er lancement en TestFlight
-    // sans embedded.mobileprovision). On accepte de rater le deep-link plutôt
-    // que de bloquer le splash.
-    try {
-      final initialMessage = await FirebaseMessaging.instance
-          .getInitialMessage()
-          .timeout(const Duration(seconds: 3));
-      if (initialMessage != null) {
-        unawaited(
-          Future<void>.delayed(const Duration(milliseconds: 500), () {
-            _handleFcmOpen(initialMessage);
-          }),
-        );
-      }
-    } on Object {
-      // Timeout ou erreur FCM — l'app boot quand même.
-    }
     // ignore: avoid_print
-    print('[BOOT] 4 Firebase block OK');
+    print('[BOOT] 3 Firebase core OK');
   } catch (e) {
     // Fail-soft: solo gameplay continues without backend if Firebase fails.
     // ignore: avoid_print
-    print('[BOOT] 4 Firebase bootstrap failed: $e');
+    print('[BOOT] 3 Firebase core failed: $e');
   }
 
   final prefs = await SharedPreferences.getInstance();
   // ignore: avoid_print
-  print('[BOOT] 5 SharedPreferences OK');
+  print('[BOOT] 4 SharedPreferences OK');
 
   SystemChrome.setSystemUIOverlayStyle(AppTheme.systemOverlay);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   // ignore: avoid_print
-  print('[BOOT] 6 SystemChrome OK — calling runApp');
+  print('[BOOT] 5 SystemChrome OK — calling runApp');
 
   runApp(
     EasyLocalization(
@@ -312,6 +258,109 @@ Future<void> _bootstrap() async {
       ),
     ),
   );
+
+  // Le reste du boot part maintenant que l'arbre est monté : la première
+  // frame Flutter n'attend plus le réseau.
+  unawaited(_deferredBoot());
+}
+
+/// Boot réseau, hors du chemin critique de la première frame.
+///
+/// Ordre imposé : App Check DOIT précéder tout appel authentifié (Auth,
+/// Firestore, RTDB, Functions), et le sign-in doit précéder tout ce qui a
+/// besoin d'un uid — d'où le séquencement explicite ici plutôt qu'une rafale
+/// de `unawaited`. Ce qui n'a aucune dépendance part en parallèle.
+///
+/// Entièrement fail-soft : le jeu solo tourne sans backend.
+Future<void> _deferredBoot() async {
+  // Audio : natif, sans réseau, mais `AVAudioSession.configure` + l'init
+  // SoLoud coûtent plusieurs centaines de ms. Rien ne joue sur le splash.
+  unawaited(AudioEngine.instance.init());
+
+  try {
+    // App Check : avant tout appel authentifié. Fait une attestation
+    // DeviceCheck / Play Integrity + `getTokenResult()` — donc du réseau.
+    await activateAppCheck();
+
+    // Câblage Auth emulator (awaité, 5 s) — juste avant le sign-in.
+    if (_useEmulator) {
+      try {
+        await FirebaseAuth.instance
+            .useAuthEmulator(_emulatorHost, 9099)
+            .timeout(const Duration(seconds: 5));
+      } catch (e) {
+        // ignore: avoid_print
+        print('🔧 Auth emulator wire failed/timeout: $e');
+      }
+
+      // Fresh sign-in en mode emulator : invalide tout token cached d'une
+      // session prod précédente (sinon Firestore rejette en permission-denied).
+      if (FirebaseAuth.instance.currentUser != null) {
+        try {
+          await FirebaseAuth.instance.signOut();
+          // ignore: avoid_print
+          print('🔧 Emulator mode: signed out previous user (prod token)');
+        } catch (e) {
+          // ignore: avoid_print
+          print('🔧 signOut failed: $e');
+        }
+      }
+    }
+
+    if (FirebaseAuth.instance.currentUser == null) {
+      try {
+        final cred = await FirebaseAuth.instance.signInAnonymously().timeout(
+          const Duration(seconds: 8),
+        );
+        // ignore: avoid_print
+        print('🔧 signInAnonymously OK uid=${cred.user?.uid}');
+      } catch (e) {
+        // ignore: avoid_print
+        print('🔧 signInAnonymously failed/timeout: $e');
+      }
+    }
+  } on Object catch (e) {
+    // ignore: avoid_print
+    print('[BOOT] deferred auth block failed: $e');
+  } finally {
+    // Toujours débloquer les consommateurs, même si l'auth a échoué : ils
+    // gèrent déjà `uid == null` en no-op, un blocage serait pire.
+    if (!_authReadyCompleter.isCompleted) _authReadyCompleter.complete();
+    // ignore: avoid_print
+    print('[BOOT] deferred: auth ready');
+  }
+
+  // Remote Config : économie + fréquences pub + killswitch. Les defaults
+  // baked-in sont servis en attendant (cf. RemoteConfigService), et les
+  // consommateurs lisent la config à l'entrée d'une session de jeu — donc
+  // bien après ce point.
+  await _remoteConfig.init();
+
+  // Analytics : tague la variante A/B du scaling des sinks. Doit suivre la
+  // résolution Remote Config pour taguer la bonne valeur.
+  unawaited(_analytics.init());
+  unawaited(
+    _analytics.setSinkScalingVariant(
+      enabled: _remoteConfig.current.sinkTierScalingEnabled,
+    ),
+  );
+
+  // FCM : l'app a-t-elle été ouverte depuis une notif (app terminée) ?
+  // Timeout 3 s — `getInitialMessage()` peut hanger indéfiniment sur iOS si
+  // APNs n'est pas prêt (1er lancement TestFlight sans
+  // embedded.mobileprovision). On accepte de rater le deep-link.
+  try {
+    final initialMessage = await FirebaseMessaging.instance
+        .getInitialMessage()
+        .timeout(const Duration(seconds: 3));
+    if (initialMessage != null) {
+      _handleFcmOpen(initialMessage);
+    }
+  } on Object {
+    // Timeout ou erreur FCM — l'app tourne quand même.
+  }
+  // ignore: avoid_print
+  print('[BOOT] deferred boot done');
 }
 
 /// Initialise les services lourds (IAP, FCM, deep links) apres que
@@ -354,19 +403,29 @@ class _BootGateState extends ConsumerState<_BootGate> {
       //    jeu offline. La restauration décisive a lieu après une
       //    (re)connexion de compte (cf. AccountController).
       ref.read(progressAutoBackupProvider);
-      unawaited(
-        ref.read(walletSyncCoordinatorProvider).reconcileOnLogin().whenComplete(
-              () => ref
-                  .read(progressSyncCoordinatorProvider)
-                  .restoreAndBackup(),
-            ),
-      );
 
-      // FCM token storage (permission + persistance Firestore).
-      // Fire-and-forget : ne doit pas bloquer le boot.
-      unawaited(ref.read(fcmRepositoryProvider).init());
-      // ignore: avoid_print
-      print('[BOOT] 9 FCM triggered');
+      // Ces trois-là écrivent sous `{uid}` : ils DOIVENT attendre la session
+      // Firebase, qui est maintenant établie après runApp. Sans ce gate ils
+      // partiraient avec `uid == null` et deviendraient des no-ops muets.
+      unawaited(
+        authReady.then((_) {
+          if (!mounted) return;
+          unawaited(
+            ref
+                .read(walletSyncCoordinatorProvider)
+                .reconcileOnLogin()
+                .whenComplete(
+                  () => ref
+                      .read(progressSyncCoordinatorProvider)
+                      .restoreAndBackup(),
+                ),
+          );
+          // FCM token storage (permission + persistance Firestore).
+          unawaited(ref.read(fcmRepositoryProvider).init());
+          // ignore: avoid_print
+          print('[BOOT] 9 wallet/progress/FCM triggered (auth ready)');
+        }),
+      );
 
       // FCM foreground : notif in-app quand un duel challenge arrive.
       _fcmForegroundSub = FirebaseMessaging.onMessage.listen(
