@@ -101,7 +101,7 @@
       "fr": "Vert et long sur la branche, je rends la sauce onctueuse et glissante."
     },
     "explanation": {
-      "fr": "Le gombo est un legume tres utilise en cote d'ivoire pour sa texture filante, base de la fameuse sauce gombo accompagnant foutou ou riz."
+      "fr": "Le gombo est un légume très utilisé en Côte d'Ivoire pour sa texture filante, base de la fameuse sauce gombo accompagnant foutou ou riz."
     },
     "difficulty": 1,
     "estimated_time_s": 20,
@@ -317,7 +317,7 @@
       "fr": "Lourd et lent, mes cornes fendent l'air. Sans moi, peu de labours, peu de festins."
     },
     "explanation": {
-      "fr": "Le boeuf est un animal d'elevage important au village, utilise pour les travaux agricoles et la viande lors des grandes occasions."
+      "fr": "Le bœuf est un animal d'élevage important au village, utilisé pour les travaux agricoles et la viande lors des grandes occasions."
     },
     "difficulty": 2,
     "estimated_time_s": 25,
@@ -735,10 +735,10 @@
       "E"
     ],
     "riddle": {
-      "fr": "Ventre rond noirci de fumee, je mijote sur trois pierres et garde les saveurs."
+      "fr": "Ventre rond noirci de fumée, je mijote sur trois pierres et garde les saveurs."
     },
     "explanation": {
-      "fr": "La marmite est l'ustensile central du foyer villageois, posee sur les trois pierres du feu pour cuire sauces et ragouts."
+      "fr": "La marmite est l'ustensile central du foyer villageois, posée sur les trois pierres du feu pour cuire sauces et ragoûts."
     },
     "difficulty": 3,
     "estimated_time_s": 35,
@@ -1396,25 +1396,29 @@
     "id": "culture_ci_051",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "GORI",
-    "answer_normalized": "gori",
+    "answer": "LEOPARD",
+    "answer_normalized": "leopard",
     "letters_pool": [
-      "G",
+      "L",
+      "E",
       "O",
+      "P",
+      "A",
       "R",
-      "I"
+      "D"
     ],
     "riddle": {
-      "fr": "Cérémonie baoulé d'honneur aux anciens, je marque le respect et la transmission."
+      "fr": "Félin des forêts ivoiriennes, je suis rare et craintif, roi invisible de la canopée."
     },
     "explanation": {
-      "fr": "Le Gori est une cérémonie baoulé de respect envers les anciens et les chefs, marquant les moments clés de la vie communautaire."
+      "fr": "Le léopard est un grand félin nocturne habitant les forêts ivoiriennes, symbole de puissance discrète dans les traditions de brousse."
     },
     "difficulty": 3,
     "estimated_time_s": 30,
     "tags": [
-      "tradition",
-      "ceremony"
+      "faune",
+      "foret",
+      "puissance"
     ],
     "format_version": 3
   },
@@ -1805,30 +1809,27 @@
     "id": "culture_ci_065",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "KONTOMIRE",
-    "answer_normalized": "kontomire",
+    "answer": "GNETUM",
+    "answer_normalized": "gnetum",
     "letters_pool": [
-      "K",
-      "O",
+      "G",
       "N",
+      "E",
       "T",
-      "O",
-      "M",
-      "I",
-      "R",
-      "E"
+      "U",
+      "M"
     ],
     "riddle": {
-      "fr": "Feuilles vertes du jardin, je suis hachée dans la sauce pour relever le goût."
+      "fr": "Feuille sauvage de la forêt, je suis pilée avec la sauce arachide du pays akan."
     },
     "explanation": {
-      "fr": "Le kontomire est une plante herbacée dont les feuilles sont très consommées en Côte d'Ivoire et dans toute l'Afrique de l'Ouest, utilisées dans les sauces traditionnelles."
+      "fr": "Le gnetum est une plante forestière dont les feuilles tendres sont consommées en Côte d'Ivoire, intégrées aux sauces traditionnelles et à la sauce d'arachide."
     },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
       "cuisine",
-      "legume",
+      "feuille",
       "tradition"
     ],
     "format_version": 3
@@ -1900,7 +1901,7 @@
     "id": "culture_ci_068",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "GBALITCHEÏ",
+    "answer": "GBALITCHEI",
     "answer_normalized": "gbalitchei",
     "letters_pool": [
       "G",
