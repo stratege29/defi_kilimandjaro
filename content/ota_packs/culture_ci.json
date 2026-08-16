@@ -4472,26 +4472,24 @@
     "id": "culture_ci_373",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "SAUCEGRAINE",
-    "answer_normalized": "saucegraine",
+    "answer": "DJOUMGBLE",
+    "answer_normalized": "djoumgble",
     "letters_pool": [
-      "S",
-      "A",
+      "D",
+      "J",
+      "O",
       "U",
-      "C",
-      "E",
+      "M",
       "G",
-      "R",
-      "A",
-      "I",
-      "N",
+      "B",
+      "L",
       "E"
     ],
     "riddle": {
-      "fr": "Bouillon rouge tiré des fruits du palmier à huile, je nappe igname et plantain."
+      "fr": "Gombo séché et pilé du pays baoulé, ma poudre sombre épaissit longtemps la sauce."
     },
     "explanation": {
-      "fr": "La sauce graine est une sauce épaisse à base de noix de palme bouillies et pressées, accompagnée de viande, poisson ou crabe."
+      "fr": "Le djoumgblé est une sauce du centre de la Côte d'Ivoire, chez les Baoulé, préparée à partir de gombo séché puis pilé, réputée pour sa longue conservation."
     },
     "difficulty": 3,
     "estimated_time_s": 35,
@@ -4506,31 +4504,31 @@
     "id": "culture_ci_374",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "SAUCEKOPE",
-    "answer_normalized": "saucekope",
+    "answer": "ADJOUKROU",
+    "answer_normalized": "adjoukrou",
     "letters_pool": [
-      "S",
       "A",
-      "U",
-      "C",
-      "E",
-      "K",
+      "D",
+      "J",
       "O",
-      "P",
-      "E"
+      "U",
+      "K",
+      "R",
+      "O",
+      "U"
     ],
     "riddle": {
-      "fr": "Crème onctueuse du sud-ouest aux fruits du palmier, je suis cousine de la sauce graine en pays krou."
+      "fr": "Peuple des rives de la lagune Ébrié, mes planteurs de palmiers ont fait de Dabou leur capitale."
     },
     "explanation": {
-      "fr": "La sauce kopé est une sauce traditionnelle du sud-ouest ivoirien à base de noix de palme, particulièrement appréciée en pays bété."
+      "fr": "Les Adjoukrou sont un peuple de la lagune Ébrié dont Dabou est la capitale traditionnelle, réputés pour la culture du palmier à huile et la production d'attiéké."
     },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
-      "sauce",
-      "cuisine",
-      "ouest"
+      "peuple",
+      "lagune",
+      "tradition"
     ],
     "format_version": 3
   },
@@ -4538,33 +4536,29 @@
     "id": "culture_ci_375",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "SAUCECLAIRE",
-    "answer_normalized": "sauceclaire",
+    "answer": "OSEILLE",
+    "answer_normalized": "oseille",
     "letters_pool": [
+      "O",
       "S",
-      "A",
-      "U",
-      "C",
       "E",
-      "C",
-      "L",
-      "A",
       "I",
-      "R",
+      "L",
+      "L",
       "E"
     ],
     "riddle": {
-      "fr": "Bouillon léger d'aubergines et de poisson, je rafraîchis les midis chauds."
+      "fr": "Fleur rouge du bissap, je suis bue en jus sucré ou pilée dans les sauces d'été."
     },
     "explanation": {
-      "fr": "La sauce claire est une sauce ivoirienne légère à base d'aubergines, tomates et poisson fumé, accompagnant le foutou ou le riz."
+      "fr": "L'oseille d'Afrique (hibiscus sabdariffa) est une plante dont les feuilles et calices sont utilisés en cuisine ivoirienne, à la fois pour les sauces et les boissons."
     },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
-      "sauce",
+      "feuille",
       "cuisine",
-      "tradition"
+      "plante"
     ],
     "format_version": 3
   },
@@ -4572,33 +4566,29 @@
     "id": "culture_ci_376",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "SAUCEFEUILLE",
-    "answer_normalized": "saucefeuille",
+    "answer": "BOUILLIE",
+    "answer_normalized": "bouillie",
     "letters_pool": [
-      "S",
-      "A",
-      "U",
-      "C",
-      "E",
-      "F",
-      "E",
+      "B",
+      "O",
       "U",
       "I",
       "L",
       "L",
+      "I",
       "E"
     ],
     "riddle": {
-      "fr": "Verdure broyée du jardin, je m'accommode des herbes sauvages et des feuilles de patate."
+      "fr": "Porridge onctueux de céréales, le matin on me déguste tiède avec miel et lait caillé."
     },
     "explanation": {
-      "fr": "La sauce feuille désigne une famille de sauces à base de légumes-feuilles (gnetum, manioc, patate douce), pilier de la cuisine du sud."
+      "fr": "La bouillie est une préparation épaisse à base de mil, de maïs ou de riz, consommée traditionnellement au petit-déjeuner dans les villages ivoiriens."
     },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
-      "sauce",
       "cuisine",
+      "petit-dejeuner",
       "tradition"
     ],
     "format_version": 3
@@ -5045,28 +5035,28 @@
     "id": "culture_ci_392",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "KLUCLU",
-    "answer_normalized": "kluclu",
+    "answer": "GNONMI",
+    "answer_normalized": "gnonmi",
     "letters_pool": [
-      "K",
-      "L",
-      "U",
-      "C",
-      "L",
-      "U"
+      "G",
+      "N",
+      "O",
+      "N",
+      "M",
+      "I"
     ],
     "riddle": {
-      "fr": "Galette frite au goûter des enfants, je suis croquant aux mille recettes."
+      "fr": "Galette de mil frite au petit matin, on me trempe dans le lait sucré des rues d'Abidjan."
     },
     "explanation": {
-      "fr": "Le kluiklui désigne en Côte d'Ivoire des galettes ou beignets traditionnels, à base de banane, d'arachide ou de mil selon les régions."
+      "fr": "Le gnonmi est un beignet traditionnel ivoirien à base de farine de mil, très populaire au petit-déjeuner, souvent dégusté avec du lait."
     },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
       "cuisine",
       "street-food",
-      "tradition"
+      "petit-dejeuner"
     ],
     "format_version": 3
   },
