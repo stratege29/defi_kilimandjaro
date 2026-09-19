@@ -166,6 +166,15 @@ class RemoteConfigService {
         d.interstitialMinIntervalSeconds,
       ),
       adsKillswitch: rc.getBool(RemoteConfigKeys.adsKillswitch),
+      otaAutoSyncEnabled: rc.getBool(RemoteConfigKeys.otaAutoSyncEnabled),
+      otaAutoSyncDelaySeconds: _safeNonNegativeInt(
+        rc.getInt(RemoteConfigKeys.otaAutoSyncDelaySeconds),
+        d.otaAutoSyncDelaySeconds,
+      ),
+      otaAutoSyncMinIntervalHours: _safeNonNegativeInt(
+        rc.getInt(RemoteConfigKeys.otaAutoSyncMinIntervalHours),
+        d.otaAutoSyncMinIntervalHours,
+      ),
     );
   }
 
@@ -190,6 +199,10 @@ class RemoteConfigService {
         RemoteConfigKeys.interstitialMinIntervalSeconds:
             d.interstitialMinIntervalSeconds,
         RemoteConfigKeys.adsKillswitch: d.adsKillswitch,
+        RemoteConfigKeys.otaAutoSyncEnabled: d.otaAutoSyncEnabled,
+        RemoteConfigKeys.otaAutoSyncDelaySeconds: d.otaAutoSyncDelaySeconds,
+        RemoteConfigKeys.otaAutoSyncMinIntervalHours:
+            d.otaAutoSyncMinIntervalHours,
       };
 
   static int _safePositiveInt(int value, int fallback) =>

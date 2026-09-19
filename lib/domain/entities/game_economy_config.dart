@@ -29,6 +29,9 @@ class GameEconomyConfig extends Equatable {
     required this.interstitialEveryNLevels,
     required this.interstitialMinIntervalSeconds,
     required this.adsKillswitch,
+    required this.otaAutoSyncEnabled,
+    required this.otaAutoSyncDelaySeconds,
+    required this.otaAutoSyncMinIntervalHours,
   });
 
   /// Coût en cauris du **premier** indice utilisé dans un niveau.
@@ -109,6 +112,23 @@ class GameEconomyConfig extends Equatable {
   /// Le shop reste actif (la décision est isolée du flux ads payants).
   final bool adsKillswitch;
 
+  /// Kill de la synchro OTA **automatique** du contenu (différée au boot,
+  /// au retour en premier plan et à l'activation d'un pack). `false` la
+  /// coupe sans store update ; le refresh manuel de « Mes packs » reste
+  /// actif dans tous les cas. Filet de sécurité si un OOM au démarrage
+  /// réapparaissait (cf. `docs/ota_v2_design.md`).
+  final bool otaAutoSyncEnabled;
+
+  /// Délai minimal (secondes) entre la première frame et tout download OTA
+  /// automatique. Doit rester au-delà de la fenêtre jetsam iOS (~10 s) et
+  /// après le preload audio.
+  final int otaAutoSyncDelaySeconds;
+
+  /// Intervalle minimal (heures) entre deux passes automatiques sur les packs
+  /// possédés. `0` = à chaque déclenchement (debug). La première passe après
+  /// installation n'est jamais throttlée.
+  final int otaAutoSyncMinIntervalHours;
+
   /// Valeurs par défaut câblées en dur (fallback si Remote Config indisponible
   /// ou première installation offline).
   static const GameEconomyConfig defaults = GameEconomyConfig(
@@ -129,6 +149,9 @@ class GameEconomyConfig extends Equatable {
     interstitialEveryNLevels: 3,
     interstitialMinIntervalSeconds: 60,
     adsKillswitch: false,
+    otaAutoSyncEnabled: true,
+    otaAutoSyncDelaySeconds: 20,
+    otaAutoSyncMinIntervalHours: 6,
   );
 
   /// Coût du Nème indice dans un niveau (N indexé depuis 0).
@@ -197,6 +220,9 @@ class GameEconomyConfig extends Equatable {
     int? interstitialEveryNLevels,
     int? interstitialMinIntervalSeconds,
     bool? adsKillswitch,
+    bool? otaAutoSyncEnabled,
+    int? otaAutoSyncDelaySeconds,
+    int? otaAutoSyncMinIntervalHours,
   }) {
     return GameEconomyConfig(
       hintCost: hintCost ?? this.hintCost,
@@ -221,6 +247,11 @@ class GameEconomyConfig extends Equatable {
       interstitialMinIntervalSeconds:
           interstitialMinIntervalSeconds ?? this.interstitialMinIntervalSeconds,
       adsKillswitch: adsKillswitch ?? this.adsKillswitch,
+      otaAutoSyncEnabled: otaAutoSyncEnabled ?? this.otaAutoSyncEnabled,
+      otaAutoSyncDelaySeconds:
+          otaAutoSyncDelaySeconds ?? this.otaAutoSyncDelaySeconds,
+      otaAutoSyncMinIntervalHours:
+          otaAutoSyncMinIntervalHours ?? this.otaAutoSyncMinIntervalHours,
     );
   }
 
@@ -243,6 +274,9 @@ class GameEconomyConfig extends Equatable {
         interstitialEveryNLevels,
         interstitialMinIntervalSeconds,
         adsKillswitch,
+        otaAutoSyncEnabled,
+        otaAutoSyncDelaySeconds,
+        otaAutoSyncMinIntervalHours,
       ];
 }
 
@@ -271,4 +305,8 @@ abstract class RemoteConfigKeys {
   static const String interstitialMinIntervalSeconds =
       'ads_interstitial_min_interval_seconds';
   static const String adsKillswitch = 'ads_killswitch';
+  static const String otaAutoSyncEnabled = 'ota_autosync_enabled';
+  static const String otaAutoSyncDelaySeconds = 'ota_autosync_delay_seconds';
+  static const String otaAutoSyncMinIntervalHours =
+      'ota_autosync_min_interval_hours';
 }
