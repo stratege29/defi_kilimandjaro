@@ -131,8 +131,10 @@ final memoryPressureSignalProvider = Provider<MemoryPressureSignal>((ref) {
 });
 
 /// Service de synchro des manifests Firestore (+ download des packs Storage).
-/// **Ne plus déclencher au boot** (cf. PR #15 — OOM iOS 26). Trigger
-/// manuel uniquement depuis `manifestSyncStateProvider` / `MyPacksView`.
+/// **Jamais dans le chemin critique du boot** (cf. PR #15 — OOM iOS 26).
+/// Deux déclencheurs : manuel (`manifestSyncStateProvider` / `MyPacksView`,
+/// tous les packs) et automatique, différé et scopé aux packs possédés
+/// (`OtaAutoSyncScheduler`, cf. `lib/data/sync/ota_auto_sync.dart`).
 final manifestSyncServiceProvider = Provider<ManifestSyncService>((ref) {
   FirebaseCrashlytics? crashlytics;
   try {
