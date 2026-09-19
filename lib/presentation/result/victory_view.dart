@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
@@ -329,11 +330,7 @@ class _VictoryCard extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                const Icon(
-                  Icons.workspace_premium_rounded,
-                  size: 22,
-                  color: AppColors.orJour,
-                ),
+                Image.asset(AppAssets.iconStarGold, width: 22, height: 22),
                 const SizedBox(width: 6),
                 Text(
                   'BOSS VAINCU',
@@ -344,11 +341,7 @@ class _VictoryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 6),
-                const Icon(
-                  Icons.workspace_premium_rounded,
-                  size: 22,
-                  color: AppColors.orJour,
-                ),
+                Image.asset(AppAssets.iconStarGold, width: 22, height: 22),
               ],
             ),
             const SizedBox(height: 10),
@@ -362,18 +355,22 @@ class _VictoryCard extends StatelessWidget {
               KiliMascot(controller: kili, size: 130),
               if (isBoss)
                 Positioned(
-                  top: -14,
-                  child: Icon(
-                    Icons.emoji_events_rounded,
-                    size: 36,
-                    color: AppColors.orJour,
-                    shadows: <Shadow>[
-                      Shadow(
-                        color: Colors.black.withValues(alpha: 0.65),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
+                  top: -18,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      boxShadow: <BoxShadow>[
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.65),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Image.asset(
+                      AppAssets.iconCrownBoss,
+                      width: 40,
+                      height: 40,
+                    ),
                   ),
                 ),
             ],
@@ -493,12 +490,26 @@ class _StarsRow extends StatelessWidget {
       children: <Widget>[
         for (var i = 1; i <= 3; i++) ...<Widget>[
           if (i > 1) const SizedBox(width: 6),
-          Icon(
-            i <= earned ? Icons.star_rounded : Icons.star_outline_rounded,
-            size: 32,
-            color: i <= earned
-                ? AppColors.orJour
-                : AppColors.textePrimaire.withValues(alpha: 0.25),
+          // Étoile or peinte ; l'étoile manquée reste la même image,
+          // désaturée et atténuée (même convention que les titres
+          // verrouillés du profil).
+          Opacity(
+            opacity: i <= earned ? 1 : 0.22,
+            child: ColorFiltered(
+              colorFilter: i <= earned
+                  ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
+                  : const ColorFilter.matrix(<double>[
+                      0.2126, 0.7152, 0.0722, 0, 0, //
+                      0.2126, 0.7152, 0.0722, 0, 0, //
+                      0.2126, 0.7152, 0.0722, 0, 0, //
+                      0, 0, 0, 1, 0, //
+                    ]),
+              child: Image.asset(
+                AppAssets.iconStarGold,
+                width: 32,
+                height: 32,
+              ),
+            ),
           ),
         ],
       ],

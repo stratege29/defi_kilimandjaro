@@ -83,6 +83,34 @@ object, no floor, no shadow on ground, no text, no watermark.*
   darker green #2E7A44 bottom edge, thin polished gold #E9B949 border with a very subtle
   carved adinkra pattern along the edge, soft glossy 3D relief, fully transparent outside.
 
+### Lot 2 — écrans de résultat (2026-09-19, 14 crédits)
+
+Remplacent des icônes Material (`Icons.terrain`, `handshake`, `star_rounded`,
+`emoji_events`, `workspace_premium`) dans `duel_result_view` et `victory_view`.
+Marques de manches et icônes de CTA (18-20 px) restent en Material, volontairement.
+
+- **Défaite duel** `duel/defeat_emblem.png` 512² — Defeat emblem for a 1v1 duel result
+  screen, companion piece to a victory trophy: the same round carved wooden shield medallion
+  with a ring of small rivets around the rim, but cracked with a deep diagonal split across
+  the wood, the central Akan adinkra knot symbol (Nyansapo) tarnished and dull, the rivets
+  darkened; muted laterite red-brown #B04A30 and dark walnut tones, no bright gold shine, a
+  few small wood splinters at the crack. Somber but dignified, not cartoonish.
+- **Match nul** `duel/draw_emblem.png` 512² — Draw / tie emblem for a 1v1 duel result
+  screen, companion piece to a victory trophy: a round carved wooden medallion with a ring
+  of small rivets, bearing two crossed traditional West African spears with wooden shafts
+  and bronze tips, a single kola nut resting at the center of the cross. Balanced,
+  symmetrical, calm; warm wood and soft antique gold #C18A2A, no bright glow.
+- **Étoile** `icons/star_gold.png` 256² — Single five-pointed star game icon, polished gold
+  #E9B949 with a soft antique-gold #C18A2A bevel and a small bright ivory specular highlight
+  on the upper-left, slightly rounded points, subtle carved adinkra dots along the edges,
+  faint warm glow. Reads clearly at 32 pixels. *(Étoile manquée = même image, matrice
+  luminance + opacité 0,22 dans `_StarsRow`.)*
+- **Couronne boss** `icons/crown_boss.png` 256² — Small ornate royal crown game icon in the
+  style of an Akan gold crown: polished gold #E9B949 band with a carved adinkra pattern,
+  three rounded gold points topped with tiny ivory beads, a small red-orange kola-colored gem
+  at the center, soft antique-gold #C18A2A shading. Reads clearly at 36 pixels, front view,
+  slightly tilted upward.
+
 Commande type :
 
 ```bash

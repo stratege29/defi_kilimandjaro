@@ -98,6 +98,13 @@ abstract final class AppAssets {
   static const String iconNavMap = '$_icons/nav_map.png';
   static const String iconNavProfile = '$_icons/nav_profile.png';
 
+  /// Étoile or peinte (écran victoire) — l'étoile manquée se rend en opacité
+  /// réduite sur ce même asset, pas de variante « vide ».
+  static const String iconStarGold = '$_icons/star_gold.png';
+
+  /// Couronne akan or posée sur Kili à la victoire d'un niveau boss.
+  static const String iconCrownBoss = '$_icons/crown_boss.png';
+
   // --- Backgrounds ---
   static const String bgHub = '$_backgrounds/hub.png';
   static const String bgMountainAscent = '$_backgrounds/mountain_ascent.png';
@@ -172,4 +179,9 @@ abstract final class AppAssets {
   static const String duelVsBanner = '$_duel/vs_banner.png';
   static const String duelLobby = '$_duel/lobby_drum.png';
   static const String duelTrophy = '$_duel/trophy_elo.png';
+
+  /// Emblèmes de résultat, même famille de médaillons que [duelTrophy] :
+  /// bouclier fendu (défaite) et lances croisées sur kola (match nul).
+  static const String duelDefeat = '$_duel/defeat_emblem.png';
+  static const String duelDraw = '$_duel/draw_emblem.png';
 }
