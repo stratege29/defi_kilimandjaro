@@ -706,7 +706,7 @@
       "N"
     ],
     "riddle": {
-      "fr": "Petite baie verte, parfois amère, je relève sauces et ragoûts au village."
+      "fr": "Petite baie verte, parfois amère, je relève sauces et pâtes au village."
     },
     "explanation": {
       "fr": "Le gnagnan est une petite baie utilisée comme légume amer dans les sauces traditionnelles ivoiriennes, notamment chez les Akan."
@@ -1325,10 +1325,10 @@
       "I"
     ],
     "riddle": {
-      "fr": "Masque sénoufo aux yeux spiralés, je viens de la nuit pour danser la création du monde."
+      "fr": "Masque traditionnel baoulé utilisé lors des danses rituelles"
     },
     "explanation": {
-      "fr": "Le Goli est un masque sénoufo dont les motifs spiralés représentent le feu et l'eau, utilisé lors de cérémonies d'initiation et de deuil."
+      "fr": "Le masque Goli est un masque traditionnel du peuple Baoulé en Côte d’Ivoire, souvent utilisé lors des cérémonies, des fêtes et des funérailles. Il symbolise des esprits protecteurs."
     },
     "difficulty": 3,
     "estimated_time_s": 30,
@@ -1354,7 +1354,7 @@
       "fr": "Masque rond du visage lisse, je suis l'esprit féminin de la brousse."
     },
     "explanation": {
-      "fr": "Le Popo est un masque féminin de la tradition sénoufo, représentant la beauté et la fécondité, apparu lors des festivités villageoises."
+      "fr": "Le masque Popo est un masque traditionnel que l’on retrouve en Côte d’Ivoire, dans certaines communautés. Il est utilisé lors de cérémonies culturelles, de danses et de fêtes pour représenter des esprits"
     },
     "difficulty": 3,
     "estimated_time_s": 30,
@@ -1379,10 +1379,10 @@
       "A"
     ],
     "riddle": {
-      "fr": "Fête alladian de la pardon et des rires, je rassemble les cœurs sous le ciel."
+      "fr": "Fête traditionnelle n’zima de Grand-Bassam, je rassemble les cœurs sous le ciel."
     },
     "explanation": {
-      "fr": "L'Abissa est une fête traditionnelle des peuples Alladian du littoral, célébration annuelle de pardon et de réjouissances."
+      "fr": "L'Abissa est une fête traditionnelle du peuple N'zima, célébration annuelle de pardon et de réjouissances."
     },
     "difficulty": 3,
     "estimated_time_s": 30,
@@ -1453,21 +1453,21 @@
     "id": "culture_ci_053",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "BANGUI",
-    "answer_normalized": "bangui",
+    "answer": "CLACLO",
+    "answer_normalized": "claclo",
     "letters_pool": [
-      "B",
+      "C",
+      "L",
       "A",
-      "N",
-      "G",
-      "U",
-      "I"
+      "C",
+      "L",
+      "O"
     ],
     "riddle": {
-      "fr": "Banane très mûre, je suis transformée en purée sucrée ou en farine pour les enfants."
+      "fr": "Banane très mûre, je suis transformée en beignet croustillant et moelleux à la fois."
     },
     "explanation": {
-      "fr": "Le bangui désigne une banane plantain très mûre, utilisée pour préparer un plat sucré ou une farine nourrissante pour les jeunes enfants."
+      "fr": "Le claclo est un plat ivoirien fait avec de la banane plantain mûre écrasée, assaisonnée puis frite."
     },
     "difficulty": 2,
     "estimated_time_s": 25,
@@ -1492,10 +1492,10 @@
       "O"
     ],
     "riddle": {
-      "fr": "Riz et haricots cuits ensemble, je suis le réconfort du pauvre et la fierté du riche."
+      "fr": "Je suis préparé avec de la poudre de maïs et accompagné de sauce."
     },
     "explanation": {
-      "fr": "Le kabato (ou kabato kabato) est un plat ivoirien d'arachides, riz et haricots mélangés, nourriture simple mais enrichissante."
+      "fr": "Le kabato est un plat ivoirien à base de farine de maïs, cuite dans l’eau jusqu’à obtenir une pâte épaisse. Il se mange chaud, généralement\naccompagné de sauces."
     },
     "difficulty": 3,
     "estimated_time_s": 30,
@@ -1650,16 +1650,16 @@
     "id": "culture_ci_060",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "PALAVER",
-    "answer_normalized": "palaver",
+    "answer": "PALABRE",
+    "answer_normalized": "palabre",
     "letters_pool": [
       "P",
       "A",
       "L",
       "A",
-      "V",
-      "E",
-      "R"
+      "B",
+      "R",
+      "E"
     ],
     "riddle": {
       "fr": "Parole publique sous l'arbre, on m'utilise pour résoudre les conflits avec sagesse."
@@ -1711,8 +1711,8 @@
     "id": "culture_ci_062",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "GNAMAKODE",
-    "answer_normalized": "gnamakode",
+    "answer": "GNAMAKOUDJI",
+    "answer_normalized": "gnamakoudji",
     "letters_pool": [
       "G",
       "N",
@@ -1721,20 +1721,21 @@
       "A",
       "K",
       "O",
+      "U",
       "D",
-      "E"
+      "J",
+      "I"
     ],
     "riddle": {
-      "fr": "Sauce arachide très épaisse où trempe la viande, je suis servie avec riz ou foutou."
+      "fr": "Breuvage épicé qui réveille le palais, je suis rafraîchissante et piquante"
     },
     "explanation": {
-      "fr": "Le gnamakode est une sauce traditionnelle ivoirienne à base d'arachide, viande et légumes, très riche et populaire dans les repas familiaux."
+      "fr": "Le gnamakoudji est une boisson traditionnelle ivoirienne préparée à base de gingembre, d’eau et de sucre, parfois parfumée au citron ou à l’ananas."
     },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
-      "cuisine",
-      "sauce",
+      "boisson",
       "tradition"
     ],
     "format_version": 3
@@ -1883,7 +1884,7 @@
       "A"
     ],
     "riddle": {
-      "fr": "Condiment fermenté de graines, je parfume les sauces et les ragoûts. Je sens très fort."
+      "fr": "Condiment fermenté de graines, je parfume les sauces et les pâtes. Je sens très fort."
     },
     "explanation": {
       "fr": "Le soumbala est un condiment ouest-africain fermenté issu des graines de néré, très odorant et savoureux, indispensable dans la cuisine ivoirienne traditionnelle."
