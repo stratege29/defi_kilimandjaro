@@ -3,7 +3,7 @@
   "packs": {
     "culture_ci": {
       "file": "culture_ci.json",
-      "count": 354,
+      "count": 350,
       "current_version": 4,
       "name_key": "pack.culture_ci.name",
       "description_key": "pack.culture_ci.description",
@@ -32,5 +32,5 @@
       "price_cauris": 2000
     }
   },
-  "total": 1100
+  "total": 1096
 }

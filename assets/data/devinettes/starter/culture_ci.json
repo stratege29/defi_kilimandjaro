@@ -1088,20 +1088,20 @@
     "id": "culture_ci_040",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "SANZA",
-    "answer_normalized": "sanza",
+    "answer": "AHOKO",
+    "answer_normalized": "ahoko",
     "letters_pool": [
-      "S",
       "A",
-      "N",
-      "Z",
-      "A"
+      "H",
+      "O",
+      "K",
+      "O"
     ],
     "riddle": {
-      "fr": "Petites lames métalliques, je tinte entre vos pouces, musique hypnotique des veillées."
+      "fr": "Instrument de musique traditionnel ivoirien, je suis utilisé dans les danses baoulé."
     },
     "explanation": {
-      "fr": "La sanza (ou mbira) est un idiophone à lamelles métalliques, instrument miniature créateur de mélodies complexes, utilisé pour la méditation et la danse."
+      "fr": "L’Ahoko est un instrument de musique traditionnelle des Baoulé de Côte d’Ivoire. Il s’agit d’un bâton strié que l’on racle à l’aide d’un racleur."
     },
     "difficulty": 2,
     "estimated_time_s": 25,
