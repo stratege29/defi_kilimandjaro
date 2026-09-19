@@ -180,20 +180,21 @@
     "id": "culture_ci_227",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "BAGOE",
-    "answer_normalized": "bagoe",
+    "answer": "BAGOUE",
+    "answer_normalized": "bagoue",
     "letters_pool": [
       "B",
       "A",
       "G",
       "O",
+      "U",
       "E"
     ],
     "riddle": {
       "fr": "Cours d'eau du grand nord, je rejoindrai au loin le fleuve qui irrigue le Mali."
     },
     "explanation": {
-      "fr": "Le Bagoé est une rivière du nord ivoirien, affluent du Niger, traversant la région du pays sénoufo."
+      "fr": "La Bagoué est une rivière du nord de la Côte d’Ivoire, qui a donné son nom à la région de la Bagoué."
     },
     "difficulty": 2,
     "estimated_time_s": 25,
@@ -5178,40 +5179,6 @@
     "format_version": 3
   },
   {
-    "id": "culture_ci_397",
-    "pack": "culture_ci",
-    "country": "ci",
-    "answer": "GNAMAKOUDJI",
-    "answer_normalized": "gnamakoudji",
-    "letters_pool": [
-      "G",
-      "N",
-      "A",
-      "M",
-      "A",
-      "K",
-      "O",
-      "U",
-      "D",
-      "J",
-      "I"
-    ],
-    "riddle": {
-      "fr": "Jus piquant tiré de la racine épicée, je réveille les bouches même à jeun."
-    },
-    "explanation": {
-      "fr": "Le gnamakoudji est un jus traditionnel ouest-africain à base de gingembre frais, citron et sucre, parfois aromatisé à l'ananas."
-    },
-    "difficulty": 3,
-    "estimated_time_s": 35,
-    "tags": [
-      "boisson",
-      "tradition",
-      "condiment"
-    ],
-    "format_version": 3
-  },
-  {
     "id": "culture_ci_398",
     "pack": "culture_ci",
     "country": "ci",
@@ -8098,36 +8065,6 @@
     "format_version": 3
   },
   {
-    "id": "culture_ci_497",
-    "pack": "culture_ci",
-    "country": "ci",
-    "answer": "PALABRE",
-    "answer_normalized": "palabre",
-    "letters_pool": [
-      "P",
-      "A",
-      "L",
-      "A",
-      "B",
-      "R",
-      "E"
-    ],
-    "riddle": {
-      "fr": "Assemblée tenue à l'ombre du grand arbre, mes paroles tranchent les conflits sans tribunal."
-    },
-    "explanation": {
-      "fr": "La palabre est l'institution communautaire ouest-africaine de règlement des conflits par la parole, sous l'arbre à palabres au cœur du village."
-    },
-    "difficulty": 4,
-    "estimated_time_s": 45,
-    "tags": [
-      "tradition",
-      "village",
-      "oralite"
-    ],
-    "format_version": 3
-  },
-  {
     "id": "culture_ci_498",
     "pack": "culture_ci",
     "country": "ci",
@@ -8213,6 +8150,191 @@
       "histoire",
       "tradition",
       "centre"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_501",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "ELEPHANTS",
+    "answer_normalized": "elephants",
+    "letters_pool": [
+      "E",
+      "L",
+      "E",
+      "P",
+      "H",
+      "A",
+      "N",
+      "T",
+      "S"
+    ],
+    "riddle": {
+      "fr": "C'est le nom de l'équipe nationale de football de Côte d'Ivoire, fierté du pays."
+    },
+    "explanation": {
+      "fr": "Les Éléphants est le surnom affectueux de l'équipe nationale masculine de football de la Côte d'Ivoire. Elle a remporté la Coupe d'Afrique des Nations à plusieurs reprises, faisant la joie de ses supporters."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "sport",
+      "football",
+      "national",
+      "abidjan"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_504",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GOURO",
+    "answer_normalized": "gouro",
+    "letters_pool": [
+      "G",
+      "O",
+      "U",
+      "R",
+      "O"
+    ],
+    "riddle": {
+      "fr": "C'est le nom d'un groupe ethnique ivoirien connu pour ses masques colorés et ses danses festives."
+    },
+    "explanation": {
+      "fr": "Les Guro sont un peuple de Côte d'Ivoire réputé pour son art, notamment ses masques et ses sculptures de figures féminines. Leurs traditions et danses sont souvent représentées lors d'événements culturels à Abidjan."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 40,
+    "tags": [
+      "culture",
+      "art",
+      "danse",
+      "tradition",
+      "peuple",
+      "abidjan"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_505",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "FAROT",
+    "answer_normalized": "farot",
+    "letters_pool": [
+      "F",
+      "A",
+      "R",
+      "O",
+      "T"
+    ],
+    "riddle": {
+      "fr": "Il s'agit d'une attitude consistant à se montrer, à vouloir impressionner les autres par son style ou ses biens."
+    },
+    "explanation": {
+      "fr": "\"Farot\" est un terme d'argot ivoirien qui désigne l'action de se vanter, de montrer sa richesse ou son statut social. C'est une attitude courante dans la culture urbaine abidjanaise."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 40,
+    "tags": [
+      "societe",
+      "oralite",
+      "langage",
+      "abidjan",
+      "jeunesse",
+      "attitude"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_506",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "NOUCHI",
+    "answer_normalized": "nouchi",
+    "letters_pool": [
+      "N",
+      "O",
+      "U",
+      "C",
+      "H",
+      "I"
+    ],
+    "riddle": {
+      "fr": "Je suis le parler urbain des rues animées, un mélange savoureux qui fait la richesse de la communication. Qui suis-je ?"
+    },
+    "explanation": {
+      "fr": "Le Nouchi est un argot ivoirien issu du français populaire et de diverses langues locales, très répandu à Abidjan. Il est en constante évolution et utilisé majoritairement par les jeunes."
+    },
+    "difficulty": 1,
+    "estimated_time_s": 25,
+    "tags": [
+      "societe",
+      "oralite",
+      "langage",
+      "abidjan",
+      "jeunesse"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_507",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "YAKO",
+    "answer_normalized": "yako",
+    "letters_pool": [
+      "Y",
+      "A",
+      "K",
+      "O"
+    ],
+    "riddle": {
+      "fr": "Petit mot de réconfort en langue locale, il exprime la compassion ou les condoléances."
+    },
+    "explanation": {
+      "fr": "« Yako » est un terme Akan, très utilisé à Abidjan et en Côte d'Ivoire pour exprimer la compassion, les condoléances ou le réconfort face à une épreuve."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": [
+      "societe",
+      "oralite",
+      "langage",
+      "abidjan",
+      "attitude"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_510",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GBEGBE",
+    "answer_normalized": "gbegbe",
+    "letters_pool": [
+      "G",
+      "B",
+      "E",
+      "G",
+      "B",
+      "E"
+    ],
+    "riddle": {
+      "fr": "Cette danse rythmée, originaire de l'Ouest du pays, a gagné en popularité dans les clubs et fêtes d'Abidjan."
+    },
+    "explanation": {
+      "fr": "Le Gbegbe est une danse traditionnelle de l'ouest de la Côte d'Ivoire qui s'est popularisée et est souvent pratiquée lors des célébrations et nuits festives à Abidjan."
+    },
+    "difficulty": 2,
+    "estimated_time_s": 30,
+    "tags": [
+      "culture",
+      "art",
+      "danse",
+      "abidjan"
     ],
     "format_version": 3
   }
