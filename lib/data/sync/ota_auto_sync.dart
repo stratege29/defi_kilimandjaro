@@ -27,9 +27,21 @@ const Duration kOtaPressureRetryDelay = Duration(minutes: 2);
 /// Nombre maximal de reports pour pression mémoire par session.
 const int kOtaPressureMaxRetries = 3;
 
-/// Backoff (en mémoire) après un échec top-level du service (réseau,
-/// Firestore, App Check) — évite de marteler en boucle sur `resumed`.
+/// Backoff (en mémoire) après un échec du service (réseau, Firestore, App
+/// Check, ou passe dont tous les packs sont en erreur) — évite de marteler
+/// en boucle sur `resumed`.
 const Duration kOtaFailureBackoff = Duration(minutes: 5);
+
+/// Attente maximale du sas sur `bootReady` (App Check + Auth + Remote
+/// Config). Au-delà, on continue avec la config courante (defaults RC) :
+/// une attestation App Check qui pend ne doit pas rendre l'auto-sync
+/// silencieusement inerte pour toute la session.
+const Duration kOtaBootReadyTimeout = Duration(seconds: 90);
+
+/// Cooldown en mémoire d'un pack déjà synchronisé (par n'importe quelle
+/// passe) : une bascule de pack actif dans « Mes packs » ne doit pas coûter
+/// une requête Firestore à chaque fois.
+const Duration kOtaSinglePackCooldown = Duration(minutes: 10);
 
 /// Paramètres de l'auto-sync résolus depuis Remote Config **au moment du
 /// déclenchement** (jamais figés à la construction : le fetch RC termine
@@ -129,6 +141,9 @@ class OtaAutoSyncScheduler with WidgetsBindingObserver {
   int _pressureRetries = 0;
   final Set<String> _singleInFlight = <String>{};
 
+  /// Dernière sync réussie (ou « à jour ») par pack, toutes passes confondues.
+  final Map<String, DateTime> _lastPackSyncAt = <String, DateTime>{};
+
   /// À appeler une fois, en fin de post-frame du `_BootGate`. Mémorise
   /// l'origine du délai, enregistre l'observer lifecycle et lance la passe
   /// différée sur les packs possédés.
@@ -145,7 +160,10 @@ class OtaAutoSyncScheduler with WidgetsBindingObserver {
     if (_ownedRunInFlight || _disposed) return;
     _ownedRunInFlight = true;
     try {
-      final cfg = await _gate(reason);
+      final cfg = await _gate(
+        reason,
+        retry: () => syncOwnedPacks(reason: 'pressure-retry'),
+      );
       if (cfg == null) return;
       final now = _now();
       if (_isBackingOff(now)) return;
@@ -153,7 +171,9 @@ class OtaAutoSyncScheduler with WidgetsBindingObserver {
       if (lastMs != null) {
         final since =
             now.difference(DateTime.fromMillisecondsSinceEpoch(lastMs));
-        if (since < cfg.minInterval) {
+        // `since` négatif = horloge reculée depuis le stamp : on ne bloque
+        // pas sur une durée qui n'a pas de sens.
+        if (since >= Duration.zero && since < cfg.minInterval) {
           _logger.d(
             'OtaAutoSync[$reason]: throttled (dernière passe il y a '
             '${since.inMinutes} min < ${cfg.minInterval.inHours} h).',
@@ -172,14 +192,25 @@ class OtaAutoSyncScheduler with WidgetsBindingObserver {
         priorityPack: _activePackId(),
         resetPressureSignal: false,
       );
-      if (!report.abortedByMemoryPressure) {
-        await _prefs.setInt(kOtaLastAutoSyncAtKey, now.millisecondsSinceEpoch);
-      }
       _logger.i(
         'OtaAutoSync[$reason]: ${report.updated} maj, ${report.skipped} à '
         'jour, ${report.errors} erreur(s)'
         '${report.abortedByMemoryPressure ? ", abandonnée (pression)" : ""}.',
       );
+      // Passe entièrement en échec (erreurs par pack avalées par le
+      // service, donc pas d'exception ici) : pas de stamp, backoff court.
+      final allFailed =
+          report.errors > 0 && report.errors == report.totalProcessed;
+      if (allFailed) {
+        _onFailure(reason, 'tous les packs en erreur', StackTrace.empty);
+        return;
+      }
+      if (!report.abortedByMemoryPressure) {
+        await _prefs.setInt(kOtaLastAutoSyncAtKey, now.millisecondsSinceEpoch);
+        for (final id in owned) {
+          _lastPackSyncAt[id] = now;
+        }
+      }
       if (report.hasChanges) _onSynced?.call(report);
     } on Object catch (e, st) {
       _onFailure(reason, e, st);
@@ -189,12 +220,22 @@ class OtaAutoSyncScheduler with WidgetsBindingObserver {
   }
 
   /// Sync non bloquante d'un seul pack (activation, choix du pack gratuit,
-  /// déblocage). Coalescée par pack, jamais throttlée : un pack déjà à jour
-  /// coûte une requête `whereIn` et zéro download.
+  /// déblocage). Coalescée par pack et hors throttle « possédés », mais
+  /// soumise à un cooldown court ([kOtaSinglePackCooldown]) si ce pack a
+  /// déjà été synchronisé par n'importe quelle passe : une bascule de pack
+  /// actif ne coûte alors rien.
   Future<void> syncActivePack(String packId) async {
     if (_disposed || !_singleInFlight.add(packId)) return;
     try {
-      final cfg = await _gate('pack:$packId');
+      final last = _lastPackSyncAt[packId];
+      if (last != null && _now().difference(last) < kOtaSinglePackCooldown) {
+        _logger.d('OtaAutoSync[pack:$packId]: synchronisé récemment, skip.');
+        return;
+      }
+      final cfg = await _gate(
+        'pack:$packId',
+        retry: () => syncActivePack(packId),
+      );
       if (cfg == null) return;
       if (_isBackingOff(_now())) return;
       final report = await _service.refresh(
@@ -202,6 +243,11 @@ class OtaAutoSyncScheduler with WidgetsBindingObserver {
         priorityPack: packId,
         resetPressureSignal: false,
       );
+      if (report.errors > 0 && report.errors == report.totalProcessed) {
+        _onFailure('pack:$packId', 'pack en erreur', StackTrace.empty);
+        return;
+      }
+      if (!report.abortedByMemoryPressure) _lastPackSyncAt[packId] = _now();
       if (report.hasChanges) _onSynced?.call(report);
     } on Object catch (e, st) {
       _onFailure('pack:$packId', e, st);
@@ -224,9 +270,23 @@ class OtaAutoSyncScheduler with WidgetsBindingObserver {
   }
 
   /// Sas commun à tous les déclencheurs. Retourne la config résolue, ou
-  /// `null` si la sync ne doit pas avoir lieu maintenant.
-  Future<OtaAutoSyncConfig?> _gate(String reason) async {
-    await _bootReady;
+  /// `null` si la sync ne doit pas avoir lieu maintenant. [retry] est
+  /// rejoué (même déclencheur, mêmes packs) après un report pour pression
+  /// mémoire fraîche.
+  Future<OtaAutoSyncConfig?> _gate(
+    String reason, {
+    required Future<void> Function() retry,
+  }) async {
+    // Borné : une attestation App Check qui pend ne doit pas suspendre le
+    // sas (et donc tous les déclencheurs) pour la session entière.
+    await _bootReady.timeout(
+      kOtaBootReadyTimeout,
+      onTimeout: () => _logger.w(
+        'OtaAutoSync[$reason]: bootReady non résolu après '
+        '${kOtaBootReadyTimeout.inSeconds} s, on continue avec la config '
+        'courante.',
+      ),
+    );
     if (_disposed) return null;
 
     final cfg = _config();
@@ -235,8 +295,11 @@ class OtaAutoSyncScheduler with WidgetsBindingObserver {
       return null;
     }
 
+    // Horloge murale : un recul d'horloge après start() gonflerait
+    // `remaining` ; on le borne au délai configuré.
     final origin = _startedAt ?? _now();
-    final remaining = cfg.delay - _now().difference(origin);
+    var remaining = cfg.delay - _now().difference(origin);
+    if (remaining > cfg.delay) remaining = cfg.delay;
     if (remaining > Duration.zero) {
       await _delay(remaining);
       if (_disposed) return null;
@@ -248,7 +311,7 @@ class OtaAutoSyncScheduler with WidgetsBindingObserver {
           at != null && _now().difference(at) < kOtaPressureStaleAfter;
       if (fresh) {
         _logger.w('OtaAutoSync[$reason]: pression mémoire fraîche, report.');
-        _scheduleRetry();
+        _scheduleRetry(retry);
         return null;
       }
       // Signal périmé (boot) : on l'efface pour ne pas bloquer la session.
@@ -257,12 +320,12 @@ class OtaAutoSyncScheduler with WidgetsBindingObserver {
     return cfg;
   }
 
-  void _scheduleRetry() {
+  void _scheduleRetry(Future<void> Function() retry) {
     if (_pressureRetries >= kOtaPressureMaxRetries) return;
     _pressureRetries++;
     unawaited(
       _delay(kOtaPressureRetryDelay).then((_) {
-        if (!_disposed) unawaited(syncOwnedPacks(reason: 'pressure-retry'));
+        if (!_disposed) unawaited(retry());
       }),
     );
   }
@@ -276,8 +339,9 @@ class OtaAutoSyncScheduler with WidgetsBindingObserver {
 
   void _onFailure(String reason, Object error, StackTrace stack) {
     _notBefore = _now().add(kOtaFailureBackoff);
-    // Le service a déjà remonté l'erreur à Crashlytics quand elle vient d'un
-    // pack ; ici ce sont les échecs top-level (manifests / réseau).
+    // Le service a déjà remonté à Crashlytics les erreurs par pack ; ici ce
+    // sont les échecs top-level (manifests / réseau) ou une passe sans
+    // aucun pack réussi.
     _logger.w('OtaAutoSync[$reason]: échec, backoff 5 min — $error');
   }
 }

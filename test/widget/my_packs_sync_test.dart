@@ -158,10 +158,6 @@ class _FakeRemote implements RemoteDevinettePackDatasource {
     return activePackIds;
   }
 
-  @override
-  Future<ContentPackManifest?> fetchManifest(String packId) async {
-    return manifests.where((m) => m.packId == packId).firstOrNull;
-  }
 
   @override
   Future<List<ContentPackManifest>> fetchManifests(List<String> packIds) async {

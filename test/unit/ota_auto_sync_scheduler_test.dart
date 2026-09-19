@@ -207,6 +207,35 @@ void main() {
       expect(synced, hasLength(1));
     });
 
+    test('tous les packs en erreur → pas de stamp, backoff 5 min', () async {
+      service.report = const SyncReport(updated: 0, skipped: 0, errors: 2);
+      config = const OtaAutoSyncConfig(
+        enabled: true,
+        delay: Duration.zero,
+        minInterval: Duration.zero,
+      );
+      final s = build();
+      await s.syncOwnedPacks(reason: 'a');
+      expect(service.calls, hasLength(1));
+      expect(prefs.getInt(kOtaLastAutoSyncAtKey), isNull);
+
+      // Backoff court : la passe suivante est ignorée…
+      await s.syncOwnedPacks(reason: 'b');
+      expect(service.calls, hasLength(1));
+      // …puis reprend après 5 min, sans attendre 6 h.
+      clock.advance(kOtaFailureBackoff + const Duration(seconds: 1));
+      service.report = const SyncReport(updated: 1, skipped: 1, errors: 0);
+      await s.syncOwnedPacks(reason: 'c');
+      expect(service.calls, hasLength(2));
+      expect(prefs.getInt(kOtaLastAutoSyncAtKey), isNotNull);
+    });
+
+    test('erreurs partielles → stamp écrit (au moins un pack OK)', () async {
+      service.report = const SyncReport(updated: 1, skipped: 0, errors: 1);
+      await build().syncOwnedPacks(reason: 'a');
+      expect(prefs.getInt(kOtaLastAutoSyncAtKey), isNotNull);
+    });
+
     test('réentrance : un second appel pendant la passe est ignoré',
         () async {
       service.gate = Completer<void>();
@@ -239,6 +268,25 @@ void main() {
       expect(service.calls, hasLength(1));
     });
 
+    test('signal frais sur syncActivePack → retentative du MÊME pack, '
+        'hors throttle', () async {
+      // Passe possédés récente : la retentative ne doit pas être throttlée.
+      await prefs.setInt(
+        kOtaLastAutoSyncAtKey,
+        clock.now().millisecondsSinceEpoch,
+      );
+      pressure
+        ..underPressure = true
+        ..lastPressureAt = clock.now();
+      final s = build();
+      await s.syncActivePack('football_ci');
+      expect(service.calls, isEmpty);
+      await _settle();
+      expect(service.calls.map((c) => c.onlyPacks), [
+        {'football_ci'},
+      ]);
+    });
+
     test('signal frais → retentative planifiée après 2 min', () async {
       pressure
         ..underPressure = true
@@ -265,6 +313,49 @@ void main() {
       expect(call.resetPressureSignal, isFalse);
       // Pas de stamp : seule la passe « possédés » l'écrit.
       expect(prefs.getInt(kOtaLastAutoSyncAtKey), stamp);
+    });
+
+    test('cooldown : pack synchronisé il y a < 10 min → aucun appel',
+        () async {
+      final s = build();
+      await s.syncActivePack('p');
+      expect(service.calls, hasLength(1));
+
+      clock.advance(const Duration(minutes: 3));
+      await s.syncActivePack('p');
+      expect(service.calls, hasLength(1), reason: 'cooldown');
+
+      clock.advance(const Duration(minutes: 8));
+      await s.syncActivePack('p');
+      expect(service.calls, hasLength(2));
+    });
+
+    test('cooldown alimenté par la passe possédés', () async {
+      final s = build();
+      await s.syncOwnedPacks(reason: 'boot');
+      // culture_ci vient d'être couvert par la passe possédés.
+      await s.syncActivePack('culture_ci');
+      expect(service.calls, hasLength(1));
+      // Un pack non possédé n'est pas couvert.
+      await s.syncActivePack('football_ci');
+      expect(service.calls, hasLength(2));
+    });
+
+    test("recul d'horloge après start() → attente bornée au délai",
+        () async {
+      final s = build()..start();
+      await _settle();
+      service.calls.clear();
+      clock.waits.clear();
+      config = const OtaAutoSyncConfig(
+        enabled: true,
+        delay: Duration(seconds: 20),
+        minInterval: Duration.zero,
+      );
+      clock.advance(const Duration(hours: -2));
+      await s.syncOwnedPacks(reason: 'skew');
+      expect(clock.waits, [const Duration(seconds: 20)]);
+      expect(service.calls, hasLength(1));
     });
 
     test('coalescé par pack : deux appels concurrents → un seul', () async {
@@ -451,9 +542,6 @@ class _FakeSyncService implements ManifestSyncService {
     return report;
   }
 
-  @override
-  Future<SyncReport> syncPack(String pack) =>
-      refresh(onlyPacks: [pack], priorityPack: pack, resetPressureSignal: false);
 }
 
 /// Remote Config sans réseau : défauts avec délai nul, pour que le test de

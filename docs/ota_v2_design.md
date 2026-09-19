@@ -33,7 +33,9 @@ Déclencheurs (`OtaAutoSyncScheduler`) :
 
 Sas commun à tout déclenchement automatique : `App Check + Auth + Remote Config` prêts → kill-switch `ota_autosync_enabled` → délai `ota_autosync_delay_seconds` (20 s) depuis `start()` → pression mémoire (fraîche : report ; périmée : reset). L'auto-sync n'écrit jamais `manifestSyncStateProvider` (pas de bannière) et invalide `packLiveQuestionCountProvider` + `packUpdatesProvider` quand un pack a changé.
 
-Mutex à scope dans `ManifestSyncService.refresh` : un appel dont le scope est couvert par la sync en vol partage son Future ; sinon il est chaîné après elle (union des scopes). Un tap manuel pendant l'auto-sync reste complet, sans double download.
+Mutex FIFO dans `ManifestSyncService.refresh` : tout appel pendant une sync en vol est chaîné après elle et exécute son propre scope avec ses propres paramètres (jamais de partage de Future — chaque appelant reçoit un rapport sur ses packs). Un pack déjà traité est skippé par version + hash, donc une passe redondante coûte un `whereIn` et zéro download ; un seul download à la fois reste garanti.
+
+Garde-fous ajoutés en revue (2026-09-19) : bornes réelles comptées sur le flux (`kMaxPackGzipBytes` reçu, `kMaxPackDecompressedBytes` décompressé — `size_bytes` déclaré n'est qu'un pré-filtre) ; timeout 90 s du sas sur `bootReady` (une attestation App Check qui pend ne rend plus l'auto-sync inerte) ; plancher client de 10 s sur `ota_autosync_delay_seconds` ; pas de stamp de throttle si tous les packs sont en erreur (backoff 5 min à la place) ; retry pression rejouant le même déclencheur ; cooldown 10 min par pack déjà synchronisé ; scheduler construit en début de post-frame (listeners actifs avant la restauration cloud), `start()` en fin.
 
 **Rollback sans release** : console Firebase (projet `kilimandjaro-dev`, celui des builds store) → Remote Config → `ota_autosync_enabled = false` → publier. Effet au prochain boot (fetch RC toutes les heures en release, immédiat en debug). Le refresh manuel reste disponible.
 

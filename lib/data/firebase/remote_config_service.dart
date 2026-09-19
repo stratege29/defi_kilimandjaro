@@ -167,8 +167,11 @@ class RemoteConfigService {
       ),
       adsKillswitch: rc.getBool(RemoteConfigKeys.adsKillswitch),
       otaAutoSyncEnabled: rc.getBool(RemoteConfigKeys.otaAutoSyncEnabled),
-      otaAutoSyncDelaySeconds: _safeNonNegativeInt(
+      // Plancher côté client : une valeur console trop basse (typo, 0)
+      // ne doit jamais ramener un download dans la fenêtre jetsam iOS.
+      otaAutoSyncDelaySeconds: _safeMinInt(
         rc.getInt(RemoteConfigKeys.otaAutoSyncDelaySeconds),
+        GameEconomyConfig.otaAutoSyncMinDelaySeconds,
         d.otaAutoSyncDelaySeconds,
       ),
       otaAutoSyncMinIntervalHours: _safeNonNegativeInt(
@@ -210,6 +213,10 @@ class RemoteConfigService {
 
   static int _safeNonNegativeInt(int value, int fallback) =>
       value >= 0 ? value : fallback;
+
+  /// Négatif → [fallback] ; sinon jamais sous [min].
+  static int _safeMinInt(int value, int min, int fallback) =>
+      value < 0 ? fallback : (value < min ? min : value);
 
   static double _safePositiveDouble(double value, double fallback) =>
       value > 0 ? value : fallback;

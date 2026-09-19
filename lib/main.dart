@@ -403,6 +403,12 @@ class _BootGateState extends ConsumerState<_BootGate> {
       // ignore: avoid_print
       print('[BOOT] 7 post-frame entered');
 
+      // Construit le scheduler OTA (et ses `ref.listen` sur le pack actif /
+      // les packs possédés) dès maintenant, AVANT la restauration cloud et
+      // les dialogues consent/ATT : la construction est sans réseau, seul
+      // `start()` (en fin de callback) arme la passe différée.
+      ref.read(otaAutoSyncSchedulerProvider);
+
       // IAP init is fire-and-forget.
       unawaited(ref.read(iapServiceProvider).init());
       // ignore: avoid_print

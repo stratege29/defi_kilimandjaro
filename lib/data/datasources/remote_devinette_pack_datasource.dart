@@ -37,11 +37,16 @@ class PackParseException extends RemotePackException {
   const PackParseException(super.message);
 }
 
-/// Taille gzippée maximale acceptée pour un pack (`manifest.size_bytes`).
-/// Garde-fou mémoire : un pack réel pèse 40–60 Ko gzippés (190–320 Ko
-/// décompressés) ; au-delà de 5 Mio on refuse le download plutôt que de
-/// risquer un pic RAM (≈ 3–4× la taille décompressée pendant le parse).
+/// Taille gzippée maximale acceptée pour un pack. Vérifiée sur
+/// `manifest.size_bytes` (pré-filtre, évite d'ouvrir la socket) **et** sur
+/// les octets réellement reçus (garde-fou effectif : `size_bytes` peut être
+/// absent → 0, ou faux). Un pack réel pèse 40–60 Ko gzippés.
 const int kMaxPackGzipBytes = 5 * 1024 * 1024;
+
+/// Taille décompressée maximale acceptée, comptée au fil du flux. C'est la
+/// vraie borne mémoire : le parse coûte ≈ 3–4× cette taille en transitoire.
+/// Un pack réel fait 190–320 Ko ; 16 Mio laisse ×50 de marge.
+const int kMaxPackDecompressedBytes = 16 * 1024 * 1024;
 
 /// Récupère les manifests Firestore et télécharge les packs JSON gzippés
 /// depuis Cloud Storage. Vérifie le hash SHA256 avant retour.
@@ -58,9 +63,13 @@ class RemoteDevinettePackDatasource {
     required FirebaseFirestore firestore,
     http.Client? httpClient,
     Duration bodyIdleTimeout = const Duration(seconds: 30),
+    int maxGzipBytes = kMaxPackGzipBytes,
+    int maxDecompressedBytes = kMaxPackDecompressedBytes,
   })  : _firestore = firestore,
         _http = httpClient ?? _defaultClient(),
-        _bodyIdleTimeout = bodyIdleTimeout;
+        _bodyIdleTimeout = bodyIdleTimeout,
+        _maxGzipBytes = maxGzipBytes,
+        _maxDecompressedBytes = maxDecompressedBytes;
 
   /// Crée un client HTTP avec `autoUncompress = false` : Firebase Storage sert
   /// les packs avec `Content-Encoding: gzip`, et `dart:io HttpClient` les
@@ -79,6 +88,11 @@ class RemoteDevinettePackDatasource {
   /// connexion qui se fige en cours de body bloquait la sync indéfiniment.
   final Duration _bodyIdleTimeout;
 
+  /// Bornes de taille (injectables en test), cf. [kMaxPackGzipBytes] et
+  /// [kMaxPackDecompressedBytes].
+  final int _maxGzipBytes;
+  final int _maxDecompressedBytes;
+
   static const String _manifestCollection = 'content_packs';
   static const String _indexCollection = 'content_index';
   static const String _indexDocId = 'global';
@@ -96,16 +110,6 @@ class RemoteDevinettePackDatasource {
     final raw = data['packs'] as List<dynamic>?;
     if (raw == null) return const <String>[];
     return raw.map((e) => e.toString()).toList(growable: false);
-  }
-
-  /// Récupère le manifest d'un pack donné.
-  Future<ContentPackManifest?> fetchManifest(String packId) async {
-    final snap =
-        await _firestore.collection(_manifestCollection).doc(packId).get();
-    if (!snap.exists) return null;
-    final data = snap.data();
-    if (data == null) return null;
-    return ContentPackManifest.fromFirestore(docId: packId, data: data);
   }
 
   /// Récupère plusieurs manifests en une seule passe (whereIn limit 30).
@@ -150,10 +154,10 @@ class RemoteDevinettePackDatasource {
         'Pack ${manifest.packId} désactivé via Remote Config / manifest.',
       );
     }
-    if (manifest.sizeBytes > kMaxPackGzipBytes) {
+    if (manifest.sizeBytes > _maxGzipBytes) {
       throw PackDownloadException(
         'Pack ${manifest.packId} trop volumineux : ${manifest.sizeBytes} B '
-        '> $kMaxPackGzipBytes B (cap gzip).',
+        '> $_maxGzipBytes B (cap gzip déclaré).',
       );
     }
 
@@ -189,8 +193,20 @@ class RemoteDevinettePackDatasource {
     final hashSink = _DigestSink();
     final hashConv = sha256.startChunkedConversion(hashSink);
 
+    // Bornes réelles, comptées au fil du flux : la taille déclarée par le
+    // manifest n'est qu'un pré-filtre. Au-delà, on lève depuis le sink (ce
+    // qui sort de la boucle `await for` et annule la souscription HTTP).
+    var receivedGzip = 0;
+    var receivedDecompressed = 0;
     final gzipSink = gzip.decoder.startChunkedConversion(
       _ChunkCallbackSink((chunk) {
+        receivedDecompressed += chunk.length;
+        if (receivedDecompressed > _maxDecompressedBytes) {
+          throw PackDownloadException(
+            'Pack ${manifest.packId} : > $_maxDecompressedBytes B '
+            'décompressés (cap mémoire).',
+          );
+        }
         decompressed.add(chunk);
         hashConv.add(chunk);
       }),
@@ -204,9 +220,18 @@ class RemoteDevinettePackDatasource {
         ),
       );
       await for (final chunk in guarded) {
+        receivedGzip += chunk.length;
+        if (receivedGzip > _maxGzipBytes) {
+          throw PackDownloadException(
+            'Pack ${manifest.packId} : > $_maxGzipBytes B reçus (cap gzip).',
+          );
+        }
         gzipSink.add(chunk);
       }
       gzipSink.close();
+    } on RemotePackException {
+      hashConv.close();
+      rethrow;
     } on FormatException catch (e) {
       hashConv.close();
       throw PackParseException('Gzip decode failed: ${e.message}');

@@ -45,11 +45,8 @@ class ManifestSyncService {
   final Logger _logger;
   final FirebaseCrashlytics? _crashlytics;
 
-  /// Mutex global pour éviter les syncs concurrents (e.g. user double-tap).
+  /// Dernier maillon de la file de syncs (mutex FIFO).
   Future<SyncReport>? _inFlight;
-
-  /// Packs couverts par la sync en vol ; `null` = tous (refresh manuel).
-  Set<String>? _inFlightScope;
 
   /// Synchronise les packs distants.
   ///
@@ -60,12 +57,12 @@ class ManifestSyncService {
   ///   émis au boot ne doit pas bloquer l'utilisateur), `false` pour
   ///   l'auto-sync qui doit honorer un signal frais.
   ///
-  /// Mutex à scope : si le scope demandé est **couvert** par la sync en vol
-  /// (sync complète en cours, ou sous-ensemble de son scope), le Future
-  /// existant est partagé. Sinon l'appel est **chaîné** après elle et la
-  /// sync en vol « s'élargit » à l'union des scopes — les packs déjà
-  /// traités seront skippés par hash. Un tap manuel pendant l'auto-sync
-  /// reste donc complet, sans double download.
+  /// Mutex FIFO : un appel pendant une sync en vol est **chaîné** après
+  /// elle et exécute toujours son propre scope avec ses propres paramètres
+  /// (jamais de partage de Future : chaque appelant reçoit un rapport qui
+  /// porte sur ses packs). Un pack déjà traité par la passe précédente est
+  /// skippé par version + hash, donc une passe redondante coûte un
+  /// `whereIn` et zéro download. Un seul download à la fois, garanti.
   Future<SyncReport> refresh({
     Iterable<String>? onlyPacks,
     String? priorityPack,
@@ -82,34 +79,18 @@ class ManifestSyncService {
           onProgress: onProgress,
         );
 
-    if (pending != null) {
-      final covered = _inFlightScope == null ||
-          (scope != null && _inFlightScope!.containsAll(scope));
-      if (covered) return pending;
-      late final Future<SyncReport> chained;
-      chained = pending
-          .then<SyncReport>(
-            (_) => run(),
-            onError: (Object _, StackTrace __) => run(),
-          )
-          .whenComplete(() => _release(chained));
-      _inFlight = chained;
-      _inFlightScope = scope == null ? null : {..._inFlightScope!, ...scope};
-      return chained;
-    }
-
-    late final Future<SyncReport> started;
-    started = run().whenComplete(() => _release(started));
-    _inFlight = started;
-    _inFlightScope = scope;
-    return started;
-  }
-
-  void _release(Future<SyncReport> completed) {
-    if (identical(_inFlight, completed)) {
-      _inFlight = null;
-      _inFlightScope = null;
-    }
+    late final Future<SyncReport> next;
+    next = (pending == null
+            ? run()
+            : pending.then<SyncReport>(
+                (_) => run(),
+                onError: (Object _, StackTrace __) => run(),
+              ))
+        .whenComplete(() {
+      if (identical(_inFlight, next)) _inFlight = null;
+    });
+    _inFlight = next;
+    return next;
   }
 
   Future<SyncReport> _refreshImpl({
@@ -203,15 +184,6 @@ class ManifestSyncService {
       abortedByMemoryPressure: aborted,
     );
   }
-
-  /// Synchronise un pack précis (+ sa variante communautaire) : raccourci
-  /// de [refresh] scopé, passe par le mutex et honore la pression mémoire.
-  /// Utilisé à l'activation d'un pack par `OtaAutoSyncScheduler`.
-  Future<SyncReport> syncPack(String pack) => refresh(
-        onlyPacks: [pack],
-        priorityPack: pack,
-        resetPressureSignal: false,
-      );
 
   /// Ordre stable : le pack prioritaire (officiel puis communautaire) en
   /// tête, les autres dans l'ordre reçu. `List.sort` n'étant pas stable,

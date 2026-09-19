@@ -119,10 +119,15 @@ class GameEconomyConfig extends Equatable {
   /// réapparaissait (cf. `docs/ota_v2_design.md`).
   final bool otaAutoSyncEnabled;
 
-  /// Délai minimal (secondes) entre la première frame et tout download OTA
-  /// automatique. Doit rester au-delà de la fenêtre jetsam iOS (~10 s) et
-  /// après le preload audio.
+  /// Délai minimal (secondes) entre la fin du post-frame de boot (après les
+  /// dialogues consentement / ATT) et tout download OTA automatique. Doit
+  /// rester au-delà de la fenêtre jetsam iOS (~10 s) et après le preload
+  /// audio ; le parseur Remote Config applique le plancher
+  /// [otaAutoSyncMinDelaySeconds] quelle que soit la valeur console.
   final int otaAutoSyncDelaySeconds;
+
+  /// Plancher appliqué à [otaAutoSyncDelaySeconds] côté client.
+  static const int otaAutoSyncMinDelaySeconds = 10;
 
   /// Intervalle minimal (heures) entre deux passes automatiques sur les packs
   /// possédés. `0` = à chaque déclenchement (debug). La première passe après

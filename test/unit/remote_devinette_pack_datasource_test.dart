@@ -176,6 +176,63 @@ void main() {
       );
     });
 
+    test('flux décompressé au-delà du cap → PackDownloadException', () async {
+      final entries = [
+        for (var i = 0; i < 300; i++) _devinetteMap('p1-$i'),
+      ];
+      final (bytes, hash) = _encodePack({
+        'format_version': 2,
+        'devinettes': entries,
+      });
+      // size_bytes déclaré à 0 (manifest incomplet) : seul le comptage réel
+      // du flux protège.
+      final ds = _datasource(
+        MockClient.streaming(
+          (req, body) async => _streamedOk(bytes, chunkSize: 512),
+        ),
+        maxDecompressedBytes: 4 * 1024,
+      );
+      final manifest = _manifest('p1', hash: hash, sizeBytes: 0);
+
+      await expectLater(
+        ds.downloadAndParse(manifest),
+        throwsA(
+          isA<PackDownloadException>().having(
+            (e) => e.message,
+            'message',
+            contains('cap mémoire'),
+          ),
+        ),
+      );
+    });
+
+    test('flux gzip reçu au-delà du cap → PackDownloadException', () async {
+      final (bytes, hash) = _encodePack({
+        'format_version': 2,
+        'devinettes': [
+          for (var i = 0; i < 300; i++) _devinetteMap('p1-$i'),
+        ],
+      });
+      final ds = _datasource(
+        MockClient.streaming(
+          (req, body) async => _streamedOk(bytes, chunkSize: 256),
+        ),
+        maxGzipBytes: 1024,
+      );
+      final manifest = _manifest('p1', hash: hash, sizeBytes: 0);
+
+      await expectLater(
+        ds.downloadAndParse(manifest),
+        throwsA(
+          isA<PackDownloadException>().having(
+            (e) => e.message,
+            'message',
+            contains('cap gzip'),
+          ),
+        ),
+      );
+    });
+
     test('size_bytes > cap gzip → PackDownloadException sans HTTP', () async {
       var called = 0;
       final ds = _datasource(
@@ -206,11 +263,15 @@ void main() {
 RemoteDevinettePackDatasource _datasource(
   http.Client client, {
   Duration bodyIdleTimeout = const Duration(seconds: 30),
+  int maxGzipBytes = kMaxPackGzipBytes,
+  int maxDecompressedBytes = kMaxPackDecompressedBytes,
 }) {
   return RemoteDevinettePackDatasource(
     firestore: _NullFirestore(),
     httpClient: client,
     bodyIdleTimeout: bodyIdleTimeout,
+    maxGzipBytes: maxGzipBytes,
+    maxDecompressedBytes: maxDecompressedBytes,
   );
 }
 
