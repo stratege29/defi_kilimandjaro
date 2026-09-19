@@ -144,6 +144,58 @@ void main() {
       final result = await ds.downloadAndParse(manifest);
       expect(result.length, 500);
     });
+
+    test('body qui se fige après le 1er chunk → PackDownloadException (idle)',
+        () async {
+      final (bytes, hash) = _encodePack({
+        'format_version': 2,
+        'devinettes': [_devinetteMap('x')],
+      });
+      // Émet un seul chunk puis ne se termine jamais : simule une connexion
+      // qui se fige en cours de body.
+      final controller = StreamController<List<int>>();
+      addTearDown(controller.close);
+      controller.add(bytes.sublist(0, 4));
+      final ds = _datasource(
+        MockClient.streaming(
+          (req, body) async => http.StreamedResponse(controller.stream, 200),
+        ),
+        bodyIdleTimeout: const Duration(milliseconds: 50),
+      );
+      final manifest = _manifest('p1', hash: hash);
+
+      await expectLater(
+        ds.downloadAndParse(manifest),
+        throwsA(
+          isA<PackDownloadException>().having(
+            (e) => e.message,
+            'message',
+            contains('Timeout body'),
+          ),
+        ),
+      );
+    });
+
+    test('size_bytes > cap gzip → PackDownloadException sans HTTP', () async {
+      var called = 0;
+      final ds = _datasource(
+        MockClient.streaming((req, body) async {
+          called++;
+          return http.StreamedResponse(const Stream<List<int>>.empty(), 200);
+        }),
+      );
+      final manifest = _manifest(
+        'p1',
+        hash: 'h',
+        sizeBytes: kMaxPackGzipBytes + 1,
+      );
+
+      await expectLater(
+        ds.downloadAndParse(manifest),
+        throwsA(isA<PackDownloadException>()),
+      );
+      expect(called, 0);
+    });
   });
 }
 
@@ -151,10 +203,14 @@ void main() {
 // Helpers
 // ---------------------------------------------------------------------------
 
-RemoteDevinettePackDatasource _datasource(http.Client client) {
+RemoteDevinettePackDatasource _datasource(
+  http.Client client, {
+  Duration bodyIdleTimeout = const Duration(seconds: 30),
+}) {
   return RemoteDevinettePackDatasource(
     firestore: _NullFirestore(),
     httpClient: client,
+    bodyIdleTimeout: bodyIdleTimeout,
   );
 }
 
@@ -205,6 +261,7 @@ ContentPackManifest _manifest(
   String packId, {
   required String hash,
   bool enabled = true,
+  int sizeBytes = 1024,
 }) {
   return ContentPackManifest(
     packId: packId,
@@ -212,7 +269,7 @@ ContentPackManifest _manifest(
     currentVersion: 1,
     formatVersion: 3,
     hashSha256: hash,
-    sizeBytes: 1024,
+    sizeBytes: sizeBytes,
     count: 1,
     storagePath: 'packs/v2/$packId/$packId-v1.json.gz',
     downloadUrl: 'https://example.test/$packId-v1.json.gz',

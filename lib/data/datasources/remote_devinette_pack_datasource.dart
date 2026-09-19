@@ -37,6 +37,12 @@ class PackParseException extends RemotePackException {
   const PackParseException(super.message);
 }
 
+/// Taille gzippée maximale acceptée pour un pack (`manifest.size_bytes`).
+/// Garde-fou mémoire : un pack réel pèse 40–60 Ko gzippés (190–320 Ko
+/// décompressés) ; au-delà de 5 Mio on refuse le download plutôt que de
+/// risquer un pic RAM (≈ 3–4× la taille décompressée pendant le parse).
+const int kMaxPackGzipBytes = 5 * 1024 * 1024;
+
 /// Récupère les manifests Firestore et télécharge les packs JSON gzippés
 /// depuis Cloud Storage. Vérifie le hash SHA256 avant retour.
 ///
@@ -51,8 +57,10 @@ class RemoteDevinettePackDatasource {
   RemoteDevinettePackDatasource({
     required FirebaseFirestore firestore,
     http.Client? httpClient,
+    Duration bodyIdleTimeout = const Duration(seconds: 30),
   })  : _firestore = firestore,
-        _http = httpClient ?? _defaultClient();
+        _http = httpClient ?? _defaultClient(),
+        _bodyIdleTimeout = bodyIdleTimeout;
 
   /// Crée un client HTTP avec `autoUncompress = false` : Firebase Storage sert
   /// les packs avec `Content-Encoding: gzip`, et `dart:io HttpClient` les
@@ -65,6 +73,11 @@ class RemoteDevinettePackDatasource {
 
   final FirebaseFirestore _firestore;
   final http.Client _http;
+
+  /// Délai maximal **entre deux chunks** du body. `_httpTimeout` ne couvre
+  /// que l'attente des headers (`send()`) ; sans ce second timeout, une
+  /// connexion qui se fige en cours de body bloquait la sync indéfiniment.
+  final Duration _bodyIdleTimeout;
 
   static const String _manifestCollection = 'content_packs';
   static const String _indexCollection = 'content_index';
@@ -137,6 +150,12 @@ class RemoteDevinettePackDatasource {
         'Pack ${manifest.packId} désactivé via Remote Config / manifest.',
       );
     }
+    if (manifest.sizeBytes > kMaxPackGzipBytes) {
+      throw PackDownloadException(
+        'Pack ${manifest.packId} trop volumineux : ${manifest.sizeBytes} B '
+        '> $kMaxPackGzipBytes B (cap gzip).',
+      );
+    }
 
     final Uri uri;
     try {
@@ -178,7 +197,13 @@ class RemoteDevinettePackDatasource {
     );
 
     try {
-      await for (final chunk in response.stream) {
+      final guarded = response.stream.timeout(
+        _bodyIdleTimeout,
+        onTimeout: (sink) => sink.addError(
+          TimeoutException('Body stream idle > $_bodyIdleTimeout'),
+        ),
+      );
+      await for (final chunk in guarded) {
         gzipSink.add(chunk);
       }
       gzipSink.close();
@@ -188,6 +213,9 @@ class RemoteDevinettePackDatasource {
     } on SocketException catch (e) {
       hashConv.close();
       throw PackDownloadException('Stream error: ${e.message}');
+    } on TimeoutException catch (e) {
+      hashConv.close();
+      throw PackDownloadException('Timeout body: ${e.message}');
     }
 
     hashConv.close();
