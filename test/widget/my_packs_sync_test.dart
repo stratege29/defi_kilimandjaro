@@ -246,6 +246,9 @@ class _FakePressure implements MemoryPressureSignal {
   bool get isUnderPressure => false;
 
   @override
+  DateTime? get lastPressureAt => null;
+
+  @override
   void reset() {}
 
   @override

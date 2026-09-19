@@ -84,6 +84,11 @@ class SyncReport {
 abstract class MemoryPressureSignal {
   bool get isUnderPressure;
 
+  /// Horodatage du dernier signal reçu, `null` si aucun. Historique : n'est
+  /// **pas** effacé par [reset]. Permet à l'auto-sync de distinguer un
+  /// warning de boot périmé (à ignorer) d'une pression fraîche (à honorer).
+  DateTime? get lastPressureAt;
+
   /// Réinitialise le flag avant une nouvelle sync — un warning passé
   /// pendant le boot ne doit pas empoisonner les syncs ultérieures.
   void reset();
@@ -101,9 +106,13 @@ class WidgetsBindingMemoryPressureSignal
   }
 
   bool _underPressure = false;
+  DateTime? _lastPressureAt;
 
   @override
   bool get isUnderPressure => _underPressure;
+
+  @override
+  DateTime? get lastPressureAt => _lastPressureAt;
 
   @override
   void reset() {
@@ -113,6 +122,7 @@ class WidgetsBindingMemoryPressureSignal
   @override
   void didHaveMemoryPressure() {
     _underPressure = true;
+    _lastPressureAt = DateTime.now();
   }
 
   @override
