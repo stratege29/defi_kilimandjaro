@@ -95,6 +95,24 @@ void main() {
     });
   });
 
+  group('otaAutoSync — synchro OTA automatique', () {
+    const d = GameEconomyConfig.defaults;
+
+    test('défauts : activée, 20 s après la 1re frame, throttle 6 h', () {
+      expect(d.otaAutoSyncEnabled, isTrue);
+      expect(d.otaAutoSyncDelaySeconds, 20);
+      expect(d.otaAutoSyncMinIntervalHours, 6);
+    });
+
+    test('kill-switch via copyWith ne touche pas au reste', () {
+      final c = d.copyWith(otaAutoSyncEnabled: false);
+      expect(c.otaAutoSyncEnabled, isFalse);
+      expect(c.otaAutoSyncDelaySeconds, d.otaAutoSyncDelaySeconds);
+      expect(c.adsKillswitch, d.adsKillswitch);
+      expect(c, isNot(equals(d)));
+    });
+  });
+
   group('streakRewardForDay — inchangé (faucet de rétention)', () {
     const d = GameEconomyConfig.defaults;
 

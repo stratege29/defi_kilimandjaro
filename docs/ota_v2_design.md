@@ -1,4 +1,4 @@
-# OTA Content Sync — Design v0.2
+# OTA Content Sync — Design v0.2 / v0.3
 
 ## Pourquoi cette doc ?
 
@@ -8,7 +8,36 @@ Diagnostic complet après ~15 builds et 8 PRs : le seul code qui causait l'OOM �
 
 Le fix v0.1 (PR #15) : `unawaited(ref.read(manifestSyncServiceProvider).refresh())` est commenté. L'app boot sur le starter pack bundlé uniquement. Pas de nouveau contenu téléchargé.
 
-Cette doc cadre la ré-activation propre en v0.2.
+Cette doc cadre la ré-activation propre : **v0.2** (service séquentiel + streaming + bouton manuel, livré) puis **v0.3** (déclencheur automatique différé, gaté et scopé, septembre 2026).
+
+## État d'implémentation (2026-09)
+
+| Principe | État | Où |
+|---|---|---|
+| 1. Pas d'OTA dans la fenêtre de boot | **v0.3** : auto-sync différé + gaté + scopé (voir ci-dessous) | `lib/data/sync/ota_auto_sync.dart`, `_BootGate` dans `lib/main.dart` |
+| 2. Un pack à la fois | **fait** (v0.2) : boucle séquentielle + `Future.delayed(Duration.zero)` | `manifest_sync_service.dart` |
+| 3. Streaming JSON | **partiel, suffisant** : gzip + sha256 en flux ; un seul `jsonDecode` par pack. Les packs réels font 190–320 Ko décompressés (≈ 1–1,5 Mo transitoires). Garde-fou : cap 5 Mio gzip (`kMaxPackGzipBytes`) + timeout d'inactivité du body | `remote_devinette_pack_datasource.dart` |
+| 4. Quota mémoire | **fait** (v0.2) : `didHaveMemoryPressure` → abort ; v0.3 distingue signal frais (report 2 min) et périmé (> 60 s, ignoré) via `lastPressureAt` | `sync_state.dart` |
+| 5. Idempotence + checksum | **fait** (v0.2) : skip si `packVersion` + `hashSha256` identiques | `manifest_sync_service.dart` |
+
+### v0.3 — Auto-sync différé, gaté, scopé
+
+Déclencheurs (`OtaAutoSyncScheduler`) :
+
+| Trigger | Scope | Throttle |
+|---|---|---|
+| Manuel (bouton « Mes packs ») | tous les packs | aucun (inchangé) |
+| Différé après `start()` (fin du post-frame du `_BootGate`) | packs possédés, actif en tête | `ota_autosync_min_interval_hours` (6 h), 1re passe jamais throttlée |
+| Retour en premier plan (`resumed`) | idem | idem |
+| Activation / choix / déblocage d'un pack | ce pack seul | aucun (hash-skip = 1 `whereIn`, 0 download) |
+
+Sas commun à tout déclenchement automatique : `App Check + Auth + Remote Config` prêts → kill-switch `ota_autosync_enabled` → délai `ota_autosync_delay_seconds` (20 s) depuis `start()` → pression mémoire (fraîche : report ; périmée : reset). L'auto-sync n'écrit jamais `manifestSyncStateProvider` (pas de bannière) et invalide `packLiveQuestionCountProvider` + `packUpdatesProvider` quand un pack a changé.
+
+Mutex FIFO dans `ManifestSyncService.refresh` : tout appel pendant une sync en vol est chaîné après elle et exécute son propre scope avec ses propres paramètres (jamais de partage de Future — chaque appelant reçoit un rapport sur ses packs). Un pack déjà traité est skippé par version + hash, donc une passe redondante coûte un `whereIn` et zéro download ; un seul download à la fois reste garanti.
+
+Garde-fous ajoutés en revue (2026-09-19) : bornes réelles comptées sur le flux (`kMaxPackGzipBytes` reçu, `kMaxPackDecompressedBytes` décompressé — `size_bytes` déclaré n'est qu'un pré-filtre) ; timeout 90 s du sas sur `bootReady` (une attestation App Check qui pend ne rend plus l'auto-sync inerte) ; plancher client de 10 s sur `ota_autosync_delay_seconds` ; pas de stamp de throttle si tous les packs sont en erreur (backoff 5 min à la place) ; retry pression rejouant le même déclencheur ; cooldown 10 min par pack déjà synchronisé ; scheduler construit en début de post-frame (listeners actifs avant la restauration cloud), `start()` en fin.
+
+**Rollback sans release** : console Firebase (projet `kilimandjaro-dev`, celui des builds store) → Remote Config → `ota_autosync_enabled = false` → publier. Effet au prochain boot (fetch RC toutes les heures en release, immédiat en debug). Le refresh manuel reste disponible.
 
 ## Cause racine du OOM v0.1
 
@@ -37,17 +66,18 @@ L'OTA sync chargeait potentiellement plusieurs packs de plusieurs MB chacun **en
 
 ## Architecture cible v0.2
 
-### Principe 1 — Pas d'OTA au boot
+### Principe 1 — Pas d'OTA dans la fenêtre de boot
 
-OTA sync ne doit **jamais** être déclenché par `_BootGate.initState` ni par un post-frame callback automatique.
+OTA sync ne doit **jamais** télécharger pendant les ~10 premières secondes ni depuis le chemin critique du boot. Un déclencheur automatique est acceptable s'il est **différé** (délai Remote Config depuis la fin du post-frame), **gaté** (kill-switch, pression mémoire, throttle) et **scopé** (packs possédés, un pack à la fois) — c'est la v0.3 décrite plus haut.
 
-**Triggers acceptables :**
+**Triggers en place :**
 
 | Trigger | Where | UX |
 |---|---|---|
-| Manuel par l'utilisateur | Settings → « Télécharger plus de devinettes » | Bouton + spinner explicite |
-| Après onboarding complété | Une fois que le user a vu son 1er hub | Banner discret « Nouveaux packs disponibles » |
-| Background fetch iOS (BGTaskScheduler) | Quand iOS le permet, app en background | Silencieux |
+| Manuel par l'utilisateur | « Mes packs » → bouton refresh / bandeau MAJ | Bouton + barre de progression |
+| Différé après le boot, puis `resumed` | `OtaAutoSyncScheduler` (`_BootGate` → `start()`) | Silencieux ; compteurs de « Mes packs » invalidés si changement |
+| Activation d'un pack | `ref.listen(activePackIdProvider / ownedPacksProvider)` | Silencieux, non bloquant |
+| Background fetch iOS (BGTaskScheduler) | non implémenté | — |
 
 ### Principe 2 — Un pack à la fois
 
@@ -150,18 +180,21 @@ Future<void> _syncOnePack(ContentPackManifest manifest) async {
 └─────────────────────────────────────────────────────────┘
 ```
 
-## Fichiers à modifier
+## Fichiers concernés
 
-- `lib/data/sync/manifest_sync_service.dart` — rewrite `refresh()` selon les principes ci-dessus, ajouter `onProgress` callback
-- `lib/data/datasources/remote_devinette_pack_datasource.dart` — passer en mode collection Firestore plutôt que download Storage si pertinent
-- `lib/presentation/my_packs/my_packs_view.dart` (ou nouvel écran Settings) — bouton manuel + spinner + progression
-- `lib/main.dart` ligne 316 — laisser le `//   unawaited(ref.read(manifestSyncServiceProvider).refresh());` commenté en boot
+- `lib/data/sync/manifest_sync_service.dart` — `refresh({onlyPacks, priorityPack, resetPressureSignal, onProgress})`, mutex à scope, `syncPack`
+- `lib/data/sync/ota_auto_sync.dart` — `OtaAutoSyncScheduler`, `deferredBootReadyProvider`, `otaAutoSyncSchedulerProvider`
+- `lib/data/datasources/remote_devinette_pack_datasource.dart` — download Storage streamé, cap 5 Mio, timeout d'inactivité
+- `lib/presentation/my_packs/my_packs_view.dart` — bouton manuel + progression (inchangé en v0.3)
+- `lib/main.dart` — `_BootGate` appelle `otaAutoSyncSchedulerProvider.start()` en fin de post-frame ; `deferredBootReadyProvider` overridé avec `authReady` + `remoteConfigReady`
+- `lib/domain/entities/game_economy_config.dart` + `remoteconfig.template.json` — clés `ota_autosync_*`
 
-## Tests à écrire
+## Tests
 
-- Unit : `ManifestSyncService.refresh()` avec `n=10` packs, vérifier mémoire stable (< 100 MB delta) via instrumentation
-- Integration : simuler iOS memory pressure mid-sync, vérifier que ça abort proprement
-- E2E : sync 5 packs → fermer → ré-ouvrir → re-sync = skip total (idempotence checksum)
+- Unit `manifest_sync_service_test.dart` : séquentialité, idempotence, abort pression, scope, priorité, mutex partagé / chaîné
+- Unit `ota_auto_sync_scheduler_test.dart` : kill-switch, délai, throttle, première passe, scope + priorité, pression fraîche / périmée, `resumed`, coalescing, backoff
+- Unit `remote_devinette_pack_datasource_test.dart` : gzip/hash, body figé, cap de taille
+- Manuel sur simulateur (Xcode, jauge mémoire) : aucun pic dans les 10 premières secondes ; logs `[BOOT] 12 OTA auto-sync scheduled` → `deferred: remote config ready` → `ManifestSync: … (download)` à ~T+20 s
 
 ## Annexes — autres learnings v0.1 à conserver
 

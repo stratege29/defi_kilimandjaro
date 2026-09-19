@@ -151,7 +151,8 @@ void main() {
     expect(remote.downloadCalls, 3);
   });
 
-  test('refresh mutex : double appel concurrent partage le Future', () async {
+  test('refresh mutex : double appel concurrent est chaîné, 1 download',
+      () async {
     remote
       ..activePackIds = ['p1']
       ..manifests = [_manifest('p1', version: 1)]
@@ -160,10 +161,12 @@ void main() {
     final f1 = service.refresh();
     final f2 = service.refresh();
 
-    expect(identical(f1, f2), isTrue);
+    expect(identical(f1, f2), isFalse);
     final reports = await Future.wait([f1, f2]);
     expect(reports[0].updated, 1);
-    expect(reports[1].updated, 1);
+    // Le second passe après le premier et skippe p1 par hash.
+    expect(reports[1].updated, 0);
+    expect(reports[1].skipped, 1);
     expect(remote.downloadCalls, 1);
   });
 
@@ -179,6 +182,170 @@ void main() {
     expect(report.skipped, 1);
     expect(report.errors, 0);
   });
+
+  group('auto-sync (scope / priorité / pression)', () {
+    test('resetPressureSignal:false → abort immédiat si pression', () async {
+      pressure.underPressure = true;
+      remote
+        ..activePackIds = ['p1']
+        ..manifests = [_manifest('p1', version: 1)];
+
+      final report = await service.refresh(
+        onlyPacks: ['p1'],
+        resetPressureSignal: false,
+      );
+
+      expect(remote.downloadCalls, 0);
+      expect(report.updated, 0);
+      expect(report.abortedByMemoryPressure, isTrue);
+      expect(pressure.underPressure, isTrue, reason: 'pas de reset');
+    });
+
+    test('onlyPacks : ni content_index, ni packs hors scope', () async {
+      remote
+        ..activePackIds = ['p1', 'p2', 'p3']
+        ..manifests = [
+          _manifest('p1', version: 1),
+          _manifest('p1_community', version: 1, pack: 'p1', community: true),
+          _manifest('p2', version: 1),
+          _manifest('p3', version: 1),
+        ];
+
+      final report = await service.refresh(onlyPacks: ['p1', 'p2']);
+
+      expect(remote.listActiveCalls, 0);
+      expect(remote.fetchManifestsCalls, [
+        ['p1', 'p1_community', 'p2', 'p2_community'],
+      ]);
+      expect(remote.downloadCalls, 3);
+      expect(report.updated, 3);
+    });
+
+    test('priorityPack passe en tête (officiel puis communautaire)', () async {
+      remote
+        ..activePackIds = ['p1', 'p2_community', 'p2', 'p3']
+        ..manifests = [
+          _manifest('p1', version: 1),
+          _manifest('p2_community', version: 1, pack: 'p2', community: true),
+          _manifest('p2', version: 1),
+          _manifest('p3', version: 1),
+        ];
+
+      final order = <String>[];
+      await service.refresh(
+        priorityPack: 'p2',
+        onProgress: (p) => order.add(p.currentPackId),
+      );
+
+      expect(order, ['p2', 'p2_community', 'p1', 'p3']);
+    });
+
+    test('full pendant scopé : chaîné après, un seul download par pack',
+        () async {
+      remote
+        ..activePackIds = ['p1', 'p2', 'p3']
+        ..manifests = [
+          _manifest('p1', version: 1),
+          _manifest('p2', version: 1),
+          _manifest('p3', version: 1),
+        ]
+        ..downloadDelay = const Duration(milliseconds: 20);
+
+      final scoped = service.refresh(onlyPacks: ['p1']);
+      final full = service.refresh();
+
+      expect(identical(scoped, full), isFalse);
+      DateTime? scopedDone;
+      DateTime? fullDone;
+      await Future.wait([
+        scoped.then((_) => scopedDone = DateTime.now()),
+        full.then((_) => fullDone = DateTime.now()),
+      ]);
+      expect(fullDone!.isBefore(scopedDone!), isFalse);
+      // p1 téléchargé par la passe scopée, skippé par hash dans la passe
+      // complète ; p2 et p3 téléchargés une fois.
+      expect(remote.downloadCalls, 3);
+      expect((await full).skipped, 1);
+    });
+
+    test('scopé pendant scopé (même pack) : chaîné, un seul download',
+        () async {
+      remote
+        ..activePackIds = ['p1']
+        ..manifests = [_manifest('p1', version: 1)]
+        ..downloadDelay = const Duration(milliseconds: 20);
+
+      final f1 = service.refresh(onlyPacks: ['p1']);
+      final f2 = service.refresh(onlyPacks: ['p1'], priorityPack: 'p1');
+
+      expect(identical(f1, f2), isFalse);
+      final reports = await Future.wait([f1, f2]);
+      expect(reports[1].skipped, 1);
+      expect(remote.downloadCalls, 1);
+    });
+
+    test('chaque appelant reçoit un rapport sur SES packs, même après une '
+        'passe précédente abandonnée', () async {
+      remote
+        ..activePackIds = ['p1', 'p2', 'p3']
+        ..manifests = [
+          _manifest('p1', version: 1),
+          _manifest('p2', version: 1),
+          _manifest('p3', version: 1),
+        ]
+        ..downloadDelay = const Duration(milliseconds: 20);
+      // A abandonne immédiatement (pression fraîche, auto-path).
+      pressure.underPressure = true;
+      final a = service.refresh(
+        onlyPacks: ['p1', 'p2'],
+        resetPressureSignal: false,
+      );
+      final b = service.refresh(onlyPacks: ['p3']);
+      final c = service.refresh(onlyPacks: ['p1']);
+
+      final reports = await Future.wait([a, b, c]);
+      expect(reports[0].abortedByMemoryPressure, isTrue);
+      // B (manuel → reset) synchronise p3 ; C synchronise p1 (pas p3).
+      expect(reports[1].updated, 1);
+      expect(reports[2].updated, 1);
+      expect(cache.replacedPacks, ['p3', 'p1']);
+    });
+
+    test("scopé pendant scopé d'un autre pack : chaîné, ordre FIFO",
+        () async {
+      remote
+        ..activePackIds = ['p1', 'p2']
+        ..manifests = [
+          _manifest('p1', version: 1),
+          _manifest('p2', version: 1),
+        ]
+        ..downloadDelay = const Duration(milliseconds: 20);
+
+      final f1 = service.refresh(onlyPacks: ['p1']);
+      final f2 = service.refresh(onlyPacks: ['p2']);
+      final f3 = service.refresh(onlyPacks: ['p1']);
+
+      expect(identical(f1, f2), isFalse);
+      expect(identical(f2, f3), isFalse);
+      await Future.wait([f1, f2, f3]);
+      expect(remote.downloadCalls, 2);
+      expect(cache.replacedPacks, ['p1', 'p2']);
+    });
+
+    test('mutex libéré après une sync chaînée', () async {
+      remote
+        ..activePackIds = ['p1']
+        ..manifests = [_manifest('p1', version: 1)];
+
+      await service.refresh(onlyPacks: ['p1']);
+      final full = service.refresh();
+      await full;
+      final again = service.refresh(onlyPacks: ['p1']);
+
+      expect(identical(full, again), isFalse);
+      await again;
+    });
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -193,17 +360,19 @@ class _FakeRemote implements RemoteDevinettePackDatasource {
   String? failOnPack;
   void Function()? onAfterDownload;
   final List<(DateTime, DateTime)> downloadWindows = [];
+  int listActiveCalls = 0;
+  final List<List<String>> fetchManifestsCalls = [];
 
   @override
-  Future<List<String>> listActivePackIds() async => activePackIds;
-
-  @override
-  Future<ContentPackManifest?> fetchManifest(String packId) async {
-    return manifests.where((m) => m.packId == packId).firstOrNull;
+  Future<List<String>> listActivePackIds() async {
+    listActiveCalls++;
+    return activePackIds;
   }
+
 
   @override
   Future<List<ContentPackManifest>> fetchManifests(List<String> packIds) async {
+    fetchManifestsCalls.add(List.of(packIds));
     return manifests.where((m) => packIds.contains(m.packId)).toList();
   }
 
@@ -301,6 +470,9 @@ class _FakePressure implements MemoryPressureSignal {
   bool underPressure = false;
 
   @override
+  DateTime? lastPressureAt;
+
+  @override
   bool get isUnderPressure => underPressure;
 
   @override
@@ -321,10 +493,12 @@ ContentPackManifest _manifest(
   required int version,
   String hash = 'hX',
   bool enabled = true,
+  String? pack,
+  bool community = false,
 }) {
   return ContentPackManifest(
     packId: packId,
-    pack: packId,
+    pack: pack ?? packId,
     currentVersion: version,
     formatVersion: 3,
     hashSha256: hash,
@@ -336,7 +510,7 @@ ContentPackManifest _manifest(
     langs: const ['fr'],
     defaultLang: 'fr',
     enabled: enabled,
-    isCommunity: false,
+    isCommunity: community,
   );
 }
 

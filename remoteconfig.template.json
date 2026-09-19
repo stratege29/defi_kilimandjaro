@@ -31,6 +31,21 @@
       "valueType": "NUMBER",
       "description": "Cauris bonus par seconde restante au moment de la validation."
     },
+    "eco_freehand_bonus_base": {
+      "defaultValue": { "value": "15" },
+      "valueType": "NUMBER",
+      "description": "Forfait du bonus 'A main levee' (trace continu sans auto-croisement), ajoute a la victoire."
+    },
+    "eco_freehand_bonus_per_letter": {
+      "defaultValue": { "value": "3" },
+      "valueType": "NUMBER",
+      "description": "Bonus 'A main levee' additionnel par lettre au-dela de eco_freehand_min_length."
+    },
+    "eco_freehand_min_length": {
+      "defaultValue": { "value": "4" },
+      "valueType": "NUMBER",
+      "description": "Longueur mini du mot pour que le bonus 'A main levee' soit eligible."
+    },
     "eco_rewarded_video_bonus": {
       "defaultValue": { "value": "50" },
       "valueType": "NUMBER",
@@ -70,6 +85,21 @@
       "defaultValue": { "value": "false" },
       "valueType": "BOOLEAN",
       "description": "KILL GLOBAL — coupe rewarded + interstitielles sans store update."
+    },
+    "ota_autosync_enabled": {
+      "defaultValue": { "value": "true" },
+      "valueType": "BOOLEAN",
+      "description": "KILL de la synchro OTA automatique (boot differe, resume, activation de pack). false = coupe sans store update ; le refresh manuel de Mes packs reste actif."
+    },
+    "ota_autosync_delay_seconds": {
+      "defaultValue": { "value": "20" },
+      "valueType": "NUMBER",
+      "description": "Delai mini (s) entre la fin du post-frame de boot (apres consentement/ATT) et tout download OTA auto. Plancher client = 10 s (fenetre jetsam iOS 26), toute valeur plus basse est relevee."
+    },
+    "ota_autosync_min_interval_hours": {
+      "defaultValue": { "value": "6" },
+      "valueType": "NUMBER",
+      "description": "Intervalle mini (h) entre deux passes auto sur les packs possedes. 0 = a chaque boot (debug). 1re passe apres install jamais throttlee."
     }
   },
   "conditions": [],

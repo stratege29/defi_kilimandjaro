@@ -158,10 +158,6 @@ class _FakeRemote implements RemoteDevinettePackDatasource {
     return activePackIds;
   }
 
-  @override
-  Future<ContentPackManifest?> fetchManifest(String packId) async {
-    return manifests.where((m) => m.packId == packId).firstOrNull;
-  }
 
   @override
   Future<List<ContentPackManifest>> fetchManifests(List<String> packIds) async {
@@ -244,6 +240,9 @@ class _FakeCache implements LocalDevinetteCacheDatasource {
 class _FakePressure implements MemoryPressureSignal {
   @override
   bool get isUnderPressure => false;
+
+  @override
+  DateTime? get lastPressureAt => null;
 
   @override
   void reset() {}

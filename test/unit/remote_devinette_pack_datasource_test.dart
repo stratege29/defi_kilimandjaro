@@ -144,6 +144,115 @@ void main() {
       final result = await ds.downloadAndParse(manifest);
       expect(result.length, 500);
     });
+
+    test('body qui se fige après le 1er chunk → PackDownloadException (idle)',
+        () async {
+      final (bytes, hash) = _encodePack({
+        'format_version': 2,
+        'devinettes': [_devinetteMap('x')],
+      });
+      // Émet un seul chunk puis ne se termine jamais : simule une connexion
+      // qui se fige en cours de body.
+      final controller = StreamController<List<int>>();
+      addTearDown(controller.close);
+      controller.add(bytes.sublist(0, 4));
+      final ds = _datasource(
+        MockClient.streaming(
+          (req, body) async => http.StreamedResponse(controller.stream, 200),
+        ),
+        bodyIdleTimeout: const Duration(milliseconds: 50),
+      );
+      final manifest = _manifest('p1', hash: hash);
+
+      await expectLater(
+        ds.downloadAndParse(manifest),
+        throwsA(
+          isA<PackDownloadException>().having(
+            (e) => e.message,
+            'message',
+            contains('Timeout body'),
+          ),
+        ),
+      );
+    });
+
+    test('flux décompressé au-delà du cap → PackDownloadException', () async {
+      final entries = [
+        for (var i = 0; i < 300; i++) _devinetteMap('p1-$i'),
+      ];
+      final (bytes, hash) = _encodePack({
+        'format_version': 2,
+        'devinettes': entries,
+      });
+      // size_bytes déclaré à 0 (manifest incomplet) : seul le comptage réel
+      // du flux protège.
+      final ds = _datasource(
+        MockClient.streaming(
+          (req, body) async => _streamedOk(bytes, chunkSize: 512),
+        ),
+        maxDecompressedBytes: 4 * 1024,
+      );
+      final manifest = _manifest('p1', hash: hash, sizeBytes: 0);
+
+      await expectLater(
+        ds.downloadAndParse(manifest),
+        throwsA(
+          isA<PackDownloadException>().having(
+            (e) => e.message,
+            'message',
+            contains('cap mémoire'),
+          ),
+        ),
+      );
+    });
+
+    test('flux gzip reçu au-delà du cap → PackDownloadException', () async {
+      final (bytes, hash) = _encodePack({
+        'format_version': 2,
+        'devinettes': [
+          for (var i = 0; i < 300; i++) _devinetteMap('p1-$i'),
+        ],
+      });
+      final ds = _datasource(
+        MockClient.streaming(
+          (req, body) async => _streamedOk(bytes, chunkSize: 256),
+        ),
+        maxGzipBytes: 1024,
+      );
+      final manifest = _manifest('p1', hash: hash, sizeBytes: 0);
+
+      await expectLater(
+        ds.downloadAndParse(manifest),
+        throwsA(
+          isA<PackDownloadException>().having(
+            (e) => e.message,
+            'message',
+            contains('cap gzip'),
+          ),
+        ),
+      );
+    });
+
+    test('size_bytes > cap gzip → PackDownloadException sans HTTP', () async {
+      var called = 0;
+      final ds = _datasource(
+        MockClient.streaming((req, body) async {
+          called++;
+          return http.StreamedResponse(const Stream<List<int>>.empty(), 200);
+        }),
+      );
+      final manifest = _manifest(
+        'p1',
+        hash: 'h',
+        sizeBytes: kMaxPackGzipBytes + 1,
+      );
+
+      await expectLater(
+        ds.downloadAndParse(manifest),
+        throwsA(isA<PackDownloadException>()),
+      );
+      expect(called, 0);
+    });
   });
 }
 
@@ -151,10 +260,18 @@ void main() {
 // Helpers
 // ---------------------------------------------------------------------------
 
-RemoteDevinettePackDatasource _datasource(http.Client client) {
+RemoteDevinettePackDatasource _datasource(
+  http.Client client, {
+  Duration bodyIdleTimeout = const Duration(seconds: 30),
+  int maxGzipBytes = kMaxPackGzipBytes,
+  int maxDecompressedBytes = kMaxPackDecompressedBytes,
+}) {
   return RemoteDevinettePackDatasource(
     firestore: _NullFirestore(),
     httpClient: client,
+    bodyIdleTimeout: bodyIdleTimeout,
+    maxGzipBytes: maxGzipBytes,
+    maxDecompressedBytes: maxDecompressedBytes,
   );
 }
 
@@ -205,6 +322,7 @@ ContentPackManifest _manifest(
   String packId, {
   required String hash,
   bool enabled = true,
+  int sizeBytes = 1024,
 }) {
   return ContentPackManifest(
     packId: packId,
@@ -212,7 +330,7 @@ ContentPackManifest _manifest(
     currentVersion: 1,
     formatVersion: 3,
     hashSha256: hash,
-    sizeBytes: 1024,
+    sizeBytes: sizeBytes,
     count: 1,
     storagePath: 'packs/v2/$packId/$packId-v1.json.gz',
     downloadUrl: 'https://example.test/$packId-v1.json.gz',

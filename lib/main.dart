@@ -16,6 +16,7 @@ import 'package:defi_kilimandjaro/data/iap/iap_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/composite_pack_catalog_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/fcm_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
+import 'package:defi_kilimandjaro/data/sync/ota_auto_sync.dart';
 import 'package:defi_kilimandjaro/data/sync/progress_sync_service.dart';
 import 'package:defi_kilimandjaro/data/wallet/wallet_sync.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
@@ -109,6 +110,12 @@ final AnalyticsService _analytics =
 /// jamais laisser un consommateur suspendu.
 final Completer<void> _authReadyCompleter = Completer<void>();
 Future<void> get authReady => _authReadyCompleter.future;
+
+/// Signale que `RemoteConfigService.init()` a rendu la main (fail-soft :
+/// toujours complété, defaults actifs si le fetch a échoué). L'auto-sync OTA
+/// lit son kill-switch derrière ce gate.
+final Completer<void> _remoteConfigReadyCompleter = Completer<void>();
+Future<void> get remoteConfigReady => _remoteConfigReadyCompleter.future;
 
 /// Emulateurs locaux — opt-in via `--dart-define USE_FIREBASE_EMULATOR=true`.
 const _useEmulator = bool.fromEnvironment('USE_FIREBASE_EMULATOR');
@@ -249,10 +256,15 @@ Future<void> _bootstrap() async {
           analyticsServiceProvider.overrideWithValue(_analytics),
           // Phase 3 : active le catalog remote (Firestore catalog/index)
           // en override du bundle-only par défaut. Le composite fait le
-          // fallback bundle si remote indisponible. Pas de fetch au boot
-          // (cf OTA v0.2) — il faut un refresh manuel pour récupérer le
-          // remote la première fois.
+          // fallback bundle si remote indisponible. Pas de fetch du
+          // catalogue au boot : le contenu des packs possédés est synchronisé
+          // par l'auto-sync différé, mais le catalogue distant (nouveaux
+          // packs) n'est récupéré qu'au refresh manuel de « Mes packs ».
           packCatalogRepositoryOverride,
+          // Sas de l'auto-sync OTA : App Check + Auth + Remote Config prêts.
+          deferredBootReadyProvider.overrideWithValue(
+            Future.wait<void>([authReady, remoteConfigReady]).then((_) {}),
+          ),
         ],
         child: const _BootGate(child: KilimandjaroApp()),
       ),
@@ -334,7 +346,15 @@ Future<void> _deferredBoot() async {
   // baked-in sont servis en attendant (cf. RemoteConfigService), et les
   // consommateurs lisent la config à l'entrée d'une session de jeu — donc
   // bien après ce point.
-  await _remoteConfig.init();
+  try {
+    await _remoteConfig.init();
+  } finally {
+    if (!_remoteConfigReadyCompleter.isCompleted) {
+      _remoteConfigReadyCompleter.complete();
+    }
+    // ignore: avoid_print
+    print('[BOOT] deferred: remote config ready');
+  }
 
   // Analytics : tague la variante A/B du scaling des sinks. Doit suivre la
   // résolution Remote Config pour taguer la bonne valeur.
@@ -382,6 +402,12 @@ class _BootGateState extends ConsumerState<_BootGate> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // ignore: avoid_print
       print('[BOOT] 7 post-frame entered');
+
+      // Construit le scheduler OTA (et ses `ref.listen` sur le pack actif /
+      // les packs possédés) dès maintenant, AVANT la restauration cloud et
+      // les dialogues consent/ATT : la construction est sans réseau, seul
+      // `start()` (en fin de callback) arme la passe différée.
+      ref.read(otaAutoSyncSchedulerProvider);
 
       // IAP init is fire-and-forget.
       unawaited(ref.read(iapServiceProvider).init());
@@ -450,11 +476,15 @@ class _BootGateState extends ConsumerState<_BootGate> {
       // ignore: avoid_print
       print('[BOOT] 11 deep links triggered');
 
-      // OTA content sync DÉSACTIVÉ TEMPORAIREMENT — suspect d'OOM iOS 26.
-      // Réactiver après confirmation que ce n'est pas le coupable.
-      //   unawaited(ref.read(manifestSyncServiceProvider).refresh());
+      // OTA auto-sync v0.3 : différé (≥ `ota_autosync_delay_seconds` après
+      // ce point, hors fenêtre jetsam iOS 26 — cf. PR #15), gaté (App Check
+      // + Auth + Remote Config prêts, kill-switch `ota_autosync_enabled`,
+      // pression mémoire) et scopé aux packs possédés. Jamais de download
+      // ici : `start()` ne fait que planifier. Le refresh manuel de
+      // « Mes packs » reste disponible. Cf. docs/ota_v2_design.md.
+      ref.read(otaAutoSyncSchedulerProvider).start();
       // ignore: avoid_print
-      print('[BOOT] 12 OTA sync skipped (debug)');
+      print('[BOOT] 12 OTA auto-sync scheduled');
     });
   }
 

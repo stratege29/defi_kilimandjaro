@@ -166,6 +166,18 @@ class RemoteConfigService {
         d.interstitialMinIntervalSeconds,
       ),
       adsKillswitch: rc.getBool(RemoteConfigKeys.adsKillswitch),
+      otaAutoSyncEnabled: rc.getBool(RemoteConfigKeys.otaAutoSyncEnabled),
+      // Plancher côté client : une valeur console trop basse (typo, 0)
+      // ne doit jamais ramener un download dans la fenêtre jetsam iOS.
+      otaAutoSyncDelaySeconds: _safeMinInt(
+        rc.getInt(RemoteConfigKeys.otaAutoSyncDelaySeconds),
+        GameEconomyConfig.otaAutoSyncMinDelaySeconds,
+        d.otaAutoSyncDelaySeconds,
+      ),
+      otaAutoSyncMinIntervalHours: _safeNonNegativeInt(
+        rc.getInt(RemoteConfigKeys.otaAutoSyncMinIntervalHours),
+        d.otaAutoSyncMinIntervalHours,
+      ),
     );
   }
 
@@ -190,6 +202,10 @@ class RemoteConfigService {
         RemoteConfigKeys.interstitialMinIntervalSeconds:
             d.interstitialMinIntervalSeconds,
         RemoteConfigKeys.adsKillswitch: d.adsKillswitch,
+        RemoteConfigKeys.otaAutoSyncEnabled: d.otaAutoSyncEnabled,
+        RemoteConfigKeys.otaAutoSyncDelaySeconds: d.otaAutoSyncDelaySeconds,
+        RemoteConfigKeys.otaAutoSyncMinIntervalHours:
+            d.otaAutoSyncMinIntervalHours,
       };
 
   static int _safePositiveInt(int value, int fallback) =>
@@ -197,6 +213,10 @@ class RemoteConfigService {
 
   static int _safeNonNegativeInt(int value, int fallback) =>
       value >= 0 ? value : fallback;
+
+  /// Négatif → [fallback] ; sinon jamais sous [min].
+  static int _safeMinInt(int value, int min, int fallback) =>
+      value < 0 ? fallback : (value < min ? min : value);
 
   static double _safePositiveDouble(double value, double fallback) =>
       value > 0 ? value : fallback;
