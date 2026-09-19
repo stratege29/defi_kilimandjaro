@@ -1480,7 +1480,7 @@
       "T"
     ],
     "riddle": {
-      "fr": "Vieux du village et père de la nation, mon nom orne avenues et stades aux quatre coins du pays."
+      "fr": "Père de la nation, mon nom orne avenues et stades aux quatre coins du pays."
     },
     "explanation": {
       "fr": "Félix Houphouët-Boigny fut le premier président de la Côte d'Ivoire de 1960 à 1993, surnommé le Vieux ou le Sage de l'Afrique."
@@ -2559,16 +2559,17 @@
       "E"
     ],
     "riddle": {
-      "fr": "Fruit doré de la plantation côtière, je m'exporte en cartons vers l'Europe."
+      "fr": "À la fois un fruit et un légume jaune de la plantation côtière, je suis très prisée dans la cuisine ivoirienne."
     },
     "explanation": {
-      "fr": "La banane est une culture d'exportation importante du sud ivoirien, principalement à destination du marché européen."
+      "fr": "La banane est un fruit tropical très consommé en Afrique de l’Ouest, aussi bien mûre que plantain. Elle est riche en énergie et utilisée dans de nombreux plats et desserts."
     },
     "difficulty": 2,
     "estimated_time_s": 25,
     "tags": [
       "agriculture",
-      "sud"
+      "sud",
+      "cuisine"
     ],
     "format_version": 3
   },
@@ -3048,28 +3049,27 @@
     "id": "culture_ci_325",
     "pack": "culture_ci",
     "country": "ci",
-    "answer": "GBEKRE",
-    "answer_normalized": "gbekre",
+    "answer": "GBEKE",
+    "answer_normalized": "gbeke",
     "letters_pool": [
       "G",
       "B",
       "E",
       "K",
-      "R",
       "E"
     ],
     "riddle": {
-      "fr": "Masque-singe redouté du peuple baoulé, je veille sur les jugements et les mauvaises gens."
+      "fr": "Cours d’eau du centre de la Côte d’Ivoire, j'ai donné mon nom à une région ivoirienne."
     },
     "explanation": {
-      "fr": "Le Gbêkrê est un masque baoulé représentant un babouin, lié au culte des esprits et utilisé dans la justice traditionnelle."
+      "fr": "Gbeké désigne un cours d’eau de la Côte d’Ivoire, situé au centre du pays. La région du Gbeké (dont Bouaké est le chef‑lieu) tire son nom de cette rivière."
     },
     "difficulty": 3,
     "estimated_time_s": 35,
     "tags": [
-      "masque",
-      "tradition",
-      "spiritualite"
+      "geographie",
+      "centre",
+      "patrimoine"
     ],
     "format_version": 3
   },
@@ -3900,34 +3900,6 @@
     "format_version": 3
   },
   {
-    "id": "culture_ci_354",
-    "pack": "culture_ci",
-    "country": "ci",
-    "answer": "AHOKO",
-    "answer_normalized": "ahoko",
-    "letters_pool": [
-      "A",
-      "H",
-      "O",
-      "K",
-      "O"
-    ],
-    "riddle": {
-      "fr": "Noix de palmiste enfilées et frottées d'une tige, je donne le rythme des fêtes attié."
-    },
-    "explanation": {
-      "fr": "L'ahoko est un instrument rythmique traditionnel attié et akan, formé de noix de palmiste assemblées, frotté avec une tige."
-    },
-    "difficulty": 3,
-    "estimated_time_s": 35,
-    "tags": [
-      "musique",
-      "tradition",
-      "est"
-    ],
-    "format_version": 3
-  },
-  {
     "id": "culture_ci_355",
     "pack": "culture_ci",
     "country": "ci",
@@ -4207,32 +4179,6 @@
     "format_version": 3
   },
   {
-    "id": "culture_ci_364",
-    "pack": "culture_ci",
-    "country": "ci",
-    "answer": "DOTE",
-    "answer_normalized": "dote",
-    "letters_pool": [
-      "D",
-      "O",
-      "T",
-      "E"
-    ],
-    "riddle": {
-      "fr": "Présents apportés à la belle-famille, je scelle l'union de deux maisons."
-    },
-    "explanation": {
-      "fr": "La dot est l'ensemble de présents traditionnels remis par la famille du marié à celle de la mariée, scellant l'alliance des deux lignages."
-    },
-    "difficulty": 3,
-    "estimated_time_s": 35,
-    "tags": [
-      "ceremonie",
-      "tradition"
-    ],
-    "format_version": 3
-  },
-  {
     "id": "culture_ci_365",
     "pack": "culture_ci",
     "country": "ci",
@@ -4455,7 +4401,7 @@
       "I"
     ],
     "riddle": {
-      "fr": "Igname doucement bouillie, je m'accompagne d'une sauce rouge tirée du palmier."
+      "fr": "Banane ou Igname doucement bouillie, je m'accompagne d'une sauce rouge tirée du palmier."
     },
     "explanation": {
       "fr": "L'akpèssi est un plat traditionnel ivoirien d'igname bouillie servie avec de la sauce graine, parfois enrichie de viande ou de poisson."
@@ -4681,36 +4627,6 @@
       "cuisine",
       "nord",
       "street-food"
-    ],
-    "format_version": 3
-  },
-  {
-    "id": "culture_ci_380",
-    "pack": "culture_ci",
-    "country": "ci",
-    "answer": "BARABARA",
-    "answer_normalized": "barabara",
-    "letters_pool": [
-      "B",
-      "A",
-      "R",
-      "A",
-      "B",
-      "A",
-      "R",
-      "A"
-    ],
-    "riddle": {
-      "fr": "Brochettes des nuits abidjanaises, je grésille au charbon au bord du trottoir."
-    },
-    "explanation": {
-      "fr": "Les barabara sont des brochettes de viande grillée et épicée, omniprésentes dans les rues abidjanaises au crépuscule."
-    },
-    "difficulty": 3,
-    "estimated_time_s": 35,
-    "tags": [
-      "street-food",
-      "cuisine"
     ],
     "format_version": 3
   },
@@ -5325,37 +5241,6 @@
     "format_version": 3
   },
   {
-    "id": "culture_ci_403",
-    "pack": "culture_ci",
-    "country": "ci",
-    "answer": "DJANSANG",
-    "answer_normalized": "djansang",
-    "letters_pool": [
-      "D",
-      "J",
-      "A",
-      "N",
-      "S",
-      "A",
-      "N",
-      "G"
-    ],
-    "riddle": {
-      "fr": "Graine forestière grillée et pilée, je parfume les ragoûts du sud."
-    },
-    "explanation": {
-      "fr": "Le djansang est une graine d'arbre forestier ouest-africain, dont les amandes pilées servent de condiment épaississant pour les sauces."
-    },
-    "difficulty": 3,
-    "estimated_time_s": 35,
-    "tags": [
-      "condiment",
-      "foret",
-      "sud"
-    ],
-    "format_version": 3
-  },
-  {
     "id": "culture_ci_404",
     "pack": "culture_ci",
     "country": "ci",
@@ -5639,36 +5524,6 @@
       "legume",
       "cuisine",
       "tradition"
-    ],
-    "format_version": 3
-  },
-  {
-    "id": "culture_ci_414",
-    "pack": "culture_ci",
-    "country": "ci",
-    "answer": "WAGASHI",
-    "answer_normalized": "wagashi",
-    "letters_pool": [
-      "W",
-      "A",
-      "G",
-      "A",
-      "S",
-      "H",
-      "I"
-    ],
-    "riddle": {
-      "fr": "Fromage caillé au lait de zébu, je viens du nord peul et se déguste frit."
-    },
-    "explanation": {
-      "fr": "Le wagashi est un fromage frais traditionnel peul à base de lait caillé, consommé frit ou poêlé, populaire dans le nord ivoirien."
-    },
-    "difficulty": 3,
-    "estimated_time_s": 35,
-    "tags": [
-      "cuisine",
-      "tradition",
-      "nord"
     ],
     "format_version": 3
   },
@@ -8335,6 +8190,34 @@
       "art",
       "danse",
       "abidjan"
+    ],
+    "format_version": 3
+  },
+  {
+    "id": "culture_ci_511",
+    "pack": "culture_ci",
+    "country": "ci",
+    "answer": "GRIN",
+    "answer_normalized": "grin",
+    "letters_pool": [
+      "G",
+      "R",
+      "I",
+      "N"
+    ],
+    "riddle": {
+      "fr": "C'est un cercle d'amis intimes qui partagent des moments et des discussions animées."
+    },
+    "explanation": {
+      "fr": "Un \"grin\" est un groupe d'amis proches qui se retrouvent régulièrement pour discuter, échanger et passer du temps ensemble, un concept social fort à Abidjan."
+    },
+    "difficulty": 3,
+    "estimated_time_s": 40,
+    "tags": [
+      "societe",
+      "abidjan",
+      "jeunesse",
+      "oralite"
     ],
     "format_version": 3
   }
