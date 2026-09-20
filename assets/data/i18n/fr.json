@@ -22,7 +22,9 @@
   "error": {
     "generic": "Une erreur est survenue",
     "network": "Pas de connexion Internet",
-    "load_failed": "Erreur de chargement"
+    "load_failed": "Erreur de chargement",
+    "play_store_outdated_title": "PLAY STORE À METTRE À JOUR",
+    "play_store_outdated": "Ton Google Play Store est trop ancien pour vérifier l'app : le Défi en ligne et les tournois sont bloqués.\nMets à jour le Play Store (Play Store → Paramètres → À propos → Mettre à jour), puis relance le jeu."
   },
   "game": {
     "back": "Retour",

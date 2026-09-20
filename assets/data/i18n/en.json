@@ -22,7 +22,9 @@
   "error": {
     "generic": "An error occurred",
     "network": "No internet connection",
-    "load_failed": "Failed to load"
+    "load_failed": "Failed to load",
+    "play_store_outdated_title": "UPDATE PLAY STORE",
+    "play_store_outdated": "Your Google Play Store is too old to verify the app, so online duels and tournaments are blocked.\nUpdate the Play Store (Play Store → Settings → About → Update), then relaunch the game."
   },
   "game": {
     "back": "Back",

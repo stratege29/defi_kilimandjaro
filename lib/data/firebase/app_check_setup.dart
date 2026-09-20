@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/data/firebase/app_check_status.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -62,6 +63,9 @@ Future<void> activateAppCheck() async {
       );
     }
   } on Object catch (e, stack) {
+    // Mémorisé pour que les écrans en ligne (duel, tournoi) puissent
+    // expliquer le refus serveur (ex. Play Store à mettre à jour).
+    AppCheckHealth.lastFailure = classifyAppCheckError(e);
     if (kDebugMode) {
       // ignore: avoid_print
       print('🛡️ App Check getTokenResult failed: $e');
