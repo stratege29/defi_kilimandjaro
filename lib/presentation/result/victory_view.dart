@@ -8,6 +8,8 @@ import 'package:defi_kilimandjaro/data/ads/rewarded_daily_cap_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/remote_config_service.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:defi_kilimandjaro/presentation/result/devinette_explanation.dart';
+import 'package:defi_kilimandjaro/presentation/result/reward_lines.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/app_button.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/dashed_button.dart';
@@ -41,12 +43,24 @@ class VictoryView extends ConsumerStatefulWidget {
     required this.caurisAwarded,
     required this.onNext,
     this.freehandBonus = 0,
+    this.perfectBonus = 0,
+    this.comboStreak = 0,
+    this.comboMultiplier = 1.0,
     this.starsEarned = 0,
     this.isBoss = false,
+    this.devinettes,
     super.key,
   });
 
   final Devinette devinette;
+
+  /// Toutes les devinettes du niveau (rafale : 3 mots, duo : 2 mots).
+  /// `null` = niveau à un seul mot. Au-delà d'une, l'explication de chaque
+  /// mot est listée (mot en gras + explication) sous le mot-réponse.
+  final List<Devinette>? devinettes;
+
+  /// Devinettes à expliquer, principale seule par défaut.
+  List<Devinette> get allDevinettes => devinettes ?? <Devinette>[devinette];
 
   /// Secondes restantes au moment de la victoire (pour affichage info).
   final int timeLeft;
@@ -60,6 +74,16 @@ class VictoryView extends ConsumerStatefulWidget {
   /// se croisait ou mot trop court). Affiché en ligne dédiée sous le chip
   /// cauris quand > 0. **Déjà inclus** dans le solde — purement informatif.
   final int freehandBonus;
+
+  /// Bonus « Sans faute » (aucun mot erroné sur le niveau), déjà inclus dans
+  /// le solde. 0 = pas de ligne.
+  final int perfectBonus;
+
+  /// Longueur de la série intra-session (victoire courante incluse).
+  final int comboStreak;
+
+  /// Multiplicateur de série appliqué à [caurisAwarded] (1.0 = pas de ligne).
+  final double comboMultiplier;
 
   /// Nombre d'étoiles obtenues (0-3). 0 ne devrait jamais arriver ici
   /// puisque l'overlay n'est affiché que sur victoire (≥ 1).
@@ -90,10 +114,11 @@ class _VictoryViewState extends ConsumerState<VictoryView>
   /// une fois la card apparue (geste signature « bonne réponse »).
   final KiliController _kili = KiliController();
 
-  /// Total animé dans le chip « ka-ching » = récompense de base + bonus à
-  /// main levée. La ligne « À main levée : +M inclus » sous le chip en donne
-  /// la décomposition (et évite que le joueur additionne deux nombres).
-  int get _caurisEarned => widget.caurisAwarded + widget.freehandBonus;
+  /// Total animé dans le chip « ka-ching » = récompense de base (série
+  /// incluse) + bonus à main levée + bonus sans faute. Les lignes sous le
+  /// chip en donnent la décomposition (le joueur n'additionne rien).
+  int get _caurisEarned =>
+      widget.caurisAwarded + widget.freehandBonus + widget.perfectBonus;
 
   /// Vrai après que le joueur a cliqué "Doubler" et que la pub s'est
   /// terminée avec succès — masque le bouton et déclenche le second tween
@@ -243,12 +268,21 @@ class _VictoryViewState extends ConsumerState<VictoryView>
               scale: _cardScale,
               child: _VictoryCard(
                 devinette: widget.devinette,
+                devinettes: widget.allDevinettes,
                 caurisAnim: _caurisAnim,
                 kili: _kili,
                 onNext: widget.onNext,
                 starsEarned: widget.starsEarned,
                 isBoss: widget.isBoss,
-                freehandBonus: widget.freehandBonus,
+                bonusLines: RewardBonusLines(
+                  comboStreak: widget.comboStreak,
+                  comboMultiplier: widget.comboMultiplier,
+                  perfectBonus: widget.perfectBonus,
+                  freehandBonus: widget.freehandBonus,
+                ),
+                hasBonusLines: widget.comboMultiplier > 1 ||
+                    widget.perfectBonus > 0 ||
+                    widget.freehandBonus > 0,
                 doubleButton: _buildDoubleButton(context),
               ),
             ),
@@ -266,16 +300,22 @@ class _VictoryViewState extends ConsumerState<VictoryView>
 class _VictoryCard extends StatelessWidget {
   const _VictoryCard({
     required this.devinette,
+    required this.devinettes,
     required this.caurisAnim,
     required this.kili,
     required this.onNext,
     required this.starsEarned,
     required this.isBoss,
-    required this.freehandBonus,
+    required this.bonusLines,
+    required this.hasBonusLines,
     required this.doubleButton,
   });
 
   final Devinette devinette;
+
+  /// Devinettes à expliquer (≥ 1, [devinette] en tête).
+  final List<Devinette> devinettes;
+
   final Animation<int> caurisAnim;
 
   /// Poignée de la mascotte Kili affichée en tête de card (hochement piloté
@@ -286,8 +326,11 @@ class _VictoryCard extends StatelessWidget {
   final int starsEarned;
   final bool isBoss;
 
-  /// Bonus « À main levée » (0 = pas de ligne dédiée).
-  final int freehandBonus;
+  /// Lignes série / sans faute / à main levée (cf. [RewardBonusLines]).
+  final Widget bonusLines;
+
+  /// Vrai si au moins une ligne bonus est à afficher (pilote l'espacement).
+  final bool hasBonusLines;
 
   /// Bouton optionnel "Doubler la récompense" (rewarded video). Vide
   /// (SizedBox.shrink) quand les conditions ne sont pas réunies, ce qui
@@ -409,22 +452,30 @@ class _VictoryCard extends StatelessWidget {
           // pédagogique principal, il mérite la couleur primaire et la
           // lisibilité maximale (la chute Fraunces 40pt → 14pt italic était
           // trop violente hiérarchiquement).
-          Text(
-            devinette.explanation,
-            textAlign: TextAlign.center,
-            style: AppTypography.bodyMd.copyWith(
-              color: AppColors.textePrimaire,
-              height: 1.5,
-            ),
-          ),
+          if (devinettes.length <= 1)
+            Text(
+              devinette.explanation,
+              textAlign: TextAlign.center,
+              style: AppTypography.bodyMd.copyWith(
+                color: AppColors.textePrimaire,
+                height: 1.5,
+              ),
+            )
+          else
+            // Rafale / duo : une ligne par mot (mot en gras + explication).
+            for (var i = 0; i < devinettes.length; i++)
+              Padding(
+                padding: EdgeInsets.only(top: i == 0 ? 0 : 10),
+                child: DevinetteExplanation(devinette: devinettes[i]),
+              ),
           const SizedBox(height: 24),
           // Reward cauris — chip pill animé (ka-ching).
           _CaurisRewardChip(caurisAnim: caurisAnim),
-          // Bonus « À main levée » — ligne dédiée discrète, uniquement quand
-          // le joueur a tracé d'un seul geste sans croiser son trait.
-          if (freehandBonus > 0) ...<Widget>[
+          // Lignes bonus discrètes (série, sans faute, à main levée) —
+          // uniquement quand au moins une s'applique.
+          if (hasBonusLines) ...<Widget>[
             const SizedBox(height: 10),
-            _FreehandBonusLine(bonus: freehandBonus),
+            bonusLines,
           ],
           // Bouton optionnel "Doubler" — n'apparaît que si conditions
           // remplies (cf. `_VictoryViewState._buildDoubleButton`).
@@ -566,35 +617,6 @@ class _CaurisRewardChip extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-/// Ligne « À main levée ! +N » — feedback discret du bonus de tracé propre.
-/// Icône geste + libellé localisé, teinte succès pour distinguer du chip
-/// cauris doré (récompense de base) sans voler la vedette au CTA.
-class _FreehandBonusLine extends StatelessWidget {
-  const _FreehandBonusLine({required this.bonus});
-
-  final int bonus;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        const Icon(Icons.gesture_rounded, size: 18, color: AppColors.success),
-        const SizedBox(width: 6),
-        Text(
-          'result.victory.freehand_bonus'.tr(
-            namedArgs: <String, String>{'cauris': '$bonus'},
-          ),
-          style: AppTypography.labelSm.copyWith(
-            color: AppColors.success,
-            letterSpacing: 0.5,
-          ),
-        ),
-      ],
     );
   }
 }
