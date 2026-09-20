@@ -50,12 +50,15 @@ def _credentials():
 
 
 def _request(creds, url: str, method: str = "GET", body: dict | None = None,
-             etag: str | None = None):
+             etag: str | None = None, quota_project: str | None = None):
     data = json.dumps(body).encode() if body is not None else None
     headers = {
         "Authorization": f"Bearer {creds.token}",
         "Content-Type": "application/json; UTF-8",
     }
+    # Identifiants utilisateur (ADC) : l'API exige un projet de quota explicite.
+    if quota_project:
+        headers["x-goog-user-project"] = quota_project
     if etag:
         headers["If-Match"] = etag
     req = urllib.request.Request(url, data=data, method=method, headers=headers)
@@ -80,7 +83,7 @@ def main() -> None:
 
     creds = _credentials()
     url = API.format(project=args.project)
-    etag, remote = _request(creds, url)
+    etag, remote = _request(creds, url, quota_project=args.project)
     remote_params: dict = remote.setdefault("parameters", {})
 
     missing = sorted(k for k in wanted if k in local_params and k not in remote_params)
@@ -102,8 +105,8 @@ def main() -> None:
         print("Dry-run : relancer avec --apply pour valider puis publier.")
         return
 
-    _request(creds, url + "?validate_only=true", "PUT", remote, etag)
-    new_etag, _ = _request(creds, url, "PUT", remote, etag)
+    _request(creds, url + "?validate_only=true", "PUT", remote, etag, args.project)
+    new_etag, _ = _request(creds, url, "PUT", remote, etag, args.project)
     print(f"Publié sur {args.project} (nouvelle version, ETag reçu : {'oui' if new_etag else 'non'}).")
 
 
