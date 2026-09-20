@@ -344,7 +344,8 @@ class _VictoryCard extends StatelessWidget {
                 Image.asset(AppAssets.iconStarGold, width: 22, height: 22),
               ],
             ),
-            const SizedBox(height: 10),
+            // Marge élargie : la couronne déborde de 20 px au-dessus de Kili.
+            const SizedBox(height: 26),
           ],
           // Mascotte Kili — idle + hochement de tête à l'ouverture (pas de
           // pulsation). En mode boss, surmontée d'une couronne flottante.
@@ -354,22 +355,27 @@ class _VictoryCard extends StatelessWidget {
             children: <Widget>[
               KiliMascot(controller: kili, size: 130),
               if (isBoss)
+                // Décalée vers la gauche : la tête de Kili est à gauche du
+                // centre de sa boîte (la queue occupe la droite).
                 Positioned(
-                  top: -18,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.65),
-                          blurRadius: 6,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Image.asset(
-                      AppAssets.iconCrownBoss,
-                      width: 40,
-                      height: 40,
+                  top: -20,
+                  child: Transform.translate(
+                    offset: const Offset(-24, 0),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        boxShadow: <BoxShadow>[
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.65),
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        AppAssets.iconCrownBoss,
+                        width: 44,
+                        height: 44,
+                      ),
                     ),
                   ),
                 ),
@@ -456,9 +462,8 @@ class _DoubleRewardButton extends StatelessWidget {
       // Le rewarded ne crédite QUE la base (pas le bonus à main levée), donc
       // le libellé annonce le gain concret en cauris plutôt qu'un « ×2 » qui
       // serait trompeur quand un bonus à main levée existe.
-      label: '${'result.victory.double_cta'.tr(namedArgs: <String, String>{
-            'cauris': '$bonus',
-          })} ▶',
+      label:
+          '${'result.victory.double_cta'.tr(namedArgs: <String, String>{'cauris': '$bonus'})} ▶',
       onTap: onTap,
       leading: loading
           ? const SizedBox(
@@ -504,11 +509,7 @@ class _StarsRow extends StatelessWidget {
                       0.2126, 0.7152, 0.0722, 0, 0, //
                       0, 0, 0, 1, 0, //
                     ]),
-              child: Image.asset(
-                AppAssets.iconStarGold,
-                width: 32,
-                height: 32,
-              ),
+              child: Image.asset(AppAssets.iconStarGold, width: 32, height: 32),
             ),
           ),
         ],
@@ -582,11 +583,7 @@ class _FreehandBonusLine extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const Icon(
-          Icons.gesture_rounded,
-          size: 18,
-          color: AppColors.success,
-        ),
+        const Icon(Icons.gesture_rounded, size: 18, color: AppColors.success),
         const SizedBox(width: 6),
         Text(
           'result.victory.freehand_bonus'.tr(
@@ -649,8 +646,9 @@ class _ParticlePainter extends CustomPainter {
             p,
             2.5,
             Paint()
-              ..color =
-                  AppColors.textePrimaire.withValues(alpha: opacity * 0.85),
+              ..color = AppColors.textePrimaire.withValues(
+                alpha: opacity * 0.85,
+              ),
           );
       }
     }
