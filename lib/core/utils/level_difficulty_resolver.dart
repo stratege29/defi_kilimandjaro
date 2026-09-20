@@ -1,4 +1,5 @@
 import 'package:defi_kilimandjaro/domain/entities/level_difficulty_config.dart';
+import 'package:defi_kilimandjaro/domain/entities/level_kind.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 
@@ -10,19 +11,31 @@ import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 /// Remplace l'ancienne `difficultyForAltitude` (supprimée). Le contrat
 /// unique est désormais [LevelDifficultyConfig].
 ///
-/// Modèle :
-/// - Le **tier** (1–5) vient de l'altitude (palier validé PO option B).
-/// - Le **bucket de longueur** s'aligne sur le tier (préférence) — la
-///   sélection de devinette gère le fallback si le pool est trop maigre.
-/// - Le **timer** est adaptatif : `15 + 3·wordLen + 2·tier`, multiplié par
-///   0,8 si `thinAir` est actif. On utilise la longueur attendue dérivée
-///   du bucket pour pré-calculer un timer cohérent.
-/// - Le **multiplicateur cauris** scale en cinq paliers (1.0, 1.3, 1.6,
-///   2.0, 2.5) pour récompenser la difficulté.
-/// - Les **modifiers** sont attribués algorithmiquement par règles
-///   thématiques (altitude, géologie via [Mountain.shape], etc.).
-/// - Le flag **isBoss** marque la dernière énigme d'une montagne
-///   (préparation S4).
+/// Modèle en deux couches :
+///
+/// 1. **Le tier** (1–5) vient de l'altitude (palier validé PO option B) et
+///    fixe la *base* de chaque paramètre.
+/// 2. **La rampe intra-sommet** fait ensuite varier ces bases avec le
+///    `levelIndex` (1-based) pour qu'un sommet à 4 ou 8 niveaux ne soit pas
+///    une suite de niveaux identiques :
+///    - **bucket de longueur** = tier, +1 sur le boss dès le tier 2
+///      (plafond 5) ;
+///    - **distracteurs** = base(tier) + (levelIndex − 1) ÷ 2, plafonné à
+///      [maxDistractorCount] ;
+///    - **timer** = base(tier) − 2 s par niveau, plancher à 60 % de la
+///      base, puis ×0,8 si `thinAir` ;
+///    - **multiplicateur cauris** = mult(tier) × (1 + 0,1 × (levelIndex − 1)),
+///      +0,25 sur le boss, arrondi à 2 décimales ;
+///    - **modifiers** : rotation déterministe niveau par niveau (jamais deux
+///      niveaux consécutifs avec le même modificateur actif), signature
+///      boss (`shuffle`) et signature tectonique (`earthquake` garanti),
+///      voir [_attributeModifiers] ;
+///    - **structure du tour** ([LevelKind]) : classique aux niveaux 1-2,
+///      boss aveugle sur le boss des tiers ≥ 3, sinon tirage par hachage
+///      d'une rafale ou d'un duo sans deux rafale/duo consécutifs, voir
+///      [_kindChain].
+///
+/// Le flag **isBoss** marque la dernière énigme d'une montagne.
 abstract final class LevelDifficultyResolver {
   /// Construit la config pour `mountain` et son `levelIndex` 1-based.
   /// `levelIndex` est borné dans `1..mountain.totalLevels` ; les valeurs
@@ -33,33 +46,63 @@ abstract final class LevelDifficultyResolver {
   }) {
     final clampedLevel = levelIndex.clamp(1, mountain.totalLevels);
     final tier = _tierForAltitude(mountain.altitude);
-    final bucket = _wordLengthBucketForTier(tier);
     final isBoss = clampedLevel == mountain.totalLevels;
+    final bucket = _wordLengthBucketFor(tier: tier, isBoss: isBoss);
     final modifiers = _attributeModifiers(
       mountain: mountain,
       levelIndex: clampedLevel,
       tier: tier,
       isBoss: isBoss,
     );
-
-    // Longueur de mot attendue pour calibrer le timer. On prend la borne
-    // basse du bucket — c'est conservateur (plus de temps), évite les
-    // niveaux étouffants si la sélection finit par tomber sur un mot
-    // plus court que le bucket cible.
-    final expectedWordLen = _expectedWordLengthForBucket(bucket);
-    var timer = 15 + 3 * expectedWordLen + 2 * tier;
-    if (modifiers.contains(LevelModifier.thinAir)) {
-      timer = (timer * 0.8).round();
-    }
+    final timer = _timerSecondsFor(
+      tier: tier,
+      levelIndex: clampedLevel,
+      thinAir: modifiers.contains(LevelModifier.thinAir),
+    );
 
     return LevelDifficultyConfig(
       difficultyTier: tier,
       wordLengthBucket: bucket,
       timerSeconds: timer,
-      caurisMultiplier: _caurisMultiplierForTier(tier),
-      distractorCount: _distractorCountForTier(tier),
+      caurisMultiplier: _caurisMultiplierFor(
+        tier: tier,
+        levelIndex: clampedLevel,
+        isBoss: isBoss,
+      ),
+      distractorCount: _distractorCountFor(
+        tier: tier,
+        levelIndex: clampedLevel,
+      ),
       modifiers: modifiers,
       isBoss: isBoss,
+      kind: _kindChain(mountain: mountain, tier: tier)[clampedLevel - 1],
+    );
+  }
+
+  /// Vrai quand le niveau propose l'embranchement « voie exposée » avant de
+  /// se lancer : niveau [_branchingLevel] exactement, sur les sommets d'au
+  /// moins [_branchingMinTotalLevels] niveaux. Déterministe, sans hachage.
+  static bool isBranchingLevel({
+    required Mountain mountain,
+    required int levelIndex,
+  }) {
+    return mountain.totalLevels >= _branchingMinTotalLevels &&
+        levelIndex == _branchingLevel;
+  }
+
+  /// Variante « voie exposée » d'une config : une lettre parasite de plus
+  /// (plafond [maxDistractorCount]), timer × [_exposedTimerFactor], cauris
+  /// × [_exposedCaurisFactor] (arrondi à 2 décimales). Le reste (tier,
+  /// modificateurs, structure du tour) est inchangé.
+  static LevelDifficultyConfig exposedVariant(LevelDifficultyConfig config) {
+    return config.copyWith(
+      distractorCount: (config.distractorCount + 1).clamp(
+        0,
+        maxDistractorCount,
+      ),
+      timerSeconds: (config.timerSeconds * _exposedTimerFactor).round(),
+      caurisMultiplier:
+          (config.caurisMultiplier * _exposedCaurisFactor * 100).round() / 100,
     );
   }
 
@@ -77,6 +120,66 @@ abstract final class LevelDifficultyResolver {
   static int tierForAltitude(int altitudeMeters) =>
       _tierForAltitude(altitudeMeters);
 
+  /// Ensemble **trié** (ordre de déclaration de l'enum) des modificateurs
+  /// « actifs » éligibles pour ce niveau — c'est dans cette liste que
+  /// [resolve] tire le modificateur du niveau. Vide sur les niveaux 1-2.
+  ///
+  /// Exposé pour les tests et l'outillage (overlay debug) : il permet de
+  /// vérifier les règles d'éligibilité (tectonique, altitude, tier) sans
+  /// dépendre du tirage par hachage.
+  static List<LevelModifier> candidateModifiers({
+    required Mountain mountain,
+    required int levelIndex,
+  }) {
+    final clampedLevel = levelIndex.clamp(1, mountain.totalLevels);
+    final tier = _tierForAltitude(mountain.altitude);
+    if (clampedLevel <= _tutorialMaxLevel) return const <LevelModifier>[];
+    if (clampedLevel <= _gentleRampMaxLevel) {
+      // Zone douce : palette de base, élargie dès le tier 3 à `mirage` et
+      // `spirit` (effets doux eux aussi). Sans cet élargissement, les 28
+      // sommets tier ≥ 3 à 4 niveaux ne verraient jamais que wind/shuffle/
+      // rain. `reverse` et `fog` restent hors zone douce.
+      return _sorted(tier >= 3 ? _gentleModifiersExtended : _gentleModifiers);
+    }
+
+    final candidates = <LevelModifier>{};
+    // earthquake : signature des pays tectoniques (Rift, volcans actifs),
+    // réservé au tier ≥ 3 pour ne pas brutaliser la rampe basse.
+    if (_isTectonic(mountain.countryCode) && tier >= 3) {
+      candidates.add(LevelModifier.earthquake);
+    }
+    // wind : vents catabatiques dès 3000 m.
+    if (mountain.altitude >= _windAltitudeMeters) {
+      candidates.add(LevelModifier.wind);
+    }
+    // fog : zone des nuages dès 2000 m.
+    if (mountain.altitude >= _fogAltitudeMeters) {
+      candidates.add(LevelModifier.fog);
+    }
+    // Modificateurs cognitifs / de masquage : tier ≥ 3 uniquement.
+    if (tier >= 3) {
+      candidates.addAll(const <LevelModifier>{
+        LevelModifier.reverse,
+        LevelModifier.mirage,
+        LevelModifier.spirit,
+        LevelModifier.rain,
+        LevelModifier.shuffle,
+      });
+    }
+    // rain : le plus doux des modificateurs, ouvert dès le tier 2.
+    if (tier >= 2) {
+      candidates.add(LevelModifier.rain);
+    }
+    // Garde-fou : la rotation exige au moins deux candidats pour garantir
+    // que deux niveaux consécutifs diffèrent. Ne concerne que les sommets
+    // tier 1-2 à ≥ 5 niveaux (absents de `mountains.json`, mais possibles
+    // en test ou dans un futur pack) — on retombe sur la palette douce.
+    if (candidates.length < 2) {
+      candidates.addAll(_gentleModifiers);
+    }
+    return _sorted(candidates);
+  }
+
   // ---------------------------------------------------------------------------
   // Mapping primitives
   // ---------------------------------------------------------------------------
@@ -84,10 +187,10 @@ abstract final class LevelDifficultyResolver {
   static int _tierForAltitude(int altitudeMeters) {
     // Tier 1 étendu à < 700 m (vs < 500 m initial) pour donner une vraie
     // zone d'onboarding : 3 premières montagnes (Red Rocks, Sambadougou,
-    // Sokbaro) = 10 niveaux à 4 lettres / 29 s / 0 distracteur avant le
-    // premier saut de difficulté. Tena Kourou (749 m) bascule en Tier 2
-    // pour amorcer la rampe. La borne haute (700 m) reste **strictement**
-    // exclusive : 700 m exact = Tier 2 (cf. tests).
+    // Sokbaro) = 10 niveaux à 4 lettres avant le premier saut de
+    // difficulté. Tena Kourou (749 m) bascule en Tier 2 pour amorcer la
+    // rampe. La borne haute (700 m) reste **strictement** exclusive :
+    // 700 m exact = Tier 2 (cf. tests).
     if (altitudeMeters < 700) return 1;
     if (altitudeMeters < 1500) return 2;
     if (altitudeMeters < 3000) return 3;
@@ -95,10 +198,15 @@ abstract final class LevelDifficultyResolver {
     return 5;
   }
 
-  static int _wordLengthBucketForTier(int tier) {
-    // Mapping 1:1 simple — la sélection de devinette gère le fallback
-    // ±1 / ±2 si le pool de cette taille est trop maigre.
-    return tier;
+  /// Bucket de longueur de mot : mapping 1:1 avec le tier, +1 sur le boss
+  /// (plafond 5) pour que la finale d'un sommet demande un mot plus long.
+  /// Le tier 1 est exempté : Red Rocks niveau 2 est le 2ᵉ niveau du jeu,
+  /// il reste sur des mots de 4 lettres (le boss y garde son bonus cauris).
+  /// La sélection de devinette gère le fallback ±1 / ±2 si le pool de
+  /// cette taille est trop maigre.
+  static int _wordLengthBucketFor({required int tier, required bool isBoss}) {
+    if (!isBoss || tier == 1) return tier;
+    return (tier + 1).clamp(1, 5);
   }
 
   static int _expectedWordLengthForBucket(int bucket) {
@@ -119,10 +227,41 @@ abstract final class LevelDifficultyResolver {
     }
   }
 
-  /// Nombre de lettres parasites ajoutées à la grille selon le tier.
-  /// Courbe douce : 0 en zone tutoriel (tier 1-2), puis +1 par palier.
-  /// Au tier 5, un mot de 6 lettres affiche 9 cases (6 + 3 distracteurs).
-  static int _distractorCountForTier(int tier) {
+  // ---------------------------------------------------------------------------
+  // Rampe intra-sommet
+  // ---------------------------------------------------------------------------
+
+  /// Un distracteur supplémentaire tous les [_distractorRampStepLevels]
+  /// niveaux : niveaux 1-2 → +0, 3-4 → +1, 5-6 → +2, 7-8 → +3.
+  static const int _distractorRampStepLevels = 2;
+
+  /// Plafond absolu de lettres parasites.
+  ///
+  /// Calcul : les patterns de grille curés (`compatiblePatterns` dans
+  /// `letter_grid_pattern.dart`) sont validés par tests jusqu'à **10
+  /// tuiles** ; au-delà, seuls les patterns 2D universels (circle, scatter,
+  /// jittered, spiral, clusters, grid) restent éligibles et acceptent
+  /// n'importe quel count. Longueur haute des buckets : 4 / 6 / 7 / 8 / 9+
+  /// (12 max dans les packs). Avec un plafond de 4 :
+  /// - buckets 1-4 : ≤ 8 + 4 = 12 tuiles, dont ≤ 10 tuiles (patterns curés)
+  ///   pour tout mot ≤ 6 lettres ;
+  /// - bucket 5 (mot de 9 à 12 lettres) : ≤ 16 tuiles, soit +1 par rapport
+  ///   aux 15 tuiles déjà possibles avant la rampe (12 + 3 au tier 5).
+  /// Un plafond plus haut ferait basculer les buckets 3-4 hors des patterns
+  /// curés sur la majorité des niveaux ; plus bas, la rampe des tiers 1-2
+  /// (0 → 2 distracteurs) perdrait son dernier palier.
+  static const int maxDistractorCount = 4;
+
+  /// Nombre de lettres parasites : base(tier) + rampe intra-sommet.
+  /// Base : 0 en zone tutoriel (tier 1-2), puis +1 par palier.
+  /// Effet sur tiers 1-2 : 0 aux niveaux 1-2, 1 aux niveaux 3-4, 2 au 5+.
+  static int _distractorCountFor({required int tier, required int levelIndex}) {
+    final ramp = (levelIndex - 1) ~/ _distractorRampStepLevels;
+    final count = _baseDistractorCountForTier(tier) + ramp;
+    return count.clamp(0, maxDistractorCount);
+  }
+
+  static int _baseDistractorCountForTier(int tier) {
     switch (tier) {
       case 1:
       case 2:
@@ -138,7 +277,62 @@ abstract final class LevelDifficultyResolver {
     }
   }
 
-  static double _caurisMultiplierForTier(int tier) {
+  /// Secondes retirées au timer à chaque niveau supplémentaire.
+  static const int _timerRampSecondsPerLevel = 2;
+
+  /// Plancher du timer rampé, en proportion de la base du tier.
+  static const double _timerFloorRatio = 0.6;
+
+  /// Facteur appliqué au timer quand `thinAir` est actif (hypoxie).
+  static const double _thinAirTimerFactor = 0.8;
+
+  /// Timer de base du tier : `15 + 3·wordLen + 2·tier`, avec la longueur
+  /// attendue dérivée du bucket du tier (borne basse — conservateur, évite
+  /// les niveaux étouffants si la sélection tombe sur un mot plus court).
+  /// Le boss garde la base de son tier : son mot plus long est compensé
+  /// par le multiplicateur cauris majoré, pas par du temps en plus.
+  static int _baseTimerSecondsForTier(int tier) {
+    final expectedWordLen = _expectedWordLengthForBucket(tier);
+    return 15 + 3 * expectedWordLen + 2 * tier;
+  }
+
+  /// Timer rampé : base(tier) − 2 s par niveau, plancher à 60 % de la base
+  /// (arrondi), puis ×0,8 si `thinAir`.
+  static int _timerSecondsFor({
+    required int tier,
+    required int levelIndex,
+    required bool thinAir,
+  }) {
+    final base = _baseTimerSecondsForTier(tier);
+    final floor = (base * _timerFloorRatio).round();
+    final ramped = base - _timerRampSecondsPerLevel * (levelIndex - 1);
+    var timer = ramped < floor ? floor : ramped;
+    if (thinAir) {
+      timer = (timer * _thinAirTimerFactor).round();
+    }
+    return timer;
+  }
+
+  /// Bonus relatif du multiplicateur cauris par niveau supplémentaire.
+  static const double _caurisRampPerLevel = 0.1;
+
+  /// Bonus absolu ajouté au multiplicateur du boss.
+  static const double _bossCaurisBonus = 0.25;
+
+  /// Multiplicateur cauris : mult(tier) × (1 + 0,1 × (levelIndex − 1)),
+  /// +0,25 sur le boss, arrondi à 2 décimales pour un affichage stable.
+  static double _caurisMultiplierFor({
+    required int tier,
+    required int levelIndex,
+    required bool isBoss,
+  }) {
+    final ramp = 1 + _caurisRampPerLevel * (levelIndex - 1);
+    var multiplier = _baseCaurisMultiplierForTier(tier) * ramp;
+    if (isBoss) multiplier += _bossCaurisBonus;
+    return (multiplier * 100).round() / 100;
+  }
+
+  static double _baseCaurisMultiplierForTier(int tier) {
     switch (tier) {
       case 1:
         return 1;
@@ -167,125 +361,328 @@ abstract final class LevelDifficultyResolver {
   /// Borne supérieure de la zone « ramp-up doux » : niveaux 3 et 4. Sur
   /// cette plage on garantit **exactement un** modifier doux pour casser
   /// la monotonie sans surprendre brutalement le joueur (jamais de fog
-  /// occultant, jamais d'earthquake déstabilisant, jamais de boss).
+  /// occultant, jamais d'earthquake déstabilisant, jamais de double boss).
   static const int _gentleRampMaxLevel = 4;
 
-  /// Modifiers considérés « doux » pour le ramp-up — pas de masquage,
-  /// pas de mouvement brutal, pas d'inversion cognitive imposée.
-  /// Utilisés pour le filtre des niveaux 3–4 et pour le fallback garanti.
+  /// Altitude à partir de laquelle `thinAir` (hypoxie) s'applique.
+  static const int _thinAirAltitudeMeters = 4000;
+
+  /// Altitude à partir de laquelle `wind` devient candidat.
+  static const int _windAltitudeMeters = 3000;
+
+  /// Altitude à partir de laquelle `fog` devient candidat.
+  static const int _fogAltitudeMeters = 2000;
+
+  /// Modifiers considérés « doux » pour le ramp-up — pas de masquage
+  /// durable, pas de mouvement brutal, pas d'inversion cognitive imposée.
+  /// Palette des niveaux 3–4 et filet de sécurité des candidats trop rares.
   static const Set<LevelModifier> _gentleModifiers = <LevelModifier>{
     LevelModifier.wind,
     LevelModifier.shuffle,
+    LevelModifier.rain,
   };
 
+  /// Palette douce des niveaux 3–4 à partir du tier 3 : `mirage` (une
+  /// lettre fausse de plus) et `spirit` (une lettre empruntée 3 s) sont des
+  /// effets doux, contrairement à `reverse` (cognitif) et `fog` (masquage).
+  static const Set<LevelModifier> _gentleModifiersExtended = <LevelModifier>{
+    ..._gentleModifiers,
+    LevelModifier.mirage,
+    LevelModifier.spirit,
+  };
+
+  /// Règles :
+  /// - niveaux 1-2 : aucun modifier (tutoriel strict) ;
+  /// - `thinAir` : passif, additif au-dessus de 4000 m dès le niveau 3 ;
+  /// - **un seul** modifier « actif » (mouvement/masquage/cognitif) par
+  ///   niveau, tiré par hachage dans [candidateModifiers] et garanti
+  ///   différent du modifier actif du niveau précédent (rotation) ;
+  /// - boss tier ≥ 3 (même au niveau 3-4) : `shuffle` garanti **en plus**
+  ///   du modifier tiré — dans la zone douce, le tirage se fait parmi
+  ///   la palette douce élargie hors shuffle ;
+  /// - signatures de palier (`earthquake` tectonique, `reverse`, `fog`) :
+  ///   apparaissent au moins une fois sur les niveaux ≥ 5 quand le sommet
+  ///   en a (voir [_activeChain] et [_signaturesFor]).
   static Set<LevelModifier> _attributeModifiers({
     required Mountain mountain,
     required int levelIndex,
     required int tier,
     required bool isBoss,
   }) {
-    // ----- Niveaux 1-2 : zone tutoriel stricte ---------------------------
-    // Aucun modifier (même thinAir/environmental). Le joueur apprend la
-    // grille, le drag, la validation sans aucune friction. Cette règle
-    // *écrase* toutes les règles tier-based qui suivraient.
     if (levelIndex <= _tutorialMaxLevel) {
       return const <LevelModifier>{};
     }
 
     final modifiers = <LevelModifier>{};
-
-    // thinAir : timer accéléré au-dessus de 4000 m (effet hypoxie).
-    // Passif (pas de modifier visuel) — cohabite avec tout. Réactivé à
-    // partir du niveau 3 (sortie de la zone tutoriel).
-    if (mountain.altitude >= 4000) {
+    if (mountain.altitude >= _thinAirAltitudeMeters) {
       modifiers.add(LevelModifier.thinAir);
     }
 
-    // Règles **exclusives** pour les modifiers de mouvement/masquage :
-    // un niveau ne reçoit qu'un seul d'entre eux pour éviter la surcharge
-    // visuelle (4 modifiers simultanés = grille illisible).
-    //
-    // Priorité :
-    // 1. earthquake — montagnes en pays tectonique (Rift, volcans actifs).
-    //    Match thématique fort, on l'attribue dès qu'éligible.
-    // 2. wind — altitude ≥ 3000 m sur sommets non-tectoniques.
-    //    Les vents catabatiques dominent à cette altitude.
-    // 3. fog — zone des nuages (2000–3000 m) sur sommets non-tectoniques.
-    //    Calme atmosphérique, brouillard plus que tremblement.
-    final isTectonic = _isTectonic(mountain.countryCode);
-    if (isTectonic && tier >= 3) {
-      modifiers.add(LevelModifier.earthquake);
-    } else if (mountain.altitude >= 3000) {
-      modifiers.add(LevelModifier.wind);
-    } else if (mountain.altitude >= 2000) {
-      modifiers.add(LevelModifier.fog);
-    }
+    final chain = _activeChain(mountain: mountain, tier: tier);
+    modifiers.add(chain[levelIndex - _tutorialMaxLevel - 1]);
 
-    // reverse : à partir du tier 3, attribué de façon déterministe à
-    // certains niveaux. Hash stable sur (mountainId, levelIndex) pour
-    // que l'attribution ne varie pas d'un boot à l'autre. ~1 niveau sur
-    // 3 au tier 3, ~1 sur 2 au tier 4+.
-    if (tier >= 3) {
-      final salt = _stableHash('${mountain.id}:$levelIndex');
-      final modulus = tier >= 4 ? 2 : 3;
-      if (salt % modulus == 0) {
-        modifiers.add(LevelModifier.reverse);
-      }
-    }
-
-    // shuffle : signature des boss tier ≥ 3. Re-mélange complet de la
-    // grille toutes les 15 s pour casser la mémoire spatiale du joueur.
-    if (isBoss && tier >= 3) {
+    if (_hasBossSignature(
+      mountain: mountain,
+      tier: tier,
+      levelIndex: levelIndex,
+    )) {
       modifiers.add(LevelModifier.shuffle);
     }
 
-    // Boss tier ≥ 3 : on garantit qu'au moins UN modifier sortant est
-    // présent pour donner du sel à la finale (au minimum reverse si rien
-    // d'autre attribué par les règles ci-dessus). En S3+ on enrichira
-    // (drumbeat, ice, etc.).
-    //
-    // Pourquoi pas tier 1-2 : ces paliers servent de zone tutoriel
-    // implicite (apprentissage du gameplay de base). Les 10 premiers
-    // niveaux (3 premières montagnes Tier 1, alt < 700 m) doivent rester
-    // "soft" sans inversion cognitive — le joueur découvre la grille
-    // circulaire, la barre de timer et le système d'indices sur des mots
-    // courts (4 lettres). Tier 2 prolonge la rampe jusqu'à ~1500 m.
-    if (isBoss && tier >= 3 && modifiers.length <= 1) {
-      // Si on n'a que `shuffle` (ajouté juste au-dessus), on ajoute reverse
-      // pour le double-pic boss. La condition `length <= 1` couvre les
-      // boss tier 3 avec uniquement shuffle (zones non-tectoniques,
-      // < 2000 m donc pas fog/wind/earthquake/thinAir).
-      modifiers.add(LevelModifier.reverse);
+    return modifiers;
+  }
+
+  /// Vrai quand le niveau reçoit la signature boss (`shuffle` garanti en
+  /// plus du tirage) : dernier niveau d'un sommet tier ≥ 3, y compris dans
+  /// la zone douce — un sommet à 4 niveaux a droit à un vrai boss.
+  static bool _hasBossSignature({
+    required Mountain mountain,
+    required int tier,
+    required int levelIndex,
+  }) {
+    return tier >= 3 && levelIndex == mountain.totalLevels;
+  }
+
+  /// Chaîne des modifiers actifs des niveaux `3..totalLevels` (index 0 =
+  /// niveau 3). Comme chaque tirage dépend du précédent, on rejoue toute la
+  /// chaîne — au plus `totalLevels` tirages, négligeable (8 niveaux max) et
+  /// parfaitement déterministe.
+  ///
+  /// **Signatures de palier** (voir [_signaturesFor]) : après le tirage, si
+  /// une signature n'apparaît sur aucun niveau ≥ 5, on l'impose sur le
+  /// premier niveau ≥ 5 encore libre (ni imposé, ni occupé par un tirage
+  /// qui satisfait une signature plus prioritaire) puis on retire les
+  /// niveaux suivants non verrouillés en
+  /// excluant leurs voisins — l'alternance reste garantie. S'il ne reste
+  /// aucun emplacement libre (sommet à 5 niveaux), la signature est
+  /// abandonnée. Plusieurs passes car un retirage peut faire disparaître
+  /// une signature satisfaite par tirage ; chaque imposition verrouille un
+  /// emplacement, donc `signatures.length` passes suffisent.
+  ///
+  /// Cas particulier : sans niveau ≥ 5 (sommet à 3-4 niveaux), seule la
+  /// signature tectonique s'impose, sur le boss (avec `shuffle`) — les
+  /// autres signatures restent hors zone douce.
+  static List<LevelModifier> _activeChain({
+    required Mountain mountain,
+    required int tier,
+  }) {
+    const firstLevel = _tutorialMaxLevel + 1;
+    const firstDeepIndex = _gentleRampMaxLevel + 1 - firstLevel;
+    final chain = <LevelModifier>[];
+    for (var level = firstLevel; level <= mountain.totalLevels; level++) {
+      chain.add(
+        _drawActiveModifier(
+          mountain: mountain,
+          tier: tier,
+          levelIndex: level,
+          exclude: {if (chain.isNotEmpty) chain.last},
+        ),
+      );
     }
 
-    // ----- Niveaux 3-4 : ramp-up doux garanti ----------------------------
-    // Sur cette plage, on filtre les modifiers « durs » (fog occultant,
-    // earthquake brutal, reverse cognitif) qui ont pu être proposés par
-    // les règles tier-based ci-dessus pour les montagnes de haute
-    // altitude. Si après filtrage il ne reste aucun modifier doux, on
-    // injecte `wind` comme baseline universelle.
-    //
-    // Pourquoi ces filtres :
-    // - fog masque des lettres → trop punitif quand on découvre l'effet.
-    // - earthquake déplace 2 lettres brutalement → désoriente.
-    // - reverse impose une gymnastique cognitive → réservé aux niv. 5+.
-    // - shuffle (boss only) → un boss reste possible mais on retire shuffle.
-    if (levelIndex >= _tutorialMaxLevel + 1 &&
-        levelIndex <= _gentleRampMaxLevel) {
-      modifiers
-        ..remove(LevelModifier.fog)
-        ..remove(LevelModifier.earthquake)
-        ..remove(LevelModifier.reverse)
-        ..remove(LevelModifier.shuffle);
-      // Garantie : au moins un modifier doux pour briser la monotonie
-      // du tout-pur signalée par les joueurs. `wind` est le défaut sûr.
-      final hasGentle = modifiers.any(_gentleModifiers.contains);
-      if (!hasGentle) {
-        modifiers.add(LevelModifier.wind);
+    final signatures = _signaturesFor(mountain: mountain, tier: tier);
+    if (signatures.isEmpty || chain.isEmpty) return chain;
+
+    if (chain.length <= firstDeepIndex) {
+      if (signatures.first == LevelModifier.earthquake) {
+        chain[chain.length - 1] = LevelModifier.earthquake;
+      }
+      return chain;
+    }
+
+    final locked = <int>{};
+    for (var pass = 0; pass < signatures.length; pass++) {
+      for (var rank = 0; rank < signatures.length; rank++) {
+        final signature = signatures[rank];
+        final deep = chain.sublist(firstDeepIndex);
+        if (deep.contains(signature)) continue;
+        // Emplacement libre : ni imposé, ni occupé par un tirage qui
+        // satisfait déjà une signature plus prioritaire (une signature de
+        // rang inférieur peut en revanche être écrasée — avec un seul
+        // niveau ≥ 5, c'est la plus prioritaire qui entre).
+        var slot = firstDeepIndex;
+        while (slot < chain.length &&
+            (locked.contains(slot) ||
+                _isHigherSignature(signatures, chain[slot], rank))) {
+          slot++;
+        }
+        if (slot >= chain.length) continue;
+        chain[slot] = signature;
+        locked.add(slot);
+        _redrawAfter(
+          chain: chain,
+          locked: locked,
+          fromIndex: slot + 1,
+          mountain: mountain,
+          tier: tier,
+        );
       }
     }
+    return chain;
+  }
 
-    return modifiers;
+  /// Vrai si `value` est une signature de rang strictement plus prioritaire
+  /// que `rank` (donc à protéger d'une imposition).
+  static bool _isHigherSignature(
+    List<LevelModifier> signatures,
+    LevelModifier value,
+    int rank,
+  ) {
+    final index = signatures.indexOf(value);
+    return index != -1 && index < rank;
+  }
+
+  /// Retire les niveaux non verrouillés à partir de `fromIndex`, en excluant
+  /// le modifier du niveau précédent et celui du niveau suivant s'il est
+  /// verrouillé (pour ne jamais produire deux niveaux consécutifs égaux).
+  static void _redrawAfter({
+    required List<LevelModifier> chain,
+    required Set<int> locked,
+    required int fromIndex,
+    required Mountain mountain,
+    required int tier,
+  }) {
+    const firstLevel = _tutorialMaxLevel + 1;
+    for (var index = fromIndex; index < chain.length; index++) {
+      if (locked.contains(index)) continue;
+      final nextLocked = index + 1 < chain.length && locked.contains(index + 1);
+      chain[index] = _drawActiveModifier(
+        mountain: mountain,
+        tier: tier,
+        levelIndex: index + firstLevel,
+        exclude: {chain[index - 1], if (nextLocked) chain[index + 1]},
+      );
+    }
+  }
+
+  /// Signatures que le sommet doit montrer au moins une fois sur ses
+  /// niveaux ≥ 5, par ordre de priorité :
+  /// - `earthquake` : pays tectonique (tier ≥ 3) ;
+  /// - `reverse` : tout sommet tier ≥ 3 (les tirages seuls n'en
+  ///   produisaient qu'un sur 224 niveaux, la zone douce l'excluant) ;
+  /// - `fog` : altitude ≥ 2000 m (même raison).
+  /// Dès le tier 4, `reverse` passe avant `fog` ; au tier 3, `fog` d'abord
+  /// (la zone des nuages est le thème du palier). Avec un seul niveau ≥ 5
+  /// (sommets à 5 niveaux), seule la première signature manquante entre.
+  static List<LevelModifier> _signaturesFor({
+    required Mountain mountain,
+    required int tier,
+  }) {
+    if (tier < 3) return const <LevelModifier>[];
+    final reverseFirst = tier >= 4;
+    final fogEligible = mountain.altitude >= _fogAltitudeMeters;
+    return <LevelModifier>[
+      if (_isTectonic(mountain.countryCode)) LevelModifier.earthquake,
+      if (reverseFirst) LevelModifier.reverse,
+      if (fogEligible) LevelModifier.fog,
+      if (!reverseFirst) LevelModifier.reverse,
+    ];
+  }
+
+  /// Tirage par hachage FNV-1a sur `'<mountainId>:<levelIndex>'` dans la
+  /// liste triée des candidats. On avance au candidat suivant (modulo) si
+  /// le résultat est dans `exclude` (voisins déjà fixés), ou vaut `shuffle`
+  /// sur un boss signature (déjà garanti) et sur le niveau qui le précède
+  /// (pour que la signature ne répète pas le niveau d'avant).
+  static LevelModifier _drawActiveModifier({
+    required Mountain mountain,
+    required int tier,
+    required int levelIndex,
+    required Set<LevelModifier> exclude,
+  }) {
+    final candidates = candidateModifiers(
+      mountain: mountain,
+      levelIndex: levelIndex,
+    );
+    final excludeShuffle =
+        _hasBossSignature(
+          mountain: mountain,
+          tier: tier,
+          levelIndex: levelIndex,
+        ) ||
+        _hasBossSignature(
+          mountain: mountain,
+          tier: tier,
+          levelIndex: levelIndex + 1,
+        );
+    final start = _stableHash('${mountain.id}:$levelIndex') % candidates.length;
+    for (var offset = 0; offset < candidates.length; offset++) {
+      final pick = candidates[(start + offset) % candidates.length];
+      if (exclude.contains(pick)) continue;
+      if (excludeShuffle && pick == LevelModifier.shuffle) continue;
+      return pick;
+    }
+    // Inatteignable : au plus 3 exclusions (précédent, suivant verrouillé,
+    // shuffle) pour ≥ 5 candidats dès le tier 3, et ≤ 2 exclusions pour
+    // les 3 candidats doux des tiers 1-2 (jamais de voisin verrouillé).
+    return candidates[start];
+  }
+
+  // ---------------------------------------------------------------------------
+  // Structure du tour (LevelKind) et embranchement « voie exposée »
+  // ---------------------------------------------------------------------------
+
+  /// Premier niveau éligible à une structure non classique (rafale / duo).
+  static const int _firstVariedLevel = _tutorialMaxLevel + 1;
+
+  /// Tier minimal pour un boss aveugle (l'énigme s'efface).
+  static const int _blindBossMinTier = 3;
+
+  /// Tier minimal pour un duo (deux mots dans une grille) : jamais en zone
+  /// d'amorçage, où l'union de deux pools serait déjà trop dense.
+  static const int _duoMinTier = 2;
+
+  /// Modulo du tirage par hachage : 0 → rafale, 1 → duo, 2-4 → classique.
+  static const int _kindDrawModulo = 5;
+  static const int _kindDrawRafale = 0;
+  static const int _kindDrawDuo = 1;
+
+  /// Niveau de l'embranchement « voie exposée ».
+  static const int _branchingLevel = 3;
+
+  /// Taille minimale d'un sommet pour proposer l'embranchement.
+  static const int _branchingMinTotalLevels = 5;
+
+  /// Facteurs de la voie exposée.
+  static const double _exposedTimerFactor = 0.8;
+  static const double _exposedCaurisFactor = 2;
+
+  /// Structure de chaque niveau `1..totalLevels` (index 0 = niveau 1).
+  ///
+  /// Règles :
+  /// - niveaux 1-2 : [LevelKind.classic] (tutoriel) ;
+  /// - boss tier ≥ 3 : [LevelKind.blindBoss] ;
+  /// - sinon, dès le niveau 3, hachage FNV-1a de `'<mountainId>:kind:<n>'`
+  ///   modulo 5 → 0 = rafale, 1 = duo (tier ≥ 2 seulement), autres =
+  ///   classique ;
+  /// - jamais deux rafale/duo consécutifs : si le précédent est rafale ou
+  ///   duo, on force classique. Le boss aveugle ne compte pas dans cette
+  ///   alternance (un niveau rafale/duo peut le précéder).
+  static List<LevelKind> _kindChain({
+    required Mountain mountain,
+    required int tier,
+  }) {
+    final total = mountain.totalLevels;
+    final chain = List<LevelKind>.filled(total, LevelKind.classic);
+    final hasBlindBoss = tier >= _blindBossMinTier;
+    if (hasBlindBoss) chain[total - 1] = LevelKind.blindBoss;
+
+    for (var level = _firstVariedLevel; level <= total; level++) {
+      if (hasBlindBoss && level == total) break;
+      if (chain[level - 2].isMultiWord) continue;
+      final draw = _stableHash('${mountain.id}:kind:$level') % _kindDrawModulo;
+      if (draw == _kindDrawRafale) {
+        chain[level - 1] = LevelKind.rafale;
+      } else if (draw == _kindDrawDuo && tier >= _duoMinTier) {
+        chain[level - 1] = LevelKind.duo;
+      }
+    }
+    return chain;
+  }
+
+  static List<LevelModifier> _sorted(Iterable<LevelModifier> modifiers) {
+    return modifiers.toList(growable: false)
+      ..sort((a, b) => a.index.compareTo(b.index));
   }
 
   /// Codes pays à géologie tectonique active (Rift Valley est-africain,

@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/domain/entities/level_kind.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:equatable/equatable.dart';
 
@@ -12,16 +13,19 @@ import 'package:equatable/equatable.dart';
 /// - [difficultyTier] : palier global 1–5 (anciennement `difficultyForAltitude`).
 ///   Sert au matching primaire d'une devinette dans le pool.
 /// - [wordLengthBucket] : bucket de longueur de mot préféré (1–5).
-///   Bucket 1 ≈ 3–4 lettres, 5 ≈ 9+ lettres. Filtrage secondaire dans
-///   le service de sélection avec fallback progressif.
-/// - [timerSeconds] : durée de la partie en secondes (déjà adaptée à la
-///   longueur du mot et au tier).
+///   Bucket 1 ≈ 3–4 lettres, 5 ≈ 9+ lettres. Égal au tier, +1 sur le boss.
+///   Filtrage secondaire dans le service de sélection avec fallback
+///   progressif.
+/// - [timerSeconds] : durée de la partie en secondes (déjà adaptée au tier,
+///   à la position du niveau dans le sommet et à `thinAir`).
 /// - [caurisMultiplier] : multiplicateur appliqué à la récompense finale
-///   pour valoriser les niveaux difficiles.
-/// - [distractorCount] : nombre de lettres parasites à ajouter au pool
-///   affiché (déclaré ici mais non encore appliqué — S2).
+///   pour valoriser les niveaux difficiles (croît avec le niveau, majoré
+///   sur le boss).
+/// - [distractorCount] : nombre de lettres parasites ajoutées au pool
+///   affiché par `GameController` (croît avec le niveau, plafonné).
 /// - [modifiers] : modificateurs gameplay actifs (cf. `LevelModifier`).
 /// - [isBoss] : niveau final d'une montagne (préparation S4).
+/// - [kind] : structure du tour (cf. [LevelKind]) — classique par défaut.
 class LevelDifficultyConfig extends Equatable {
   const LevelDifficultyConfig({
     required this.difficultyTier,
@@ -31,6 +35,7 @@ class LevelDifficultyConfig extends Equatable {
     this.distractorCount = 0,
     this.modifiers = const <LevelModifier>{},
     this.isBoss = false,
+    this.kind = LevelKind.classic,
   })  : assert(
           difficultyTier >= 1 && difficultyTier <= 5,
           'difficultyTier must be in 1..5',
@@ -63,6 +68,7 @@ class LevelDifficultyConfig extends Equatable {
   final int distractorCount;
   final Set<LevelModifier> modifiers;
   final bool isBoss;
+  final LevelKind kind;
 
   /// Raccourci : vrai si le modifier `reverse` est actif.
   /// Utilisé par `GameController.validate` pour comparer le mot formé à
@@ -89,6 +95,7 @@ class LevelDifficultyConfig extends Equatable {
     int? distractorCount,
     Set<LevelModifier>? modifiers,
     bool? isBoss,
+    LevelKind? kind,
   }) {
     return LevelDifficultyConfig(
       difficultyTier: difficultyTier ?? this.difficultyTier,
@@ -98,6 +105,7 @@ class LevelDifficultyConfig extends Equatable {
       distractorCount: distractorCount ?? this.distractorCount,
       modifiers: modifiers ?? this.modifiers,
       isBoss: isBoss ?? this.isBoss,
+      kind: kind ?? this.kind,
     );
   }
 
@@ -110,5 +118,6 @@ class LevelDifficultyConfig extends Equatable {
         distractorCount,
         modifiers,
         isBoss,
+        kind,
       ];
 }
