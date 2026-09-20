@@ -19,6 +19,8 @@ class GameArgs {
     this.levelIndex,
     this.isDailyChallenge = false,
     this.dailyDate,
+    this.extraDevinettes = const <Devinette>[],
+    this.isExposed = false,
   });
 
   /// Constructeur de commodité pour les call-sites qui n'ont pas encore
@@ -30,7 +32,9 @@ class GameArgs {
     this.levelIndex,
   })  : config = LevelDifficultyConfig.fallback,
         isDailyChallenge = false,
-        dailyDate = null;
+        dailyDate = null,
+        extraDevinettes = const <Devinette>[],
+        isExposed = false;
 
   /// Factory pour le **mode défi du jour**. Bypass les flows
   /// `recordWin`/`recordFailure` standard et redirige vers
@@ -46,9 +50,28 @@ class GameArgs {
   })  : mountainId = null,
         levelIndex = null,
         isDailyChallenge = true,
-        dailyDate = date;
+        dailyDate = date,
+        extraDevinettes = const <Devinette>[],
+        isExposed = false;
 
   final Devinette devinette;
+
+  /// Devinettes supplémentaires du niveau, selon `config.kind` : deux mots
+  /// de plus pour une rafale, un second mot pour un duo, vide sinon. Tirées
+  /// par `LevelDevinetteDrawer` au lancement, ids distincts de [devinette].
+  final List<Devinette> extraDevinettes;
+
+  /// Vrai quand le joueur a choisi la « voie exposée » à l'embranchement
+  /// du niveau 3 (config déjà durcie par `LevelDifficultyResolver
+  /// .exposedVariant`). Purement informatif (analytics) — non persisté.
+  final bool isExposed;
+
+  /// Toutes les devinettes du niveau, principale en tête.
+  List<Devinette> get allDevinettes => <Devinette>[
+        devinette,
+        ...extraDevinettes,
+      ];
+
   final String? mountainId;
 
   /// Index 1-based du niveau dans la montagne. Utilisé pour persister

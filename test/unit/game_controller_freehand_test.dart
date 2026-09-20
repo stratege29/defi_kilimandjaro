@@ -9,6 +9,7 @@ import 'package:defi_kilimandjaro/domain/entities/level_difficulty_config.dart';
 import 'package:defi_kilimandjaro/domain/services/daily_challenge_service.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
+import 'package:defi_kilimandjaro/presentation/game/solo_combo_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -66,6 +67,7 @@ void main() {
   late PlayerProgressNotifier progress;
   late _FakeAudio audio;
   late TempoScheduler tempo;
+  late SoloComboNotifier combo;
   final controllers = <GameController>[];
 
   setUp(() async {
@@ -74,6 +76,7 @@ void main() {
     progress = PlayerProgressNotifier(PlayerProgressRepository(prefs));
     audio = _FakeAudio();
     tempo = TempoScheduler();
+    combo = SoloComboNotifier();
   });
 
   tearDown(() {
@@ -113,6 +116,7 @@ void main() {
       economy,
       const NoopAnalyticsService(),
       tempo,
+      combo,
     );
     controllers.add(c);
     return c;
@@ -167,12 +171,19 @@ void main() {
 
       final base = expectedBase(eco, 30, 1); // (20 + 30) * 1 = 50
       const freehand = 15; // freehandBonus(4) défauts
+      // Aucun mot erroné → bonus « Sans faute » (10 par défaut) en plus.
+      final perfect = eco.perfectBonus;
       expect(c.state.phase, GamePhase.won);
       expect(c.state.caurisAwarded, base);
       expect(c.state.freehandBonusAwarded, freehand);
-      expect(c.state.cauris, newPlayerCauris + base + freehand);
-      // recordWin a crédité base + freehand (pas seulement la base).
-      expect(progress.state.cauris, newPlayerCauris + base + freehand);
+      expect(c.state.perfectBonusAwarded, perfect);
+      expect(c.state.cauris, newPlayerCauris + base + freehand + perfect);
+      // recordWin a crédité base + freehand + sans faute (pas seulement la
+      // base).
+      expect(
+        progress.state.cauris,
+        newPlayerCauris + base + freehand + perfect,
+      );
     });
 
     test('tracé auto-croisé → bonus 0, base seule créditée', () async {
@@ -183,10 +194,11 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       final base = expectedBase(eco, 30, 1);
+      final perfect = eco.perfectBonus;
       expect(c.state.phase, GamePhase.won);
       expect(c.state.freehandBonusAwarded, 0);
-      expect(c.state.cauris, newPlayerCauris + base);
-      expect(progress.state.cauris, newPlayerCauris + base);
+      expect(c.state.cauris, newPlayerCauris + base + perfect);
+      expect(progress.state.cauris, newPlayerCauris + base + perfect);
     });
 
     test('mot < seuil (3 lettres) même propre → bonus 0', () async {

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:defi_kilimandjaro/core/geometry/freehand_path.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
@@ -37,6 +38,9 @@ class CircularGrid extends StatefulWidget {
     this.shuffledIndices = const <int>[],
     this.seed,
     this.hiddenIndices = const <int>{},
+    this.spiritIndex,
+    this.mirageIndices = const <int>{},
+    this.rainBlurActive = false,
     this.onTrailSelfIntersectingChanged,
     super.key,
   });
@@ -60,10 +64,24 @@ class CircularGrid extends StatefulWidget {
   /// Indices des tuiles sélectionnées.
   final List<int> selectedIndices;
 
-  /// Indices des tuiles masquées par le modifier `fog`. Rendues avec
-  /// opacité 0 et ignorées par le hit-test. Tournent toutes les 5 s
-  /// côté `GameController`.
+  /// Indices des tuiles masquées, toutes causes confondues (fog ∪ esprit —
+  /// cf. `GameState.hiddenTileIndices`). Ignorées par le hit-test. Une tuile
+  /// de fog est rendue avec opacité 0 ; celle de [spiritIndex] est remplacée
+  /// par un fantôme violet.
   final Set<int> hiddenIndices;
+
+  /// Index grille de la tuile empruntée par l'esprit (modifier `spirit`),
+  /// `null` sinon. Doit aussi figurer dans [hiddenIndices] ; sert uniquement
+  /// à choisir le rendu (fantôme violet + étincelle) plutôt que le fondu fog.
+  final int? spiritIndex;
+
+  /// Indices grille des tuiles « mirage » (lettre fausse, modifier `mirage`).
+  /// Rendues avec un scintillement continu — restent tappables.
+  final Set<int> mirageIndices;
+
+  /// Modifier `rain` : vrai pendant l'averse → les tuiles sont floutées
+  /// (`ImageFiltered`), le chemin doré reste net et les taps passent.
+  final bool rainBlurActive;
 
   /// Phase du jeu.
   final Object phase;
@@ -89,7 +107,7 @@ class CircularGrid extends StatefulWidget {
 }
 
 class _CircularGridState extends State<CircularGrid>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   /// Diamètre d'une tuile — 68pt (au-dessus du 48pt minimum tactile Material).
   /// Bumpé de 60 → 68 après refonte gameplay : la suppression du chip
   /// "regarder une pub" pleine-largeur libère ~36pt verticaux que la grille
@@ -150,6 +168,11 @@ class _CircularGridState extends State<CircularGrid>
   /// pendant l'animation `_shakeCtrl`. Vide hors animation.
   List<Offset> _oldSnapPoints = const <Offset>[];
 
+  /// Scintillement des tuiles mirage : boucle aller-retour continue, lue
+  /// par [_MirageShimmer]. Ne tourne que si la grille contient au moins une
+  /// tuile mirage (pas de ticker inutile sur les niveaux sans modifier).
+  late final AnimationController _mirageCtrl;
+
   @override
   void initState() {
     super.initState();
@@ -160,18 +183,36 @@ class _CircularGridState extends State<CircularGrid>
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
+    _mirageCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    );
+    _syncMirageAnimation();
   }
 
   @override
   void dispose() {
     _shakeCtrl.dispose();
+    _mirageCtrl.dispose();
     super.dispose();
+  }
+
+  /// Démarre / arrête la boucle de scintillement selon la présence de tuiles
+  /// mirage. Idempotent.
+  void _syncMirageAnimation() {
+    final wanted = widget.mirageIndices.isNotEmpty;
+    if (wanted && !_mirageCtrl.isAnimating) {
+      _mirageCtrl.repeat(reverse: true);
+    } else if (!wanted && _mirageCtrl.isAnimating) {
+      _mirageCtrl.stop();
+    }
   }
 
   @override
   void didUpdateWidget(CircularGrid oldWidget) {
     super.didUpdateWidget(oldWidget);
     _syncTrailWithSelection(oldWidget.selectedIndices.length);
+    _syncMirageAnimation();
     // Détecte un changement de permutation pour déclencher le shake.
     // On compare entry-par-entry — listEquals serait plus lourd ; ici la
     // taille reste constante donc une boucle suffit.
@@ -272,8 +313,8 @@ class _CircularGridState extends State<CircularGrid>
     const fullRadius = _tileSize / 2;
     const smallRadius = _tileSize * 0.40;
     for (var i = 0; i < _tileCenters.length; i++) {
-      // Une tuile masquée par le fog ne capte pas le touch — le doigt
-      // passe « à travers » comme si la case n'existait pas.
+      // Une tuile masquée (fog ou empruntée par l'esprit) ne capte pas le
+      // touch — le doigt passe « à travers » comme si la case n'existait pas.
       if (widget.hiddenIndices.contains(i)) continue;
       final dist = (_tileCenters[i] - localPos).distance;
       final r = _smallHitIndices.contains(i) ? smallRadius : fullRadius;
@@ -430,47 +471,162 @@ class _CircularGridState extends State<CircularGrid>
                       },
                     ),
                   ),
-                  ...List<Widget>.generate(count, (i) {
-                    final center = layout.centers[i];
-                    final isSelected = widget.selectedIndices.contains(i);
-                    final isHidden = widget.hiddenIndices.contains(i);
-                    // Clé stable : si shuffledIndices est fourni, on prend
-                    // l'index du pool sous-jacent (identité de la lettre,
-                    // stable à travers les permutations). Sinon fallback
-                    // sur l'index grille (comportement legacy sans anim).
-                    final stableKey = widget.shuffledIndices.length == count
-                        ? ValueKey<int>(widget.shuffledIndices[i])
-                        : ValueKey<int>(-(i + 1));
-                    return AnimatedPositioned(
-                      key: stableKey,
-                      duration: const Duration(milliseconds: 450),
-                      curve: Curves.easeInOutCubic,
-                      left: center.dx - _tileSize / 2,
-                      top: center.dy - _tileSize / 2,
-                      width: _tileSize,
-                      height: _tileSize,
-                      child: AnimatedOpacity(
-                        // Fog : fade-out à 0 quand la tuile est masquée,
-                        // re-fade-in quand elle ré-apparaît.
-                        duration: const Duration(milliseconds: 400),
-                        opacity: isHidden ? 0.0 : 1.0,
-                        child: _Tile(
-                          letter: widget.letters[i],
-                          isSelected: isSelected,
-                          theme: widget.theme,
-                          selectionOrder: isSelected
-                              ? widget.selectedIndices.indexOf(i) + 1
-                              : null,
-                        ),
+                  // Rain : un seul `ImageFiltered` autour de TOUTES les
+                  // tuiles (une seule saveLayer, pas une par tuile). Sigma
+                  // animé 0 → 3 pour que l'averse arrive et passe en
+                  // fondu ; `enabled` évite le coût du filtre au repos.
+                  // Le hit-test est manuel (`_hitTest`), le flou ne bloque
+                  // donc aucun tap. Le chemin doré (dessiné dessous) reste net.
+                  Positioned.fill(
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(
+                        end: widget.rainBlurActive ? _rainBlurSigma : 0,
                       ),
-                    );
-                  }),
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeInOut,
+                      builder: (context, sigma, child) => ImageFiltered(
+                        imageFilter: ImageFilter.blur(
+                          sigmaX: sigma,
+                          sigmaY: sigma,
+                        ),
+                        enabled: sigma > 0.05,
+                        child: child,
+                      ),
+                      child: Stack(
+                        children: List<Widget>.generate(count, _buildTile),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+  /// Sigma du flou de pluie (modifier `rain`) : assez fort pour rendre la
+  /// lettre illisible une seconde, assez doux pour que la tuile reste
+  /// repérable.
+  static const double _rainBlurSigma = 3;
+
+  /// Une tuile positionnée + ses habillages de modifiers (fog, esprit,
+  /// mirage). Lit `_tileCenters` — à appeler après `computeLayout`.
+  Widget _buildTile(int i) {
+    final count = widget.letters.length;
+    final center = _tileCenters[i];
+    final isSelected = widget.selectedIndices.contains(i);
+    final isSpirit = widget.spiritIndex == i;
+    // Fog = fondu à 0 ; l'esprit a son propre rendu (fantôme), pas le fondu.
+    final isFogHidden = widget.hiddenIndices.contains(i) && !isSpirit;
+    final isMirage = widget.mirageIndices.contains(i);
+    // Clé stable : si shuffledIndices est fourni, on prend
+    // l'index du pool sous-jacent (identité de la lettre,
+    // stable à travers les permutations). Sinon fallback
+    // sur l'index grille (comportement legacy sans anim).
+    final stableKey = widget.shuffledIndices.length == count
+        ? ValueKey<int>(widget.shuffledIndices[i])
+        : ValueKey<int>(-(i + 1));
+
+    Widget tile = _Tile(
+      // Clé locale pour que l'`AnimatedSwitcher` distingue tuile et fantôme.
+      key: const ValueKey<String>('tile'),
+      letter: widget.letters[i],
+      isSelected: isSelected,
+      theme: widget.theme,
+      selectionOrder: isSelected ? widget.selectedIndices.indexOf(i) + 1 : null,
+    );
+    if (isMirage) {
+      tile = _MirageShimmer(animation: _mirageCtrl, child: tile);
+    }
+
+    return AnimatedPositioned(
+      key: stableKey,
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeInOutCubic,
+      left: center.dx - _tileSize / 2,
+      top: center.dy - _tileSize / 2,
+      width: _tileSize,
+      height: _tileSize,
+      child: AnimatedOpacity(
+        // Fog : fade-out à 0 quand la tuile est masquée,
+        // re-fade-in quand elle ré-apparaît.
+        duration: const Duration(milliseconds: 400),
+        opacity: isFogHidden ? 0.0 : 1.0,
+        // Esprit : fondu croisé tuile ↔ fantôme violet (emprunt / retour).
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 350),
+          child: isSpirit
+              ? _SpiritGhost(
+                  key: const ValueKey<String>('spirit'),
+                  theme: widget.theme,
+                )
+              : tile,
+        ),
+      ),
+    );
+  }
+}
+
+/// Scintillement d'une tuile mirage (modifier `mirage`) : l'opacité ondule
+/// entre 1 et ~0,55 et la tuile flotte d'un pixel et demi, comme une image
+/// de chaleur. Assez visible pour signaler « cette lettre est suspecte »,
+/// assez discret pour ne pas la désigner à coup sûr.
+class _MirageShimmer extends StatelessWidget {
+  const _MirageShimmer({required this.animation, required this.child});
+
+  final Animation<double> animation;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        final t = Curves.easeInOutSine.transform(animation.value);
+        return Opacity(
+          opacity: 1.0 - 0.45 * t,
+          child: Transform.translate(
+            offset: Offset(0, -1.5 + 3 * t),
+            child: child,
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+}
+
+/// Emplacement d'une tuile empruntée par l'esprit (modifier `spirit`) :
+/// silhouette translucide teintée violet + étincelle, à la forme du skin.
+/// Distinct du fog (qui efface la tuile) pour que le joueur comprenne que la
+/// lettre reviendra à cette place.
+class _SpiritGhost extends StatelessWidget {
+  const _SpiritGhost({required this.theme, super.key});
+
+  final PackTheme theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: ShapeDecoration(
+        shape: _tileShapeBorder(theme.tileShape),
+        color: AppColors.esprit.withValues(alpha: 0.22),
+        shadows: <BoxShadow>[
+          BoxShadow(
+            color: AppColors.esprit.withValues(alpha: 0.45),
+            blurRadius: 18,
+          ),
+        ],
+      ),
+      child: Center(
+        child: Icon(
+          Icons.auto_awesome_rounded,
+          size: 26,
+          color: AppColors.esprit.withValues(alpha: 0.9),
+        ),
+      ),
     );
   }
 }
@@ -487,6 +643,7 @@ class _Tile extends StatefulWidget {
     required this.isSelected,
     required this.theme,
     this.selectionOrder,
+    super.key,
   });
 
   final String letter;

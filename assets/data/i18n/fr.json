@@ -68,9 +68,35 @@
         "shuffle": {
           "name": "Remélange",
           "desc": "Les lettres changent de place régulièrement. Reste vigilant."
+        },
+        "mirage": {
+          "name": "Mirage",
+          "desc": "Une lettre en trop scintille dans la grille : elle n'appartient pas au mot."
+        },
+        "rain": {
+          "name": "Pluie",
+          "desc": "Une averse brouille les lettres une seconde, à intervalles réguliers."
+        },
+        "spirit": {
+          "name": "Esprit",
+          "desc": "Un esprit emprunte une lettre quelques secondes, puis la rend."
         }
       }
-    }
+    },
+    "route_choice": {
+      "title": "Choisis ta voie",
+      "subtitle": "Deux chemins mènent au niveau 3. Le choix vaut pour cette tentative.",
+      "easy": "Voie facile",
+      "exposed": "Voie exposée",
+      "time": "{seconds} s",
+      "extra_letters": "{count} lettres en plus",
+      "cauris": "cauris ×{mult}"
+    },
+    "rafale_progress": "Mot {current}/{total}",
+    "duo_found": "Trouvé",
+    "blind_reread": "Relire",
+    "blind_reread_cost": "−{seconds} s",
+    "blind_hidden": "L'énigme s'est effacée"
   },
   "result": {
     "victory": {

@@ -6,7 +6,6 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
-import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
 import 'package:defi_kilimandjaro/data/ads/rewarded_daily_cap_service.dart';
 import 'package:defi_kilimandjaro/data/firebase/analytics_service.dart';
@@ -15,20 +14,24 @@ import 'package:defi_kilimandjaro/data/local/link_prompt_gate.dart';
 import 'package:defi_kilimandjaro/data/local/seen_devinette_store.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
-import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
+import 'package:defi_kilimandjaro/domain/entities/devinette.dart';
+import 'package:defi_kilimandjaro/domain/entities/level_kind.dart';
 import 'package:defi_kilimandjaro/domain/entities/level_modifier.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack_theme.dart';
 import 'package:defi_kilimandjaro/presentation/auth/link_account_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_controller.dart';
+import 'package:defi_kilimandjaro/presentation/game/level_launcher.dart';
+import 'package:defi_kilimandjaro/presentation/game/solo_combo_provider.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/answer_cells.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/circular_grid.dart';
-import 'package:defi_kilimandjaro/presentation/game/widgets/griot_briefing_overlay.dart';
+import 'package:defi_kilimandjaro/presentation/game/widgets/first_encounter_banner.dart';
 import 'package:defi_kilimandjaro/presentation/game/widgets/timer_bar.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/mountain_reveal_intent.dart';
 import 'package:defi_kilimandjaro/presentation/result/failure_view.dart';
 import 'package:defi_kilimandjaro/presentation/result/mountain_conquest_view.dart';
+import 'package:defi_kilimandjaro/presentation/result/victory_banner.dart';
 import 'package:defi_kilimandjaro/presentation/result/victory_view.dart';
 import 'package:defi_kilimandjaro/presentation/theme/pack_background.dart';
 import 'package:defi_kilimandjaro/presentation/theme/pack_theme_provider.dart';
@@ -59,70 +62,65 @@ class _GameViewState extends ConsumerState<GameView>
   /// le timer en pause via [_pauseForModal]. Évite un double-resume.
   bool _modalPaused = false;
 
-  /// Vrai dès que le briefing « Le griot t'avertit » a été affiché. Empêche
-  /// la réapparition au [GameController.restart] (retry après échec), qui
-  /// reset `_overlayShown` mais ne doit pas re-déclencher le briefing.
-  bool _briefingShown = false;
+  /// Modificateurs du niveau que le joueur rencontre pour la **première
+  /// fois** (absents de `PlayerProgress.encounteredModifiers`) et qui ont une
+  /// description joueur. Figé à l'entrée du niveau : le bandeau ne se
+  /// réaffiche pas au [GameController.restart] (retry après échec) puisque le
+  /// widget n'est créé qu'une fois avec la vue. Vide = aucun bandeau.
+  late final Set<LevelModifier> _firstEncounter;
+
+  /// Vrai tant que le bandeau de première rencontre tient le timer en pause.
+  bool _bannerHoldsPause = false;
+
+  /// Vrai pendant le dialog « Quitter la partie ? » — empêche le repli du
+  /// bandeau de reprendre le timer sous un modal encore ouvert.
+  bool _backDialogOpen = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    // Briefing du griot — si le niveau a des modifiers ou est un boss, on
-    // pause le timer et on affiche un overlay narratif AVANT que le joueur
-    // soit confronté à la grille. Cf. discussion produit : "no surprises".
-    // Le timer démarre dans le constructeur du `GameController` (Timer.periodic
-    // à 1s) ; la pause via postFrame intervient bien avant le 1er tick.
-    final cfg = widget.args.config;
-    final needsBriefing = cfg.isBoss || cfg.modifiers.isNotEmpty;
-    if (needsBriefing) {
+    // Première rencontre d'un modificateur : bandeau compact non modal
+    // (3 s, tap pour fermer) avec timer en pause. Plus de briefing plein
+    // écran ni pour les modificateurs connus ni pour le boss : les badges
+    // d'en-tête (`_ModifierBadges`) restent l'indication permanente.
+    // Le timer démarre dans le constructeur du `GameController`
+    // (Timer.periodic à 1 s) ; la pause via postFrame précède le 1er tick.
+    final encountered = ref.read(
+      playerProgressProvider.select((p) => p.encounteredModifiers),
+    );
+    _firstEncounter = FirstEncounterBanner.describable(
+      widget.args.config.modifiers.difference(encountered),
+    );
+    if (_firstEncounter.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        _showGriotBriefing();
+        _bannerHoldsPause = true;
+        _pauseForModal();
       });
     }
   }
 
-  /// Affiche l'overlay de briefing modifiers/boss. Pause forcée du timer
-  /// pendant l'affichage ; reprise au dismiss (tap CTA ou tap fond).
-  ///
-  /// Première rencontre : description longue affichée pour chaque modifier
-  /// nouveau. Rencontres suivantes : seul le nom apparaît (les modifiers
-  /// déjà connus du joueur restent dans `PlayerProgress.encounteredModifiers`).
-  /// La persistance n'est faite qu'au dismiss pour éviter de marquer comme
-  /// "vu" un modifier que le joueur n'aurait pas eu le temps de lire (ex.
-  /// crash app en pleine ouverture du dialog).
-  Future<void> _showGriotBriefing() async {
-    if (_briefingShown) return;
-    _briefingShown = true;
-    final modifiers = widget.args.config.modifiers;
-    final encountered = ref.read(
-      playerProgressProvider.select((p) => p.encounteredModifiers),
+  /// Repli du bandeau de première rencontre (auto ou tap) : mémorise les
+  /// modificateurs comme rencontrés (comme l'ancien briefing, seulement au
+  /// dismiss — un crash en plein affichage ne marque rien) et reprend le
+  /// timer, sauf si un autre modal est ouvert.
+  void _onFirstEncounterDismissed() {
+    unawaited(
+      ref
+          .read(playerProgressProvider.notifier)
+          .recordModifiersEncounter(_firstEncounter),
     );
-    final firstEncounter = modifiers.difference(encountered);
-    _pauseForModal();
-    await showDialog<void>(
-      context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.78),
-      builder: (dialogCtx) => GriotBriefingOverlay(
-        modifiers: modifiers,
-        isBoss: widget.args.config.isBoss,
-        firstEncounter: firstEncounter,
-        onConfirm: () => Navigator.of(dialogCtx).pop(),
-      ),
-    );
-    if (!mounted) return;
-    // Mémorise les modifiers fraîchement rencontrés pour que les prochains
-    // briefings affichent une version courte (icône + nom seulement).
-    if (firstEncounter.isNotEmpty) {
-      unawaited(
-        ref
-            .read(playerProgressProvider.notifier)
-            .recordModifiersEncounter(firstEncounter),
-      );
-    }
-    _resumeFromModal();
+    _bannerHoldsPause = false;
+    if (!_backDialogOpen) _resumeFromModal();
+  }
+
+  /// Remet la série intra-session à zéro sur abandon (quitter confirmé, skip
+  /// gratuit). Hors périmètre en défi du jour et en mode Hub.
+  void _resetComboOnAbandon() {
+    if (widget.args.isDailyChallenge || widget.args.mountainId == null) return;
+    ref.read(soloComboProvider.notifier).reset();
   }
 
   @override
@@ -169,6 +167,9 @@ class _GameViewState extends ConsumerState<GameView>
       return _GameHeader(cauris: cauris, onBack: _confirmBack);
     }
 
+    // Série intra-session (flamme + compteur dès 2 victoires d'affilée).
+    final comboStreak = ref.watch(soloComboProvider);
+
     final mountainsAsync = ref.watch(mountainsProvider);
     final mountain = mountainsAsync.maybeWhen(
       data: (list) => list.cast<Mountain?>().firstWhere(
@@ -179,7 +180,11 @@ class _GameViewState extends ConsumerState<GameView>
     );
 
     if (mountain == null) {
-      return _GameHeader(cauris: cauris, onBack: _confirmBack);
+      return _GameHeader(
+        cauris: cauris,
+        onBack: _confirmBack,
+        comboStreak: comboStreak,
+      );
     }
 
     // Niveau affiché = celui que le joueur est en train d'essayer
@@ -195,7 +200,29 @@ class _GameViewState extends ConsumerState<GameView>
       mountainName: mountain.name,
       levelLabel: 'Niveau $currentLevel / ${mountain.totalLevels}',
       countryCode: mountain.countryCode,
+      comboStreak: comboStreak,
     );
+  }
+
+  /// Vrai si ce niveau est le dernier de sa montagne (la victoire déclenche
+  /// la conquête). Lu sur `mountainsProvider` ; si la montagne n'est pas
+  /// résolue (chargement), on considère « dernier » par prudence pour garder
+  /// l'écran complet plutôt qu'une bannière avant un overlay de conquête.
+  bool _isLastLevelOfMountain() {
+    final mountainId = widget.args.mountainId;
+    final levelIndex = widget.args.levelIndex;
+    if (mountainId == null || levelIndex == null) return false;
+    final mountain = ref
+        .read(mountainsProvider)
+        .maybeWhen(
+          data: (list) => list.cast<Mountain?>().firstWhere(
+            (m) => m?.id == mountainId,
+            orElse: () => null,
+          ),
+          orElse: () => null,
+        );
+    if (mountain == null) return true;
+    return levelIndex >= mountain.totalLevels;
   }
 
   @override
@@ -214,14 +241,11 @@ class _GameViewState extends ConsumerState<GameView>
         // Anti-répétition : marque cette devinette comme résolue dans son
         // pack. Seule une victoire effective déclenche le marquage (une
         // défaite garde la devinette ouverte pour un retry).
-        unawaited(
-          ref
-              .read(seenDevinetteTrackerProvider)
-              .markSolved(
-                packId: next.devinette.pack,
-                devinetteId: next.devinette.id,
-              ),
-        );
+        // Sur une rafale ou un duo, chaque mot du niveau est marqué.
+        final tracker = ref.read(seenDevinetteTrackerProvider);
+        for (final d in _levelDevinettes) {
+          unawaited(tracker.markSolved(packId: d.pack, devinetteId: d.id));
+        }
         // En mode défi du jour, on persiste le résultat via le flow
         // dédié AVANT d'afficher la victoire (l'overlay affiche le solde
         // mis à jour). Le controller a déjà skippé recordWin standard.
@@ -237,13 +261,7 @@ class _GameViewState extends ConsumerState<GameView>
         }
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          _showVictoryOverlay(
-            context,
-            next.timeLeft,
-            next.starsEarned,
-            next.caurisAwarded,
-            next.freehandBonusAwarded,
-          );
+          _showVictoryOverlay(context, next);
         });
       } else if (next.phase == GamePhase.lost &&
           (previous == null || previous.phase != GamePhase.lost)) {
@@ -266,73 +284,101 @@ class _GameViewState extends ConsumerState<GameView>
         body: PackBackground(
           theme: packTheme,
           child: SafeArea(
-            child: Column(
+            child: Stack(
               children: <Widget>[
-                // Header — montagne en cours + niveau (au lieu du nom d'app).
-                _buildHeader(gameState.cauris),
-                const SizedBox(height: 8),
-                // Riddle card.
-                _RiddleCard(
-                  riddle: widget.args.devinette.riddle,
-                  theme: packTheme,
+                Column(
+                  children: <Widget>[
+                    // Header — montagne en cours + niveau (au lieu du nom d'app).
+                    _buildHeader(gameState.cauris),
+                    const SizedBox(height: 8),
+                    // Énigme(s) — selon la structure du niveau : énigme du
+                    // mot en cours (rafale, avec compteur k/n), deux énigmes
+                    // compactes (duo), ou énigme effaçable (boss aveugle).
+                    ..._buildRiddles(gameState, controller, packTheme),
+                    if (widget.args.config.isBoss ||
+                        widget.args.config.modifiers.isNotEmpty) ...<Widget>[
+                      const SizedBox(height: 8),
+                      _ModifierBadges(
+                        modifiers: widget.args.config.modifiers,
+                        isBoss: widget.args.config.isBoss,
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+                    // Timer bar — totalTime calibré sur la config du niveau.
+                    TimerBar(
+                      timeLeft: gameState.timeLeft,
+                      totalTime: widget.args.config.timerSeconds,
+                    ),
+                    const SizedBox(height: 10),
+                    // Answer cells — quand `reverse` (« mot à l'envers ») est
+                    // actif, les cases se remplissent de droite à gauche : la
+                    // 1re lettre saisie va dans la dernière case, etc.
+                    // En duo : une rangée par mot ; le mot trouvé reste
+                    // affiché rempli (doré) jusqu'à la fin du niveau.
+                    for (var w = 0; w < gameState.wordCount; w++) ...<Widget>[
+                      if (w > 0) const SizedBox(height: 6),
+                      AnswerCells(
+                        key: ValueKey<String>(
+                          'answer_${gameState.roundIndex}_$w',
+                        ),
+                        answer: gameState.answerFor(w),
+                        formedLetters: gameState.formedFor(w),
+                        isValidated:
+                            gameState.validationCorrect ||
+                            gameState.isSolved(w),
+                        fillFromEnd: gameState.reverseAnswer,
+                        revealedPositions: gameState.revealedFor(w),
+                        theme: packTheme,
+                      ),
+                    ],
+                    const SizedBox(height: 10),
+                    // Circular tile grid — `Expanded` absorbe l'espace gagné par
+                    // la suppression du `_RewardedAdChip` pleine-largeur (~36pt).
+                    Expanded(
+                      child: Center(
+                        child: CircularGrid(
+                          theme: packTheme,
+                          letters: gameState.displayLetters,
+                          selectedIndices: gameState.selectedIndices,
+                          hiddenIndices: gameState.hiddenTileIndices,
+                          spiritIndex: gameState.spiritHiddenIndex,
+                          mirageIndices: gameState.mirageGridIndices,
+                          rainBlurActive: gameState.rainBlurActive,
+                          shuffledIndices: gameState.shuffledIndices,
+                          phase: gameState.phase,
+                          onTileEntered: controller.selectTile,
+                          onTrailSelfIntersectingChanged:
+                              controller.updateTrailSelfIntersecting,
+                          onDragEnd: () {
+                            // validate() is called automatically on complete word;
+                            // on partial lift we just let selection persist.
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // Bottom action row — [Pub?] · Indice · Effacer.
+                    // Le bouton Valider a été retiré (auto-validation déclenchée
+                    // dans `selectTile` quand `state.isComplete`). Le chip pub
+                    // pleine-largeur a été absorbé ici pour rendre son espace à
+                    // la grille. Pub gating + montant rewarded sont pilotés par
+                    // Remote Config via `_buildActionButtons` (cf. helper).
+                    _buildActionButtons(context, ref, controller, gameState),
+                    const SizedBox(height: 12),
+                  ],
                 ),
-                if (widget.args.config.isBoss ||
-                    widget.args.config.modifiers.isNotEmpty) ...<Widget>[
-                  const SizedBox(height: 8),
-                  _ModifierBadges(
-                    modifiers: widget.args.config.modifiers,
-                    isBoss: widget.args.config.isBoss,
-                  ),
-                ],
-                const SizedBox(height: 8),
-                // Timer bar — totalTime calibré sur la config du niveau.
-                TimerBar(
-                  timeLeft: gameState.timeLeft,
-                  totalTime: widget.args.config.timerSeconds,
-                ),
-                const SizedBox(height: 10),
-                // Answer cells — quand `reverse` (« mot à l'envers ») est
-                // actif, les cases se remplissent de droite à gauche : la
-                // 1re lettre saisie va dans la dernière case, etc.
-                AnswerCells(
-                  answer: gameState.expectedAnswer,
-                  formedLetters: gameState.formedWord,
-                  isValidated: gameState.validationCorrect,
-                  fillFromEnd: gameState.reverseAnswer,
-                  revealedPositions: gameState.revealedPositions,
-                  theme: packTheme,
-                ),
-                const SizedBox(height: 10),
-                // Circular tile grid — `Expanded` absorbe l'espace gagné par
-                // la suppression du `_RewardedAdChip` pleine-largeur (~36pt).
-                Expanded(
-                  child: Center(
-                    child: CircularGrid(
-                      theme: packTheme,
-                      letters: gameState.displayLetters,
-                      selectedIndices: gameState.selectedIndices,
-                      hiddenIndices: gameState.fogHiddenIndices,
-                      shuffledIndices: gameState.shuffledIndices,
-                      phase: gameState.phase,
-                      onTileEntered: controller.selectTile,
-                      onTrailSelfIntersectingChanged:
-                          controller.updateTrailSelfIntersecting,
-                      onDragEnd: () {
-                        // validate() is called automatically on complete word;
-                        // on partial lift we just let selection persist.
-                      },
+                // Bandeau de première rencontre — superposé sous l'en-tête,
+                // sans décaler la mise en page quand il se replie.
+                if (_firstEncounter.isNotEmpty)
+                  Positioned(
+                    top: 48,
+                    left: 16,
+                    right: 16,
+                    child: FirstEncounterBanner(
+                      modifiers: _firstEncounter,
+                      onDismissed: _onFirstEncounterDismissed,
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                // Bottom action row — [Pub?] · Indice · Effacer.
-                // Le bouton Valider a été retiré (auto-validation déclenchée
-                // dans `selectTile` quand `state.isComplete`). Le chip pub
-                // pleine-largeur a été absorbé ici pour rendre son espace à
-                // la grille. Pub gating + montant rewarded sont pilotés par
-                // Remote Config via `_buildActionButtons` (cf. helper).
-                _buildActionButtons(context, ref, controller, gameState),
-                const SizedBox(height: 12),
               ],
             ),
           ),
@@ -341,15 +387,77 @@ class _GameViewState extends ConsumerState<GameView>
     );
   }
 
+  /// Devinettes effectivement jouées sur ce niveau (même règle que le
+  /// controller) : toutes celles d'une rafale ou d'un duo, la principale
+  /// seule sinon.
+  List<Devinette> get _levelDevinettes => widget.args.config.kind.isMultiWord
+      ? widget.args.allDevinettes
+      : <Devinette>[widget.args.devinette];
+
+  /// Bloc énigme(s) du haut d'écran selon `config.kind`.
+  List<Widget> _buildRiddles(
+    GameState gameState,
+    GameController controller,
+    PackTheme packTheme,
+  ) {
+    final kind = widget.args.config.kind;
+    if (gameState.isDuo) {
+      final second = gameState.secondDevinette!;
+      return <Widget>[
+        _RiddleCard(
+          riddle: gameState.devinette.riddle,
+          theme: packTheme,
+          compact: true,
+          solved: gameState.isSolved(0),
+        ),
+        const SizedBox(height: 6),
+        _RiddleCard(
+          riddle: second.riddle,
+          theme: packTheme,
+          compact: true,
+          showKili: false,
+          solved: gameState.isSolved(1),
+        ),
+      ];
+    }
+    if (kind == LevelKind.blindBoss) {
+      return <Widget>[
+        _BlindRiddleCard(
+          riddle: gameState.devinette.riddle,
+          theme: packTheme,
+          visible: gameState.riddleVisible,
+          rereadCount: gameState.rereadCount,
+          onReread: controller.rereadRiddle,
+        ),
+      ];
+    }
+    return <Widget>[
+      _RiddleCard(riddle: gameState.devinette.riddle, theme: packTheme),
+      if (gameState.roundCount > 1) ...<Widget>[
+        const SizedBox(height: 6),
+        _RafaleProgress(
+          current: gameState.roundIndex + 1,
+          total: gameState.roundCount,
+        ),
+      ],
+    ];
+  }
+
   /// Demande confirmation avant de quitter une partie en cours. Pas de modal
   /// si la partie est déjà terminée (won/lost) — dans ce cas, pop direct.
   Future<void> _confirmBack() async {
     final gameState = ref.read(gameControllerProvider(widget.args));
     if (gameState.phase != GamePhase.playing) {
+      // Sortie après un échec (dialogue d'échec fermé au retour système,
+      // puis second retour) : c'est un abandon. Après une victoire, non.
+      if (gameState.phase == GamePhase.lost) {
+        _logLevelAbandoned(AnalyticsKeys.abandonReasonQuitAfterFailure);
+      }
       if (mounted) context.pop();
       return;
     }
 
+    _backDialogOpen = true;
     _pauseForModal();
     final confirmed = await showDialog<bool>(
       context: context,
@@ -366,10 +474,7 @@ class _GameViewState extends ConsumerState<GameView>
         ),
         content: Text(
           'Tu perdras ta progression sur cette devinette.',
-          style: AppTypography.crimson(
-            size: 15,
-            color: AppColors.textePrimaire,
-          ),
+          style: AppTypography.crimson(size: 15),
         ),
         actions: [
           TextButton(
@@ -401,12 +506,45 @@ class _GameViewState extends ConsumerState<GameView>
       ),
     );
 
+    _backDialogOpen = false;
     if (!mounted) return;
     if (confirmed ?? false) {
+      _logLevelAbandoned(AnalyticsKeys.abandonReasonQuit);
+      _resetComboOnAbandon();
       context.pop();
-    } else {
+    } else if (!_bannerHoldsPause) {
       _resumeFromModal();
     }
+  }
+
+  /// Émet `level_abandoned` (fail-soft, non bloquant). Mesure la lassitude
+  /// par `level_index` et `tier` : rapporté à `level_won`, donne le taux
+  /// d'abandon de chaque position dans l'ascension.
+  void _logLevelAbandoned(String reason) {
+    final gameState = ref.read(gameControllerProvider(widget.args));
+    final mountainId = widget.args.mountainId;
+    final levelIndex = widget.args.levelIndex;
+    final failsOnLevel = mountainId != null && levelIndex != null
+        ? ref
+              .read(playerProgressProvider)
+              .failsOnLevel(mountainId: mountainId, levelIndex: levelIndex)
+        : 0;
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logLevelAbandoned(
+            tier: widget.args.config.difficultyTier,
+            reason: reason,
+            timeLeft: gameState.timeLeft,
+            hintsUsed: gameState.hintRevealedCount,
+            failsOnLevel: failsOnLevel,
+            isDaily: widget.args.isDailyChallenge,
+            kind: widget.args.config.kind.name,
+            exposed: widget.args.isExposed,
+            levelIndex: levelIndex,
+            mountainId: mountainId,
+          ),
+    );
   }
 
   /// Construit la rangée d'actions (Indice / Effacer / Valider) avec la
@@ -426,8 +564,7 @@ class _GameViewState extends ConsumerState<GameView>
     GameState gameState,
   ) {
     final cost = controller.nextHintCost;
-    final hasLettersLeft =
-        gameState.hintRevealedCount < widget.args.devinette.answer.length;
+    final hasLettersLeft = gameState.canRevealMore;
     final isPlaying = gameState.phase == GamePhase.playing;
     final canAfford = gameState.cauris >= cost;
     final progress = ref.watch(playerProgressProvider);
@@ -466,6 +603,9 @@ class _GameViewState extends ConsumerState<GameView>
         );
       },
       onClear: controller.clearSelection,
+      // Mélanger gratuit, une fois par niveau (rendu par `restart`).
+      onShuffle: controller.shuffleByPlayer,
+      canShuffle: isPlaying && !gameState.shuffleUsed,
       // Bouton Pub absorbé dans la row d'action — `null` quand No-Ads ou
       // killswitch / cap quotidien atteint : la row se rééquilibre sur
       // 2 colonnes (Indice + Effacer).
@@ -500,13 +640,7 @@ class _GameViewState extends ConsumerState<GameView>
     );
   }
 
-  void _showVictoryOverlay(
-    BuildContext ctx,
-    int timeLeft,
-    int starsEarned,
-    int caurisAwarded,
-    int freehandBonus,
-  ) {
+  void _showVictoryOverlay(BuildContext ctx, GameState won) {
     // Compte la victoire pour la cadence interstitielle (Étape D).
     // L'incrément est fait au moment de l'overlay : si le joueur quitte
     // avant de tap SUIVANT, sa victoire compte quand même.
@@ -515,26 +649,75 @@ class _GameViewState extends ConsumerState<GameView>
     // (ATT est désormais demandé au démarrage, avant l'init AdMob —
     // cf. main.dart / AttService.ensureRequested. Plus de gate victoire.)
 
+    // Suite du flux — strictement identique bannière / écran complet :
+    // ferme l'overlay, tente une interstitielle (transition naturelle entre
+    // 2 niveaux), puis enchaîne. Le helper skip si pas atteint / min
+    // interval / killswitch / No-Ads / duel.
+    Future<void> onNext() async {
+      ctx.pop();
+      await ref.read(adsServiceProvider).maybeShowInterstitial();
+      if (!mounted) return;
+      await _advanceAfterVictory();
+    }
+
+    // Écran complet (Kili, explication, proverbe) réservé aux moments qui
+    // le méritent : boss, défi du jour, dernier niveau d'une montagne.
+    // Les 200+ niveaux ordinaires passent par la bannière compacte.
+    final isBoss = widget.args.config.isBoss;
+    final needsFullView =
+        isBoss || widget.args.isDailyChallenge || _isLastLevelOfMountain();
+
+    if (needsFullView) {
+      showDialog<void>(
+        context: ctx,
+        barrierDismissible: false,
+        barrierColor: Colors.black.withValues(alpha: 0.92),
+        builder: (_) => VictoryView(
+          devinette: won.devinette,
+          devinettes: _levelDevinettes,
+          timeLeft: won.timeLeft,
+          caurisAwarded: won.caurisAwarded,
+          freehandBonus: won.freehandBonusAwarded,
+          perfectBonus: won.perfectBonusAwarded,
+          comboStreak: won.comboStreak,
+          comboMultiplier: won.comboMultiplierApplied,
+          starsEarned: won.starsEarned,
+          isBoss: isBoss,
+          onNext: onNext,
+        ),
+      );
+      return;
+    }
+
+    // Éligibilité « Doubler » — mêmes conditions que `VictoryView` : flag
+    // Remote Config, pas de No-Ads, killswitch off, cap quotidien non
+    // atteint. Le crédit passe par le même `showRewardedForCauris`.
+    final canDouble =
+        ref.read(gameEconomyConfigProvider).rewardedDoubleEnabled &&
+        !ref.read(playerProgressProvider).noAdsPurchased &&
+        ref.read(canOfferRewardedProvider);
+    final bonus = won.caurisAwarded;
+
     showDialog<void>(
       context: ctx,
       barrierDismissible: false,
-      barrierColor: Colors.black.withValues(alpha: 0.92),
-      builder: (_) => VictoryView(
-        devinette: widget.args.devinette,
-        timeLeft: timeLeft,
-        caurisAwarded: caurisAwarded,
-        freehandBonus: freehandBonus,
-        starsEarned: starsEarned,
-        isBoss: widget.args.config.isBoss,
-        onNext: () async {
-          // Ferme l'overlay, tente une interstitielle (transition naturelle
-          // entre 2 niveaux), puis enchaîne sur la suite. Le helper skip
-          // si pas atteint / min interval / killswitch / No-Ads / duel.
-          ctx.pop();
-          await ref.read(adsServiceProvider).maybeShowInterstitial();
-          if (!mounted) return;
-          await _advanceAfterVictory();
-        },
+      // Voile léger : la grille reste visible derrière la bannière.
+      barrierColor: Colors.black.withValues(alpha: 0.35),
+      builder: (_) => VictoryBanner(
+        devinette: won.devinette,
+        devinettes: _levelDevinettes,
+        caurisAwarded: bonus,
+        freehandBonus: won.freehandBonusAwarded,
+        perfectBonus: won.perfectBonusAwarded,
+        comboStreak: won.comboStreak,
+        comboMultiplier: won.comboMultiplierApplied,
+        starsEarned: won.starsEarned,
+        doubleReward: canDouble && bonus > 0
+            ? () => ref
+                  .read(adsServiceProvider)
+                  .showRewardedForCauris(caurisReward: bonus)
+            : null,
+        onNext: onNext,
       ),
     );
   }
@@ -573,7 +756,7 @@ class _GameViewState extends ConsumerState<GameView>
     final mountainDone = current.completedLevels >= current.totalLevels;
 
     if (!mountainDone) {
-      await _pushNextDevinette(mountainId);
+      await _pushNextLevel(current);
       return;
     }
 
@@ -642,65 +825,20 @@ class _GameViewState extends ConsumerState<GameView>
     );
   }
 
-  Future<void> _pushNextDevinette(String mountainId) async {
-    try {
-      final selectionService = ref.read(devinetteSelectionServiceProvider);
-      final progress = ref.read(playerProgressProvider);
-
-      // Résoudre la montagne courante pour calculer la difficulté cible.
-      final asyncMountains = ref.read(mountainsProvider);
-      final mountain = asyncMountains.maybeWhen(
-        data: (list) => list.cast<Mountain?>().firstWhere(
-          (m) => m?.id == mountainId,
-          orElse: () => null,
-        ),
-        orElse: () => null,
-      );
-      // Pour la devinette suivante en chaîne, on se base sur le niveau
-      // que le joueur s'apprête à atteindre (completedLevels + 1).
-      // Si pas de montagne (mode Hub) → config fallback.
-      final nextLevelIndex = mountain != null
-          ? mountain.completedLevels + 1
-          : null;
-      final config = mountain != null
-          ? LevelDifficultyResolver.resolve(
-              mountain: mountain,
-              levelIndex: nextLevelIndex!,
-            )
-          : LevelDifficultyResolver.fallback();
-
-      final next = await selectionService.nextDevinette(
-        mix: progress.activePackMix,
-        targetDifficulty: config.difficultyTier,
-        wordLengthBucket: config.wordLengthBucket,
-        excludeIds: progress.recentDevinetteIds.toSet(),
-        fallbackPackIds: progress.ownedPacks,
-      );
-      await ref
-          .read(playerProgressProvider.notifier)
-          .recordRecentDevinette(next.id);
-      if (!mounted) return;
-      context.pushReplacement(
-        AppRoutes.game,
-        extra: GameArgs(
-          devinette: next,
-          mountainId: mountainId,
-          levelIndex: nextLevelIndex,
-          config: config,
-        ),
-      );
-    } on Object catch (_) {
-      // `on Object` (pas `on Exception`) : un tirage épuisé lève un
-      // `StateError`, qui étend `Error` et n'est PAS une `Exception`.
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erreur de chargement', style: AppTypography.bebas()),
-          backgroundColor: AppColors.rouge,
-        ),
-      );
-      context.pop();
-    }
+  /// Enchaîne sur le niveau suivant de [mountain] (`completedLevels + 1`,
+  /// déjà mis à jour par `recordWin`) en remplaçant la route `/game`
+  /// courante. Tirage, embranchement « voie exposée » et structure du
+  /// niveau sont gérés par le lanceur commun ; si celui-ci n'a pas navigué
+  /// (dialogue refermé, tirage épuisé), on ressort de la partie.
+  Future<void> _pushNextLevel(Mountain mountain) async {
+    final launched = await launchMountainLevel(
+      context,
+      ref,
+      mountain: mountain,
+      levelIndex: mountain.completedLevels + 1,
+      replace: true,
+    );
+    if (!launched && mounted) context.pop();
   }
 
   /// Seuil d'échecs consécutifs sur **un même niveau** au-delà duquel la
@@ -713,6 +851,11 @@ class _GameViewState extends ConsumerState<GameView>
     BuildContext ctx,
     GameController controller,
   ) async {
+    // Devinette montrée / révélée à l'échec : le mot en cours d'une rafale,
+    // le premier mot non trouvé d'un duo, l'unique sinon.
+    final devinette = ref
+        .read(gameControllerProvider(widget.args))
+        .focusDevinette;
     // Mode défi du jour : on persiste le résultat via le flow dédié,
     // **sans** toucher au compteur global `consecutiveFailures` (qui
     // sert au throttling pub côté niveau standard).
@@ -737,7 +880,7 @@ class _GameViewState extends ConsumerState<GameView>
       // proposera un skip gratuit. Hors défi du jour (flow dédié).
       await ref
           .read(playerProgressProvider.notifier)
-          .recordSoloLoss(devinetteId: widget.args.devinette.id);
+          .recordSoloLoss(devinetteId: devinette.id);
     }
 
     // Logique de reveal (T2+ uniquement, et seulement en mode montagne
@@ -779,7 +922,7 @@ class _GameViewState extends ConsumerState<GameView>
     if (answerRevealed && !widget.args.isDailyChallenge) {
       await ref
           .read(playerProgressProvider.notifier)
-          .markDevinetteRewarded(widget.args.devinette.id);
+          .markDevinetteRewarded(devinette.id);
     }
 
     if (!ctx.mounted) return;
@@ -795,7 +938,7 @@ class _GameViewState extends ConsumerState<GameView>
     // Anti-tilt : skip gratuit proposé dès que les défaites consécutives
     // sur cette devinette atteignent le seuil (hors défi du jour — déjà
     // exclu de `recordSoloLoss` ci-dessus, donc le compteur y reste à 0).
-    final devinetteId = widget.args.devinette.id;
+    final devinetteId = devinette.id;
     final showSkip = ref.read(
       playerProgressProvider.select(
         (p) => p.consecutiveLossesOn(devinetteId) >= kFreeSkipLossThreshold,
@@ -807,7 +950,7 @@ class _GameViewState extends ConsumerState<GameView>
       barrierDismissible: false,
       barrierColor: Colors.black.withValues(alpha: 0.92),
       builder: (_) => FailureView(
-        devinette: widget.args.devinette,
+        devinette: devinette,
         answerRevealed: answerRevealed,
         revealCost: isPayWallActive && !answerRevealed
             ? revealCostCauris
@@ -829,8 +972,7 @@ class _GameViewState extends ConsumerState<GameView>
                 if (ok) {
                   // Anti-farm : reveal payé → récompense de cette devinette
                   // consommée (reformer le mot révélé ne rapportera rien).
-                  await notifier
-                      .markDevinetteRewarded(widget.args.devinette.id);
+                  await notifier.markDevinetteRewarded(devinette.id);
                 }
                 return ok;
               }
@@ -846,6 +988,8 @@ class _GameViewState extends ConsumerState<GameView>
                 // ressort de la partie : le prochain tirage — désormais
                 // filtré par le seen-tracker — servira une devinette
                 // fraîche.
+                _logLevelAbandoned(AnalyticsKeys.abandonReasonSkipFree);
+                _resetComboOnAbandon();
                 unawaited(
                   ref
                       .read(playerProgressProvider.notifier)
@@ -872,10 +1016,14 @@ class _GameHeader extends StatelessWidget {
     this.mountainName,
     this.levelLabel,
     this.countryCode,
+    this.comboStreak = 0,
   });
 
   final int cauris;
   final VoidCallback onBack;
+
+  /// Série intra-session de victoires (flamme + compteur affichés dès 2).
+  final int comboStreak;
 
   /// Nom de la montagne en cours (ex. "MONT NIMBA"). `null` en mode Hub.
   final String? mountainName;
@@ -924,9 +1072,48 @@ class _GameHeader extends StatelessWidget {
             ),
           ] else
             const Spacer(),
+          if (comboStreak >= 2) ...<Widget>[
+            const SizedBox(width: 8),
+            _ComboChip(streak: comboStreak),
+          ],
           const SizedBox(width: 8),
           // Cauris chip (la pile de cauris du joueur).
           _CaurisChip(cauris: cauris),
+        ],
+      ),
+    );
+  }
+}
+
+/// Flamme + compteur de série intra-session (visible dès 2 victoires
+/// d'affilée). Couleur kola pour se distinguer du chip cauris doré.
+class _ComboChip extends StatelessWidget {
+  const _ComboChip({required this.streak});
+
+  final int streak;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.kola.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.kola.withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const Icon(
+            Icons.local_fire_department_rounded,
+            size: 15,
+            color: AppColors.kola,
+          ),
+          const SizedBox(width: 3),
+          Text(
+            '×$streak',
+            style: AppTypography.bebas(size: 14, color: AppColors.kola),
+          ),
         ],
       ),
     );
@@ -963,13 +1150,32 @@ class _CaurisChip extends StatelessWidget {
 }
 
 class _RiddleCard extends StatelessWidget {
-  const _RiddleCard({required this.riddle, required this.theme});
+  const _RiddleCard({
+    required this.riddle,
+    required this.theme,
+    this.compact = false,
+    this.showKili = true,
+    this.solved = false,
+  });
 
   final String riddle;
   final PackTheme theme;
 
+  /// Duo : énoncé plus petit et padding réduit pour loger deux cartes.
+  final bool compact;
+
+  /// Kili « peek » sur le bord supérieur (une seule fois par écran).
+  final bool showKili;
+
+  /// Duo : mot déjà trouvé — la carte s'estompe et se coche.
+  final bool solved;
+
   @override
   Widget build(BuildContext context) {
+    final fontSize = compact ? 16.0 : 22.0;
+    final padding = compact
+        ? EdgeInsets.fromLTRB(16, showKili ? 18 : 10, 18, 10)
+        : const EdgeInsets.fromLTRB(16, 28, 18, 16);
     // Carte devinette — accent gauche (3pt) sur fond de bulle, couleurs pilotées
     // par le skin du pack (défaut = surfaceContainer / or / crème historiques).
     // Plus de bordure dorée pleine : la hiérarchie vient de l'accent + ombre.
@@ -1001,17 +1207,33 @@ class _RiddleCard extends StatelessWidget {
                     Container(width: 3, color: theme.bubbleAccent),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 28, 18, 16),
+                        padding: padding,
                         // Énoncé — 22pt, héros culturel de l'écran. Padding
                         // haut majoré pour laisser respirer Kili posé sur
                         // le bord supérieur.
-                        child: Text(
-                          riddle,
-                          style: AppTypography.bodyMd.copyWith(
-                            fontSize: 22,
-                            height: 1.35,
-                            color: theme.bubbleText,
-                          ),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                riddle,
+                                style: AppTypography.bodyMd.copyWith(
+                                  fontSize: fontSize,
+                                  height: 1.35,
+                                  color: solved
+                                      ? theme.bubbleText.withValues(alpha: 0.55)
+                                      : theme.bubbleText,
+                                ),
+                              ),
+                            ),
+                            if (solved) ...<Widget>[
+                              const SizedBox(width: 8),
+                              const Icon(
+                                Icons.check_circle_rounded,
+                                size: 20,
+                                color: AppColors.orSoleil,
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     ),
@@ -1026,17 +1248,132 @@ class _RiddleCard extends StatelessWidget {
         // la bordure de la rampe (dans le PNG source) sur le bord réel de la
         // carte (même calcul que le CTA GRIMPER). `IgnorePointer` : purement
         // décoratif.
-        Positioned(
-          top: -37,
-          child: IgnorePointer(
-            child: Image.asset(
-              AppAssets.kiliPeek,
-              width: 84,
-              height: 43,
-              fit: BoxFit.contain,
+        if (showKili)
+          Positioned(
+            top: -37,
+            child: IgnorePointer(
+              child: Image.asset(
+                AppAssets.kiliPeek,
+                width: 84,
+                height: 43,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
+      ],
+    );
+  }
+}
+
+/// Compteur « Mot k/n » d'une rafale, sous l'énigme.
+class _RafaleProgress extends StatelessWidget {
+  const _RafaleProgress({required this.current, required this.total});
+
+  final int current;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        for (var i = 1; i <= total; i++) ...<Widget>[
+          if (i > 1) const SizedBox(width: 6),
+          Container(
+            width: i == current ? 18 : 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: i <= current
+                  ? AppColors.orSoleil
+                  : AppColors.orSoleil.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ],
+        const SizedBox(width: 10),
+        Text(
+          'game.rafale_progress'.tr(
+            namedArgs: <String, String>{
+              'current': '$current',
+              'total': '$total',
+            },
+          ),
+          style: AppTypography.bebas(
+            size: 13,
+            color: AppColors.orSoleil,
+            letterSpacing: 1.2,
+          ),
         ),
+      ],
+    );
+  }
+}
+
+/// Énigme du boss aveugle : le texte s'estompe (fondu) quand
+/// `GameController` la masque ; un bouton « Relire » la réaffiche via
+/// [onReread]. Le coût des relectures suivantes est affiché sur le bouton.
+class _BlindRiddleCard extends StatelessWidget {
+  const _BlindRiddleCard({
+    required this.riddle,
+    required this.theme,
+    required this.visible,
+    required this.rereadCount,
+    required this.onReread,
+  });
+
+  final String riddle;
+  final PackTheme theme;
+  final bool visible;
+  final int rereadCount;
+  final VoidCallback onReread;
+
+  @override
+  Widget build(BuildContext context) {
+    final reread = 'game.blind_reread'.tr();
+    final cost = 'game.blind_reread_cost'.tr(
+      namedArgs: <String, String>{
+        'seconds': '${GameController.blindRereadCostSeconds}',
+      },
+    );
+    return Stack(
+      alignment: Alignment.center,
+      children: <Widget>[
+        // La carte garde sa place : seul le texte s'estompe, pour ne pas
+        // faire sauter la grille.
+        AnimatedOpacity(
+          opacity: visible ? 1 : 0.06,
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOut,
+          child: _RiddleCard(riddle: riddle, theme: theme),
+        ),
+        if (!visible)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                'game.blind_hidden'.tr(),
+                style: AppTypography.bodySm.copyWith(
+                  color: AppColors.texteSecondaire,
+                ),
+              ),
+              const SizedBox(height: 6),
+              ElevatedButton.icon(
+                onPressed: onReread,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.orSoleil,
+                  foregroundColor: AppColors.boisFonce,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                icon: const Icon(Icons.visibility_rounded, size: 18),
+                label: Text(
+                  rereadCount == 0 ? reread : '$reread · $cost',
+                  style: AppTypography.bebas(size: 14, letterSpacing: 1.5),
+                ),
+              ),
+            ],
+          ),
       ],
     );
   }
@@ -1080,42 +1417,64 @@ class _ModifierBadges extends StatelessWidget {
     );
   }
 
+  /// Libellé i18n d'un modificateur (`game.briefing.modifier.<clé>.name`,
+  /// mêmes clés que `FirstEncounterBanner`).
+  static String _nameOf(String i18nKey) =>
+      'game.briefing.modifier.$i18nKey.name'.tr();
+
   static Widget? _badgeForModifier(LevelModifier m) {
     switch (m) {
       case LevelModifier.reverse:
-        return const _ModifierPill(
+        return _ModifierPill(
           icon: Icons.swap_horiz_rounded,
-          label: "Mot à l'envers",
+          label: _nameOf('reverse'),
           color: AppColors.rouge,
         );
       case LevelModifier.wind:
-        return const _ModifierPill(
+        return _ModifierPill(
           icon: Icons.air_rounded,
-          label: 'Vent',
+          label: _nameOf('wind'),
           color: AppColors.cielHauteur,
         );
       case LevelModifier.earthquake:
-        return const _ModifierPill(
+        return _ModifierPill(
           icon: Icons.terrain_rounded,
-          label: 'Tremblement',
+          label: _nameOf('earthquake'),
           color: AppColors.laterite,
         );
       case LevelModifier.fog:
-        return const _ModifierPill(
+        return _ModifierPill(
           icon: Icons.cloud_rounded,
-          label: 'Brouillard',
+          label: _nameOf('fog'),
           color: AppColors.cielHauteur,
         );
       case LevelModifier.shuffle:
-        return const _ModifierPill(
+        return _ModifierPill(
           icon: Icons.shuffle_rounded,
-          label: 'Remélange',
+          label: _nameOf('shuffle'),
           color: AppColors.rouge,
+        );
+      case LevelModifier.mirage:
+        return _ModifierPill(
+          icon: Icons.wb_sunny_rounded,
+          label: _nameOf('mirage'),
+          color: AppColors.savanneOcre,
+        );
+      case LevelModifier.rain:
+        return _ModifierPill(
+          icon: Icons.water_drop_rounded,
+          label: _nameOf('rain'),
+          color: AppColors.info,
+        );
+      case LevelModifier.spirit:
+        return _ModifierPill(
+          icon: Icons.auto_awesome_rounded,
+          label: _nameOf('spirit'),
+          color: AppColors.esprit,
         );
       // ignore: no_default_cases
       default:
-        // thinAir + autres modifiers non-implémentés visuellement → pas
-        // de badge pour l'instant. La couverture S3 se limite aux 4 cités.
+        // thinAir + modifiers sans runtime (lava, ice, …) → pas de badge.
         return null;
     }
   }
@@ -1164,14 +1523,20 @@ class _ActionButtons extends StatelessWidget {
   const _ActionButtons({
     required this.onHint,
     required this.onClear,
+    required this.onShuffle,
     required this.onWatchAd,
     required this.canHint,
     required this.canWatchAd,
+    required this.canShuffle,
     required this.hintCostLabel,
   });
 
   final VoidCallback onHint;
   final VoidCallback onClear;
+
+  /// Mélanger gratuit (une fois par niveau) — cf. `GameController.shuffleByPlayer`.
+  final VoidCallback onShuffle;
+  final bool canShuffle;
 
   /// Callback rewarded video — `null` quand le joueur a acheté "No Ads".
   /// Dans ce cas le bouton disparaît et la row passe sur 2 colonnes.
@@ -1218,6 +1583,10 @@ class _ActionButtons extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
+          // Bouton Mélanger — carré compact (icône + libellé réduit) pour
+          // tenir sur 4 colonnes quand le bouton Pub est présent.
+          _ShuffleButton(enabled: canShuffle, onTap: onShuffle),
+          const SizedBox(width: 8),
           // Bouton Effacer.
           Expanded(
             child: _GameButton(
@@ -1228,6 +1597,53 @@ class _ActionButtons extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Bouton « Mélanger » compact — gratuit, une seule fois par niveau. Grisé
+/// une fois consommé (ré-armé par `restart`).
+class _ShuffleButton extends StatelessWidget {
+  const _ShuffleButton({required this.enabled, required this.onTap});
+
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: enabled ? 1 : 0.45,
+      child: GestureDetector(
+        onTap: enabled ? onTap : null,
+        child: Container(
+          key: const ValueKey<String>('game_shuffle_button'),
+          width: 64,
+          height: 56,
+          decoration: BoxDecoration(
+            color: AppColors.bois,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.25),
+                offset: const Offset(0, 2),
+                blurRadius: 6,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Icon(
+                Icons.shuffle_rounded,
+                size: 22,
+                color: AppColors.textePrimaire,
+              ),
+              const SizedBox(height: 2),
+              Text('MÉLANGER', style: AppTypography.bebas(size: 9)),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1288,26 +1704,37 @@ class _GameButton extends StatelessWidget {
                   Icon(iconData, size: 26, color: AppColors.textePrimaire),
                   const SizedBox(width: 6),
                 ],
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(label, style: AppTypography.bebas(size: 15)),
-                    if (subtitle != null)
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            subtitle!,
-                            style: AppTypography.crimson(
-                              size: 11,
-                              color: AppColors.textePrimaire,
-                            ),
-                          ),
-                          const SizedBox(width: 3),
-                          const CaurisIcon(size: 11),
-                        ],
+                // `Flexible` + ellipse : un libellé long (traduction, clé
+                // i18n brute) se tronque au lieu de déborder du bouton sur
+                // les petits écrans (4 boutons sur 375 pt).
+                Flexible(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        label,
+                        style: AppTypography.bebas(size: 15),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                  ],
+                      if (subtitle != null)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                subtitle!,
+                                style: AppTypography.crimson(size: 11),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 3),
+                            const CaurisIcon(size: 11),
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
               ],
             ),

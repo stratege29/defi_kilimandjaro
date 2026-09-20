@@ -1,15 +1,12 @@
 import 'dart:math';
 
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
-import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
-import 'package:defi_kilimandjaro/core/utils/level_difficulty_resolver.dart';
 import 'package:defi_kilimandjaro/data/repositories/mountain_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
-import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
-import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
+import 'package:defi_kilimandjaro/presentation/game/level_launcher.dart';
 import 'package:defi_kilimandjaro/presentation/mountains/widgets/mountain_silhouette_vector.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/cauris_icon.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/flag_roundel.dart';
@@ -75,44 +72,14 @@ class _MountainDetailViewState extends ConsumerState<MountainDetailView>
       return;
     }
 
-    try {
-      final selectionService = ref.read(devinetteSelectionServiceProvider);
-      final progress = ref.read(playerProgressProvider);
-      final config = LevelDifficultyResolver.resolve(
-        mountain: liveMountain,
-        levelIndex: levelNumber,
-      );
-      final devinette = await selectionService.nextDevinette(
-        mix: progress.activePackMix,
-        targetDifficulty: config.difficultyTier,
-        wordLengthBucket: config.wordLengthBucket,
-        excludeIds: progress.recentDevinetteIds.toSet(),
-        fallbackPackIds: progress.ownedPacks,
-      );
-      await ref
-          .read(playerProgressProvider.notifier)
-          .recordRecentDevinette(devinette.id);
-      if (!mounted) return;
-      await context.push<void>(
-        AppRoutes.game,
-        extra: GameArgs(
-          devinette: devinette,
-          mountainId: widget.mountain.id,
-          levelIndex: levelNumber,
-          config: config,
-        ),
-      );
-    } on Object catch (_) {
-      // `on Object` (pas `on Exception`) : un tirage épuisé lève un
-      // `StateError`, qui étend `Error` et n'est PAS une `Exception`.
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erreur de chargement', style: AppTypography.bebas()),
-          backgroundColor: AppColors.rouge,
-        ),
-      );
-    }
+    // Tirage + embranchement « voie exposée » + navigation : helper commun
+    // à tous les points de lancement d'un niveau Sommets.
+    await launchMountainLevel(
+      context,
+      ref,
+      mountain: liveMountain,
+      levelIndex: levelNumber,
+    );
   }
 
   @override
