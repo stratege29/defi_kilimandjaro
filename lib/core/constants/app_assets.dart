@@ -109,6 +109,26 @@ abstract final class AppAssets {
   static String mountainHero(String id) => '$_mountains/hero_$id.png';
   static const String kilimandjaroHero = '$_mountains/hero_tz_kilimanjaro.png';
 
+  /// Ids de `mountains.json` disposant d'un visuel `hero_<id>.png` embarqué.
+  ///
+  /// Source de vérité côté client : un id absent d'ici ne doit JAMAIS passer
+  /// par `Image.asset` (un chargement qui échoue après disposition du widget
+  /// remonte dans `FlutterError.onError`, donc dans Crashlytics comme faux
+  /// crash). Le test `mountain_hero_assets_test.dart` vérifie que ce set
+  /// reflète exactement le dossier `assets/images/mountains/`.
+  static const Set<String> mountainHeroIds = {
+    'ci_nimba',
+    'cm_cameroon',
+    'et_ras_dashen',
+    'ke_mount_kenya',
+    'ma_toubkal',
+    'tz_kilimanjaro',
+    'ug_stanley',
+  };
+
+  /// `true` si un visuel hero existe pour cette montagne.
+  static bool hasMountainHero(String id) => mountainHeroIds.contains(id);
+
   // --- Devinettes (sujets, clé = answer_normalized) ---
   static String devinetteSubject(String key) => '$_devinettes/$key.png';
 
