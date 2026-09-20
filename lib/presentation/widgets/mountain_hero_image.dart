@@ -5,8 +5,12 @@ import 'package:flutter/material.dart';
 /// Illustration peinte d'un sommet (`assets/images/mountains/hero_<id>.png`).
 ///
 /// Charge l'asset hero correspondant à l'`id` de la montagne via
-/// [AppAssets.mountainHero]. En cas d'asset manquant (id sans visuel généré),
-/// affiche un fallback discret plutôt que l'icône d'erreur Flutter.
+/// [AppAssets.mountainHero]. Si l'id n'a pas de visuel généré (cf.
+/// [AppAssets.mountainHeroIds]), le fallback est affiché directement, sans
+/// passer par [Image.asset] : un chargement qui échoue après disposition du
+/// widget (liste qui défile) n'a plus de listener et remonte dans
+/// `FlutterError.onError`, donc dans Crashlytics comme faux crash.
+/// L'`errorBuilder` reste en filet de sécurité (asset corrompu, etc.).
 ///
 /// Usage : carte « Continuer l'ascension » (accueil), scène Sommets, fond du
 /// hub Défi, etc.
@@ -40,6 +44,9 @@ class MountainHeroImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!AppAssets.hasMountainHero(mountainId)) {
+      return fallback ?? _Fallback(width: width, height: height);
+    }
     final image = Image.asset(
       AppAssets.mountainHero(mountainId),
       width: width,

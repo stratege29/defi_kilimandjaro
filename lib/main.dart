@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:defi_kilimandjaro/audio/audio_engine.dart';
+import 'package:defi_kilimandjaro/core/crash_error_policy.dart';
 import 'package:defi_kilimandjaro/core/deep_links.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_theme.dart';
@@ -204,7 +205,11 @@ Future<void> _bootstrap() async {
     // stack et toute erreur de build devient invisible au développement).
     FlutterError.onError = (errorDetails) {
       if (kDebugMode) FlutterError.presentError(errorDetails);
-      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+      if (isNonFatalFlutterError(errorDetails)) {
+        FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
+      } else {
+        FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+      }
     };
     PlatformDispatcher.instance.onError = (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
