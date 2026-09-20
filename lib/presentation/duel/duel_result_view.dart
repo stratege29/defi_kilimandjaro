@@ -228,24 +228,19 @@ class _DuelResultViewState extends ConsumerState<DuelResultView> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                if (isDraw)
-                                  const Icon(
-                                    Icons.handshake,
-                                    size: 80,
-                                    color: AppColors.orJour,
-                                  )
-                                else if (won)
-                                  Image.asset(
-                                    AppAssets.duelTrophy,
-                                    width: 80,
-                                    height: 80,
-                                  )
-                                else
-                                  const Icon(
-                                    Icons.terrain,
-                                    size: 80,
-                                    color: AppColors.error,
-                                  ),
+                                // Emblème de résultat — trois médaillons de
+                                // la même famille (trophée / bouclier fendu /
+                                // lances croisées) pour que défaite et nul
+                                // aient le même poids visuel que la victoire.
+                                Image.asset(
+                                  isDraw
+                                      ? AppAssets.duelDraw
+                                      : won
+                                          ? AppAssets.duelTrophy
+                                          : AppAssets.duelDefeat,
+                                  width: 80,
+                                  height: 80,
+                                ),
                                 const SizedBox(height: 10),
                                 // Eyebrow MATCH NUL / VICTOIRE / DÉFAITE.
                                 Text(

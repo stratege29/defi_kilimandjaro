@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/ads/ads_service.dart';
@@ -329,11 +330,7 @@ class _VictoryCard extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                const Icon(
-                  Icons.workspace_premium_rounded,
-                  size: 22,
-                  color: AppColors.orJour,
-                ),
+                Image.asset(AppAssets.iconStarGold, width: 22, height: 22),
                 const SizedBox(width: 6),
                 Text(
                   'BOSS VAINCU',
@@ -344,14 +341,11 @@ class _VictoryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 6),
-                const Icon(
-                  Icons.workspace_premium_rounded,
-                  size: 22,
-                  color: AppColors.orJour,
-                ),
+                Image.asset(AppAssets.iconStarGold, width: 22, height: 22),
               ],
             ),
-            const SizedBox(height: 10),
+            // Marge élargie : la couronne déborde de 20 px au-dessus de Kili.
+            const SizedBox(height: 26),
           ],
           // Mascotte Kili — idle + hochement de tête à l'ouverture (pas de
           // pulsation). En mode boss, surmontée d'une couronne flottante.
@@ -361,19 +355,28 @@ class _VictoryCard extends StatelessWidget {
             children: <Widget>[
               KiliMascot(controller: kili, size: 130),
               if (isBoss)
+                // Décalée vers la gauche : la tête de Kili est à gauche du
+                // centre de sa boîte (la queue occupe la droite).
                 Positioned(
-                  top: -14,
-                  child: Icon(
-                    Icons.emoji_events_rounded,
-                    size: 36,
-                    color: AppColors.orJour,
-                    shadows: <Shadow>[
-                      Shadow(
-                        color: Colors.black.withValues(alpha: 0.65),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
+                  top: -20,
+                  child: Transform.translate(
+                    offset: const Offset(-24, 0),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        boxShadow: <BoxShadow>[
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.65),
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
-                    ],
+                      child: Image.asset(
+                        AppAssets.iconCrownBoss,
+                        width: 44,
+                        height: 44,
+                      ),
+                    ),
                   ),
                 ),
             ],
@@ -459,9 +462,8 @@ class _DoubleRewardButton extends StatelessWidget {
       // Le rewarded ne crédite QUE la base (pas le bonus à main levée), donc
       // le libellé annonce le gain concret en cauris plutôt qu'un « ×2 » qui
       // serait trompeur quand un bonus à main levée existe.
-      label: '${'result.victory.double_cta'.tr(namedArgs: <String, String>{
-            'cauris': '$bonus',
-          })} ▶',
+      label:
+          '${'result.victory.double_cta'.tr(namedArgs: <String, String>{'cauris': '$bonus'})} ▶',
       onTap: onTap,
       leading: loading
           ? const SizedBox(
@@ -493,12 +495,22 @@ class _StarsRow extends StatelessWidget {
       children: <Widget>[
         for (var i = 1; i <= 3; i++) ...<Widget>[
           if (i > 1) const SizedBox(width: 6),
-          Icon(
-            i <= earned ? Icons.star_rounded : Icons.star_outline_rounded,
-            size: 32,
-            color: i <= earned
-                ? AppColors.orJour
-                : AppColors.textePrimaire.withValues(alpha: 0.25),
+          // Étoile or peinte ; l'étoile manquée reste la même image,
+          // désaturée et atténuée (même convention que les titres
+          // verrouillés du profil).
+          Opacity(
+            opacity: i <= earned ? 1 : 0.22,
+            child: ColorFiltered(
+              colorFilter: i <= earned
+                  ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
+                  : const ColorFilter.matrix(<double>[
+                      0.2126, 0.7152, 0.0722, 0, 0, //
+                      0.2126, 0.7152, 0.0722, 0, 0, //
+                      0.2126, 0.7152, 0.0722, 0, 0, //
+                      0, 0, 0, 1, 0, //
+                    ]),
+              child: Image.asset(AppAssets.iconStarGold, width: 32, height: 32),
+            ),
           ),
         ],
       ],
@@ -571,11 +583,7 @@ class _FreehandBonusLine extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        const Icon(
-          Icons.gesture_rounded,
-          size: 18,
-          color: AppColors.success,
-        ),
+        const Icon(Icons.gesture_rounded, size: 18, color: AppColors.success),
         const SizedBox(width: 6),
         Text(
           'result.victory.freehand_bonus'.tr(
@@ -638,8 +646,9 @@ class _ParticlePainter extends CustomPainter {
             p,
             2.5,
             Paint()
-              ..color =
-                  AppColors.textePrimaire.withValues(alpha: opacity * 0.85),
+              ..color = AppColors.textePrimaire.withValues(
+                alpha: opacity * 0.85,
+              ),
           );
       }
     }
