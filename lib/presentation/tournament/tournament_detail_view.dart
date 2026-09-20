@@ -2,6 +2,7 @@ import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_spacing.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
+import 'package:defi_kilimandjaro/data/firebase/app_check_status.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart'
     show firebaseAuthProvider;
 import 'package:defi_kilimandjaro/data/repositories/pack_catalog_repository_impl.dart';
@@ -61,8 +62,21 @@ class _TournamentDetailViewState extends ConsumerState<TournamentDetailView> {
           .joinTournament(widget.tournamentId);
     } on Exception catch (_) {
       if (mounted) {
+        // Play Integrity KO au boot (Play Store obsolète) : le serveur refuse
+        // le jeton App Check — dire quoi faire plutôt qu'un échec générique.
+        final playStoreOutdated = ref.read(appCheckFailureProvider) ==
+            AppCheckFailure.playStoreOutdated;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('tournament.join_failed'.tr())),
+          SnackBar(
+            duration: playStoreOutdated
+                ? const Duration(seconds: 8)
+                : const Duration(seconds: 4),
+            content: Text(
+              playStoreOutdated
+                  ? 'error.play_store_outdated'.tr()
+                  : 'tournament.join_failed'.tr(),
+            ),
+          ),
         );
       }
     } finally {

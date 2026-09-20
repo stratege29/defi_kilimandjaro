@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:defi_kilimandjaro/audio/audio_controller.dart';
 import 'package:defi_kilimandjaro/core/constants/duel_protocol.dart';
+import 'package:defi_kilimandjaro/data/firebase/app_check_status.dart';
 import 'package:defi_kilimandjaro/data/repositories/duel_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/matchmaking_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
@@ -26,6 +28,10 @@ enum LobbyPhase {
 }
 
 /// État du lobby de matchmaking.
+/// Valeur de [LobbyState.errorMessage] quand le matchmaking est refusé
+/// parce que Play Integrity ne peut pas s'exécuter (Play Store obsolète).
+const String kLobbyErrorPlayStoreOutdated = 'play_store_outdated';
+
 class LobbyState {
   const LobbyState({
     required this.phase,
@@ -127,6 +133,7 @@ class LobbyController extends StateNotifier<LobbyState> {
     required this.profile,
     required this.database,
     required this.auth,
+    this.appCheckFailure = AppCheckFailure.none,
     String? rematchOpponentUid,
     String? previousMatchId,
   }) : super(
@@ -147,6 +154,11 @@ class LobbyController extends StateNotifier<LobbyState> {
   final PlayerProfile profile;
   final FirebaseDatabase database;
   final FirebaseAuth auth;
+
+  /// État de l'attestation App Check au boot (cf. `activateAppCheck`).
+  /// Sert à expliquer un `unauthenticated` du matchmaking au lieu de
+  /// laisser tourner la recherche indéfiniment.
+  final AppCheckFailure appCheckFailure;
   final Logger _log = Logger();
 
   static const int _timeoutSeconds = 30;
@@ -401,8 +413,31 @@ class LobbyController extends StateNotifier<LobbyState> {
         );
         return;
       }
+      // App Check refusé côté serveur alors que l'attestation Play Integrity
+      // a échoué au boot pour cause de Play Store obsolète (-9) : re-poller
+      // ne servira à rien, on explique quoi faire au joueur.
+      if (_isAppCheckRejection(e) &&
+          appCheckFailure == AppCheckFailure.playStoreOutdated) {
+        _cancelled = true;
+        _pollTimer?.cancel();
+        _tickTimer?.cancel();
+        unawaited(_matchedToSub?.cancel());
+        unawaited(audioController.stopLobbySearchLoop());
+        state = state.copyWith(
+          phase: LobbyPhase.noOpponent,
+          errorMessage: kLobbyErrorPlayStoreOutdated,
+        );
+        return;
+      }
       _log.e('Erreur matchmaking poll', error: e);
     }
+  }
+
+  /// True si le serveur a rejeté l'appel faute de jeton App Check valide
+  /// (`enforceAppCheck` → code `unauthenticated`).
+  static bool _isAppCheckRejection(Object e) {
+    if (e is FirebaseFunctionsException) return e.code == 'unauthenticated';
+    return e.toString().contains('unauthenticated');
   }
 
   void _onTimeout() {
@@ -477,6 +512,7 @@ final lobbyControllerProvider =
       profile: profile ?? PlayerProfile.initial('anonymous'),
       database: ref.watch(firebaseDatabaseProvider),
       auth: ref.watch(firebaseAuthProvider),
+      appCheckFailure: ref.watch(appCheckFailureProvider),
       rematchOpponentUid: rematchUid,
       previousMatchId: previousMatchId,
     );

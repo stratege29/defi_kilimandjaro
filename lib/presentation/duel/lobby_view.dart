@@ -6,6 +6,7 @@ import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_controller.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -107,6 +108,8 @@ class _LobbyViewState extends ConsumerState<LobbyView>
                               lobbyState.errorMessage == 'declined',
                           isOutdated:
                               lobbyState.errorMessage == 'outdated',
+                          isPlayStoreOutdated: lobbyState.errorMessage ==
+                              kLobbyErrorPlayStoreOutdated,
                         ),
                       },
                     ),
@@ -516,6 +519,7 @@ class _NoOpponentBody extends ConsumerWidget {
     required this.isRematch,
     this.wasDeclined = false,
     this.isOutdated = false,
+    this.isPlayStoreOutdated = false,
     super.key,
   });
 
@@ -529,7 +533,14 @@ class _NoOpponentBody extends ConsumerWidget {
   /// contrat duel — barrière de version).
   final bool isOutdated;
 
+  /// True quand App Check a refusé l'appareil parce que Play Integrity n'a
+  /// pas pu s'exécuter (Play Store obsolète, erreur -9).
+  final bool isPlayStoreOutdated;
+
   String _bodyText() {
+    if (isPlayStoreOutdated) {
+      return 'error.play_store_outdated'.tr();
+    }
     if (isOutdated) {
       return "Cette version de l'app n'est plus compatible avec le Défi en ligne.\nMets-la à jour pour rejouer !";
     }
@@ -563,11 +574,13 @@ class _NoOpponentBody extends ConsumerWidget {
           FadeTransition(
             opacity: slideCtrl,
             child: Text(
-              isOutdated
-                  ? 'MISE À JOUR REQUISE'
-                  : wasDeclined
-                      ? 'DÉFI REFUSÉ'
-                      : 'PERSONNE DISPONIBLE',
+              isPlayStoreOutdated
+                  ? 'error.play_store_outdated_title'.tr()
+                  : isOutdated
+                      ? 'MISE À JOUR REQUISE'
+                      : wasDeclined
+                          ? 'DÉFI REFUSÉ'
+                          : 'PERSONNE DISPONIBLE',
               style: AppTypography.bebas(size: 22, color: AppColors.orSoleil),
             ),
           ),
