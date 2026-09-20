@@ -17,7 +17,8 @@ import 'package:logger/logger.dart';
 ///
 /// Exemples invalides (retournent null) :
 /// - `https://kilimandjaro.app/duel/ABC123`
-/// - `kilimandjaro://join?m=ABC&s=secret` (QR flow — scheme différent)
+/// - `kilimandjaro://join?m=ABC&s=secret` (QR de duel — voir
+///   [parseDeepLinkJoin], qui porte en plus le secret)
 /// - `kilimandjaro://duel/` (matchId vide)
 String? parseDeepLinkMatchId(Uri uri) {
   if (uri.scheme != 'kilimandjaro') return null;
@@ -27,6 +28,31 @@ String? parseDeepLinkMatchId(Uri uri) {
   final matchId = segments.first.trim();
   if (matchId.isEmpty) return null;
   return matchId;
+}
+
+/// Extrait `(matchId, secret)` depuis le payload d'un QR de duel
+/// `kilimandjaro://join?m=<matchId>&s=<secret>`.
+///
+/// C'est la valeur encodée par `DuelSession.toQrPayload()`. Le scanner
+/// in-app la lit via `DuelSession.parseQrPayload`, mais le même QR peut
+/// être scanné par l'appareil photo du téléphone : iOS/Android ouvrent
+/// alors l'URL comme un deep link, et c'est ce parseur qui la reçoit.
+///
+/// Retourne null si l'URI ne correspond pas au schéma attendu.
+///
+/// Exemples valides :
+/// - `kilimandjaro://join?m=ABC123&s=deadbeef` → `('ABC123', 'deadbeef')`
+///
+/// Exemples invalides (retournent null) :
+/// - `kilimandjaro://join?m=ABC123` (secret manquant)
+/// - `kilimandjaro://duel/ABC123` (autre schéma)
+({String matchId, String secret})? parseDeepLinkJoin(Uri uri) {
+  if (uri.scheme != 'kilimandjaro') return null;
+  if (uri.host != 'join') return null;
+  final matchId = uri.queryParameters['m']?.trim() ?? '';
+  final secret = uri.queryParameters['s']?.trim() ?? '';
+  if (matchId.isEmpty || secret.isEmpty) return null;
+  return (matchId: matchId, secret: secret);
 }
 
 /// Extrait l'uid depuis une URI deep link `kilimandjaro://friend/<uid>`.
@@ -50,8 +76,13 @@ String? parseDeepLinkFriendUid(Uri uri) {
   return uid;
 }
 
-/// Service singleton qui écoute les URL scheme `kilimandjaro://duel/<matchId>`
-/// et navigue vers `/duel/join/<matchId>`.
+/// Service singleton qui écoute les URL scheme `kilimandjaro://…` et navigue
+/// vers la route correspondante.
+///
+/// Schémas pris en charge :
+/// - `kilimandjaro://duel/<matchId>` → `/duel/join/<matchId>`
+/// - `kilimandjaro://join?m=…&s=…` (QR de duel) → idem, secret en query
+/// - `kilimandjaro://friend/<uid>` → `/friend/add/<uid>`
 ///
 /// La vue DuelDeepLinkView gère ensuite le join Firebase asynchrone et
 /// l'affichage de l'état de chargement / erreur.
@@ -104,6 +135,17 @@ class DeepLinkService {
     final context = navigatorKey.currentContext;
     if (context == null) {
       _log.w('DeepLink: contexte navigator null pour $uri');
+      return;
+    }
+
+    // `kilimandjaro://join?m=<matchId>&s=<secret>` → QR de duel scanné
+    // hors de l'app (appareil photo). Le secret est transmis pour rester
+    // sur le flux vérifié côté serveur.
+    final join = parseDeepLinkJoin(uri);
+    if (join != null) {
+      GoRouter.of(context).go(
+        AppRoutes.duelJoinPath(join.matchId, secret: join.secret),
+      );
       return;
     }
 

@@ -96,7 +96,16 @@ abstract final class AppRoutes {
   static const duelJoin = '/duel/join/:matchId';
 
   /// Construit le path de navigation vers un match via deep link.
-  static String duelJoinPath(String matchId) => '/duel/join/$matchId';
+  ///
+  /// [secret] n'est fourni que par le QR de duel
+  /// (`kilimandjaro://join?m=…&s=…`) : il est alors passé en query `?s=` et
+  /// vérifié côté serveur par la Cloud Function `joinDuel`. Les autres flux
+  /// (deep link `duel/<id>`, saisie du code à 6 caractères) rejoignent sans
+  /// secret, ce que la CF accepte explicitement.
+  static String duelJoinPath(String matchId, {String secret = ''}) =>
+      secret.isEmpty
+          ? '/duel/join/$matchId'
+          : '/duel/join/$matchId?s=${Uri.encodeQueryComponent(secret)}';
 
   // Leaderboard & amis (PR #4).
   static const leaderboard = '/leaderboard';
@@ -162,6 +171,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final segments = uri.pathSegments;
           if (segments.isNotEmpty && segments.first.isNotEmpty) {
             return AppRoutes.duelJoinPath(segments.first);
+          }
+        } else if (uri.host == 'join') {
+          // QR de duel ouvert par l'appareil photo du téléphone.
+          final matchId = uri.queryParameters['m']?.trim() ?? '';
+          final secret = uri.queryParameters['s']?.trim() ?? '';
+          if (matchId.isNotEmpty && secret.isNotEmpty) {
+            return AppRoutes.duelJoinPath(matchId, secret: secret);
           }
         } else if (uri.host == 'friend') {
           final segments = uri.pathSegments;
@@ -344,7 +360,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return const LobbyView();
       },
     ),
-    // PR #3 — Deep link : `kilimandjaro://duel/<matchId>`.
+    // PR #3 — Deep link : `kilimandjaro://duel/<matchId>`, et QR de duel
+    // `kilimandjaro://join?m=…&s=…` (secret repris en query `?s=`).
     // [DuelDeepLinkView] gère le join asynchrone puis redirige vers
     // [DuelPlayView] ou affiche un message d'erreur.
     GoRoute(
@@ -352,6 +369,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       name: 'duel-join',
       builder: (_, state) => DuelDeepLinkView(
         matchId: state.pathParameters['matchId']!,
+        secret: state.uri.queryParameters['s'] ?? '',
       ),
     ),
     // -------------------------------------------------------------------------

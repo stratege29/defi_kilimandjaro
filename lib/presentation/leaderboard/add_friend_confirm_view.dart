@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/friends_repository.dart';
@@ -43,7 +44,7 @@ class _AddFriendConfirmViewState extends ConsumerState<AddFriendConfirmView> {
         leading: IconButton(
           icon: const Icon(Icons.close, size: 22),
           color: AppColors.orSoleil,
-          onPressed: () => context.pop(),
+          onPressed: () => context.canPop() ? context.pop() : context.go(AppRoutes.hub),
         ),
         title: Text(
           'friends.confirm_title'.tr(),
@@ -96,7 +97,11 @@ class _AddFriendConfirmViewState extends ConsumerState<AddFriendConfirmView> {
           backgroundColor: AppColors.vertClair,
         ),
       );
-      context.pop();
+      if (context.canPop()) {
+        context.pop();
+      } else {
+        context.go(AppRoutes.hub);
+      }
     } on Exception catch (e) {
       if (!context.mounted) return;
       setState(() => _submitting = false);
@@ -185,7 +190,7 @@ class _ConfirmBody extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: submitting ? null : () => context.pop(),
+                    onPressed: submitting ? null : () => context.canPop() ? context.pop() : context.go(AppRoutes.hub),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.bois),
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -251,7 +256,7 @@ class _ErrorBody extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => context.pop(),
+              onPressed: () => context.canPop() ? context.pop() : context.go(AppRoutes.hub),
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.bois),
               child: Text('common.back'.tr(), style: AppTypography.bebas()),
             ),

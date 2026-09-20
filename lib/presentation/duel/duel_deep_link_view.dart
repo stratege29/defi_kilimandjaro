@@ -7,7 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Écran de transition affiché quand l'app s'ouvre depuis un deep link
-/// `kilimandjaro://duel/<matchId>`.
+/// `kilimandjaro://duel/<matchId>` ou depuis un QR de duel
+/// `kilimandjaro://join?m=<matchId>&s=<secret>` scanné hors de l'app.
 ///
 /// Étapes :
 /// 1. Attend que Firebase Auth ait un utilisateur (cold start).
@@ -15,9 +16,17 @@ import 'package:go_router/go_router.dart';
 /// 3. Si succès → navigue vers [AppRoutes.duelPlay].
 /// 4. Si erreur → affiche un message et propose de retourner au hub.
 class DuelDeepLinkView extends ConsumerStatefulWidget {
-  const DuelDeepLinkView({required this.matchId, super.key});
+  const DuelDeepLinkView({
+    required this.matchId,
+    this.secret = '',
+    super.key,
+  });
 
   final String matchId;
+
+  /// Secret du QR, vide pour les autres flux (deep link `duel/<id>`).
+  /// Vérifié côté serveur seulement lorsqu'il est fourni.
+  final String secret;
 
   @override
   ConsumerState<DuelDeepLinkView> createState() => _DuelDeepLinkViewState();
@@ -53,7 +62,7 @@ class _DuelDeepLinkViewState extends ConsumerState<DuelDeepLinkView> {
     try {
       final session = await ref
           .read(duelRepositoryProvider)
-          .joinOpen(widget.matchId);
+          .joinOpen(widget.matchId, secret: widget.secret);
       if (!mounted) return;
       context.go(AppRoutes.duelPlay, extra: session);
     } on Exception catch (e) {
@@ -75,6 +84,9 @@ class _DuelDeepLinkViewState extends ConsumerState<DuelDeepLinkView> {
     }
     if (rawMessage.contains('auth_timeout')) {
       return 'Connexion trop lente. Réessaie.';
+    }
+    if (rawMessage.contains('Secret invalide')) {
+      return "Ce QR n'est plus valide.";
     }
     return 'Impossible de rejoindre le défi.';
   }

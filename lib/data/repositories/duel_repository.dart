@@ -179,13 +179,18 @@ class DuelRepository {
     });
   }
 
-  /// Rejoint un match ouvert (deep link / share) sans verification de secret.
+  /// Rejoint un match ouvert (deep link / share).
+  ///
+  /// [secret] n'est fourni que par le QR de duel ouvert hors de l'app
+  /// (`kilimandjaro://join?m=…&s=…`) ; la Cloud Function ne le verifie que
+  /// s'il est present, les autres flux rejoignent sur le seul matchId.
   ///
   /// Anti-cheat (C1) : delegue a la Cloud Function joinDuel (Admin SDK).
-  Future<DuelSession> joinOpen(String matchId) async {
+  Future<DuelSession> joinOpen(String matchId, {String secret = ''}) async {
     final callable = _fn('joinDuel');
     final result = await callable.call<Map<Object?, Object?>>(<String, dynamic>{
       'matchId': matchId,
+      if (secret.isNotEmpty) 'secret': secret,
       'protocol_version': kDuelProtocolVersion,
     });
     final data = result.data.cast<String, dynamic>();
