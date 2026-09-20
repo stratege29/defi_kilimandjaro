@@ -97,7 +97,24 @@ abstract final class AnalyticsKeys {
   static const String abandonReasonQuitAfterFailure = 'quit_after_failure';
   static const String abandonReasonSkipFree = 'skip_free';
 
+  /// Convention **unique** pour les booléens envoyés à GA4 : un flag part
+  /// toujours en `int` 0/1, jamais en `bool`.
+  ///
+  /// `firebase_analytics` n'accepte que `String` et `num` dans la map
+  /// `parameters` de `logEvent` (assertion du plugin) : un `bool` fait
+  /// échouer l'event entier — silencieusement ici, puisque le wrapper
+  /// `_safe` de [FirebaseAnalyticsService] avale l'exception. Aucun
+  /// paramètre de ce fichier ne doit donc être un `bool`
+  /// (cf. le test générique `analytics_service_test.dart`).
+  ///
+  /// `int` plutôt que `'true'`/`'false'` : la valeur reste lisible en
+  /// dimension personnalisée (0 / 1) *et* exploitable en métrique, où la
+  /// moyenne du flag donne directement le taux (part de défis du jour, part
+  /// de voie exposée, part d'indices gratuits…).
+  static int flag({required bool value}) => value ? 1 : 0;
+
   /// Mapping de la variante A/B vers la valeur de user property GA4.
+  /// (User property, pas paramètre d'event : GA4 les veut en `String`.)
   static String sinkVariantValue({required bool enabled}) =>
       enabled ? 'on' : 'off';
 
@@ -119,9 +136,9 @@ abstract final class AnalyticsKeys {
         'hints_used': hintsUsed,
         'time_left': timeLeft,
         'stars': stars,
-        'is_daily': isDaily,
+        'is_daily': flag(value: isDaily),
         'kind': kind,
-        'exposed': exposed,
+        'exposed': flag(value: exposed),
         if (levelIndex != null) 'level_index': levelIndex,
         if (mountainId != null) 'mountain_id': mountainId,
       };
@@ -135,7 +152,7 @@ abstract final class AnalyticsKeys {
       <String, Object>{
         'tier': tier,
         'cost': cost,
-        'free': free,
+        'free': flag(value: free),
         if (levelIndex != null) 'level_index': levelIndex,
       };
 
@@ -163,9 +180,9 @@ abstract final class AnalyticsKeys {
         'time_left': timeLeft,
         'hints_used': hintsUsed,
         'fails_on_level': failsOnLevel,
-        'is_daily': isDaily,
+        'is_daily': flag(value: isDaily),
         'kind': kind,
-        'exposed': exposed,
+        'exposed': flag(value: exposed),
         if (levelIndex != null) 'level_index': levelIndex,
         if (mountainId != null) 'mountain_id': mountainId,
       };
