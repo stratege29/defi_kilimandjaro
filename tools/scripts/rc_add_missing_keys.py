@@ -26,6 +26,7 @@ le template entre-temps.
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import pathlib
 import sys
@@ -55,6 +56,9 @@ def _request(creds, url: str, method: str = "GET", body: dict | None = None,
     headers = {
         "Authorization": f"Bearer {creds.token}",
         "Content-Type": "application/json; UTF-8",
+        # L'API ne renvoie l'en-tête ETag (obligatoire pour publier) que si le
+        # client accepte gzip.
+        "Accept-Encoding": "gzip",
     }
     # Identifiants utilisateur (ADC) : l'API exige un projet de quota explicite.
     if quota_project:
@@ -64,7 +68,10 @@ def _request(creds, url: str, method: str = "GET", body: dict | None = None,
     req = urllib.request.Request(url, data=data, method=method, headers=headers)
     try:
         with urllib.request.urlopen(req) as resp:
-            return resp.headers.get("ETag"), json.load(resp)
+            raw = resp.read()
+            if resp.headers.get("Content-Encoding") == "gzip":
+                raw = gzip.decompress(raw)
+            return resp.headers.get("ETag"), json.loads(raw.decode("utf-8"))
     except urllib.error.HTTPError as err:
         detail = err.read().decode(errors="replace")[:600]
         sys.exit(f"HTTP {err.code} sur {method} {url}\n{detail}")
@@ -84,6 +91,8 @@ def main() -> None:
     creds = _credentials()
     url = API.format(project=args.project)
     etag, remote = _request(creds, url, quota_project=args.project)
+    if not etag:
+        sys.exit("ETag absent de la réponse : publication impossible sans If-Match.")
     remote_params: dict = remote.setdefault("parameters", {})
 
     missing = sorted(k for k in wanted if k in local_params and k not in remote_params)
