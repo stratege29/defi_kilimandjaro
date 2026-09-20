@@ -140,6 +140,19 @@ class RemoteConfigService {
         rc.getInt(RemoteConfigKeys.freehandMinLength),
         d.freehandMinLength,
       ),
+      comboMinStreak: _safePositiveInt(
+        rc.getInt(RemoteConfigKeys.comboMinStreak),
+        d.comboMinStreak,
+      ),
+      // Un multiplicateur < 1 pénaliserait la série : traité comme invalide.
+      comboMultiplier: _safeAtLeastOneDouble(
+        rc.getDouble(RemoteConfigKeys.comboMultiplier),
+        d.comboMultiplier,
+      ),
+      perfectBonus: _safeNonNegativeInt(
+        rc.getInt(RemoteConfigKeys.perfectBonus),
+        d.perfectBonus,
+      ),
       rewardedVideoBonus: _safePositiveInt(
         rc.getInt(RemoteConfigKeys.rewardedVideoBonus),
         d.rewardedVideoBonus,
@@ -193,6 +206,9 @@ class RemoteConfigService {
         RemoteConfigKeys.freehandBonusBase: d.freehandBonusBase,
         RemoteConfigKeys.freehandBonusPerLetter: d.freehandBonusPerLetter,
         RemoteConfigKeys.freehandMinLength: d.freehandMinLength,
+        RemoteConfigKeys.comboMinStreak: d.comboMinStreak,
+        RemoteConfigKeys.comboMultiplier: d.comboMultiplier,
+        RemoteConfigKeys.perfectBonus: d.perfectBonus,
         RemoteConfigKeys.rewardedVideoBonus: d.rewardedVideoBonus,
         RemoteConfigKeys.rewardedDoubleEnabled: d.rewardedDoubleEnabled,
         RemoteConfigKeys.rewardedDailyCap: d.rewardedDailyCap,
@@ -220,6 +236,11 @@ class RemoteConfigService {
 
   static double _safePositiveDouble(double value, double fallback) =>
       value > 0 ? value : fallback;
+
+  /// Sous 1.0 (ou NaN) → [fallback] : un multiplicateur ne doit jamais
+  /// réduire la récompense.
+  static double _safeAtLeastOneDouble(double value, double fallback) =>
+      value >= 1 ? value : fallback;
 
   static List<int> _parseCsvInts(String csv, List<int> fallback) {
     if (csv.trim().isEmpty) return fallback;

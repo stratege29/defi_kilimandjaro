@@ -46,6 +46,21 @@
       "valueType": "NUMBER",
       "description": "Longueur mini du mot pour que le bonus 'A main levee' soit eligible."
     },
+    "eco_combo_min_streak": {
+      "defaultValue": { "value": "3" },
+      "valueType": "NUMBER",
+      "description": "Serie intra-session (victoires consecutives Sommets, courante incluse, non persistee) a partir de laquelle eco_combo_multiplier s'applique aux cauris de victoire. Exige aussi 'sans indice' sur le niveau."
+    },
+    "eco_combo_multiplier": {
+      "defaultValue": { "value": "1.5" },
+      "valueType": "NUMBER",
+      "description": "Multiplicateur des cauris de victoire quand la serie atteint eco_combo_min_streak sans indice. 1.0 = off ; < 1 ignore (fallback)."
+    },
+    "eco_perfect_bonus": {
+      "defaultValue": { "value": "10" },
+      "valueType": "NUMBER",
+      "description": "Bonus 'Sans faute' ajoute a la victoire quand aucun mot errone n'a ete forme sur le niveau. 0 = off."
+    },
     "eco_rewarded_video_bonus": {
       "defaultValue": { "value": "50" },
       "valueType": "NUMBER",

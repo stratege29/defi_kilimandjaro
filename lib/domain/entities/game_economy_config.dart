@@ -21,6 +21,9 @@ class GameEconomyConfig extends Equatable {
     required this.freehandBonusBase,
     required this.freehandBonusPerLetter,
     required this.freehandMinLength,
+    required this.comboMinStreak,
+    required this.comboMultiplier,
+    required this.perfectBonus,
     required this.rewardedVideoBonus,
     required this.rewardedDoubleEnabled,
     required this.rewardedDailyCap,
@@ -80,6 +83,21 @@ class GameEconomyConfig extends Equatable {
   /// En dessous, un tracé ne peut géométriquement pas se croiser → bonus
   /// trivial, donc neutralisé.
   final int freehandMinLength;
+
+  /// Longueur de série intra-session (victoires consécutives sur les niveaux
+  /// Sommets, cf. `soloComboProvider`) à partir de laquelle le multiplicateur
+  /// [comboMultiplier] s'applique aux cauris de victoire. La série est comptée
+  /// **victoire courante incluse** : avec 3, la 3e victoire d'affilée est la
+  /// première bonifiée. Condition supplémentaire : aucun indice sur le niveau.
+  final int comboMinStreak;
+
+  /// Multiplicateur appliqué aux cauris de victoire (base + vitesse, après
+  /// tier) quand la série atteint [comboMinStreak] sans indice. 1.0 = off.
+  final double comboMultiplier;
+
+  /// Bonus « Sans faute » crédité en plus quand le joueur n'a formé aucun mot
+  /// erroné sur le niveau (`GameState.wrongAttempts == 0`). 0 = off.
+  final int perfectBonus;
 
   /// Cauris crédités après une rewarded video terminée.
   final int rewardedVideoBonus;
@@ -146,6 +164,9 @@ class GameEconomyConfig extends Equatable {
     freehandBonusBase: 15,
     freehandBonusPerLetter: 3,
     freehandMinLength: 4,
+    comboMinStreak: 3,
+    comboMultiplier: 1.5,
+    perfectBonus: 10,
     rewardedVideoBonus: 50,
     rewardedDoubleEnabled: true,
     rewardedDailyCap: 5,
@@ -196,6 +217,12 @@ class GameEconomyConfig extends Equatable {
         (wordLength - freehandMinLength) * freehandBonusPerLetter;
   }
 
+  /// Vrai quand une série de [streak] victoires consécutives (courante
+  /// incluse) ouvre droit au multiplicateur [comboMultiplier]. Une série
+  /// bonifiée exige aussi « sans indice », vérifié par l'appelant.
+  bool comboApplies(int streak) =>
+      comboMultiplier > 1 && comboMinStreak > 0 && streak >= comboMinStreak;
+
   /// Récompense streak pour un compteur donné (1-indexé : `streakDay = 1` →
   /// `streakRewards[0]`). Au-delà de la liste, retourne la dernière valeur
   /// (palier asymptotique).
@@ -217,6 +244,9 @@ class GameEconomyConfig extends Equatable {
     int? freehandBonusBase,
     int? freehandBonusPerLetter,
     int? freehandMinLength,
+    int? comboMinStreak,
+    double? comboMultiplier,
+    int? perfectBonus,
     int? rewardedVideoBonus,
     bool? rewardedDoubleEnabled,
     int? rewardedDailyCap,
@@ -241,6 +271,9 @@ class GameEconomyConfig extends Equatable {
       freehandBonusPerLetter:
           freehandBonusPerLetter ?? this.freehandBonusPerLetter,
       freehandMinLength: freehandMinLength ?? this.freehandMinLength,
+      comboMinStreak: comboMinStreak ?? this.comboMinStreak,
+      comboMultiplier: comboMultiplier ?? this.comboMultiplier,
+      perfectBonus: perfectBonus ?? this.perfectBonus,
       rewardedVideoBonus: rewardedVideoBonus ?? this.rewardedVideoBonus,
       rewardedDoubleEnabled:
           rewardedDoubleEnabled ?? this.rewardedDoubleEnabled,
@@ -271,6 +304,9 @@ class GameEconomyConfig extends Equatable {
         freehandBonusBase,
         freehandBonusPerLetter,
         freehandMinLength,
+        comboMinStreak,
+        comboMultiplier,
+        perfectBonus,
         rewardedVideoBonus,
         rewardedDoubleEnabled,
         rewardedDailyCap,
@@ -300,6 +336,9 @@ abstract class RemoteConfigKeys {
   static const String freehandBonusBase = 'eco_freehand_bonus_base';
   static const String freehandBonusPerLetter = 'eco_freehand_bonus_per_letter';
   static const String freehandMinLength = 'eco_freehand_min_length';
+  static const String comboMinStreak = 'eco_combo_min_streak';
+  static const String comboMultiplier = 'eco_combo_multiplier';
+  static const String perfectBonus = 'eco_perfect_bonus';
   static const String rewardedVideoBonus = 'eco_rewarded_video_bonus';
   static const String rewardedDoubleEnabled = 'eco_rewarded_double_enabled';
   static const String rewardedDailyCap = 'eco_rewarded_daily_cap';
