@@ -20,7 +20,9 @@ abstract interface class AnalyticsService {
   /// Pose la variante A/B du scaling des sinks comme user property GA4.
   Future<void> setSinkScalingVariant({required bool enabled});
 
-  /// Victoire d'un niveau (standard ou défi du jour).
+  /// Victoire d'un niveau (standard ou défi du jour). `kind` = nom du
+  /// `LevelKind` (classic / rafale / duo / blindBoss), `exposed` = voie
+  /// exposée choisie à l'embranchement du niveau 3.
   Future<void> logLevelWon({
     required int tier,
     required int caurisAwarded,
@@ -28,6 +30,8 @@ abstract interface class AnalyticsService {
     required int timeLeft,
     required int stars,
     required bool isDaily,
+    required String kind,
+    required bool exposed,
     int? levelIndex,
     String? mountainId,
   });
@@ -42,6 +46,23 @@ abstract interface class AnalyticsService {
 
   /// Révélation payante de la réponse à l'écran d'échec (T2+).
   Future<void> logAnswerRevealed({required int tier, required int cost});
+
+  /// Abandon d'un niveau sans victoire. Sert à mesurer la lassitude par
+  /// numéro de niveau et par tier (taux = abandons / (abandons + victoires)
+  /// à `level_index` et `tier` égaux). `reason` est l'une des constantes
+  /// `AnalyticsKeys.abandonReason*`. `kind` / `exposed` : cf. [logLevelWon].
+  Future<void> logLevelAbandoned({
+    required int tier,
+    required String reason,
+    required int timeLeft,
+    required int hintsUsed,
+    required int failsOnLevel,
+    required bool isDaily,
+    required String kind,
+    required bool exposed,
+    int? levelIndex,
+    String? mountainId,
+  });
 
   /// Achat IAP validé — event ecommerce `purchase` (revenu → ARPDAU GA4).
   Future<void> logIapPurchase({
@@ -61,7 +82,20 @@ abstract final class AnalyticsKeys {
   static const String levelWon = 'level_won';
   static const String hintUsed = 'hint_used';
   static const String answerRevealed = 'answer_revealed';
+  static const String levelAbandoned = 'level_abandoned';
   static const String purchase = 'purchase';
+
+  /// Raisons d'abandon d'un niveau (paramètre `reason` de
+  /// [levelAbandoned]).
+  ///
+  /// - [abandonReasonQuit] : bouton retour confirmé pendant la partie.
+  /// - [abandonReasonQuitAfterFailure] : sortie après un échec (timer ou
+  ///   mot faux) sans réessayer.
+  /// - [abandonReasonSkipFree] : « Passer (gratuit) » de l'écran d'échec
+  ///   après plusieurs défaites consécutives.
+  static const String abandonReasonQuit = 'quit';
+  static const String abandonReasonQuitAfterFailure = 'quit_after_failure';
+  static const String abandonReasonSkipFree = 'skip_free';
 
   /// Mapping de la variante A/B vers la valeur de user property GA4.
   static String sinkVariantValue({required bool enabled}) =>
@@ -74,6 +108,8 @@ abstract final class AnalyticsKeys {
     required int timeLeft,
     required int stars,
     required bool isDaily,
+    required String kind,
+    required bool exposed,
     int? levelIndex,
     String? mountainId,
   }) =>
@@ -84,6 +120,8 @@ abstract final class AnalyticsKeys {
         'time_left': timeLeft,
         'stars': stars,
         'is_daily': isDaily,
+        'kind': kind,
+        'exposed': exposed,
         if (levelIndex != null) 'level_index': levelIndex,
         if (mountainId != null) 'mountain_id': mountainId,
       };
@@ -106,6 +144,31 @@ abstract final class AnalyticsKeys {
     required int cost,
   }) =>
       <String, Object>{'tier': tier, 'cost': cost};
+
+  static Map<String, Object> levelAbandonedParams({
+    required int tier,
+    required String reason,
+    required int timeLeft,
+    required int hintsUsed,
+    required int failsOnLevel,
+    required bool isDaily,
+    required String kind,
+    required bool exposed,
+    int? levelIndex,
+    String? mountainId,
+  }) =>
+      <String, Object>{
+        'tier': tier,
+        'reason': reason,
+        'time_left': timeLeft,
+        'hints_used': hintsUsed,
+        'fails_on_level': failsOnLevel,
+        'is_daily': isDaily,
+        'kind': kind,
+        'exposed': exposed,
+        if (levelIndex != null) 'level_index': levelIndex,
+        if (mountainId != null) 'mountain_id': mountainId,
+      };
 
   static Map<String, Object> purchaseParams({
     required String productId,
@@ -155,6 +218,8 @@ class FirebaseAnalyticsService implements AnalyticsService {
     required int timeLeft,
     required int stars,
     required bool isDaily,
+    required String kind,
+    required bool exposed,
     int? levelIndex,
     String? mountainId,
   }) =>
@@ -169,6 +234,8 @@ class FirebaseAnalyticsService implements AnalyticsService {
             timeLeft: timeLeft,
             stars: stars,
             isDaily: isDaily,
+            kind: kind,
+            exposed: exposed,
             levelIndex: levelIndex,
             mountainId: mountainId,
           ),
@@ -202,6 +269,38 @@ class FirebaseAnalyticsService implements AnalyticsService {
         () => _analytics.logEvent(
           name: AnalyticsKeys.answerRevealed,
           parameters: AnalyticsKeys.answerRevealedParams(tier: tier, cost: cost),
+        ),
+      );
+
+  @override
+  Future<void> logLevelAbandoned({
+    required int tier,
+    required String reason,
+    required int timeLeft,
+    required int hintsUsed,
+    required int failsOnLevel,
+    required bool isDaily,
+    required String kind,
+    required bool exposed,
+    int? levelIndex,
+    String? mountainId,
+  }) =>
+      _safe(
+        'logLevelAbandoned',
+        () => _analytics.logEvent(
+          name: AnalyticsKeys.levelAbandoned,
+          parameters: AnalyticsKeys.levelAbandonedParams(
+            tier: tier,
+            reason: reason,
+            timeLeft: timeLeft,
+            hintsUsed: hintsUsed,
+            failsOnLevel: failsOnLevel,
+            isDaily: isDaily,
+            kind: kind,
+            exposed: exposed,
+            levelIndex: levelIndex,
+            mountainId: mountainId,
+          ),
         ),
       );
 
@@ -243,6 +342,8 @@ class NoopAnalyticsService implements AnalyticsService {
     required int timeLeft,
     required int stars,
     required bool isDaily,
+    required String kind,
+    required bool exposed,
     int? levelIndex,
     String? mountainId,
   }) async {}
@@ -257,6 +358,20 @@ class NoopAnalyticsService implements AnalyticsService {
 
   @override
   Future<void> logAnswerRevealed({required int tier, required int cost}) async {}
+
+  @override
+  Future<void> logLevelAbandoned({
+    required int tier,
+    required String reason,
+    required int timeLeft,
+    required int hintsUsed,
+    required int failsOnLevel,
+    required bool isDaily,
+    required String kind,
+    required bool exposed,
+    int? levelIndex,
+    String? mountainId,
+  }) async {}
 
   @override
   Future<void> logIapPurchase({

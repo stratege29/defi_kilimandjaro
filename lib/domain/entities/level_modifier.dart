@@ -5,17 +5,20 @@
 /// l'environnement (vent en altitude, brouillard, lave volcanique, …)
 /// ou cognitive (mot à l'envers). Les modifiers sont attribués
 /// algorithmiquement par `LevelDifficultyResolver` selon
-/// `(mountain, levelIndex)`.
+/// `(mountain, levelIndex)`, avec une rotation niveau par niveau : deux
+/// niveaux consécutifs d'un même sommet n'ont jamais le même modifier
+/// « actif ».
 ///
-/// L'implémentation visuelle/runtime des effets est progressive :
-/// - **S1 (cette PR)** : `reverse` (validation inversée) et `thinAir`
-///   (timer accéléré) sont les seuls effectifs.
-/// - **S3** : implémentation des effets visuels des autres modifiers
-///   (lettres qui bougent, brouillard, etc.) via plugins
-///   `LevelModifierEffect` dans `presentation/game/modifiers/`.
+/// Périmètre effectivement émis par le résolveur — les seules valeurs qu'un
+/// niveau peut recevoir aujourd'hui :
+/// - `reverse`, `thinAir`, `wind`, `earthquake`, `fog`, `shuffle`, `mirage`,
+///   `rain`, `spirit` : runtime implémenté (`GameController` + effets
+///   visuels de la grille).
 ///
-/// Les autres valeurs de l'enum sont déjà déclarées pour que la chaîne
-/// de typage (resolver → config → controller) soit complète dès S1.
+/// Les autres valeurs de l'enum (`lava`, `ice`, `calabash`, `drumbeat`,
+/// `rockslide`, `chameleon`, `drySeason`, `pantherTrail`, `caveEcho`) sont
+/// déclarées pour compléter la chaîne de typage mais **ne sont jamais
+/// attribuées** par le résolveur tant qu'elles n'ont pas de runtime.
 enum LevelModifier {
   /// Le joueur doit former le mot à l'envers (FOUTOU → UOTUOF).
   /// Indiqué par un badge explicite dans l'UI.

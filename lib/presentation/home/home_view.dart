@@ -8,11 +8,11 @@ import 'package:defi_kilimandjaro/data/repositories/composite_daily_challenge_re
 import 'package:defi_kilimandjaro/data/repositories/pack_notification_repository.dart';
 import 'package:defi_kilimandjaro/data/repositories/player_progress_repository.dart';
 import 'package:defi_kilimandjaro/data/services/daily_streak_service.dart';
-import 'package:defi_kilimandjaro/data/services/devinette_selection_service_impl.dart';
 import 'package:defi_kilimandjaro/domain/entities/mountain.dart';
 import 'package:defi_kilimandjaro/domain/entities/pack.dart';
 import 'package:defi_kilimandjaro/presentation/auth/link_account_prompt.dart';
 import 'package:defi_kilimandjaro/presentation/game/game_args.dart';
+import 'package:defi_kilimandjaro/presentation/game/level_launcher.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/continue_ascent_card.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/daily_streak_dialog.dart';
 import 'package:defi_kilimandjaro/presentation/home/widgets/grimper_cta.dart';
@@ -167,56 +167,23 @@ class _HomeViewState extends ConsumerState<HomeView> {
   }
 }
 
-/// Lance le niveau suivant d'un sommet : résout config + devinette,
-/// enregistre l'id pour anti-répétition et navigue vers `/game`.
+/// Lance le niveau suivant d'un sommet (`completedLevels + 1`) via le
+/// helper commun `launchMountainLevel` (config, embranchement « voie
+/// exposée », tirage selon la structure du niveau, navigation).
 ///
 /// Helper public partagé entre la carte HERO et le bouton GRIMPER du
-/// sticky CTA. Conservé ici (hors widget) pour rester à la frontière
-/// présentation/data sans dépendance circulaire.
+/// sticky CTA.
 Future<void> launchNextLevel(
   BuildContext context,
   WidgetRef ref,
   Mountain mountain,
 ) async {
-  final levelNumber = mountain.completedLevels + 1;
-  try {
-    final selectionService = ref.read(devinetteSelectionServiceProvider);
-    final progress = ref.read(playerProgressProvider);
-    final config = LevelDifficultyResolver.resolve(
-      mountain: mountain,
-      levelIndex: levelNumber,
-    );
-    final devinette = await selectionService.nextDevinette(
-      mix: progress.activePackMix,
-      targetDifficulty: config.difficultyTier,
-      wordLengthBucket: config.wordLengthBucket,
-      excludeIds: progress.recentDevinetteIds.toSet(),
-      fallbackPackIds: progress.ownedPacks,
-    );
-    await ref
-        .read(playerProgressProvider.notifier)
-        .recordRecentDevinette(devinette.id);
-    if (!context.mounted) return;
-    await context.push<void>(
-      AppRoutes.game,
-      extra: GameArgs(
-        devinette: devinette,
-        mountainId: mountain.id,
-        levelIndex: levelNumber,
-        config: config,
-      ),
-    );
-  } on Object catch (_) {
-    // `on Object` (pas `on Exception`) : un tirage épuisé lève un
-    // `StateError`, qui étend `Error` et n'est PAS une `Exception`.
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Erreur de chargement', style: AppTypography.bebas()),
-        backgroundColor: AppColors.rouge,
-      ),
-    );
-  }
+  await launchMountainLevel(
+    context,
+    ref,
+    mountain: mountain,
+    levelIndex: mountain.completedLevels + 1,
+  );
 }
 
 /// Lance le Défi du jour : calibre une config Tier 3 via une montagne

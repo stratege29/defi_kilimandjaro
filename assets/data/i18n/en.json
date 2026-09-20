@@ -68,9 +68,35 @@
         "shuffle": {
           "name": "Reshuffle",
           "desc": "Letters change place periodically. Stay sharp."
+        },
+        "mirage": {
+          "name": "Mirage",
+          "desc": "An extra letter shimmers in the grid: it is not part of the word."
+        },
+        "rain": {
+          "name": "Rain",
+          "desc": "A shower blurs the letters for a second, at regular intervals."
+        },
+        "spirit": {
+          "name": "Spirit",
+          "desc": "A spirit borrows a letter for a few seconds, then gives it back."
         }
       }
-    }
+    },
+    "route_choice": {
+      "title": "Pick your route",
+      "subtitle": "Two paths lead to level 3. The choice holds for this attempt.",
+      "easy": "Easy route",
+      "exposed": "Exposed route",
+      "time": "{seconds} s",
+      "extra_letters": "{count} extra letters",
+      "cauris": "cauris ×{mult}"
+    },
+    "rafale_progress": "Word {current}/{total}",
+    "duo_found": "Found",
+    "blind_reread": "Read again",
+    "blind_reread_cost": "−{seconds} s",
+    "blind_hidden": "The riddle has faded"
   },
   "result": {
     "victory": {

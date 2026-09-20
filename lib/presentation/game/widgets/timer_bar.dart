@@ -53,9 +53,11 @@ class _TimerBarState extends State<TimerBar>
 
   @override
   Widget build(BuildContext context) {
+    // Borné à 1 : une rafale crédite du temps à chaque mot validé et peut
+    // dépasser la durée initiale du niveau.
     final progress = widget.totalTime == 0
         ? 0.0
-        : widget.timeLeft / widget.totalTime;
+        : (widget.timeLeft / widget.totalTime).clamp(0.0, 1.0);
     final barColor = _barColor();
     final isDanger = widget.timeLeft < 5;
 

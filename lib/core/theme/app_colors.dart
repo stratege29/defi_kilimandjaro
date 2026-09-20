@@ -94,6 +94,13 @@ abstract final class AppColors {
   /// Halo du sommet en cours (pulsation dorée). Alias de [orSoleil].
   static const Color haloCourant = orSoleil;
 
+  // --- Modificateurs de niveau (effets de grille) ---
+
+  /// Esprit — violet indigo lumineux : fantôme de la tuile empruntée par le
+  /// modifier `spirit` et son badge. Volontairement hors palette or/vert
+  /// pour se distinguer du fog (bleu) et de la sélection (or).
+  static const Color esprit = Color(0xFFA48BEA);
+
   // ============================================================
   // PALETTE 2026 — tokens sémantiques opaques (cible de migration).
   // ============================================================

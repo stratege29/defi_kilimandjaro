@@ -95,6 +95,54 @@ void main() {
     });
   });
 
+  group('série intra-session & sans faute — eco_combo_* / eco_perfect_bonus',
+      () {
+    const d = GameEconomyConfig.defaults;
+
+    test('défauts : seuil 3, ×1.5, sans faute +10', () {
+      expect(d.comboMinStreak, 3);
+      expect(d.comboMultiplier, 1.5);
+      expect(d.perfectBonus, 10);
+    });
+
+    test('comboApplies : vrai dès le seuil (victoire courante incluse)', () {
+      expect(d.comboApplies(0), isFalse);
+      expect(d.comboApplies(2), isFalse);
+      expect(d.comboApplies(3), isTrue);
+      expect(d.comboApplies(10), isTrue);
+    });
+
+    test('multiplicateur 1.0 = série désactivée quel que soit le seuil', () {
+      final c = d.copyWith(comboMultiplier: 1);
+      expect(c.comboApplies(3), isFalse);
+      expect(c.comboApplies(99), isFalse);
+    });
+
+    test('seuil 0 = série désactivée (garde-fou console)', () {
+      final c = d.copyWith(comboMinStreak: 0);
+      expect(c.comboApplies(1), isFalse);
+    });
+
+    test('copyWith respecte les overrides Remote Config', () {
+      final c = d.copyWith(
+        comboMinStreak: 5,
+        comboMultiplier: 2,
+        perfectBonus: 0,
+      );
+      expect(c.comboApplies(4), isFalse);
+      expect(c.comboApplies(5), isTrue);
+      expect(c.comboMultiplier, 2);
+      expect(c.perfectBonus, 0);
+      expect(c, isNot(equals(d)));
+    });
+
+    test('clés Remote Config littérales figées', () {
+      expect(RemoteConfigKeys.comboMinStreak, 'eco_combo_min_streak');
+      expect(RemoteConfigKeys.comboMultiplier, 'eco_combo_multiplier');
+      expect(RemoteConfigKeys.perfectBonus, 'eco_perfect_bonus');
+    });
+  });
+
   group('otaAutoSync — synchro OTA automatique', () {
     const d = GameEconomyConfig.defaults;
 
