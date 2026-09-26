@@ -77,7 +77,8 @@ final kiliRiveFileProvider = FutureProvider<rive.File?>((ref) async {
 /// repos, Kili jette de temps en temps un coup d'œil de côté.
 ///
 /// Replis, dans l'ordre :
-/// - animations désactivées par le système (accessibilité) → image fixe ;
+/// - animations désactivées par le système (accessibilité) → pose fixe
+///   dessinée correspondant à l'humeur ;
 /// - Rive en cours de chargement ou indisponible → rig pur Flutter à deux
 ///   calques (corps statique + tête qui pivote), identique à l'ancienne
 ///   version.
@@ -336,7 +337,14 @@ class _KiliMascotState extends ConsumerState<KiliMascot>
     final Widget content;
 
     if (MediaQuery.disableAnimationsOf(context)) {
-      content = Image.asset(AppAssets.kiliBody, fit: BoxFit.contain);
+      // Pose fixe dessinée qui correspond à l'humeur (même ratio que le rig).
+      final pose = switch (widget.mood) {
+        KiliMood.idle => AppAssets.kiliBody,
+        KiliMood.happy => AppAssets.kiliCheer,
+        KiliMood.sad => AppAssets.kiliSad,
+        KiliMood.sleep => AppAssets.kiliSleep,
+      };
+      content = Image.asset(pose, fit: BoxFit.contain);
     } else {
       final file = ref.watch(kiliRiveFileProvider).valueOrNull;
       final controller = file == null ? null : _ensureRive(file);

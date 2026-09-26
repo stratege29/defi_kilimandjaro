@@ -1,3 +1,4 @@
+import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/presentation/widgets/kili_mascot.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,6 +37,26 @@ void main() {
     await tester.pump();
 
     expect(find.byType(Image), findsOneWidget);
+  });
+
+  testWidgets("animations désactivées : la pose fixe suit l'humeur", (
+    tester,
+  ) async {
+    const expected = {
+      KiliMood.idle: AppAssets.kiliBody,
+      KiliMood.happy: AppAssets.kiliCheer,
+      KiliMood.sad: AppAssets.kiliSad,
+      KiliMood.sleep: AppAssets.kiliSleep,
+    };
+    for (final entry in expected.entries) {
+      await tester.pumpWidget(
+        _host(KiliMascot(mood: entry.key), disableAnimations: true),
+      );
+      await tester.pump();
+
+      final image = tester.widget<Image>(find.byType(Image));
+      expect((image.image as AssetImage).assetName, entry.value);
+    }
   });
 
   testWidgets('nod/cheer/tap sur le repli ne lèvent rien', (tester) async {
