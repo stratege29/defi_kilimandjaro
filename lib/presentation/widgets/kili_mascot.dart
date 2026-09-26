@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rive/rive.dart' as rive;
 
@@ -70,6 +73,8 @@ final kiliRiveFileProvider = FutureProvider<rive.File?>((ref) async {
 /// Rendu principal : rig **Rive** (`assets/kili/kili.riv`) — maillage déformé
 /// (queue en vague, poitrine qui respire), tête sur os, clignements, humeurs
 /// ([mood]) et one-shots ([KiliController.nod], [KiliController.cheer]).
+/// Le regard suit le doigt n'importe où à l'écran ([followFinger]) et, au
+/// repos, Kili jette de temps en temps un coup d'œil de côté.
 ///
 /// Replis, dans l'ordre :
 /// - animations désactivées par le système (accessibilité) → image fixe ;
@@ -86,6 +91,7 @@ class KiliMascot extends ConsumerStatefulWidget {
     this.size = 120,
     this.tapToNod = true,
     this.mood = KiliMood.idle,
+    this.followFinger = true,
   });
 
   /// Poignée externe pour déclencher nod/cheer. Optionnelle.
@@ -100,11 +106,15 @@ class KiliMascot extends ConsumerStatefulWidget {
   /// Boucle de fond jouée entre deux one-shots.
   final KiliMood mood;
 
+  /// Si vrai, les iris suivent le doigt (ou la souris) partout à l'écran.
+  final bool followFinger;
+
   @override
   ConsumerState<KiliMascot> createState() => _KiliMascotState();
 }
 
-class _KiliMascotState extends ConsumerState<KiliMascot> {
+class _KiliMascotState extends ConsumerState<KiliMascot>
+    with SingleTickerProviderStateMixin {
   // Ratio de `assets/kili/kili.png` (1024×757) : l'emprise de layout.
   static const double _aspect = 757 / 1024;
 
@@ -118,6 +128,29 @@ class _KiliMascotState extends ConsumerState<KiliMascot> {
   rive.ViewModelInstanceNumber? _moodProp;
   rive.ViewModelInstanceTrigger? _nodProp;
   rive.ViewModelInstanceTrigger? _cheerProp;
+  rive.ViewModelInstanceNumber? _lookXProp;
+  rive.ViewModelInstanceNumber? _lookYProp;
+
+  // --- Regard -------------------------------------------------------------
+  // Milieu des deux yeux dans l'emprise 1024×757 (yeux ~x158 et ~x392, y~180).
+  static const Offset _eyesAt = Offset(275 / 1024, 180 / 757);
+
+  /// Distance (px logiques) à partir de laquelle le regard est au maximum :
+  /// en deçà, l'iris ne dévie qu'en proportion — un doigt posé sur Kili ne
+  /// le fait pas loucher.
+  static const double _lookReach = 140;
+
+  /// Raideur du lissage exponentiel (1/s) : ~0,1 s pour rattraper le doigt.
+  static const double _lookStiffness = 14;
+
+  late final Ticker _lookTicker;
+  Offset _look = Offset.zero;
+  Offset _lookTarget = Offset.zero;
+  Duration _lastTick = Duration.zero;
+  bool _fingerDown = false;
+  bool _routeAdded = false;
+  Timer? _lookTimer;
+  final math.Random _rng = math.Random();
 
   /// Signal de hochement pour le rig de repli (incrémenté à chaque nod).
   final ValueNotifier<int> _fallbackNod = ValueNotifier<int>(0);
@@ -125,6 +158,7 @@ class _KiliMascotState extends ConsumerState<KiliMascot> {
   @override
   void initState() {
     super.initState();
+    _lookTicker = createTicker(_onLookTick);
     _attach(widget.controller);
   }
 
@@ -135,7 +169,94 @@ class _KiliMascotState extends ConsumerState<KiliMascot> {
       _detach(old.controller);
       _attach(widget.controller);
     }
-    if (old.mood != widget.mood) _moodProp?.value = widget.mood.index.toDouble();
+    if (old.mood != widget.mood) {
+      _moodProp?.value = widget.mood.index.toDouble();
+    }
+    if (old.followFinger != widget.followFinger) _syncPointerRoute();
+  }
+
+  /// (Dés)abonne ce widget du flux global des pointeurs : un doigt n'importe
+  /// où à l'écran — pas seulement sur Kili — oriente le regard.
+  void _syncPointerRoute() {
+    final want = widget.followFinger && _lookXProp != null;
+    if (want == _routeAdded) return;
+    final router = GestureBinding.instance.pointerRouter;
+    if (want) {
+      router.addGlobalRoute(_onPointer);
+      _scheduleGlance();
+    } else {
+      router.removeGlobalRoute(_onPointer);
+      _lookTimer?.cancel();
+    }
+    _routeAdded = want;
+  }
+
+  void _onPointer(PointerEvent e) {
+    if (!mounted) return;
+    if (e is PointerDownEvent ||
+        e is PointerMoveEvent ||
+        e is PointerHoverEvent) {
+      final box = context.findRenderObject();
+      if (box is! RenderBox || !box.attached || !box.hasSize) return;
+      final eyes = box.localToGlobal(
+        Offset(box.size.width * _eyesAt.dx, box.size.height * _eyesAt.dy),
+      );
+      final d = e.position - eyes;
+      final dist = d.distance;
+      if (dist < 1) return;
+      _fingerDown = e is! PointerHoverEvent;
+      _lookTimer?.cancel();
+      _setLookTarget(d / dist * math.min(dist / _lookReach, 1));
+    } else if (e is PointerUpEvent || e is PointerCancelEvent) {
+      _fingerDown = false;
+      // Kili garde les yeux une fraction de seconde là où était le doigt,
+      // puis revient face au joueur.
+      _lookTimer?.cancel();
+      _lookTimer = Timer(const Duration(milliseconds: 700), () {
+        _setLookTarget(Offset.zero);
+        _scheduleGlance();
+      });
+    }
+  }
+
+  /// Coups d'œil spontanés au repos : un regard de côté toutes les 3 à 7 s,
+  /// tenu ~1 s. Rien pendant le sommeil (yeux fermés) ni sous le doigt.
+  void _scheduleGlance() {
+    _lookTimer?.cancel();
+    _lookTimer = Timer(Duration(milliseconds: 3000 + _rng.nextInt(4000)), () {
+      if (!mounted || _fingerDown) return;
+      if (widget.mood != KiliMood.sleep) {
+        _setLookTarget(
+          Offset(_rng.nextDouble() * 1.6 - 0.8, _rng.nextDouble() * 0.9 - 0.5),
+        );
+      }
+      _lookTimer = Timer(Duration(milliseconds: 700 + _rng.nextInt(700)), () {
+        if (!mounted || _fingerDown) return;
+        _setLookTarget(Offset.zero);
+        _scheduleGlance();
+      });
+    });
+  }
+
+  void _setLookTarget(Offset t) {
+    _lookTarget = Offset(t.dx.clamp(-1.0, 1.0), t.dy.clamp(-1.0, 1.0));
+    if (!_lookTicker.isActive) {
+      _lastTick = Duration.zero;
+      unawaited(_lookTicker.start());
+    }
+  }
+
+  void _onLookTick(Duration elapsed) {
+    final dt = (elapsed - _lastTick).inMicroseconds / 1e6;
+    _lastTick = elapsed;
+    final k = 1 - math.exp(-_lookStiffness * dt);
+    _look += (_lookTarget - _look) * k;
+    if ((_lookTarget - _look).distance < 0.002) {
+      _look = _lookTarget;
+      _lookTicker.stop();
+    }
+    _lookXProp?.value = _look.dx;
+    _lookYProp?.value = _look.dy;
   }
 
   void _attach(KiliController? c) {
@@ -178,6 +299,12 @@ class _KiliMascotState extends ConsumerState<KiliMascot> {
       _moodProp = vmi.number('mood')?..value = widget.mood.index.toDouble();
       _nodProp = vmi.trigger('nod');
       _cheerProp = vmi.trigger('cheer');
+      _lookXProp = vmi.number('lookX');
+      _lookYProp = vmi.number('lookY');
+      // Pas de setState ici : on est dans build ; l'abonnement est différé.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _syncPointerRoute();
+      });
     } on Object catch (e) {
       debugPrint('[Kili] instanciation Rive impossible : $e');
     }
@@ -187,6 +314,13 @@ class _KiliMascotState extends ConsumerState<KiliMascot> {
   @override
   void dispose() {
     _detach(widget.controller);
+    if (_routeAdded) {
+      GestureBinding.instance.pointerRouter.removeGlobalRoute(_onPointer);
+    }
+    _lookTimer?.cancel();
+    _lookTicker.dispose();
+    _lookXProp?.dispose();
+    _lookYProp?.dispose();
     _moodProp?.dispose();
     _nodProp?.dispose();
     _cheerProp?.dispose();
@@ -283,10 +417,14 @@ class _KiliFlutterRigState extends State<_KiliFlutterRig>
       duration: const Duration(milliseconds: 720),
     );
 
-    final dip = Tween<double>(begin: 0, end: 1)
-        .chain(CurveTween(curve: Curves.easeOut));
-    final rise = Tween<double>(begin: 1, end: 0)
-        .chain(CurveTween(curve: Curves.easeInOut));
+    final dip = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).chain(CurveTween(curve: Curves.easeOut));
+    final rise = Tween<double>(
+      begin: 1,
+      end: 0,
+    ).chain(CurveTween(curve: Curves.easeInOut));
     _nodT = TweenSequence<double>(<TweenSequenceItem<double>>[
       TweenSequenceItem(tween: dip, weight: 22),
       TweenSequenceItem(tween: rise, weight: 22),

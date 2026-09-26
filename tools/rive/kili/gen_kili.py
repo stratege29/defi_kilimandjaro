@@ -61,6 +61,7 @@ EYES = {
 LID_TOP = "FFA93A21"
 LID_BOTTOM = "FFD8441E"
 LASH = "FF4E2423"
+SCLERA = "FFFBF4EC"
 
 
 def w(p):
@@ -344,12 +345,13 @@ def rigid_head_mesh():
 # ---------------------------------------------------------------------------
 IDS = {k: nid() for k in [
     "artboard", "style", "sm", "vm", "vmi", "p_mood", "p_nod", "p_cheer",
+    "p_look_x", "p_look_y", "a_iris_L", "a_iris_R", "joy",
     "kili", "shadow", "img_body", "img_tail", "img_head",
     "a_body", "a_tail", "a_head", "zs", "z1", "z2", "z3",
 ]}
 LIDS = {}
 for k in EYES:
-    LIDS[k] = {"lid": nid(), "clip": nid(), "lash": nid()}
+    LIDS[k] = {"lid": nid(), "clip": nid(), "lash": nid(), "iris": nid(), "white": nid()}
 
 lx, ly = -PIVOT[0], TOP - PIVOT[1]   # position locale des images (origine 0,0)
 
@@ -436,11 +438,47 @@ def eye_shape(k):
         d = math.hypot(dx, dy) or 1.0
         rel.append((dx + 6.5 * dx / d, dy + 6.5 * dy / d))
     h = max(p_[1] for p_ in rel) - min(p_[1] for p_ in rel)
-    return (cx, cy), rel, h
+    tight = []
+    for hx, hy in hull:  # contour serré : blanc de l'œil sous l'iris mobile
+        dx, dy = hx - cx, hy - cy
+        d = math.hypot(dx, dy) or 1.0
+        tight.append((dx + 1.0 * dx / d, dy + 1.0 * dy / d))
+    return (cx, cy), rel, h, tight
 
 
 EYE_SHAPES = {k: eye_shape(k) for k in EYE_BOXES}
-EYES = {k: (c, 0, h) for k, (c, _, h) in EYE_SHAPES.items()}
+EYES = {k: (c, 0, h) for k, (c, _, h, _t) in EYE_SHAPES.items()}
+
+# Regard : amplitude max du déplacement de l'iris (px image), par œil. L'œil
+# gauche, vu de trois-quarts, est étroit — il bouge moins en x.
+LOOK_AMP = {"L": (6.0, 7.0), "R": (12.0, 9.0)}
+
+
+def extract_iris(k):
+    """Détoure l'iris (vert + pupille + reflets) de `kili_head.png` en une
+    texture à part, pour pouvoir le déplacer dans l'ouverture de l'œil.
+    Ellipse ajustée sur les pixels verts/sombres de la boîte de l'œil."""
+    x0, y0, x1, y1 = EYE_BOXES[k]
+    px = np.asarray(head_src).astype(int)
+    sub = px[y0:y1, x0:x1]
+    r, g, b = sub[..., 0], sub[..., 1], sub[..., 2]
+    iris = ((g > r + 15) | ((r < 80) & (g < 90) & (b < 90) & (g >= r))) & (sub[..., 3] > 200)
+    ys, xs = np.where(iris)
+    ix0, ix1 = xs.min() + x0, xs.max() + x0
+    iy0, iy1 = ys.min() + y0, ys.max() + y0
+    ecx, ecy = (ix0 + ix1) / 2, (iy0 + iy1) / 2
+    rx, ry = (ix1 - ix0) / 2 + 2.5, (iy1 - iy0) / 2 + 2.5
+    bx0, by0 = int(ecx - rx - 2), int(ecy - ry - 2)
+    bx1, by1 = int(ecx + rx + 3), int(ecy + ry + 3)
+    crop = px[by0:by1, bx0:bx1].astype(np.float32)
+    yy, xx = np.mgrid[by0:by1, bx0:bx1]
+    dist_ = np.sqrt(((xx - ecx) / rx) ** 2 + ((yy - ecy) / ry) ** 2)
+    crop[..., 3] *= np.clip((1.0 - dist_) * rx / 1.5, 0, 1)  # bord doux ~1,5 px
+    Image.fromarray(crop.astype(np.uint8)).save(HERE / f"iris_{k}.png", optimize=True)
+    return (bx0, by0)
+
+
+IRIS_ORIGIN = {k: extract_iris(k) for k in EYE_BOXES}
 
 
 def _points_path(rel, pad):
@@ -454,7 +492,7 @@ def eyes_xml(indent):
     pad = " " * indent
     out = []
     # Premier déclaré = dessiné au-dessus : paupières avant leurs masques.
-    for k, (c, rel, eh) in EYE_SHAPES.items():
+    for k, (c, rel, eh, tight) in EYE_SHAPES.items():
         lx_, ly_ = head.to_local(w(c))
         rot = fmt(-head.world_rot)
         out.append(f'{pad}<Shape x="{fmt(lx_)}" y="{fmt(ly_)}" rotation="{rot}" name="EyeLid{k}">')
@@ -474,6 +512,18 @@ def eyes_xml(indent):
                    f'<GradientStop colorValue="{LID_BOTTOM}" position="1"/></LinearGradient></Fill>')
         out.append(f'{pad}    <Stroke thickness="7" cap="round" join="round" name="Lash"><SolidColor colorValue="{LASH}" name="C"/></Stroke>')
         out.append(f'{pad}    <ClippingShape sourceId="{LIDS[k]["clip"]}" name="Clip"/>')
+        out.append(f"{pad}  </Shape>")
+        # Iris mobile (piloté par le Joystick « Look »), clippé au blanc de l'œil.
+        ox, oy = IRIS_ORIGIN[k]
+        out.append(f'{pad}  <Node name="Iris{k}" id="{LIDS[k]["iris"]}">')
+        out.append(f'{pad}    <Image x="{fmt(ox - c[0])}" y="{fmt(oy - c[1])}" originX="0" originY="0" '
+                   f'assetId="{IDS["a_iris_" + k]}" name="IrisImg{k}">')
+        out.append(f'{pad}      <ClippingShape sourceId="{LIDS[k]["white"]}" name="Clip"/>')
+        out.append(f'{pad}    </Image>')
+        out.append(f'{pad}  </Node>')
+        out.append(f'{pad}  <Shape name="White{k}" id="{LIDS[k]["white"]}">')
+        out += _points_path(tight, pad + "    ")
+        out.append(f'{pad}    <Fill name="Fill"><SolidColor colorValue="{SCLERA}" name="C"/></Fill>')
         out.append(f"{pad}  </Shape>")
         out.append(f'{pad}  <Shape name="EyeMask{k}" id="{LIDS[k]["clip"]}">')
         out += _points_path(rel, pad + "    ")
@@ -715,6 +765,17 @@ lid_track(a, [(0, 0.12, None), (70, 0.12, "in"), (75, 1, "out"), (84, 0.12, None
 eye_anims["eyesHappy"] = a
 
 
+# --- regard : deux plages -1..1 lues par le Joystick « Look » --------------
+look_anims = {}
+for axis, prop in (("X", P_X), ("Y", P_Y)):
+    a = Anim(f"look{axis}", 60, False)
+    for k in EYE_BOXES:
+        amp = LOOK_AMP[k][0 if axis == "X" else 1]
+        ABSOLUTE.add((LIDS[k]["iris"], prop))
+        a.tracks[(LIDS[k]["iris"], prop)] = [(0, -amp, None), (30, 0.0, None), (60, amp, None)]
+    look_anims[axis] = a
+
+
 # ---------------------------------------------------------------------------
 # State machine (pilotée par le view model)
 # ---------------------------------------------------------------------------
@@ -823,21 +884,35 @@ for an in anims.values():
     parts.append(an.xml(full=True))
 for an in eye_anims.values():
     parts.append(abs_track_xml(an))
+for an in look_anims.values():
+    parts.append(an.xml(full=False))
+# Joystick : lookX/lookY (-1..1, y vers le bas) → position des iris.
+parts.append(
+    f'  <Joystick xId="{look_anims["X"].id}" yId="{look_anims["Y"].id}" name="Look" id="{IDS["joy"]}">'
+    f'<DataBindContext sourcePathIds="{IDS["vm"]}-{IDS["p_look_x"]}" propertyKey="299"/>'
+    f'<DataBindContext sourcePathIds="{IDS["vm"]}-{IDS["p_look_y"]}" propertyKey="300"/></Joystick>'
+)
 parts += [
     "</Artboard>",
     f'<ViewModel defaultInstanceId="{IDS["vmi"]}" name="Kili" id="{IDS["vm"]}">',
     f'  <ViewModelPropertyNumber name="mood" id="{IDS["p_mood"]}"/>',
     f'  <ViewModelPropertyTrigger name="nod" id="{IDS["p_nod"]}"/>',
     f'  <ViewModelPropertyTrigger name="cheer" id="{IDS["p_cheer"]}"/>',
+    f'  <ViewModelPropertyNumber name="lookX" id="{IDS["p_look_x"]}"/>',
+    f'  <ViewModelPropertyNumber name="lookY" id="{IDS["p_look_y"]}"/>',
     f'  <ViewModelInstance exports="true" name="Default" id="{IDS["vmi"]}">',
     f'    <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="{IDS["p_mood"]}"/>',
     f'    <ViewModelInstanceTrigger viewModelPropertyId="{IDS["p_nod"]}"/>',
     f'    <ViewModelInstanceTrigger viewModelPropertyId="{IDS["p_cheer"]}"/>',
+    f'    <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="{IDS["p_look_x"]}"/>',
+    f'    <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="{IDS["p_look_y"]}"/>',
     "  </ViewModelInstance>",
     "</ViewModel>",
     f'<ImageAsset file="body.png" name="kili_body" id="{IDS["a_body"]}"/>',
     f'<ImageAsset file="tail.png" name="kili_tail" id="{IDS["a_tail"]}"/>',
     f'<ImageAsset file="head.png" name="kili_head" id="{IDS["a_head"]}"/>',
+    f'<ImageAsset file="iris_L.png" name="kili_iris_l" id="{IDS["a_iris_L"]}"/>',
+    f'<ImageAsset file="iris_R.png" name="kili_iris_r" id="{IDS["a_iris_R"]}"/>',
     "</Rive>",
 ]
 (HERE / "scene.rml").write_text("\n".join(parts) + "\n")
