@@ -1,11 +1,11 @@
 import 'dart:math' as math;
 
-import 'package:defi_kilimandjaro/core/constants/app_assets.dart';
 import 'package:defi_kilimandjaro/core/router/app_router.dart';
 import 'package:defi_kilimandjaro/core/theme/app_colors.dart';
 import 'package:defi_kilimandjaro/core/theme/app_typography.dart';
 import 'package:defi_kilimandjaro/data/repositories/profile_repository.dart';
 import 'package:defi_kilimandjaro/presentation/duel/lobby_controller.dart';
+import 'package:defi_kilimandjaro/presentation/widgets/kili_mascot.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -560,15 +560,12 @@ class _NoOpponentBody extends ConsumerWidget {
       child: Column(
         children: [
           const Spacer(),
-          // Kili qui somnole en attendant — fade-in.
+          // Kili qui somnole en attendant (rig animé : respiration, yeux
+          // clos, « Zzz ») — fade-in. Un tap le réveille le temps d'un
+          // hochement, puis il se rendort.
           FadeTransition(
             opacity: slideCtrl,
-            child: Image.asset(
-              AppAssets.kiliSleep,
-              width: 120,
-              height: 89,
-              fit: BoxFit.contain,
-            ),
+            child: const KiliMascot(mood: KiliMood.sleep),
           ),
           const SizedBox(height: 24),
           FadeTransition(
