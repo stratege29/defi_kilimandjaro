@@ -163,11 +163,13 @@ class _VictoryViewState extends ConsumerState<VictoryView>
       if (mounted) _caurisCtrl.forward();
     });
 
-    // Hochement de Kili une fois la card posée (le spring pop-in dure ~600 ms).
-    // Synchronisé grosso modo avec le « ka-ching » cauris pour un pic de
-    // célébration unique.
+    // Saut de victoire de Kili une fois la card posée (le spring pop-in dure
+    // ~600 ms), synchronisé grosso modo avec le « ka-ching » cauris pour un
+    // pic de célébration unique. En boss, simple hochement : la couronne
+    // flotte au-dessus de sa tête et ne suit pas un saut.
     Future<void>.delayed(const Duration(milliseconds: 550), () {
-      if (mounted) _kili.nod();
+      if (!mounted) return;
+      widget.isBoss ? _kili.nod() : _kili.cheer();
     });
   }
 
@@ -390,13 +392,13 @@ class _VictoryCard extends StatelessWidget {
             // Marge élargie : la couronne déborde de 20 px au-dessus de Kili.
             const SizedBox(height: 26),
           ],
-          // Mascotte Kili — idle + hochement de tête à l'ouverture (pas de
-          // pulsation). En mode boss, surmontée d'une couronne flottante.
+          // Mascotte Kili — humeur joyeuse + saut à l'ouverture (hochement en
+          // boss). En mode boss, surmontée d'une couronne flottante.
           Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.topCenter,
             children: <Widget>[
-              KiliMascot(controller: kili, size: 130),
+              KiliMascot(controller: kili, size: 130, mood: KiliMood.happy),
               if (isBoss)
                 // Décalée vers la gauche : la tête de Kili est à gauche du
                 // centre de sa boîte (la queue occupe la droite).

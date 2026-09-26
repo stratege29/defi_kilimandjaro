@@ -1,4 +1,9 @@
 name: kili
+# Le .riv est écrit directement dans les assets Flutter (assets/kili/kili.riv).
+output:
+  dir: ../../../assets/kili
 logs:
   file: build/rive.log
   problems: build/problems.log
+exclude:
+  - gen_kili.py
